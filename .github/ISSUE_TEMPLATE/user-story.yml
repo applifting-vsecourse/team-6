@@ -1,7 +1,7 @@
 name: User story
 description: Describe a feature from the user's point of view
-title: "[Story] "
-labels: ["user story"]
+title: '[Story] '
+labels: ['user story']
 body:
   - type: input
     id: role
