@@ -1,0 +1,47 @@
+name: User story
+description: Describe a feature from the user's point of view
+title: "[Story] "
+labels: ["user story"]
+body:
+  - type: input
+    id: role
+    attributes:
+      label: As a…
+      description: Who is this for?
+      placeholder: registered user
+    validations:
+      required: true
+  - type: input
+    id: goal
+    attributes:
+      label: I want to…
+      description: What should they be able to do?
+      placeholder: delete my own quack
+    validations:
+      required: true
+  - type: input
+    id: benefit
+    attributes:
+      label: So that…
+      description: Why does it matter? What value does it bring?
+      placeholder: I can remove posts I no longer want public
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Concrete, testable conditions for "done".
+      value: |
+        - [ ]
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Design links, technical hints, out-of-scope items, dependencies. Optional.
+    validations:
+      required: false
