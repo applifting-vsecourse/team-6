@@ -3,11 +3,17 @@ name: Claude review
 on:
   pull_request:
     types: [opened]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: PR number to review
+        required: true
 
 jobs:
   review:
     # skip big PRs so one review can't eat the subscription quota (expressions can't add, so cap each side)
-    if: github.event.pull_request.additions <= 500 && github.event.pull_request.deletions <= 500 && github.event.pull_request.changed_files <= 30
+    # a manual run skips the size cap on purpose
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.additions <= 500 && github.event.pull_request.deletions <= 500 && github.event.pull_request.changed_files <= 30)
     timeout-minutes: 10
     runs-on: ubuntu-latest
     permissions:
@@ -15,6 +21,8 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.pr && format('refs/pull/{0}/merge', inputs.pr) || '' }}
 
       - uses: anthropics/claude-code-action@v1
         with:
@@ -22,6 +30,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: |
             REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
+            PR NUMBER: ${{ github.event.pull_request.number || inputs.pr }}
             Review this PR against CLAUDE.md and DESIGN.md. Focus on bugs, security and missing tests. Post your findings as a PR comment.
           claude_args: '--max-turns 15 --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*)"'
