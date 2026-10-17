@@ -33,7 +33,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PROJECT_AUTOMATION_TOKEN }}
         run: |
-          gh api graphql --paginate -f query='query($endCursor:String){organization(login:"applifting-vsecourse"){projectV2(number:18){items(first:100,after:$endCursor){pageInfo{hasNextPage endCursor} nodes{status:fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}} content{__typename ... on Issue{number state} ... on PullRequest{number state}}}}}}}' --jq '.data.organization.projectV2.items.nodes[] | "\(.status.name // "none") | \(.content.__typename // "draft") \(.content.number // "") \(.content.state // "")"' | sort | uniq -c
+          gh api graphql -f query='query{organization(login:"applifting-vsecourse"){projectV2(number:18){field(name:"Status"){... on ProjectV2SingleSelectField{options{name}}}}}}' --jq '.data.organization.projectV2.field.options[].name'
       - name: Label PRs of cards in Ready for Code Review
         shell: bash
         env:
