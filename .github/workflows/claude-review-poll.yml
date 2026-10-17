@@ -3,8 +3,6 @@ name: Claude review board poll
 # Projects v2 has no workflow event for moving a card, so we poll the board.
 # Scheduled workflows only run from the default branch.
 on:
-  push:
-    branches: [ci/claude-review-board-poll]
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
@@ -28,16 +26,16 @@ jobs:
     timeout-minutes: 5
     steps:
       # No checkout: this job never touches PR code, only PR numbers and labels.
-      - name: Label PRs of cards in Ready for Code Review
+      - name: Label PRs of cards in Ready for code review
         shell: bash
         env:
           # GITHUB_TOKEN cannot read org projects, and labels it adds do not trigger other workflows.
           GH_TOKEN: ${{ secrets.PROJECT_AUTOMATION_TOKEN }}
           PROJECT_OWNER: ${{ github.repository_owner }}
           PROJECT_NUMBER: 18
-          COLUMN: Product backlog
+          COLUMN: Ready for code review
           LABEL: claude-review
-          DRY_RUN: true
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
         run: |
           set -euo pipefail
           # Issue cards: their open linked PRs. PR cards: the PR itself. Only PRs of this repo.
