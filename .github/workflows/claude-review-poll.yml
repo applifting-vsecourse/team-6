@@ -28,6 +28,13 @@ jobs:
     timeout-minutes: 5
     steps:
       # No checkout: this job never touches PR code, only PR numbers and labels.
+      - name: debug raw response
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_AUTOMATION_TOKEN }}
+        run: |
+          gh api graphql -f query='query{organization(login:"applifting-vsecourse"){projectV2(number:18){title items(first:3){totalCount}}}}' || true
+          gh api graphql -f query='query{viewer{login}}' || true
       - name: Label PRs of cards in Ready for Code Review
         shell: bash
         env:
