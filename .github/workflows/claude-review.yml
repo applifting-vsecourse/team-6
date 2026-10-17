@@ -8,7 +8,11 @@ jobs:
   review:
     # runs on open, or when the `claude-review` label is added (a new push removes it, see the reset job)
     # skip big PRs so one review can't eat the subscription quota (expressions can't add, so cap each side)
-    if: (github.event.action == 'opened' || github.event.label.name == 'claude-review') && github.event.pull_request.additions <= 500 && github.event.pull_request.deletions <= 500 && github.event.pull_request.changed_files <= 30
+    if: github.event.pull_request.head.repo.full_name == github.repository && (github.event.action == 'opened' || github.event.label.name == 'claude-review') && github.event.pull_request.additions <= 500 && github.event.pull_request.deletions <= 500 && github.event.pull_request.changed_files <= 30
+    # a newer review (new commit) replaces a running one that is already stale
+    concurrency:
+      group: claude-review-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
     timeout-minutes: 10
     runs-on: ubuntu-latest
     permissions:
@@ -29,7 +33,7 @@ jobs:
 
   reset:
     # a new commit makes the review stale; dropping the label lets the board poller request a fresh one
-    if: github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, 'claude-review')
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, 'claude-review')
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
