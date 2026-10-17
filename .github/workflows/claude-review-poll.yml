@@ -28,12 +28,6 @@ jobs:
     timeout-minutes: 5
     steps:
       # No checkout: this job never touches PR code, only PR numbers and labels.
-      - name: debug statuses
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.PROJECT_AUTOMATION_TOKEN }}
-        run: |
-          gh api graphql -f query='query{organization(login:"applifting-vsecourse"){projectV2(number:18){field(name:"Status"){... on ProjectV2SingleSelectField{options{name}}}}}}' --jq '.data.organization.projectV2.field.options[].name'
       - name: Label PRs of cards in Ready for Code Review
         shell: bash
         env:
@@ -41,7 +35,7 @@ jobs:
           GH_TOKEN: ${{ secrets.PROJECT_AUTOMATION_TOKEN }}
           PROJECT_OWNER: ${{ github.repository_owner }}
           PROJECT_NUMBER: 18
-          COLUMN: Ready for Code Review
+          COLUMN: Product backlog
           LABEL: claude-review
           DRY_RUN: true
         run: |
