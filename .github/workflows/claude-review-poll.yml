@@ -28,6 +28,12 @@ jobs:
     timeout-minutes: 5
     steps:
       # No checkout: this job never touches PR code, only PR numbers and labels.
+      - name: debug statuses
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_AUTOMATION_TOKEN }}
+        run: |
+          gh api graphql --paginate -f query='query($endCursor:String){organization(login:"applifting-vsecourse"){projectV2(number:18){items(first:100,after:$endCursor){pageInfo{hasNextPage endCursor} nodes{status:fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}} content{__typename ... on Issue{number state} ... on PullRequest{number state}}}}}}}' --jq '.data.organization.projectV2.items.nodes[] | "\(.status.name // "none") | \(.content.__typename // "draft") \(.content.number // "") \(.content.state // "")"' | sort | uniq -c
       - name: Label PRs of cards in Ready for Code Review
         shell: bash
         env:
