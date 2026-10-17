@@ -33,8 +33,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PROJECT_AUTOMATION_TOKEN }}
         run: |
-          gh api graphql -f query='query{organization(login:"applifting-vsecourse"){projectV2(number:18){title items(first:3){totalCount}}}}' || true
-          gh api graphql -f query='query{viewer{login}}' || true
+          gh api graphql -f query='query{organization(login:"applifting-vsecourse"){projectsV2(first:30){totalCount nodes{number title}}}}' || true
+          gh api graphql -f query='query{viewer{projectsV2(first:30){nodes{number title}}}}' || true
       - name: Label PRs of cards in Ready for Code Review
         shell: bash
         env:
