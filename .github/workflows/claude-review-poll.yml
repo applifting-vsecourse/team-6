@@ -3,8 +3,6 @@ name: Claude review board poll
 # Projects v2 has no workflow event for moving a card, so we poll the board.
 # Scheduled workflows only run from the default branch.
 on:
-  push:
-    branches: [ci/claude-review-board-poll]
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
@@ -28,13 +26,6 @@ jobs:
     timeout-minutes: 5
     steps:
       # No checkout: this job never touches PR code, only PR numbers and labels.
-      - name: debug raw response
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.PROJECT_AUTOMATION_TOKEN }}
-        run: |
-          gh api graphql -f query='query{organization(login:"applifting-vsecourse"){projectsV2(first:30){totalCount nodes{number title}}}}' || true
-          gh api graphql -f query='query{viewer{projectsV2(first:30){nodes{number title}}}}' || true
       - name: Label PRs of cards in Ready for Code Review
         shell: bash
         env:
@@ -44,7 +35,7 @@ jobs:
           PROJECT_NUMBER: 18
           COLUMN: Ready for Code Review
           LABEL: claude-review
-          DRY_RUN: true
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
         run: |
           set -euo pipefail
           # Issue cards: their open linked PRs. PR cards: the PR itself. Only PRs of this repo.
