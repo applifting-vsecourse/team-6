@@ -3,6 +3,8 @@ name: Claude review board poll
 # Projects v2 has no workflow event for moving a card, so we poll the board.
 # Scheduled workflows only run from the default branch.
 on:
+  push:
+    branches: [ci/claude-review-board-poll]
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
@@ -35,7 +37,7 @@ jobs:
           PROJECT_NUMBER: 18
           COLUMN: Ready for Code Review
           LABEL: claude-review
-          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+          DRY_RUN: true
         run: |
           set -euo pipefail
           # Issue cards: their open linked PRs. PR cards: the PR itself. Only PRs of this repo.
