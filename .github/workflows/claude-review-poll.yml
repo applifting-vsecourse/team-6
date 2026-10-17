@@ -1,0 +1,70 @@
+name: Claude review board poll
+
+# Projects v2 has no workflow event for moving a card, so we poll the board.
+# Scheduled workflows only run from the default branch.
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Log what would be labelled; change nothing
+        type: boolean
+        default: true
+
+# One run at a time so a slow run never labels the same PR twice.
+concurrency:
+  group: claude-review-poll
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # No checkout: this job never touches PR code, only PR numbers and labels.
+      - name: Label PRs of cards in Ready for code review
+        shell: bash
+        env:
+          # GITHUB_TOKEN cannot read org projects, and labels it adds do not trigger other workflows.
+          GH_TOKEN: ${{ secrets.PROJECT_AUTOMATION_TOKEN }}
+          PROJECT_OWNER: ${{ github.repository_owner }}
+          PROJECT_NUMBER: 18
+          COLUMN: Ready for code review
+          LABEL: claude-review
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          # Issue cards: their open linked PRs. PR cards: the PR itself. Only PRs of this repo.
+          prs=$(gh api graphql --paginate \
+            -f query='query($owner:String!,$number:Int!,$endCursor:String){
+              organization(login:$owner){projectV2(number:$number){
+                items(first:100,after:$endCursor){
+                  pageInfo{hasNextPage endCursor}
+                  nodes{
+                    status:fieldValueByName(name:"Status"){... on ProjectV2ItemFieldSingleSelectValue{name}}
+                    content{__typename
+                      ... on PullRequest{number repository{nameWithOwner}}
+                      ... on Issue{closedByPullRequestsReferences(first:10){nodes{number repository{nameWithOwner}}}}
+                    }}}}}}' \
+            -f owner="$PROJECT_OWNER" -F number="$PROJECT_NUMBER" \
+            --jq '.data.organization.projectV2.items.nodes[]
+              | select(.status.name == env.COLUMN)
+              | (.content // empty)
+              | (if .__typename == "PullRequest" then [.] else .closedByPullRequestsReferences.nodes end)[]
+              | select(.repository.nameWithOwner == env.GITHUB_REPOSITORY)
+              | .number' | sort -un)
+
+          for pr in $prs; do
+            read -r state draft labeled < <(gh api "repos/$GITHUB_REPOSITORY/pulls/$pr" \
+              --jq '[.state, .draft, any(.labels[]; .name == env.LABEL)] | @tsv')
+            if [ "$state" != open ] || [ "$draft" != false ] || [ "$labeled" != false ]; then
+              echo "PR #$pr: skip (state=$state draft=$draft labeled=$labeled)"
+              continue
+            fi
+            echo "PR #$pr: add label $LABEL"
+            [ "$DRY_RUN" = true ] || gh api "repos/$GITHUB_REPOSITORY/issues/$pr/labels" -f "labels[]=$LABEL" --silent
+          done
