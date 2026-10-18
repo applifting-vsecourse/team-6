@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 
 import { HeaderLogo } from "@/components/Header/HeaderLogo"
 import { HeaderNav } from "@/components/Header/HeaderNav"
+import { LanguageSwitcher } from "@/components/Header/LanguageSwitcher"
 import { ThemeSwitcher } from "@/components/Header/ThemeSwitcher"
 
 type HeaderProps = {
@@ -17,6 +18,7 @@ export function Header({ userMenu }: HeaderProps) {
         <HeaderLogo />
         <HeaderNav />
         <div className="ml-auto flex items-center gap-2">
+          <LanguageSwitcher />
           <ThemeSwitcher />
           {userMenu}
         </div>

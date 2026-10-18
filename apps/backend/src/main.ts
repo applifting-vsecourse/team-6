@@ -6,6 +6,7 @@ import * as express from 'express';
 import { AppModule } from './app.module';
 import { BetterAuth } from './shared/auth/providers/better-auth.provider';
 import { Config } from './shared/config/config.service';
+import { createValidationPipe } from './shared/errors/validation.pipe';
 
 /**
  * Main application entry point
@@ -35,6 +36,9 @@ async function main(): Promise<void> {
 
   // Configure API prefix for all routes
   app.setGlobalPrefix('api');
+
+  // Validation errors carry field + constraint codes the frontend translates
+  app.useGlobalPipes(createValidationPipe());
 
   // Setup Swagger API documentation at /api/docs
   const swaggerConfig = new DocumentBuilder()

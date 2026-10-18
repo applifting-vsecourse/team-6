@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
 import { Header } from "@/components/Header/Header"
@@ -13,17 +14,18 @@ export const Route = createFileRoute("/")({
 })
 
 function LandingPage() {
+  const { t } = useTranslation()
   const { user } = useSession()
 
   return (
     <>
-      <Seo title="Welcome" />
+      <Seo title={t("landing.seoTitle")} />
       <Header userMenu={<HeaderMenu />} />
       <main className="min-h-svh">
         <section className="mx-auto w-full max-w-2xl px-4 pt-16 pb-12 text-center">
           <h1 className="text-4xl font-bold tracking-tight text-balance sm:text-5xl">Kvintet</h1>
           <p className="mx-auto mt-4 max-w-md text-lg text-pretty text-muted-foreground">
-            Forms groups of up to five students.
+            {t("landing.tagline")}
           </p>
 
           {/* The call to action depends on who is asking: no point offering an
@@ -42,14 +44,14 @@ function LandingPage() {
                   asChild
                   size="lg"
                 >
-                  <Link to={ROUTES.signup}>Create an account</Link>
+                  <Link to={ROUTES.signup}>{t("landing.createAccount")}</Link>
                 </Button>
                 <Button
                   asChild
                   size="lg"
                   variant="outline"
                 >
-                  <Link to={ROUTES.login}>Sign in</Link>
+                  <Link to={ROUTES.login}>{t("auth.signIn")}</Link>
                 </Button>
               </>
             )}

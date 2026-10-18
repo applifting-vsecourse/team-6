@@ -1,0 +1,86 @@
+{
+  "auth": {
+    "confirmPassword": "Confirm password",
+    "email": "Email",
+    "emailPlaceholder": "e.g. john@doe.com",
+    "haveAccount": "Already have an account?",
+    "name": "Name",
+    "noAccount": "No account?",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signInDescription": "Welcome back to Kvintet.",
+    "signOut": "Sign out",
+    "signUp": "Sign up",
+    "signUpDescription": "Create your Kvintet account.",
+    "userMenu": "User menu",
+    "username": "Username",
+    "validation": {
+      "emailInvalid": "Invalid email",
+      "emailRequired": "Email is required",
+      "nameRequired": "Name is required",
+      "passwordConfirmationRequired": "Password confirmation is required",
+      "passwordMin_one": "Password must be at least {{count}} character",
+      "passwordMin_other": "Password must be at least {{count}} characters",
+      "passwordRequired": "Password is required",
+      "passwordsMatch": "Passwords must match",
+      "usernameRequired": "Username is required"
+    }
+  },
+  "common": {
+    "close": "Close",
+    "goHome": "Go home",
+    "language": "Language",
+    "reload": "Reload"
+  },
+  "errors": {
+    "auth": {
+      "EMAIL_NOT_VERIFIED": "Verify your email first.",
+      "INVALID_EMAIL": "This email is not valid.",
+      "INVALID_EMAIL_OR_PASSWORD": "Incorrect email or password.",
+      "INVALID_USERNAME": "This username is not valid.",
+      "INVALID_USERNAME_OR_PASSWORD": "Incorrect username or password.",
+      "PASSWORD_TOO_LONG": "This password is too long.",
+      "PASSWORD_TOO_SHORT": "This password is too short.",
+      "USERNAME_IS_ALREADY_TAKEN": "This username is already taken.",
+      "USERNAME_TOO_SHORT": "This username is too short.",
+      "USER_ALREADY_EXISTS": "An account with this email already exists.",
+      "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "An account with this email already exists."
+    },
+    "bad_request": "The request was not valid.",
+    "conflict": "This conflicts with existing data.",
+    "forbidden": "You don't have access to this.",
+    "internal_error": "Something went wrong on our side. Please try again.",
+    "not_found": "We couldn't find what you were looking for.",
+    "pageNotFound": "Page not found",
+    "pageNotFoundDescription": "The page you're looking for doesn't exist or has been moved.",
+    "signInFailed": "Sign in failed",
+    "signUpFailed": "Sign up failed",
+    "somethingWentWrong": "Something went wrong",
+    "unauthorized": "You need to sign in first.",
+    "unexpected": "An unexpected error occurred.",
+    "validation_failed": "Some of the entered values are not valid."
+  },
+  "landing": {
+    "createAccount": "Create an account",
+    "seoTitle": "Welcome",
+    "tagline": "Find your quintet."
+  },
+  "overview": {
+    "title": "Overview"
+  },
+  "theme": {
+    "dark": "Dark",
+    "light": "Light",
+    "system": "System",
+    "toggle": "Toggle theme"
+  },
+  "validation": {
+    "invalid": "Invalid value",
+    "isEmail": "Invalid email",
+    "isNotEmpty": "Value is required",
+    "isString": "Value must be text",
+    "maxLength": "Value is too long",
+    "minLength": "Value is too short",
+    "whitelistValidation": "Unexpected field"
+  }
+}
