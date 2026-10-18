@@ -1,11 +1,11 @@
-# Quacker — starter template
+# Kvintet
 
-Full-stack teaching template: pnpm monorepo with two apps.
+Pilot app that forms groups of up to five students. pnpm monorepo with two apps.
 
 - `apps/backend` — NestJS + Prisma + Postgres. Auth: BetterAuth (mounted at `/api/auth/*`, treat as a black box). API docs: Swagger at `/api/docs`.
 - `apps/frontend` — React + Vite + TanStack Router/Query, Tailwind + shadcn/ui, `ky` + `zod` API client. Feature folders under `src/features/`.
 
-The worked example is the quack feed: `Quack` model → seed → repository → service → `GET`/`POST /api/quacks` (DTO-validated, author taken from the session) → zod schema → TanStack Query → list page + post form. Copy its pattern for new features.
+Backend modules and frontend features follow the layering in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (principle 5). Until the first real module (`profile`) lands, there is no worked example in the repo.
 
 **Before writing or changing any UI, read [`DESIGN.md`](DESIGN.md).** It is a contract, not a suggestion — it exists to stop generated screens drifting into generic nested cards.
 
