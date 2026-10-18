@@ -2,7 +2,7 @@
 
 Implementation decisions for the Kvintet pilot, so that generated code stays consistent. **What a feature must do lives in the user stories (GitHub issues), not here.** This file holds only the decisions the stories leave open. When a decision here changes, update this file in the same PR.
 
-The stack is given: NestJS + Prisma + Postgres, React + Vite + TanStack Router/Query + shadcn/ui, BetterAuth. The repo is the Quacker starter template; the product built on it is Kvintet. Follow the quack example for layering and DTO validation (see principle 5); its domain is a placeholder. Treat BetterAuth as a black box, with one exception: the additional fields below (sign-up consent) and the existing `role`.
+The stack is given: NestJS + Prisma + Postgres, React + Vite + TanStack Router/Query + shadcn/ui, BetterAuth. The repo started as the Quacker starter template (its example domain has been removed); the product built on it is Kvintet. Layering and DTO validation follow principle 5; the first real module (`profile`) becomes the reference implementation. Treat BetterAuth as a black box, with one exception: the additional fields below (sign-up consent) and the existing `role`.
 
 ## 1. Constraints and what follows from them
 

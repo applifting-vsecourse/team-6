@@ -16,7 +16,7 @@ body:
     attributes:
       label: I want to…
       description: What should they be able to do?
-      placeholder: delete my own quack
+      placeholder: delete my own offer
     validations:
       required: true
   - type: input
