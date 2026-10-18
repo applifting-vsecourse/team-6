@@ -8,8 +8,8 @@ import { betterAuthCoreConfig } from '@/shared/auth/config/better-auth.config';
 import { Config } from '@/shared/config/config.service';
 import { Inject, Provider } from '@nestjs/common';
 import { betterAuth } from 'better-auth';
-import { APIError } from 'better-auth/api';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
+import { APIError } from 'better-auth/api';
 
 const createAuth = (
   prismaService: PrismaService,
