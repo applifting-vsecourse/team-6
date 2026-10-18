@@ -29,7 +29,14 @@ function LandingPage() {
           {/* The call to action depends on who is asking: no point offering an
               account to someone who already has one. */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            {!user && (
+            {user ? (
+              <Button
+                asChild
+                size="lg"
+              >
+                <Link to={ROUTES.overview}>Go to overview</Link>
+              </Button>
+            ) : (
               <>
                 <Button
                   asChild
