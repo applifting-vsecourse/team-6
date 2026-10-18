@@ -28,6 +28,10 @@ Need a control that isn't in `src/components/ui/`? Add it with `pnpm dlx shadcn@
 
 The CLI puts `shadow-xs`/`shadow-sm` on inputs, textareas and cards. [`DESIGN.md`](DESIGN.md) keeps shadows for things that genuinely float — dialogs, dropdowns, toasts. Strip them.
 
+### UI text uses translation keys
+
+Never hardcode user-facing text (labels, placeholders, `aria-label`s, page titles, validation and error messages). Use `t("group.key")` from `react-i18next` and add the key to **every** file in `apps/frontend/src/i18n/locales/` — a test fails if the files differ. Zod messages go through a schema factory that takes `t`. Format dates and numbers with `formatDate`/`formatNumber` from `src/lib/date.ts`, never `date-fns` or hand-built strings. Server errors are shown with `getErrorMessage` (`src/lib/errorMessage.ts`), never `error.message`; the backend returns stable codes, not display text. The brand name "Kvintet" stays literal.
+
 ### The app is already running
 
 Assume the dev servers are up. If something is listening on the app's ports, that is this application: use it. Don't start a second instance, don't restart it, don't run `pnpm dev`.

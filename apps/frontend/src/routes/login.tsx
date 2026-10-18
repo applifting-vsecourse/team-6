@@ -1,10 +1,12 @@
 import { useState } from "react"
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
 import { ROUTES } from "@/app/routes"
 import { AuthLayout } from "@/components/AuthLayout"
 import { Seo } from "@/components/Seo"
+import { getErrorMessage } from "@/lib/errorMessage"
 
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
 import { SignInForm } from "@/features/auth/components/SignInForm"
@@ -26,6 +28,7 @@ export const Route = createFileRoute("/login")({
 })
 
 function LoginPage() {
+  const { t } = useTranslation()
   const { from } = Route.useSearch()
   const redirectTo = from ? decodeRedirectUri(from) : ROUTES.home
   const navigate = useNavigate()
@@ -38,24 +41,24 @@ function LoginPage() {
       await signIn.mutateAsync(values)
       await navigate({ to: redirectTo })
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Sign in failed")
+      setErrorMessage(getErrorMessage(error, "errors.signInFailed"))
     }
   }
 
   return (
     <>
-      <Seo title="Sign in" />
+      <Seo title={t("auth.signIn")} />
       <AuthLayout
-        title="Sign in"
-        description="Welcome back to Kvintet."
+        title={t("auth.signIn")}
+        description={t("auth.signInDescription")}
         footer={
           <>
-            No account?{" "}
+            {t("auth.noAccount")}{" "}
             <Link
               to={ROUTES.signup}
               className="font-medium text-foreground underline underline-offset-4"
             >
-              Sign up
+              {t("auth.signUp")}
             </Link>
           </>
         }
