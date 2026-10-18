@@ -42,7 +42,7 @@ Pilot scale: ≤ 500 users, tens online at once. One backend container and one P
 Shared (`src/shared/…`):
 
 - **Guards:** `AuthenticatedUserGuard` (signed in), `OnboardedGuard` (profile complete), `AdminGuard` (`role === 'admin'`), `MemberGuard` (caller is in a kvintet; chat additionally requires it to be `ACTIVE`).
-- **Errors:** a global exception filter returns `{ code, message }` with a stable `code`.
+- **Errors:** a global exception filter (`shared/errors`) returns `{ statusCode, code, message }` with a stable `code`; the English `message` is for logs and developers, never shown to users. Validation failures (global `ValidationPipe`) use `code: "validation_failed"` plus `errors: [{ field, code }]`, where `code` is the failed class-validator constraint (`isNotEmpty`, `maxLength`, …). The frontend translates by code.
 
 A transaction never spans repositories of different modules. When one use case must write data of two modules, the module that owns the use case writes both, through its own repository (see Leave).
 
@@ -154,6 +154,7 @@ Routes (TanStack Router, file-based). Guards are pathless layout routes (`_Authe
 - Features live in `src/features/{account,profile,board,kvintet,chat,admin,legal}`. Business decisions stay in hooks and on the server, not in components.
 - Filters that change the list (board category) live in the URL search params.
 - Polling uses TanStack Query `refetchInterval` with `refetchIntervalInBackground: false`: chat 5 s, my kvintet (vote status) 10 s. Chat appends the result of `after=<last id>` to the cache.
+- **Localization:** react-i18next with one JSON file per language in `src/i18n/locales`, registered in `src/i18n/index.ts` (English and Czech). The language comes from `localStorage`, then the browser, falling back to English; the header switcher changes it. All UI text uses `t()` keys, dates and numbers go through `lib/date.ts`, and server errors are translated by `lib/errorMessage.ts` from their `code` (backend codes under `errors.*`, BetterAuth codes under `errors.auth.*`, validation constraints under `validation.*`). Backend text that users see (emails) is not localized yet.
 - UI rules are in [`DESIGN.md`](../DESIGN.md).
 
 ## 5. Testing
