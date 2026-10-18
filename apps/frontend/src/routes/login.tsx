@@ -20,10 +20,11 @@ const loginSearchParamsSchema = z.object({
 export const Route = createFileRoute("/login")({
   component: LoginPage,
   validateSearch: loginSearchParamsSchema,
-  loader: async ({ context }) => {
+  loaderDeps: ({ search }) => ({ from: search.from }),
+  loader: async ({ context, deps }) => {
     const session = await context.queryClient.ensureQueryData(authSessionQueryOptions())
     if (!session) return
-    throw redirect({ to: postSignInPath() })
+    throw redirect({ to: postSignInPath(deps.from) })
   },
 })
 
