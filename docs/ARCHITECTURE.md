@@ -90,17 +90,17 @@ erDiagram
 
 ### Critical flows
 
-Each runs in one Prisma `$transaction` that first locks the parent row (`SELECT … FOR UPDATE` through `$queryRaw`), so two concurrent requests cannot both take the last spot. Quote reserved words and table names in raw SQL. Every flow gets an integration test against a real Postgres.
+Each runs in one Prisma `$transaction` that first locks the parent row (`SELECT … FOR UPDATE` through `$queryRaw`), so two concurrent requests cannot both take the last spot. If the locked row no longer exists, the flow returns 404, never a foreign-key error. Quote reserved words and table names in raw SQL. Every flow gets an integration test against a real Postgres.
 
 - **Claim a spot** — lock the offer; reject if it already started, is full, or the caller is its author; insert the claim (the PK rejects a second claim by the same user). Capacity is fixed after posting (no edit endpoint in the MVP).
 - **Release a spot** — lock the offer; reject if it already started; delete the claim.
-- **Join a proposal** — lock the kvintet; reject unless `FORMING` and under 5 members; insert the member (the unique `userId` rejects "already in a kvintet"); at 5 members set `ACTIVE` and `activatedAt`.
+- **Join a proposal** — lock the kvintet; return 404 if it is gone (a concurrent Leave may have deleted the empty kvintet); reject unless `FORMING` and under 5 members; insert the member (the unique `userId` rejects "already in a kvintet"); at 5 members set `ACTIVE` and `activatedAt`.
 - **Start a proposal** — insert a `FORMING` kvintet and the caller's membership in one transaction.
 - **Vote** — lock the kvintet; reject unless `FORMING` with 3–4 members; insert the vote; when votes equal members, set `ACTIVE`. A member who joins later has no vote yet, so unanimity holds by construction.
 - **Leave** — lock the kvintet; delete the member (the vote goes with it); in an `ACTIVE` kvintet insert a `SYSTEM` message, written by the `kvintet` repository; in a `FORMING` kvintet, if it now has 3 or more members and every member has voted, set `ACTIVE` (otherwise nobody could ever vote again); delete the kvintet if it is empty. An `ACTIVE` kvintet that drops below 3 members stays active; nothing else happens.
 - **Delete account** — one `account` service call: run the Leave flow if the user is in a kvintet, then delete the user. Other tables go by cascade, as story "Delete my account" asks: offers the user posted disappear together with the claims on them. Do not rely on the cascade alone for the membership, because it skips the Leave rules and leaves empty kvintets in the feed.
 - **Board listing** — `startsAt > now()` and claim count `< capacity`, filtered by category. "Full" and "past" are never stored.
-- **Chat** — only members of an `ACTIVE` kvintet can read or write. Clients poll with `after=<last message id>`; the server returns messages with `id > after` ordered by `id`. A request without a cursor returns the last 50. Sequence ids are assigned at insert, not at commit, so every message insert (user or `SYSTEM`) first locks the `kvintet` row. That makes ids commit in order per kvintet and a poll can never skip a message. Message bodies have a maximum length in the DTO and are rendered as text, never HTML.
+- **Chat** — only members of an `ACTIVE` kvintet can read or write. Clients poll with `after=<last message id>`; the server returns messages with `id > after` ordered by `id`. A request without a cursor returns the last 50; with a cursor it returns at most 100 (`after=0` must not return the whole history), and the client keeps polling until a page comes back shorter than the limit. Sending a message locks the `kvintet` row and then re-checks that the caller is still a member and the kvintet is `ACTIVE`; the guard alone is not enough, because a concurrent Leave can pass it. Sequence ids are assigned at insert, not at commit, so every message insert (user or `SYSTEM`) first locks the `kvintet` row. That makes ids commit in order per kvintet and a poll can never skip a message. Message bodies have a maximum length in the DTO and are rendered as text, never HTML.
 
 ### Matching
 
@@ -109,6 +109,8 @@ Each runs in one Prisma `$transaction` that first locks the parent row (`SELECT 
 Scope: matching **ranks and filters the proposal feed** and nothing else. Users start proposals themselves; the algorithm never creates groups or assigns people.
 
 `GET /api/kvintets/feed` loads the caller's profile and every `FORMING` kvintet with 1–4 members together with their profiles, filters by `isEligible`, scores, drops results under the threshold and sorts. Nothing is precomputed. A caller who is already in a kvintet gets `409` (the client redirects to `/kvintet`), so the feed never lists the caller's own kvintet.
+
+Eligibility is advisory: it ranks and filters what the feed shows, but joining does not re-check it, so any onboarded user may join any open proposal by id. The hard rules (size, one kvintet per user) are enforced in the Join flow.
 
 The feed shows each member's `position` and tags, as the story requires. In a cohort of a few hundred, rare combinations could identify a person; this is an accepted risk for the pilot. A controller test compares the whole response shape against an allow-list, so a new field cannot leak by accident.
 
