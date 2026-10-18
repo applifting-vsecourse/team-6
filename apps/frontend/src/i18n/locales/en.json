@@ -62,8 +62,12 @@
   },
   "landing": {
     "createAccount": "Create an account",
+    "openOverview": "Open overview",
     "seoTitle": "Welcome",
     "tagline": "Find your quintet."
+  },
+  "onboarding": {
+    "title": "Onboarding"
   },
   "overview": {
     "title": "Overview"
