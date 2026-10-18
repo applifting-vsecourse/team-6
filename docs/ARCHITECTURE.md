@@ -2,7 +2,7 @@
 
 Implementation decisions for the Kvintet pilot, so that generated code stays consistent. **What a feature must do lives in the user stories (GitHub issues), not here.** This file holds only the decisions the stories leave open. When a decision here changes, update this file in the same PR.
 
-The stack is given: NestJS + Prisma + Postgres, React + Vite + TanStack Router/Query + shadcn/ui, BetterAuth. The quack example in the repo is a placeholder for the code layout, not for the domain.
+The stack is given: NestJS + Prisma + Postgres, React + Vite + TanStack Router/Query + shadcn/ui, BetterAuth. The repo is the Quacker starter template; the product built on it is Kvintet. Follow the quack example for layering and DTO validation (see principle 5); its domain is a placeholder. Treat BetterAuth as a black box, with one exception: the additional fields below (sign-up consent) and the existing `role`.
 
 ## 1. Constraints and what follows from them
 
@@ -92,14 +92,15 @@ erDiagram
 
 Each runs in one Prisma `$transaction` that first locks the parent row (`SELECT … FOR UPDATE` through `$queryRaw`), so two concurrent requests cannot both take the last spot. Quote reserved words and table names in raw SQL. Every flow gets an integration test against a real Postgres.
 
-- **Claim a spot** — lock the offer; reject if it already started or is full; insert the claim (the PK rejects a second claim by the same user).
+- **Claim a spot** — lock the offer; reject if it already started, is full, or the caller is its author; insert the claim (the PK rejects a second claim by the same user). Capacity is fixed after posting (no edit endpoint in the MVP).
+- **Release a spot** — lock the offer; reject if it already started; delete the claim.
 - **Join a proposal** — lock the kvintet; reject unless `FORMING` and under 5 members; insert the member (the unique `userId` rejects "already in a kvintet"); at 5 members set `ACTIVE` and `activatedAt`.
 - **Start a proposal** — insert a `FORMING` kvintet and the caller's membership in one transaction.
 - **Vote** — lock the kvintet; reject unless `FORMING` with 3–4 members; insert the vote; when votes equal members, set `ACTIVE`. A member who joins later has no vote yet, so unanimity holds by construction.
 - **Leave** — lock the kvintet; delete the member (the vote goes with it); in an `ACTIVE` kvintet insert a `SYSTEM` message, written by the `kvintet` repository; in a `FORMING` kvintet, if it now has 3 or more members and every member has voted, set `ACTIVE` (otherwise nobody could ever vote again); delete the kvintet if it is empty. An `ACTIVE` kvintet that drops below 3 members stays active; nothing else happens.
-- **Delete account** — one `account` service call: run the Leave flow if the user is in a kvintet, then delete the user. Other tables go by cascade. Do not rely on the cascade alone for the membership, because it skips the Leave rules and leaves empty kvintets in the feed.
+- **Delete account** — one `account` service call: run the Leave flow if the user is in a kvintet, then delete the user. Other tables go by cascade, as story "Delete my account" asks: offers the user posted disappear together with the claims on them. Do not rely on the cascade alone for the membership, because it skips the Leave rules and leaves empty kvintets in the feed.
 - **Board listing** — `startsAt > now()` and claim count `< capacity`, filtered by category. "Full" and "past" are never stored.
-- **Chat** — only members of an `ACTIVE` kvintet can read or write. Clients poll with `after=<last message id>`; the server returns messages with `id > after` ordered by `id`. A request without a cursor returns the last 50.
+- **Chat** — only members of an `ACTIVE` kvintet can read or write. Clients poll with `after=<last message id>`; the server returns messages with `id > after` ordered by `id`. A request without a cursor returns the last 50. Sequence ids are assigned at insert, not at commit, so every message insert (user or `SYSTEM`) first locks the `kvintet` row. That makes ids commit in order per kvintet and a poll can never skip a message. Message bodies have a maximum length in the DTO and are rendered as text, never HTML.
 
 ### Matching
 
@@ -107,7 +108,9 @@ Each runs in one Prisma `$transaction` that first locks the parent row (`SELECT 
 
 Scope: matching **ranks and filters the proposal feed** and nothing else. Users start proposals themselves; the algorithm never creates groups or assigns people.
 
-`GET /api/kvintets/feed` loads the caller's profile and every `FORMING` kvintet with 1–4 members together with their profiles, filters by `isEligible`, scores, drops results under the threshold and sorts. Nothing is precomputed. A controller test asserts that the response contains no `name`, `email` or `userId`.
+`GET /api/kvintets/feed` loads the caller's profile and every `FORMING` kvintet with 1–4 members together with their profiles, filters by `isEligible`, scores, drops results under the threshold and sorts. Nothing is precomputed. A caller who is already in a kvintet gets `409` (the client redirects to `/kvintet`), so the feed never lists the caller's own kvintet.
+
+The feed shows each member's `position` and tags, as the story requires. In a cohort of a few hundred, rare combinations could identify a person; this is an accepted risk for the pilot. A controller test compares the whole response shape against an allow-list, so a new field cannot leak by accident.
 
 ### API
 
@@ -154,4 +157,7 @@ Routes (TanStack Router, file-based). Guards are pathless layout routes (`_Authe
 ## 5. Testing
 
 - Unit tests for services, and especially for `matching`.
-- Claim, join, vote and leave need integration tests against a real Postgres. Add a `postgres` service container to `ci.yml`. Never point tests at the production database.
+- Claim, join, vote, leave and delete-account need integration tests against a real Postgres. The race tests fire N requests with `Promise.all` at the last spot or the fifth seat. Also cover "leave after the others voted". The first story that needs them adds a `postgres` service container to `ci.yml`. Never point tests at the production database.
+- Auth: a sign-up payload with `role: "admin"` or its own consent timestamp is ignored, and sign-up without consent fails.
+- Every route has a test for 401 (no session), 403 (not onboarded, not admin, not a member). A non-member never gets data from another kvintet.
+- All free text (offers, messages) has a maximum length in its DTO. Rate limiting is not part of the MVP.
