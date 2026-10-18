@@ -20,5 +20,7 @@ describe("postSignInPath", () => {
   it("ignores redirect targets that leave the app", () => {
     expect(postSignInPath(encoded("https://evil.example"))).toBe("/overview")
     expect(postSignInPath(encoded("//evil.example"))).toBe("/overview")
+    expect(postSignInPath(encoded("/\\evil.example"))).toBe("/overview")
+    expect(postSignInPath(encoded("/\t/evil.example"))).toBe("/overview")
   })
 })

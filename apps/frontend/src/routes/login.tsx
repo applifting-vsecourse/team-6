@@ -23,7 +23,7 @@ export const Route = createFileRoute("/login")({
   loader: async ({ context }) => {
     const session = await context.queryClient.ensureQueryData(authSessionQueryOptions())
     if (!session) return
-    throw redirect({ to: ROUTES.overview })
+    throw redirect({ to: postSignInPath() })
   },
 })
 
