@@ -10,6 +10,7 @@ export type SignUpInput = {
   username: string
   email: string
   password: string
+  acceptCodeOfConduct: boolean
 }
 
 export function useSignUp() {
@@ -18,12 +19,16 @@ export function useSignUp() {
   return useMutation({
     mutationFn: async (input: SignUpInput) => {
       // BetterAuth handles the whole flow (and signs the user in by default)
-      const { error } = await authClient.signUp.email({
+      // The server stamps the consent time and version; we only send the flag.
+      // It is not part of the client's typed body, hence the variable.
+      const body = {
         name: input.name,
         username: input.username,
         email: input.email,
         password: input.password,
-      })
+        acceptCodeOfConduct: input.acceptCodeOfConduct,
+      }
+      const { error } = await authClient.signUp.email(body)
       if (error) throw toAuthError(error)
     },
     onSuccess: async () => {

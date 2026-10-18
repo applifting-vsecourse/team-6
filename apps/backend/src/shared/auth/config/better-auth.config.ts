@@ -13,6 +13,17 @@ export const betterAuthCoreConfig: BetterAuthOptions = {
         defaultValue: 'user',
         input: false,
       },
+      // Set by the sign-up hook in the provider, never by the client.
+      codeOfConductAcceptedAt: {
+        type: 'date',
+        required: false,
+        input: false,
+      },
+      codeOfConductVersion: {
+        type: 'string',
+        required: false,
+        input: false,
+      },
     },
   },
   plugins: [openAPI(), username()],

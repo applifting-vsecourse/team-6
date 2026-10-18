@@ -1,5 +1,6 @@
 {
   "auth": {
+    "acceptCodeOfConduct": "Přečetl/a jsem si <coc>kodex chování</coc> a souhlasím s ním",
     "confirmPassword": "Potvrzení hesla",
     "email": "E-mail",
     "emailPlaceholder": "např. jan@novak.cz",
@@ -15,6 +16,7 @@
     "userMenu": "Uživatelské menu",
     "username": "Uživatelské jméno",
     "validation": {
+      "codeOfConductRequired": "Musíte souhlasit s kodexem chování",
       "emailInvalid": "Neplatný e-mail",
       "emailRequired": "Zadejte e-mail",
       "nameRequired": "Zadejte jméno",
@@ -27,6 +29,22 @@
       "usernameRequired": "Zadejte uživatelské jméno"
     }
   },
+  "codeOfConduct": {
+    "intro": "Kvintet je místo pro lidi, kteří se chtějí potkávat a učit se od sebe navzájem. Aby se tu všichni cítili dobře, držíme se několika jednoduchých pravidel.",
+    "reportIntro": "Porušení pravidel nebo problém s konkrétním člověkem nahlaste na {{email}}.",
+    "reportStep1": "Každé hlášení čteme a potvrdíme jeho přijetí.",
+    "reportStep2": "Zjistíme, co se stalo, a podle závažnosti dotyčného upozorníme, nebo mu omezíme přístup do aplikace.",
+    "reportStep3": "Hlášení řešíme důvěrně. Totožnost autora hlášení nesdělujeme.",
+    "reportTitle": "Co se stane po nahlášení",
+    "rule1": "Chovejte se k ostatním s respektem. Žádné urážky, výsměch ani diskriminace.",
+    "rule2": "Buďte upřímní. Uvádějte o sobě pravdivé informace a nevydávejte se za někoho jiného.",
+    "rule3": "Chraňte soukromí ostatních. Nesdílejte cizí osobní údaje ani zprávy ze skupiny bez souhlasu.",
+    "rule4": "Žádný spam a reklama. Nabídky a zprávy mají souviset s komunitou.",
+    "rule5": "Dodržujte domluvy. Pokud nemůžete přijít na schůzku, dejte ostatním včas vědět.",
+    "rulesTitle": "Naše pravidla",
+    "seoTitle": "Kodex chování",
+    "title": "Kodex chování"
+  },
   "common": {
     "close": "Zavřít",
     "goHome": "Na úvodní stránku",
@@ -35,6 +53,7 @@
   },
   "errors": {
     "auth": {
+      "CODE_OF_CONDUCT_REQUIRED": "Musíte souhlasit s kodexem chování.",
       "EMAIL_NOT_VERIFIED": "Nejdřív ověřte svůj e-mail.",
       "INVALID_EMAIL": "E-mail není platný.",
       "INVALID_EMAIL_OR_PASSWORD": "Nesprávný e-mail nebo heslo.",
@@ -65,6 +84,9 @@
     "createAccount": "Vytvořit účet",
     "seoTitle": "Vítejte",
     "tagline": "Najděte si svůj kvintet."
+  },
+  "nav": {
+    "codeOfConduct": "Pravidla"
   },
   "overview": {
     "title": "Přehled"

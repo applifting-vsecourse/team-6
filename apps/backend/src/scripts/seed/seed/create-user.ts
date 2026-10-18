@@ -18,13 +18,10 @@ export async function createUser(
   const { email, password, name, username, role } = params;
 
   // use better auth api to sign the user up using email & password
-  await auth.api.signUpEmail({
-    body: {
-      email,
-      password,
-      name,
-    },
-  });
+  // The sign-up hook requires consent; the flag is not part of the typed body,
+  // so it is passed through a variable to skip the excess-property check.
+  const body = { email, password, name, acceptCodeOfConduct: true };
+  await auth.api.signUpEmail({ body });
 
   // find the user in the database
   const user = await prisma.user.findFirst({
