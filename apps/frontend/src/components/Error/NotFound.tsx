@@ -8,11 +8,11 @@ import { ErrorLayout } from "./ErrorLayout"
 export function NotFound() {
   return (
     <ErrorLayout
-      title="Page not found"
-      description="The page you're looking for doesn't exist or has been moved."
+      title="Stránka nenalezena"
+      description="Stránka, kterou hledáte, neexistuje nebo byla přesunuta."
       action={
         <Button asChild>
-          <Link to={ROUTES.home}>Go home</Link>
+          <Link to={ROUTES.home}>Na úvodní stránku</Link>
         </Button>
       }
     />

@@ -23,7 +23,9 @@ export function useSignUp() {
         email: input.email,
         password: input.password,
       })
-      if (error) throw new Error(error.message ?? "Sign up failed")
+      if (error) {
+        throw Object.assign(new Error(error.message ?? "Sign up failed"), { code: error.code })
+      }
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: authKeys.session() })

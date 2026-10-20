@@ -2,23 +2,26 @@ import type { ReactNode } from "react"
 
 import { HeaderLogo } from "@/components/Header/HeaderLogo"
 import { HeaderNav } from "@/components/Header/HeaderNav"
-import { ThemeSwitcher } from "@/components/Header/ThemeSwitcher"
+import { MobileMenu } from "@/components/Header/MobileMenu"
 
 type HeaderProps = {
-  // Auth-aware menu (sign-in CTA / user dropdown). Passed as a slot so
-  // `components/` doesn't have to import from `features/auth`.
-  userMenu: ReactNode
+  // Navigation is for signed-in users only; signed out there is nothing to list yet.
+  hasNav?: boolean
+  // Auth-aware slots (sign-in link / user dropdown, sheet account block). Passed in
+  // so `components/` doesn't have to import from `features/auth`.
+  userMenu?: ReactNode
+  mobileAccount?: ReactNode
 }
 
-export function Header({ userMenu }: HeaderProps) {
+export function Header({ hasNav = false, userMenu, mobileAccount }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur">
-      <div className="mx-auto flex h-14 w-full max-w-4xl items-center gap-4 px-4">
+    <header className="sticky top-0 z-40 border-b border-border bg-background px-4">
+      <div className="mx-auto flex h-14 w-full max-w-4xl items-center gap-4 md:h-16 md:gap-10">
         <HeaderLogo />
-        <HeaderNav />
-        <div className="ml-auto flex items-center gap-2">
-          <ThemeSwitcher />
+        {hasNav ? <HeaderNav className="hidden md:flex" /> : null}
+        <div className="ml-auto flex items-center gap-5">
           {userMenu}
+          {hasNav ? <MobileMenu account={mobileAccount} /> : null}
         </div>
       </div>
     </header>
