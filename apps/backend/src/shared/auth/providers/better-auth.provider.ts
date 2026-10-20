@@ -3,13 +3,12 @@ import { renderEmail } from '@/core/email/render';
 import { ResetPassword } from '@/core/email/templates/reset-password';
 import { VerifyEmail } from '@/core/email/templates/verify-email';
 import { PrismaService } from '@/core/prisma/prisma.service';
-import { withCodeOfConductConsent } from '@/shared/auth/code-of-conduct';
 import { betterAuthCoreConfig } from '@/shared/auth/config/better-auth.config';
+import { codeOfConductDatabaseHooks } from '@/shared/auth/hooks/code-of-conduct.hook';
 import { Config } from '@/shared/config/config.service';
 import { Inject, Provider } from '@nestjs/common';
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
-import { APIError } from 'better-auth/api';
 
 const createAuth = (
   prismaService: PrismaService,
@@ -45,22 +44,7 @@ const createAuth = (
         },
       },
     },
-    databaseHooks: {
-      user: {
-        create: {
-          before: (user, ctx) => {
-            const consented = withCodeOfConductConsent(user, ctx?.body);
-            if (!consented) {
-              throw APIError.from('BAD_REQUEST', {
-                code: 'CODE_OF_CONDUCT_REQUIRED',
-                message: 'The code of conduct must be accepted',
-              });
-            }
-            return Promise.resolve(consented);
-          },
-        },
-      },
-    },
+    databaseHooks: codeOfConductDatabaseHooks,
     trustedOrigins: [config.frontendUrl],
     emailVerification: {
       sendVerificationEmail: async ({ user, url }) => {

@@ -75,6 +75,7 @@
     "@types/nodemailer": "^8.0.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
+    "esbuild": "0.28.2",
     "eslint": "catalog:lint",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
@@ -92,6 +93,7 @@
     "moduleFileExtensions": [
       "js",
       "json",
+      "mjs",
       "ts"
     ],
     "rootDir": "./",
@@ -100,8 +102,13 @@
     ],
     "testRegex": "\\.spec\\.ts$",
     "transform": {
+      "^.+\\.mjs$": "<rootDir>/jest.esm-transform.cjs",
+      "[\\\\/]node_modules[\\\\/].*[\\\\/](@better-auth|@better-fetch|@noble|better-call|jose|kysely|nanostores)[\\\\/].+\\.js$": "<rootDir>/jest.esm-transform.cjs",
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!.*(\\.mjs$|(@better-auth|@better-fetch|@noble|better-call|jose|kysely|nanostores)/))"
+    ],
     "collectCoverageFrom": [
       "**/*.ts"
     ],
