@@ -9,6 +9,7 @@ import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOpt
 import { AppHeader } from "@/features/auth/components/AppHeader"
 import { SignUpForm } from "@/features/auth/components/SignUpForm"
 import { useSignUp } from "@/features/auth/hooks/useSignUp"
+import { signUpErrorMessage } from "@/features/auth/lib/sign-up-error"
 
 export const Route = createFileRoute("/signup")({
   component: SignUpPage,
@@ -40,7 +41,7 @@ function SignUpPage() {
       })
       await navigate({ to: ROUTES.overview })
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Registrace se nezdařila.")
+      setErrorMessage(signUpErrorMessage(error))
     }
   }
 

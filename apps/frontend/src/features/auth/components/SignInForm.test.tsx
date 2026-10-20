@@ -30,8 +30,8 @@ describe("SignInForm", () => {
       />,
     )
 
-    await userEvent.type(screen.getByLabelText("E-mail"), "jana@novak.cz")
-    await userEvent.type(screen.getByLabelText("Heslo"), "tajneheslo")
+    await userEvent.type(screen.getByLabelText("E-mail"), "  jana@novak.cz ")
+    await userEvent.type(screen.getByLabelText("Heslo"), " tajneheslo  ")
     await userEvent.click(screen.getByRole("button", { name: "Přihlásit se" }))
 
     expect(onSubmit).toHaveBeenCalledWith(

@@ -75,14 +75,14 @@ export function MobileAccount() {
   return (
     <div className="flex flex-col gap-0.5 border-t border-border pt-4">
       <p className="font-semibold text-foreground">{user.name}</p>
-      <button
-        type="button"
+      <Button
+        variant="link"
         onClick={() => signOut.mutate()}
         disabled={signOut.isPending}
-        className="self-start text-label font-semibold text-body underline"
+        className="h-auto self-start p-0 text-body underline"
       >
         Odhlásit se
-      </button>
+      </Button>
     </div>
   )
 }

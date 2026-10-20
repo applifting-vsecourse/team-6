@@ -37,7 +37,13 @@ function OverviewPage() {
           {longDate.format(new Date())}
         </p>
         <h1 className="mt-2 text-title">
-          Vítejte, <em>{firstName}</em>
+          {firstName ? (
+            <>
+              Vítejte, <em>{firstName}</em>
+            </>
+          ) : (
+            "Vítejte"
+          )}
         </h1>
       </div>
     </>
