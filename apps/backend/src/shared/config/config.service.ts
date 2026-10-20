@@ -14,9 +14,9 @@ import {
 @Injectable()
 export class Config {
   // basic info
-  readonly name: string = 'Quacker backend';
+  readonly name: string = 'Kvintet backend';
   readonly description: string =
-    'Backend for Quacker, a social media platform for sharing short messages. Project example for educational purposes.';
+    'Backend for Kvintet, a pilot app that forms groups of up to five students.';
 
   @IsSemVer()
   readonly version: string = '0.1.0';
@@ -73,7 +73,7 @@ export class Config {
 
   @Env('EMAIL_FROM', {
     expose: true,
-    defaultValue: 'Quacker <onboarding@resend.dev>',
+    defaultValue: 'Kvintet <onboarding@resend.dev>',
   })
   @IsNotEmpty()
   readonly emailFrom!: string;

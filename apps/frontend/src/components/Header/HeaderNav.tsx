@@ -1,11 +1,6 @@
-import { ROUTES } from "@/app/routes"
-import { HeaderNavLink } from "@/components/Header/HeaderNavLink"
-
-// The logo already links home, so "Home" would be a duplicate.
+// The logo already links home, so "Home" would be a duplicate. Renders nothing
+// until protected pages exist: wrap <HeaderNavLink> entries in a <nav> then,
+// an empty landmark is noise for screen readers.
 export function HeaderNav() {
-  return (
-    <nav className="flex items-center gap-1">
-      <HeaderNavLink to={ROUTES.quacks}>Quacks</HeaderNavLink>
-    </nav>
-  )
+  return null
 }
