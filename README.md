@@ -1,10 +1,10 @@
-# Quacker — full-stack starter template
+# Kvintet
 
-Starter template for [4IT580](https://4it580.vse.cz) team projects: a minimal, working full-stack app you fork and grow into your own product.
+Pilot app that forms groups of up to five students, built for [4IT580](https://4it580.vse.cz) on a minimal full-stack starter.
 
 **Stack:** React + Vite + TanStack Router/Query + Tailwind/shadcn (frontend) · NestJS + Prisma + PostgreSQL + BetterAuth (backend) · pnpm workspaces.
 
-What's included: working login/signup (BetterAuth — you use it, you don't build it), one worked-example feature (the quack feed: read a list, post a new one — copy its pattern), seeded demo data, example tests, CI. The full demo app this template was trimmed from lives on the `reference/full-app` branch.
+What's included: working login/signup (BetterAuth — you use it, you don't build it), seeded demo users, tests, CI. The original Quacker example is preserved on the `backup/quacker-original` branch.
 
 ## Prerequisites
 
