@@ -1,6 +1,21 @@
-// The logo already links home, so "Home" would be a duplicate. Renders nothing
-// until protected pages exist: wrap <HeaderNavLink> entries in a <nav> then,
-// an empty landmark is noise for screen readers.
-export function HeaderNav() {
-  return null
+import { HeaderNavLink } from "@/components/Header/HeaderNavLink"
+import { NAV_ITEMS } from "@/components/Header/nav"
+import { cn } from "@/lib/utils"
+
+export function HeaderNav({ className }: { className?: string }) {
+  return (
+    <nav
+      aria-label="Hlavní navigace"
+      className={cn("items-center gap-8", className)}
+    >
+      {NAV_ITEMS.map((item) => (
+        <HeaderNavLink
+          key={item.to}
+          to={item.to}
+        >
+          {item.label}
+        </HeaderNavLink>
+      ))}
+    </nav>
+  )
 }

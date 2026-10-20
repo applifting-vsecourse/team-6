@@ -9,9 +9,9 @@ type RootErrorBoundaryProps = {
 export function RootErrorBoundary({ error }: RootErrorBoundaryProps) {
   return (
     <ErrorLayout
-      title="Something went wrong"
-      description={error.message || "An unexpected error occurred."}
-      action={<Button onClick={() => window.location.reload()}>Reload</Button>}
+      title="Něco se pokazilo"
+      description={error.message || "Došlo k neočekávané chybě."}
+      action={<Button onClick={() => window.location.reload()}>Načíst znovu</Button>}
     />
   )
 }

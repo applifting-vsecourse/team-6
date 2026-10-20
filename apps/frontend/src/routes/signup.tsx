@@ -6,15 +6,17 @@ import { AuthLayout } from "@/components/AuthLayout"
 import { Seo } from "@/components/Seo"
 
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
+import { AppHeader } from "@/features/auth/components/AppHeader"
 import { SignUpForm } from "@/features/auth/components/SignUpForm"
 import { useSignUp } from "@/features/auth/hooks/useSignUp"
+import { signUpErrorMessage } from "@/features/auth/lib/sign-up-error"
 
 export const Route = createFileRoute("/signup")({
   component: SignUpPage,
   loader: async ({ context }) => {
     const session = await context.queryClient.ensureQueryData(authSessionQueryOptions())
     if (!session) return
-    throw redirect({ to: ROUTES.home })
+    throw redirect({ to: ROUTES.overview })
   },
 })
 
@@ -37,26 +39,27 @@ function SignUpPage() {
         name: values.name,
         username: values.username,
       })
-      await navigate({ to: ROUTES.home })
+      await navigate({ to: ROUTES.overview })
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Sign up failed")
+      setErrorMessage(signUpErrorMessage(error))
     }
   }
 
   return (
     <>
-      <Seo title="Sign up" />
+      <Seo title="Registrovat se" />
       <AuthLayout
-        title="Sign up"
-        description="Create your Kvintet account."
+        header={<AppHeader />}
+        title="Registrovat se"
+        description="Vytvořte si účet v Kvintetu."
         footer={
           <>
-            Already have an account?{" "}
+            Už máte účet?{" "}
             <Link
               to={ROUTES.login}
-              className="font-medium text-foreground underline underline-offset-4"
+              className="text-foreground underline underline-offset-4"
             >
-              Sign in
+              Přihlásit se
             </Link>
           </>
         }

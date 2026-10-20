@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -17,14 +18,14 @@ import { Input } from "@/components/ui/input"
 
 const schema = z
   .object({
-    email: z.string().trim().min(1, "Email is required").email("Invalid email"),
-    name: z.string().trim().min(1, "Name is required"),
-    username: z.string().trim().min(1, "Username is required"),
-    password: z.string().trim().min(8, "Password must be at least 8 characters"),
-    passwordConfirmation: z.string().trim().min(1, "Password confirmation is required"),
+    email: z.string().trim().min(1, "Zadejte e-mail").email("Zadejte platný e-mail"),
+    name: z.string().trim().min(1, "Zadejte jméno"),
+    username: z.string().trim().min(1, "Zadejte uživatelské jméno"),
+    password: z.string().trim().min(8, "Heslo musí mít alespoň 8 znaků"),
+    passwordConfirmation: z.string().trim().min(1, "Potvrďte heslo"),
   })
   .refine((values) => values.password === values.passwordConfirmation, {
-    message: "Passwords must match",
+    message: "Hesla se musí shodovat",
     path: ["passwordConfirmation"],
   })
 
@@ -55,20 +56,14 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
       <form
         noValidate
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4"
+        className="space-y-5"
       >
-        {errorMessage ? (
-          <Alert variant="destructive">
-            <AlertDescription>{errorMessage}</AlertDescription>
-          </Alert>
-        ) : null}
-
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Jméno</FormLabel>
               <FormControl>
                 <Input
                   autoComplete="name"
@@ -85,7 +80,7 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Uživatelské jméno</FormLabel>
               <FormControl>
                 <Input
                   autoComplete="username"
@@ -102,11 +97,11 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>E-mail</FormLabel>
               <FormControl>
                 <Input
                   type="email"
-                  placeholder="e.g. john@doe.com"
+                  placeholder="jana@novak.cz"
                   autoComplete="email"
                   {...field}
                 />
@@ -121,7 +116,7 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>Heslo</FormLabel>
               <FormControl>
                 <Input
                   type="password"
@@ -129,6 +124,7 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
                   {...field}
                 />
               </FormControl>
+              <FormDescription>Alespoň 8 znaků</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -139,7 +135,7 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           name="passwordConfirmation"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm password</FormLabel>
+              <FormLabel>Potvrzení hesla</FormLabel>
               <FormControl>
                 <Input
                   type="password"
@@ -152,6 +148,12 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           )}
         />
 
+        {errorMessage ? (
+          <Alert variant="destructive">
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
+        ) : null}
+
         <Button
           type="submit"
           size="lg"
@@ -159,7 +161,7 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           disabled={isLoading}
         >
           {isLoading ? <Loader2 className="size-4 animate-spin" /> : null}
-          Sign up
+          Registrovat se
         </Button>
       </form>
     </Form>
