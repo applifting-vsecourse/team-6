@@ -6,7 +6,9 @@ These are rules, not suggestions. When a rule and a "nicer looking" idea disagre
 
 `src/components/ui/**` is vendored shadcn — treat it as a third-party kit and restyle via tokens rather than rewriting it.
 
-**Tokens live in `apps/frontend/src/styles/global.css`.** That file is the only source of truth for colour, radius and shadows. This file says how to _use_ them.
+**Tokens live in `apps/frontend/src/styles/global.css`.** That file is the only source of truth for colour, type, radius and shadows, and mirrors the Figma file's variables (`Design_MVP`). This file says how to _use_ them.
+
+The app has **one theme: light.** There is no dark mode and no theme switcher.
 
 ## Colour
 
@@ -14,31 +16,34 @@ These are rules, not suggestions. When a rule and a "nicer looking" idea disagre
 - **`primary` is for actions, not decoration.** One primary button per view. Everything else is `outline`, `ghost` or a plain link.
 - **`destructive` only for destructive actions and errors.** Never for emphasis.
 - **`accent` is a hover/active surface, not a brand colour.** It tints menu items and ghost buttons on hover, so it must stay quiet. The brand colour is `primary`.
-- Body text is `foreground`; supporting text is `muted-foreground`. There is no third level.
+- Text has three levels: `text-foreground` (ink-900: headings, labels, input values), `text-body` (ink-700: running copy) and `text-muted-foreground` (ink-500: hints, captions, meta). There is no fourth level.
+- `background` is the paper colour of every page; `secondary`/`muted` (paper-100) is the only other surface tone.
 
 ## Layout
 
 - **Cards are for separable items in a list** — an offer, a search result, a product. They are not page sections and not layout tools.
 - **Never nest a card inside a card.** If content needs grouping inside a card, use spacing and a hairline divider.
-- **A page is not a card.** Page content sits on `background` in a centred column (`max-w-2xl` for reading, `max-w-4xl` for wide layouts), not inside a floating panel.
-- **Every page keeps the app chrome.** The header is present on every route, including login and sign-up. Pages never render as standalone islands.
+- **A page is not a card.** Page content sits on `background` in a centred column (`max-w-120` for forms, `max-w-2xl` for reading, `max-w-4xl` for wide layouts), not inside a floating panel.
+- **Every page keeps the app chrome.** The header and footer (`PageLayout`) are present on every route, including login and sign-up. Pages never render as standalone islands.
 - Forbidden by default: the centred-hero-plus-three-feature-cards layout, carousels, and any section whose only purpose is to look full.
 
 ## Spacing
 
-Use the scale only: `1, 2, 3, 4, 6, 8, 12, 16` (Tailwind units — 4px…64px). No arbitrary values like `p-[13px]`. Related things get `gap-2`/`gap-3`; separate blocks get `gap-6`/`gap-8`.
+Use the scale only: `1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 14, 16, 22, 24` (Tailwind units — 4px…96px; the half steps and 5, 10, 22 come from the Figma). No arbitrary values like `p-[13px]`. Related things get `gap-2`/`gap-3`; fields in a form get `gap-5`; separate blocks get `gap-6`/`gap-8`.
 
 ## Type
 
 - One `h1` per page. Headings step down without skipping.
-- Sizes come from the scale: `text-sm` supporting, `text-base` body, `text-lg`/`text-xl` subheads, `text-2xl`+ page titles. Headings get `tracking-tight`; body does not.
-- Sentence case everywhere. No ALL CAPS except a single small label style (`text-xs uppercase tracking-widest`), used sparingly.
+- Three families: **Newsreader** (`font-serif`, headings and the logo; `h1`–`h3` get it from the base layer), **Source Sans 3** (`font-sans`, everything else) and **IBM Plex Mono** (`font-mono`, meta labels only).
+- Sizes come from the scale: `text-sm` hints, `text-label` (15px, semibold) buttons and form labels, `text-base` body, `text-lg` lead text, `text-subheading` (21px) item titles, `text-heading` (28px) section titles, `text-title` (40px) page titles, `text-display` (64px) the landing headline only. Letter-spacing is part of the size token; do not add `tracking-*` to headings.
+- Sentence case everywhere. No ALL CAPS except the one meta label style: `font-mono text-xs uppercase tracking-meta text-muted-foreground`, used for dates, step numbers and the footer line.
+- One italic accent word per hero or greeting at most (`<em>` inside an `h1`).
 
 ## Surfaces
 
 - **Borders are hairlines**: `border border-border`. One border, not two adjacent ones.
 - **Shadows are rare.** Only for things that genuinely float above the page — dropdowns, dialogs, toasts. Cards and inputs do not get shadows.
-- Radius comes from the token (`rounded-lg`/`rounded-md`). Never mix radii in one component.
+- Radius comes from the token: `rounded-md` (2px) for buttons, `rounded-lg` (4px) for inputs, alerts and cards, `rounded-full` for tags. Never mix radii in one component.
 
 ## Forms
 

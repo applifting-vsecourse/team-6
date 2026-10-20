@@ -37,7 +37,9 @@ describe("getErrorMessage", () => {
 
   it("translates BetterAuth codes", () => {
     const error = toAuthError({ code: "INVALID_EMAIL_OR_PASSWORD", message: "English text" })
-    expect(getErrorMessage(error, "errors.signInFailed")).toBe("Incorrect email or password.")
+    expect(getErrorMessage(error, "errors.signInFailed")).toBe(
+      "Sign in failed. Incorrect email or password.",
+    )
   })
 
   it("never shows the server's English message", () => {

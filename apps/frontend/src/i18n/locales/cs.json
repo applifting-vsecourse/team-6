@@ -7,12 +7,14 @@
     "name": "Jméno",
     "noAccount": "Nemáte účet?",
     "password": "Heslo",
+    "passwordHint_few": "Alespoň {{count}} znaky",
+    "passwordHint_one": "Alespoň {{count}} znak",
+    "passwordHint_other": "Alespoň {{count}} znaků",
     "signIn": "Přihlásit se",
     "signInDescription": "Vítejte zpět v Kvintetu.",
     "signOut": "Odhlásit se",
     "signUp": "Registrovat se",
     "signUpDescription": "Vytvořte si účet v Kvintetu.",
-    "userMenu": "Uživatelské menu",
     "username": "Uživatelské jméno",
     "validation": {
       "emailInvalid": "Neplatný e-mail",
@@ -37,7 +39,7 @@
     "auth": {
       "EMAIL_NOT_VERIFIED": "Nejdřív ověřte svůj e-mail.",
       "INVALID_EMAIL": "E-mail není platný.",
-      "INVALID_EMAIL_OR_PASSWORD": "Nesprávný e-mail nebo heslo.",
+      "INVALID_EMAIL_OR_PASSWORD": "Přihlášení se nezdařilo. Nesprávný e-mail nebo heslo.",
       "INVALID_USERNAME": "Uživatelské jméno není platné.",
       "INVALID_USERNAME_OR_PASSWORD": "Nesprávné uživatelské jméno nebo heslo.",
       "PASSWORD_TOO_LONG": "Heslo je příliš dlouhé.",
@@ -62,18 +64,34 @@
     "validation_failed": "Některé zadané hodnoty nejsou platné."
   },
   "landing": {
+    "caption": "Žádné fotky, žádná hodnocení – jen lidé a témata.",
     "createAccount": "Vytvořit účet",
+    "goToOverview": "Přejít na přehled",
+    "heroText": "Kvintet posadí k jednomu stolu pět lidí, kteří se od sebe můžou něco naučit. Skupinu si vybíráte podle tématu, ne podle toho, koho už znáte.",
+    "heroTitle": "Najděte si svůj <em>kvintet</em>.",
+    "howItWorks": "Jak to funguje",
     "seoTitle": "Vítejte",
-    "tagline": "Najděte si svůj kvintet."
+    "step1Text": "Vaše role, co umíte naučit a co se chcete naučit. Štítky, žádné fotky.",
+    "step1Title": "Řekněte nám něco o sobě",
+    "step2Text": "Uvidíte všechny skupiny, které k vám sedí – role a zájmy, jména zůstanou skrytá, dokud skupina nevznikne.",
+    "step2Title": "Vyberte si návrh",
+    "step3Text": "S pěti členy vznikne sám. Se třemi nebo čtyřmi, když všichni hlasují pro. Pak se otevře skupinový chat.",
+    "step3Title": "Založte svůj kvintet"
+  },
+  "layout": {
+    "closeMenu": "Zavřít menu",
+    "contactSupport": "Kontaktovat podporu",
+    "mainNavigation": "Hlavní navigace",
+    "menu": "Menu",
+    "openMenu": "Otevřít menu"
+  },
+  "nav": {
+    "overview": "Přehled"
   },
   "overview": {
+    "greeting": "Vítejte, <em>{{name}}</em>",
+    "greetingAnonymous": "Vítejte",
     "title": "Přehled"
-  },
-  "theme": {
-    "dark": "Tmavý",
-    "light": "Světlý",
-    "system": "Podle systému",
-    "toggle": "Přepnout motiv"
   },
   "validation": {
     "invalid": "Neplatná hodnota",

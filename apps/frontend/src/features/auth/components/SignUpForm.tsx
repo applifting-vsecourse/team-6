@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -73,14 +74,8 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
       <form
         noValidate
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4"
+        className="space-y-5"
       >
-        {errorMessage ? (
-          <Alert variant="destructive">
-            <AlertDescription>{errorMessage}</AlertDescription>
-          </Alert>
-        ) : null}
-
         <FormField
           control={form.control}
           name="name"
@@ -147,6 +142,9 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
                   {...field}
                 />
               </FormControl>
+              <FormDescription>
+                {t("auth.passwordHint", { count: PASSWORD_MIN_LENGTH })}
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -169,6 +167,12 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
             </FormItem>
           )}
         />
+
+        {errorMessage ? (
+          <Alert variant="destructive">
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
+        ) : null}
 
         <Button
           type="submit"
