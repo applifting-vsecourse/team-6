@@ -8,7 +8,7 @@ jobs:
   review:
     # runs only when the `claude-review` label is added (by hand or by the board poll); a new push removes it, see the reset job
     # skip big PRs so one review can't eat the subscription quota (expressions can't add, so cap each side)
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.label.name == 'claude-review' && github.event.pull_request.additions <= 500 && github.event.pull_request.deletions <= 500 && github.event.pull_request.changed_files <= 30
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.label.name == 'claude-review' && github.event.pull_request.additions <= 1000 && github.event.pull_request.deletions <= 1000 && github.event.pull_request.changed_files <= 60
     # a newer review (new commit) replaces a running one that is already stale
     concurrency:
       group: claude-review-${{ github.event.pull_request.number }}
