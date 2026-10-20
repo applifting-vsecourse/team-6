@@ -11,6 +11,7 @@ import { AppHeader } from "@/features/auth/components/AppHeader"
 import { SignInForm } from "@/features/auth/components/SignInForm"
 import { useSignIn } from "@/features/auth/hooks/useSignIn"
 import { decodeRedirectUri } from "@/features/auth/lib/redirect"
+import { signInErrorMessage } from "@/features/auth/lib/sign-in-error"
 
 const loginSearchParamsSchema = z.object({
   from: z.string().optional(),
@@ -38,9 +39,8 @@ function LoginPage() {
     try {
       await signIn.mutateAsync(values)
       await navigate({ to: redirectTo })
-    } catch {
-      // BetterAuth words this in English and never says which half was wrong.
-      setErrorMessage("Přihlášení se nezdařilo. Nesprávný e-mail nebo heslo.")
+    } catch (error) {
+      setErrorMessage(signInErrorMessage(error))
     }
   }
 
