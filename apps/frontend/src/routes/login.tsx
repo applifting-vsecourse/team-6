@@ -7,6 +7,7 @@ import { AuthLayout } from "@/components/AuthLayout"
 import { Seo } from "@/components/Seo"
 
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
+import { AppHeader } from "@/features/auth/components/AppHeader"
 import { SignInForm } from "@/features/auth/components/SignInForm"
 import { useSignIn } from "@/features/auth/hooks/useSignIn"
 import { decodeRedirectUri } from "@/features/auth/lib/redirect"
@@ -21,13 +22,13 @@ export const Route = createFileRoute("/login")({
   loader: async ({ context }) => {
     const session = await context.queryClient.ensureQueryData(authSessionQueryOptions())
     if (!session) return
-    throw redirect({ to: ROUTES.home })
+    throw redirect({ to: ROUTES.overview })
   },
 })
 
 function LoginPage() {
   const { from } = Route.useSearch()
-  const redirectTo = from ? decodeRedirectUri(from) : ROUTES.home
+  const redirectTo = from ? decodeRedirectUri(from) : ROUTES.overview
   const navigate = useNavigate()
   const signIn = useSignIn()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -37,25 +38,27 @@ function LoginPage() {
     try {
       await signIn.mutateAsync(values)
       await navigate({ to: redirectTo })
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Sign in failed")
+    } catch {
+      // BetterAuth words this in English and never says which half was wrong.
+      setErrorMessage("Přihlášení se nezdařilo. Nesprávný e-mail nebo heslo.")
     }
   }
 
   return (
     <>
-      <Seo title="Sign in" />
+      <Seo title="Přihlásit se" />
       <AuthLayout
-        title="Sign in"
-        description="Welcome back to Kvintet."
+        header={<AppHeader hasAccount={false} />}
+        title="Přihlásit se"
+        description="Vítejte zpět v Kvintetu."
         footer={
           <>
-            No account?{" "}
+            Nemáte účet?{" "}
             <Link
               to={ROUTES.signup}
-              className="font-medium text-foreground underline underline-offset-4"
+              className="text-foreground underline underline-offset-4"
             >
-              Sign up
+              Registrovat se
             </Link>
           </>
         }
