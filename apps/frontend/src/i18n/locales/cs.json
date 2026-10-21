@@ -33,7 +33,7 @@
   },
   "codeOfConduct": {
     "intro": "Kvintet je místo pro lidi, kteří se chtějí potkávat a učit se od sebe navzájem. Aby se tu všichni cítili dobře, držíme se několika jednoduchých pravidel.",
-    "reportIntro": "Porušení pravidel nebo problém s konkrétním člověkem nahlaste na {{email}}.",
+    "reportIntro": "Porušení pravidel nebo problém s konkrétním člověkem nahlaste na <email>{{email}}</email>.",
     "reportStep1": "Každé hlášení čteme a potvrdíme jeho přijetí.",
     "reportStep2": "Zjistíme, co se stalo, a podle závažnosti dotyčného upozorníme, nebo mu omezíme přístup do aplikace.",
     "reportStep3": "Hlášení řešíme důvěrně. Totožnost autora hlášení nesdělujeme.",
@@ -81,6 +81,9 @@
     "unauthorized": "Nejdřív se musíte přihlásit.",
     "unexpected": "Došlo k neočekávané chybě.",
     "validation_failed": "Některé zadané hodnoty nejsou platné."
+  },
+  "footer": {
+    "contactSupport": "Kontaktovat podporu"
   },
   "landing": {
     "createAccount": "Vytvořit účet"

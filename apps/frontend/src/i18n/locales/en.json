@@ -31,7 +31,7 @@
   },
   "codeOfConduct": {
     "intro": "Kvintet is a place for people who want to meet and learn from each other. To keep it pleasant for everyone, we follow a few simple rules.",
-    "reportIntro": "Report a broken rule or a problem with a specific person to {{email}}.",
+    "reportIntro": "Report a broken rule or a problem with a specific person to <email>{{email}}</email>.",
     "reportStep1": "We read every report and confirm that we received it.",
     "reportStep2": "We find out what happened and, depending on how serious it is, warn the person or restrict their access to the app.",
     "reportStep3": "Reports are handled in confidence. We do not reveal who made the report.",
@@ -79,6 +79,9 @@
     "unauthorized": "You need to sign in first.",
     "unexpected": "An unexpected error occurred.",
     "validation_failed": "Some of the entered values are not valid."
+  },
+  "footer": {
+    "contactSupport": "Contact support"
   },
   "landing": {
     "createAccount": "Create an account"
