@@ -43,7 +43,7 @@ export function HeaderMenu() {
           className="hidden text-sm font-normal text-body md:inline-flex"
         >
           <GazeBlobatar
-            name={user.username ?? user.id}
+            name={user.username || user.id}
             animate="hover"
             travel={7}
             className="size-8"
@@ -87,7 +87,7 @@ export function MobileAccount() {
     <div className="flex flex-col gap-0.5">
       <div className="flex items-center gap-2">
         <Blobatar
-          name={user.username ?? user.id}
+          name={user.username || user.id}
           size="sm"
         />
         <p className="font-semibold text-foreground">{user.name}</p>
