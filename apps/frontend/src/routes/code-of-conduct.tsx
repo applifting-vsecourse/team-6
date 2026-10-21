@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
-import { Header } from "@/components/Header/Header"
+import { PageLayout } from "@/components/PageLayout"
 import { Seo } from "@/components/Seo"
 
-import { HeaderMenu } from "@/features/auth/components/HeaderMenu"
+import { AppHeader } from "@/features/auth/components/AppHeader"
 import { CodeOfConductPage } from "@/features/legal/components/CodeOfConductPage"
 
 // Public on purpose: it is linked from the sign-up form, before anyone has an account.
@@ -18,10 +18,9 @@ function CodeOfConductRoute() {
   return (
     <>
       <Seo title={t("codeOfConduct.seoTitle")} />
-      <Header userMenu={<HeaderMenu />} />
-      <main className="min-h-svh">
+      <PageLayout header={<AppHeader />}>
         <CodeOfConductPage />
-      </main>
+      </PageLayout>
     </>
   )
 }

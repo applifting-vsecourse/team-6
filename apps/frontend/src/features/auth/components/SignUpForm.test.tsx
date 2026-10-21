@@ -77,3 +77,35 @@ describe("SignUpForm code of conduct consent", () => {
     expect(onSubmit.mock.calls[0]?.[0]).toMatchObject({ acceptCodeOfConduct: true })
   })
 })
+
+describe("SignUpForm password rules", () => {
+  it("rejects passwords that do not match", async () => {
+    const user = userEvent.setup()
+    const onSubmit = await renderForm()
+    await fillRequiredFields(user)
+    await user.clear(screen.getByLabelText("Confirm password"))
+    await user.type(screen.getByLabelText("Confirm password"), "different1")
+    await user.click(screen.getByRole("checkbox"))
+
+    await user.click(screen.getByRole("button", { name: "Sign up" }))
+
+    expect(await screen.findByText("Passwords must match")).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it("rejects passwords shorter than 8 characters", async () => {
+    const user = userEvent.setup()
+    const onSubmit = await renderForm()
+    await fillRequiredFields(user)
+    await user.clear(screen.getByLabelText("Password"))
+    await user.clear(screen.getByLabelText("Confirm password"))
+    await user.type(screen.getByLabelText("Password"), "short")
+    await user.type(screen.getByLabelText("Confirm password"), "short")
+    await user.click(screen.getByRole("checkbox"))
+
+    await user.click(screen.getByRole("button", { name: "Sign up" }))
+
+    expect(await screen.findByText("Password must be at least 8 characters")).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+})

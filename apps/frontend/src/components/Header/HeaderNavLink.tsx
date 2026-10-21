@@ -16,8 +16,8 @@ export function HeaderNavLink({ children, className, ...props }: HeaderNavLinkPr
       // `activeProps`: those classes would collide with the base ones and
       // Tailwind resolves such conflicts by stylesheet order, not by class order.
       className={cn(
-        "rounded-md px-2 py-1 text-sm text-muted-foreground transition-colors hover:text-foreground",
-        "data-[status=active]:font-medium data-[status=active]:text-foreground",
+        "border-b-2 border-transparent py-1 text-label font-semibold text-muted-foreground transition-colors hover:text-foreground",
+        "data-[status=active]:border-foreground data-[status=active]:text-foreground",
         className,
       )}
     >

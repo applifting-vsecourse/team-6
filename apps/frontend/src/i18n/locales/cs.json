@@ -8,12 +8,14 @@
     "name": "Jméno",
     "noAccount": "Nemáte účet?",
     "password": "Heslo",
+    "passwordHint_few": "Alespoň {{count}} znaky",
+    "passwordHint_one": "Alespoň {{count}} znak",
+    "passwordHint_other": "Alespoň {{count}} znaků",
     "signIn": "Přihlásit se",
     "signInDescription": "Vítejte zpět v Kvintetu.",
     "signOut": "Odhlásit se",
     "signUp": "Registrovat se",
     "signUpDescription": "Vytvořte si účet v Kvintetu.",
-    "userMenu": "Uživatelské menu",
     "username": "Uživatelské jméno",
     "validation": {
       "codeOfConductRequired": "Musíte souhlasit s kodexem chování",
@@ -81,21 +83,14 @@
     "validation_failed": "Některé zadané hodnoty nejsou platné."
   },
   "landing": {
-    "createAccount": "Vytvořit účet",
-    "seoTitle": "Vítejte",
-    "tagline": "Najděte si svůj kvintet."
+    "createAccount": "Vytvořit účet"
   },
   "nav": {
-    "codeOfConduct": "Pravidla"
+    "codeOfConduct": "Pravidla",
+    "overview": "Přehled"
   },
   "overview": {
     "title": "Přehled"
-  },
-  "theme": {
-    "dark": "Tmavý",
-    "light": "Světlý",
-    "system": "Podle systému",
-    "toggle": "Přepnout motiv"
   },
   "validation": {
     "invalid": "Neplatná hodnota",

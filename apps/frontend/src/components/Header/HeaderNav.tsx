@@ -1,16 +1,25 @@
 import { useTranslation } from "react-i18next"
 
-import { ROUTES } from "@/app/routes"
 import { HeaderNavLink } from "@/components/Header/HeaderNavLink"
+import { NAV_ITEMS } from "@/components/Header/nav"
+import { cn } from "@/lib/utils"
 
-// The logo already links home, so "Home" would be a duplicate. Add
-// <HeaderNavLink> entries here as protected pages appear.
-export function HeaderNav() {
+export function HeaderNav({ className }: { className?: string }) {
   const { t } = useTranslation()
 
   return (
-    <nav className="flex items-center gap-1">
-      <HeaderNavLink to={ROUTES.codeOfConduct}>{t("nav.codeOfConduct")}</HeaderNavLink>
+    <nav
+      aria-label="Hlavní navigace"
+      className={cn("items-center gap-8", className)}
+    >
+      {NAV_ITEMS.map((item) => (
+        <HeaderNavLink
+          key={item.to}
+          to={item.to}
+        >
+          {t(item.labelKey)}
+        </HeaderNavLink>
+      ))}
     </nav>
   )
 }

@@ -8,12 +8,13 @@
     "name": "Name",
     "noAccount": "No account?",
     "password": "Password",
+    "passwordHint_one": "At least {{count}} character",
+    "passwordHint_other": "At least {{count}} characters",
     "signIn": "Sign in",
     "signInDescription": "Welcome back to Kvintet.",
     "signOut": "Sign out",
     "signUp": "Sign up",
     "signUpDescription": "Create your Kvintet account.",
-    "userMenu": "User menu",
     "username": "Username",
     "validation": {
       "codeOfConductRequired": "You must accept the code of conduct",
@@ -80,21 +81,14 @@
     "validation_failed": "Some of the entered values are not valid."
   },
   "landing": {
-    "createAccount": "Create an account",
-    "seoTitle": "Welcome",
-    "tagline": "Find your quintet."
+    "createAccount": "Create an account"
   },
   "nav": {
-    "codeOfConduct": "Rules"
+    "codeOfConduct": "Rules",
+    "overview": "Overview"
   },
   "overview": {
     "title": "Overview"
-  },
-  "theme": {
-    "dark": "Dark",
-    "light": "Light",
-    "system": "System",
-    "toggle": "Toggle theme"
   },
   "validation": {
     "invalid": "Invalid value",

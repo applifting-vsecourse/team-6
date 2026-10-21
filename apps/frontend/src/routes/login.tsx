@@ -9,6 +9,7 @@ import { Seo } from "@/components/Seo"
 import { getErrorMessage } from "@/lib/errorMessage"
 
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
+import { AppHeader } from "@/features/auth/components/AppHeader"
 import { SignInForm } from "@/features/auth/components/SignInForm"
 import { useSignIn } from "@/features/auth/hooks/useSignIn"
 import { decodeRedirectUri } from "@/features/auth/lib/redirect"
@@ -23,14 +24,14 @@ export const Route = createFileRoute("/login")({
   loader: async ({ context }) => {
     const session = await context.queryClient.ensureQueryData(authSessionQueryOptions())
     if (!session) return
-    throw redirect({ to: ROUTES.home })
+    throw redirect({ to: ROUTES.overview })
   },
 })
 
 function LoginPage() {
   const { t } = useTranslation()
   const { from } = Route.useSearch()
-  const redirectTo = from ? decodeRedirectUri(from) : ROUTES.home
+  const redirectTo = from ? decodeRedirectUri(from) : ROUTES.overview
   const navigate = useNavigate()
   const signIn = useSignIn()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -49,6 +50,7 @@ function LoginPage() {
     <>
       <Seo title={t("auth.signIn")} />
       <AuthLayout
+        header={<AppHeader hasAccount={false} />}
         title={t("auth.signIn")}
         description={t("auth.signInDescription")}
         footer={
@@ -56,7 +58,7 @@ function LoginPage() {
             {t("auth.noAccount")}{" "}
             <Link
               to={ROUTES.signup}
-              className="font-medium text-foreground underline underline-offset-4"
+              className="text-foreground underline underline-offset-4"
             >
               {t("auth.signUp")}
             </Link>

@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router"
-import { LogOut } from "lucide-react"
+import { ChevronDown, LogOut } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { ROUTES } from "@/app/routes"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -23,34 +23,25 @@ export function HeaderMenu() {
 
   if (!user) {
     return (
-      <Button
-        asChild
-        size="sm"
+      <Link
+        to={ROUTES.login}
+        className="text-label font-semibold text-foreground"
       >
-        <Link to="/login">{t("auth.signIn")}</Link>
-      </Button>
+        {t("auth.signIn")}
+      </Link>
     )
   }
-
-  const initials = user.name
-    .split(" ")
-    .map((word) => word[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase()
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          size="icon"
-          aria-label={t("auth.userMenu")}
-          className="rounded-full"
+          size="sm"
+          className="hidden text-sm font-normal text-body md:inline-flex"
         >
-          <Avatar className="size-8">
-            <AvatarFallback>{initials}</AvatarFallback>
-          </Avatar>
+          {user.name}
+          <ChevronDown aria-hidden />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -73,5 +64,28 @@ export function HeaderMenu() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  )
+}
+
+/** Account block of the mobile menu sheet: who is signed in, and sign out. */
+export function MobileAccount() {
+  const { t } = useTranslation()
+  const { user } = useSession()
+  const signOut = useSignOut()
+
+  if (!user) return null
+
+  return (
+    <div className="flex flex-col gap-0.5 border-t border-border pt-4">
+      <p className="font-semibold text-foreground">{user.name}</p>
+      <Button
+        variant="link"
+        onClick={() => signOut.mutate()}
+        disabled={signOut.isPending}
+        className="h-auto self-start p-0 text-body underline"
+      >
+        {t("auth.signOut")}
+      </Button>
+    </div>
   )
 }
