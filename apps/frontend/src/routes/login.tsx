@@ -12,7 +12,7 @@ import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOpt
 import { AppHeader } from "@/features/auth/components/AppHeader"
 import { SignInForm } from "@/features/auth/components/SignInForm"
 import { useSignIn } from "@/features/auth/hooks/useSignIn"
-import { postSignInPath } from "@/features/auth/lib/redirect"
+import { postSignInLocation } from "@/features/auth/lib/redirect"
 
 const loginSearchParamsSchema = z.object({
   from: z.string().optional(),
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/login")({
   loader: async ({ context, deps }) => {
     const session = await context.queryClient.ensureQueryData(authSessionQueryOptions())
     if (!session) return
-    throw redirect({ to: postSignInPath(deps.from) })
+    throw redirect(postSignInLocation(deps.from))
   },
 })
 
@@ -40,7 +40,7 @@ function LoginPage() {
     setErrorMessage(null)
     try {
       await signIn.mutateAsync(values)
-      await navigate({ to: postSignInPath(from) })
+      await navigate(postSignInLocation(from))
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "errors.signInFailed"))
     }

@@ -25,3 +25,14 @@ export const postSignInPath = (from?: string, hasOnboarded = isOnboarded()) => {
   const target = from ? decodeRedirectUri(from) : undefined
   return target && isSameOriginPath(target) ? target : ROUTES.overview
 }
+
+// The router's `to` takes a pathname only, so a target like "/profile?tab=2" is split into `to`, `search` and `hash`.
+// shortcut: repeated query keys collapse to the last value; upgrade if a redirect target ever needs arrays.
+export const postSignInLocation = (from?: string, hasOnboarded = isOnboarded()) => {
+  const url = new URL(postSignInPath(from, hasOnboarded), "http://app.invalid")
+  return {
+    to: url.pathname,
+    search: Object.fromEntries(url.searchParams),
+    hash: url.hash.slice(1) || undefined,
+  }
+}

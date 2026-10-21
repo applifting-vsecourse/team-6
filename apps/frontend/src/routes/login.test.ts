@@ -28,4 +28,12 @@ describe("login loader", () => {
     )
     expect(isRedirect(error) && error.options.to).toBe("/profile")
   })
+
+  it("passes the query string of the deep link as search, not inside the path", async () => {
+    const error = await runLoader({ user: {} }, encodeURIComponent("/profile?tab=2")).catch(
+      (e: unknown) => e,
+    )
+    expect(isRedirect(error) && error.options.to).toBe("/profile")
+    expect(isRedirect(error) && error.options.search).toEqual({ tab: "2" })
+  })
 })
