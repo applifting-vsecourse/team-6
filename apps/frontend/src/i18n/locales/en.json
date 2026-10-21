@@ -7,12 +7,13 @@
     "name": "Name",
     "noAccount": "No account?",
     "password": "Password",
+    "passwordHint_one": "At least {{count}} character",
+    "passwordHint_other": "At least {{count}} characters",
     "signIn": "Sign in",
     "signInDescription": "Welcome back to Kvintet.",
     "signOut": "Sign out",
     "signUp": "Sign up",
     "signUpDescription": "Create your Kvintet account.",
-    "userMenu": "User menu",
     "username": "Username",
     "validation": {
       "emailInvalid": "Invalid email",
@@ -36,7 +37,7 @@
     "auth": {
       "EMAIL_NOT_VERIFIED": "Verify your email first.",
       "INVALID_EMAIL": "This email is not valid.",
-      "INVALID_EMAIL_OR_PASSWORD": "Incorrect email or password.",
+      "INVALID_EMAIL_OR_PASSWORD": "Sign in failed. Incorrect email or password.",
       "INVALID_USERNAME": "This username is not valid.",
       "INVALID_USERNAME_OR_PASSWORD": "Incorrect username or password.",
       "PASSWORD_TOO_LONG": "This password is too long.",
@@ -61,22 +62,36 @@
     "validation_failed": "Some of the entered values are not valid."
   },
   "landing": {
+    "caption": "No photos, no ratings – just people and topics.",
     "createAccount": "Create an account",
-    "openOverview": "Open overview",
-    "seoTitle": "Welcome",
-    "tagline": "Find your quintet."
+    "goToOverview": "Go to overview",
+    "heroText": "Kvintet seats five people at one table who can learn something from each other. You pick the group by topic, not by who you already know.",
+    "heroTitle": "Find your <em>kvintet</em>.",
+    "howItWorks": "How it works",
+    "step1Text": "Your role, what you can teach and what you want to learn. Tags, no photos.",
+    "step1Title": "Tell us about yourself",
+    "step2Text": "You see every group that fits you – roles and interests, names stay hidden until the group forms.",
+    "step2Title": "Pick a proposal",
+    "step3Text": "With five members it forms on its own. With three or four, when everyone votes yes. Then the group chat opens.",
+    "step3Title": "Form your kvintet"
+  },
+  "layout": {
+    "closeMenu": "Close menu",
+    "contactSupport": "Contact support",
+    "mainNavigation": "Main navigation",
+    "menu": "Menu",
+    "openMenu": "Open menu"
+  },
+  "nav": {
+    "overview": "Overview"
   },
   "onboarding": {
     "title": "Onboarding"
   },
   "overview": {
+    "greeting": "Welcome, <em>{{name}}</em>",
+    "greetingAnonymous": "Welcome",
     "title": "Overview"
-  },
-  "theme": {
-    "dark": "Dark",
-    "light": "Light",
-    "system": "System",
-    "toggle": "Toggle theme"
   },
   "validation": {
     "invalid": "Invalid value",

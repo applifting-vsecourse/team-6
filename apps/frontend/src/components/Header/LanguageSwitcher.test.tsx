@@ -12,11 +12,13 @@ describe("LanguageSwitcher", () => {
     const user = userEvent.setup()
     render(<LanguageSwitcher />)
 
-    await user.click(screen.getByRole("button", { name: "Language" }))
-    await user.click(await screen.findByRole("menuitemradio", { name: "Čeština" }))
+    expect(screen.getByRole("button", { name: "English" })).toHaveAttribute("aria-pressed", "true")
+
+    await user.click(screen.getByRole("button", { name: "Čeština" }))
 
     expect(i18n.resolvedLanguage).toBe("cs")
     expect(document.documentElement.lang).toBe("cs")
-    expect(screen.getByRole("button", { name: "Jazyk" })).toBeInTheDocument()
+    expect(screen.getByRole("group", { name: "Jazyk" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Čeština" })).toHaveAttribute("aria-pressed", "true")
   })
 })

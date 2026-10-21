@@ -9,6 +9,7 @@ import { Seo } from "@/components/Seo"
 import { getErrorMessage } from "@/lib/errorMessage"
 
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
+import { AppHeader } from "@/features/auth/components/AppHeader"
 import { SignInForm } from "@/features/auth/components/SignInForm"
 import { useSignIn } from "@/features/auth/hooks/useSignIn"
 import { postSignInPath } from "@/features/auth/lib/redirect"
@@ -49,6 +50,7 @@ function LoginPage() {
     <>
       <Seo title={t("auth.signIn")} />
       <AuthLayout
+        header={<AppHeader hasAccount={false} />}
         title={t("auth.signIn")}
         description={t("auth.signInDescription")}
         footer={

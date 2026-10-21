@@ -8,6 +8,7 @@ import { Seo } from "@/components/Seo"
 import { getErrorMessage } from "@/lib/errorMessage"
 
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
+import { AppHeader } from "@/features/auth/components/AppHeader"
 import { SignUpForm } from "@/features/auth/components/SignUpForm"
 import { useSignUp } from "@/features/auth/hooks/useSignUp"
 
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/signup")({
   loader: async ({ context }) => {
     const session = await context.queryClient.ensureQueryData(authSessionQueryOptions())
     if (!session) return
-    throw redirect({ to: ROUTES.home })
+    throw redirect({ to: ROUTES.overview })
   },
 })
 
@@ -40,7 +41,7 @@ function SignUpPage() {
         name: values.name,
         username: values.username,
       })
-      await navigate({ to: ROUTES.home })
+      await navigate({ to: ROUTES.overview })
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "errors.signUpFailed"))
     }
@@ -50,6 +51,7 @@ function SignUpPage() {
     <>
       <Seo title={t("auth.signUp")} />
       <AuthLayout
+        header={<AppHeader />}
         title={t("auth.signUp")}
         description={t("auth.signUpDescription")}
         footer={
@@ -57,7 +59,7 @@ function SignUpPage() {
             {t("auth.haveAccount")}{" "}
             <Link
               to={ROUTES.login}
-              className="font-medium text-foreground underline underline-offset-4"
+              className="text-foreground underline underline-offset-4"
             >
               {t("auth.signIn")}
             </Link>

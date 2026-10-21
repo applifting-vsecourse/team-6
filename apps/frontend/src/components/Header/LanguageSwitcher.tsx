@@ -1,45 +1,42 @@
-import { Languages } from "lucide-react"
+import { Fragment } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { locales } from "@/i18n"
+import { cn } from "@/lib/utils"
 
-export function LanguageSwitcher() {
+/** "CS / EN" text toggle from the design. The active language is the dark one. */
+export function LanguageSwitcher({ className }: { className?: string }) {
   const { t, i18n } = useTranslation()
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={t("common.language")}
-        >
-          <Languages className="size-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuRadioGroup
-          value={i18n.resolvedLanguage}
-          onValueChange={(code) => void i18n.changeLanguage(code)}
-        >
-          {locales.map((locale) => (
-            <DropdownMenuRadioItem
-              key={locale.code}
-              value={locale.code}
+    <div
+      role="group"
+      aria-label={t("common.language")}
+      className={cn("flex items-center gap-1.5", className)}
+    >
+      {locales.map((locale, index) => (
+        <Fragment key={locale.code}>
+          {index > 0 ? (
+            <span
+              aria-hidden
+              className="font-mono text-xs text-input"
             >
-              {locale.nativeName}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+              /
+            </span>
+          ) : null}
+          <Button
+            variant="ghost"
+            lang={locale.code}
+            aria-label={locale.nativeName}
+            aria-pressed={i18n.resolvedLanguage === locale.code}
+            onClick={() => void i18n.changeLanguage(locale.code)}
+            className="h-auto p-0 font-mono text-xs tracking-meta text-muted-foreground uppercase hover:bg-transparent aria-pressed:text-foreground"
+          >
+            {locale.code}
+          </Button>
+        </Fragment>
+      ))}
+    </div>
   )
 }

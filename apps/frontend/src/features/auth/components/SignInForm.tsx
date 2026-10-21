@@ -51,14 +51,8 @@ export function SignInForm({ isLoading, errorMessage, onSubmit }: SignInFormProp
       <form
         noValidate
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4"
+        className="space-y-5"
       >
-        {errorMessage ? (
-          <Alert variant="destructive">
-            <AlertDescription>{errorMessage}</AlertDescription>
-          </Alert>
-        ) : null}
-
         <FormField
           control={form.control}
           name="email"
@@ -95,6 +89,12 @@ export function SignInForm({ isLoading, errorMessage, onSubmit }: SignInFormProp
             </FormItem>
           )}
         />
+
+        {errorMessage ? (
+          <Alert variant="destructive">
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
+        ) : null}
 
         <Button
           type="submit"
