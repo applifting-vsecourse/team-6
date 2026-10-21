@@ -71,6 +71,7 @@ describe('auth against a real Postgres', () => {
     });
 
     expect(res.status).toBe(400);
+    expect(await res.json()).toMatchObject({ code: 'FIELD_NOT_ALLOWED' });
     expect(await prisma.user.count()).toBe(0);
   });
 });
