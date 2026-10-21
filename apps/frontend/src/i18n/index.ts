@@ -7,8 +7,8 @@ import en from "./locales/en.json"
 
 // Adding a language: drop `<code>.json` into ./locales and add one line here.
 export const locales = [
-  { code: "en", nativeName: "English", translation: en },
   { code: "cs", nativeName: "Čeština", translation: cs },
+  { code: "en", nativeName: "English", translation: en },
 ] as const
 
 void i18n

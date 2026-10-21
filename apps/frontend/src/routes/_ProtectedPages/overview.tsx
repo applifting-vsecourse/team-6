@@ -1,20 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 
 import watermark from "@/assets/logo-watermark.svg"
 import { Seo } from "@/components/Seo"
+import { formatLongDate } from "@/lib/date"
 
 import { useSession } from "@/features/auth/hooks/useSession"
 
 export const Route = createFileRoute("/_ProtectedPages/overview")({
   component: OverviewPage,
-})
-
-const longDate = new Intl.DateTimeFormat("cs-CZ", {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-  year: "numeric",
 })
 
 // Stub: greeting only. The design's next-step and profile blocks need data from later stories.
@@ -36,15 +30,17 @@ function OverviewPage() {
           className="pointer-events-none absolute top-2 right-4 hidden size-45.5 md:block"
         />
         <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
-          {longDate.format(new Date())}
+          {formatLongDate(new Date())}
         </p>
         <h1 className="mt-2 text-title">
           {firstName ? (
-            <>
-              Vítejte, <em>{firstName}</em>
-            </>
+            <Trans
+              i18nKey="overview.greeting"
+              values={{ name: firstName }}
+              components={{ em: <em /> }}
+            />
           ) : (
-            "Vítejte"
+            t("overview.greetingAnonymous")
           )}
         </h1>
       </div>

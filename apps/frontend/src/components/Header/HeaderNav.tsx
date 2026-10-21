@@ -9,7 +9,7 @@ export function HeaderNav({ className }: { className?: string }) {
 
   return (
     <nav
-      aria-label="Hlavní navigace"
+      aria-label={t("layout.mainNavigation")}
       className={cn("items-center gap-8", className)}
     >
       {NAV_ITEMS.map((item) => (

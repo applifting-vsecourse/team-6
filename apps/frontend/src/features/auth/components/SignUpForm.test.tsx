@@ -10,6 +10,9 @@ import userEvent from "@testing-library/user-event"
 
 import { SignUpForm } from "./SignUpForm"
 
+// The gaze driver needs browser APIs jsdom lacks (matchMedia, ResizeObserver).
+vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
+
 async function renderForm(onSubmit = vi.fn()) {
   const rootRoute = createRootRoute()
   const indexRoute = createRoute({
@@ -107,5 +110,20 @@ describe("SignUpForm password rules", () => {
 
     expect(await screen.findByText("Password must be at least 8 characters")).toBeInTheDocument()
     expect(onSubmit).not.toHaveBeenCalled()
+  })
+})
+
+describe("SignUpForm avatar preview", () => {
+  it("updates the avatar preview as the username is typed", async () => {
+    const user = userEvent.setup()
+    await renderForm()
+    const preview = () => document.querySelector("[data-slot=avatar]")?.innerHTML
+
+    await user.type(screen.getByLabelText("Username"), "jana")
+    const before = preview()
+    await user.type(screen.getByLabelText("Username"), "2")
+
+    expect(before).toBeTruthy()
+    expect(preview()).not.toBe(before)
   })
 })

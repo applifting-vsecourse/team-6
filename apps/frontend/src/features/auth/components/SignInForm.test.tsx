@@ -44,12 +44,12 @@ describe("SignInForm", () => {
     render(
       <SignInForm
         isLoading
-        errorMessage="Přihlášení se nezdařilo."
+        errorMessage="Sign in failed"
         onSubmit={vi.fn()}
       />,
     )
 
-    expect(screen.getByRole("alert")).toHaveTextContent("Přihlášení se nezdařilo.")
+    expect(screen.getByRole("alert")).toHaveTextContent("Sign in failed")
     expect(screen.getByRole("button", { name: "Sign in" })).toBeDisabled()
   })
 })

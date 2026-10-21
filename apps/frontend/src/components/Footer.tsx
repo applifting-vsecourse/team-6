@@ -23,7 +23,7 @@ export function Footer() {
             href={`mailto:${SUPPORT_EMAIL}`}
             className="hover:underline"
           >
-            {t("footer.contactSupport")}
+            {t("layout.contactSupport")}
           </a>
         </div>
         <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase md:ml-auto">
