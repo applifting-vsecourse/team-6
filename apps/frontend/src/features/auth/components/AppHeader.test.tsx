@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
-import { render, screen } from "@testing-library/react"
+import { render, screen, within } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { AppHeader } from "@/features/auth/components/AppHeader"
@@ -33,7 +34,18 @@ describe("AppHeader", () => {
     render(<AppHeader />)
 
     expect(screen.getByRole("link", { name: "Sign in" })).toBeInTheDocument()
-    expect(screen.queryByRole("button", { name: "Open menu" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("navigation")).not.toBeInTheDocument()
+  })
+
+  it("puts the language switch in the mobile menu, with or without a session", async () => {
+    useSession.mockReturnValue({ user: null })
+    render(<AppHeader hasAccount={false} />)
+
+    await userEvent.click(screen.getByRole("button", { name: "Open menu" }))
+
+    expect(
+      within(screen.getByRole("dialog")).getByRole("group", { name: "Language" }),
+    ).toBeInTheDocument()
     expect(screen.queryByRole("navigation")).not.toBeInTheDocument()
   })
 

@@ -84,7 +84,7 @@ export function MobileAccount() {
   if (!user) return null
 
   return (
-    <div className="flex flex-col gap-0.5 border-t border-border pt-4">
+    <div className="flex flex-col gap-0.5">
       <div className="flex items-center gap-2">
         <Blobatar
           name={user.username ?? user.id}

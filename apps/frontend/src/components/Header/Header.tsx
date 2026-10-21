@@ -21,9 +21,12 @@ export function Header({ hasNav = false, userMenu, mobileAccount }: HeaderProps)
         <HeaderLogo />
         {hasNav ? <HeaderNav className="hidden md:flex" /> : null}
         <div className="ml-auto flex items-center gap-5">
-          <LanguageSwitcher />
+          <LanguageSwitcher className="hidden md:flex" />
           {userMenu}
-          {hasNav ? <MobileMenu account={mobileAccount} /> : null}
+          <MobileMenu
+            hasNav={hasNav}
+            account={mobileAccount}
+          />
         </div>
       </div>
     </header>
