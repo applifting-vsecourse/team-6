@@ -27,6 +27,7 @@ export function useSignUp() {
       if (error) throw toAuthError(error)
     },
     onSuccess: async () => {
+      queryClient.clear()
       await queryClient.invalidateQueries({ queryKey: authKeys.session() })
     },
   })

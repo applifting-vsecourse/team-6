@@ -84,8 +84,81 @@ model User {
 
   username        String? @db.VarChar(50)
   displayUsername String? @db.VarChar(50)
+  profile         Profile?
 
   @@unique([email])
   @@unique([username])
   @@map("user")
+}
+
+enum MeetingFrequency {
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+
+  @@map("meeting_frequency")
+}
+
+enum TagKind {
+  TEACH
+  LEARN
+  INTEREST
+
+  @@map("tag_kind")
+}
+
+model City {
+  id       String    @id @default(cuid())
+  name     String
+  lat      Float
+  lng      Float
+  profiles Profile[]
+
+  @@map("city")
+}
+
+model Tag {
+  id        String       @id @default(cuid())
+  slug      String       @unique
+  createdAt DateTime     @default(now()) @map("created_at")
+  profiles  ProfileTag[]
+
+  @@map("tag")
+}
+
+model ProfileTag {
+  userId  String  @map("user_id")
+  tagId   String  @map("tag_id")
+  kind    TagKind
+  profile Profile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([userId, tagId, kind])
+  @@map("profile_tag")
+}
+
+model Profile {
+  userId                String            @id @map("user_id")
+  user                  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  position              String?
+  roles                 String[]          @default([])
+  latitude              Float?            @map("latitude")
+  longitude             Float?            @map("longitude")
+  expectations          String?
+  meetingFrequency      MeetingFrequency? @map("meeting_frequency")
+  weekdays              Boolean           @default(false)
+  weekends              Boolean           @default(false)
+  mornings              Boolean           @default(false)
+  afternoons            Boolean           @default(false)
+  evenings              Boolean           @default(false)
+  cityId                String?           @map("city_id")
+  city                  City?             @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  radiusKm              Int?              @map("radius_km")
+  note                  String?           @db.Text
+  onboardingCompletedAt DateTime?         @map("onboarding_completed_at")
+  createdAt             DateTime          @default(now()) @map("created_at")
+  updatedAt             DateTime          @updatedAt @map("updated_at")
+  tags                  ProfileTag[]
+
+  @@map("profile")
 }

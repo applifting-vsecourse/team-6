@@ -1,0 +1,161 @@
+import { useState } from "react"
+import { useTranslation } from "react-i18next"
+
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+
+import type { City } from "@/features/profile/api/profileApi"
+import {
+  DEFAULT_EUROPE_LAT,
+  DEFAULT_EUROPE_LNG,
+  DEFAULT_RADIUS_KM,
+  LocationMapPicker,
+} from "@/features/profile/components/LocationMapPicker"
+
+export type Step2Data = {
+  weekdays: boolean
+  weekends: boolean
+  mornings: boolean
+  afternoons: boolean
+  evenings: boolean
+  cityId?: string | null
+  radiusKm: number
+  latitude?: number | null
+  longitude?: number | null
+}
+
+type Step2AvailabilityProps = {
+  initialData: Step2Data
+  cities?: City[]
+  onBack: () => void
+  onContinue: (data: Step2Data) => void
+}
+
+export function Step2Availability({ initialData, onBack, onContinue }: Step2AvailabilityProps) {
+  const { t } = useTranslation()
+
+  const [hasWeekdays, setHasWeekdays] = useState(initialData.weekdays)
+  const [hasWeekends, setHasWeekends] = useState(initialData.weekends)
+  const [hasMornings, setHasMornings] = useState(initialData.mornings)
+  const [hasAfternoons, setHasAfternoons] = useState(initialData.afternoons)
+  const [hasEvenings, setHasEvenings] = useState(initialData.evenings)
+  const [cityId] = useState(initialData.cityId ?? null)
+  const [radiusKm, setRadiusKm] = useState(
+    initialData.radiusKm > 0 ? initialData.radiusKm : DEFAULT_RADIUS_KM,
+  )
+  const [latitude, setLatitude] = useState<number | null>(
+    initialData.latitude ?? DEFAULT_EUROPE_LAT,
+  )
+  const [longitude, setLongitude] = useState<number | null>(
+    initialData.longitude ?? DEFAULT_EUROPE_LNG,
+  )
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    onContinue({
+      weekdays: hasWeekdays,
+      weekends: hasWeekends,
+      mornings: hasMornings,
+      afternoons: hasAfternoons,
+      evenings: hasEvenings,
+      cityId,
+      radiusKm,
+      latitude: latitude ?? DEFAULT_EUROPE_LAT,
+      longitude: longitude ?? DEFAULT_EUROPE_LNG,
+    })
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-7"
+    >
+      <div className="flex flex-col gap-2">
+        <h1 className="font-serif text-title text-foreground">{t("onboarding.step2.title")}</h1>
+        <p className="text-lg text-foreground/80">{t("onboarding.step2.description")}</p>
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-border pt-6">
+        <h3 className="font-serif text-subheading font-semibold text-foreground">
+          {t("onboarding.step2.daysTitle")}
+        </h3>
+        <div className="flex flex-col gap-3 sm:flex-row sm:gap-6">
+          <label className="flex cursor-pointer items-center gap-2.5">
+            <Checkbox
+              checked={hasWeekdays}
+              onCheckedChange={(checked) => setHasWeekdays(Boolean(checked))}
+            />
+            <span className="text-base text-foreground">{t("onboarding.step2.weekdays")}</span>
+          </label>
+          <label className="flex cursor-pointer items-center gap-2.5">
+            <Checkbox
+              checked={hasWeekends}
+              onCheckedChange={(checked) => setHasWeekends(Boolean(checked))}
+            />
+            <span className="text-base text-foreground">{t("onboarding.step2.weekends")}</span>
+          </label>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-border pt-6">
+        <h3 className="font-serif text-subheading font-semibold text-foreground">
+          {t("onboarding.step2.timeOfDayTitle")}
+        </h3>
+        <div className="flex flex-col gap-3 sm:flex-row sm:gap-6">
+          <label className="flex cursor-pointer items-center gap-2.5">
+            <Checkbox
+              checked={hasMornings}
+              onCheckedChange={(checked) => setHasMornings(Boolean(checked))}
+            />
+            <span className="text-base text-foreground">{t("onboarding.step2.mornings")}</span>
+          </label>
+          <label className="flex cursor-pointer items-center gap-2.5">
+            <Checkbox
+              checked={hasAfternoons}
+              onCheckedChange={(checked) => setHasAfternoons(Boolean(checked))}
+            />
+            <span className="text-base text-foreground">{t("onboarding.step2.afternoons")}</span>
+          </label>
+          <label className="flex cursor-pointer items-center gap-2.5">
+            <Checkbox
+              checked={hasEvenings}
+              onCheckedChange={(checked) => setHasEvenings(Boolean(checked))}
+            />
+            <span className="text-base text-foreground">{t("onboarding.step2.evenings")}</span>
+          </label>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-border pt-6">
+        <div className="flex flex-col gap-0.5">
+          <h3 className="font-serif text-subheading font-semibold text-foreground">
+            {t("onboarding.step2.whereTitle")}
+          </h3>
+          <p className="text-sm text-muted-foreground">{t("onboarding.step2.whereHint")}</p>
+        </div>
+
+        <LocationMapPicker
+          latitude={latitude}
+          longitude={longitude}
+          radiusKm={radiusKm}
+          onChange={(loc) => {
+            setLatitude(loc.latitude)
+            setLongitude(loc.longitude)
+            setRadiusKm(loc.radiusKm)
+          }}
+        />
+      </div>
+
+      <div className="flex items-center justify-between pt-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onBack}
+        >
+          {t("common.back")}
+        </Button>
+        <Button type="submit">{t("common.continue")}</Button>
+      </div>
+    </form>
+  )
+}

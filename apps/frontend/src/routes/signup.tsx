@@ -41,7 +41,7 @@ function SignUpPage() {
         name: values.name,
         username: values.username,
       })
-      await navigate({ to: ROUTES.overview })
+      await navigate({ to: ROUTES.onboarding })
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "errors.signUpFailed"))
     }

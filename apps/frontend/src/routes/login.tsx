@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
@@ -12,7 +13,8 @@ import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOpt
 import { AppHeader } from "@/features/auth/components/AppHeader"
 import { SignInForm } from "@/features/auth/components/SignInForm"
 import { useSignIn } from "@/features/auth/hooks/useSignIn"
-import { postSignInLocation } from "@/features/auth/lib/redirect"
+import { isOnboarded, postSignInLocation } from "@/features/auth/lib/redirect"
+import { profileQueryOptions } from "@/features/profile/api/profileApi"
 
 const loginSearchParamsSchema = z.object({
   from: z.string().optional(),
@@ -25,7 +27,11 @@ export const Route = createFileRoute("/login")({
   loader: async ({ context, deps }) => {
     const session = await context.queryClient.ensureQueryData(authSessionQueryOptions())
     if (!session) return
-    throw redirect(postSignInLocation(deps.from))
+    const profile = await context.queryClient
+      .ensureQueryData(profileQueryOptions(session.user.id))
+      .catch(() => null)
+    const hasOnboarded = isOnboarded(profile)
+    throw redirect(postSignInLocation(deps.from, hasOnboarded))
   },
 })
 
@@ -33,6 +39,7 @@ function LoginPage() {
   const { t } = useTranslation()
   const { from } = Route.useSearch()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const signIn = useSignIn()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -40,7 +47,12 @@ function LoginPage() {
     setErrorMessage(null)
     try {
       await signIn.mutateAsync(values)
-      await navigate(postSignInLocation(from))
+      const session = await queryClient.fetchQuery(authSessionQueryOptions())
+      const profile = session?.user.id
+        ? await queryClient.fetchQuery(profileQueryOptions(session.user.id)).catch(() => null)
+        : null
+      const hasOnboarded = isOnboarded(profile)
+      await navigate(postSignInLocation(from, hasOnboarded))
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "errors.signInFailed"))
     }
