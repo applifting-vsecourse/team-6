@@ -2,9 +2,7 @@ import { Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
-
-// Placeholder address from the design; replace once a real support mailbox exists.
-const SUPPORT_EMAIL = "podpora@kvintet.example"
+import { SUPPORT_EMAIL } from "@/features/legal/constants"
 
 export function Footer() {
   const { t } = useTranslation()
