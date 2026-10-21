@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
+import { AvatarPreview } from "@/features/auth/components/AvatarPreview"
+
 const PASSWORD_MIN_LENGTH = 8
 
 const createSchema = (t: TFunction) =>
@@ -99,12 +101,16 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t("auth.username")}</FormLabel>
-              <FormControl>
-                <Input
-                  autoComplete="username"
-                  {...field}
-                />
-              </FormControl>
+              <div className="flex items-center gap-3">
+                <FormControl>
+                  <Input
+                    autoComplete="username"
+                    {...field}
+                  />
+                </FormControl>
+                <AvatarPreview name={field.value.trim()} />
+              </div>
+              <FormDescription>{t("auth.usernameHint")}</FormDescription>
               <FormMessage />
             </FormItem>
           )}

@@ -3,6 +3,7 @@ import { ChevronDown, LogOut } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
+import { Blobatar } from "@/components/ui/blobatar"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -40,6 +41,10 @@ export function HeaderMenu() {
           size="sm"
           className="hidden text-sm font-normal text-body md:inline-flex"
         >
+          <Blobatar
+            name={user.username ?? user.id}
+            size="sm"
+          />
           {user.name}
           <ChevronDown aria-hidden />
         </Button>
@@ -77,7 +82,13 @@ export function MobileAccount() {
 
   return (
     <div className="flex flex-col gap-0.5 border-t border-border pt-4">
-      <p className="font-semibold text-foreground">{user.name}</p>
+      <div className="flex items-center gap-2">
+        <Blobatar
+          name={user.username ?? user.id}
+          size="sm"
+        />
+        <p className="font-semibold text-foreground">{user.name}</p>
+      </div>
       <Button
         variant="link"
         onClick={() => signOut.mutate()}

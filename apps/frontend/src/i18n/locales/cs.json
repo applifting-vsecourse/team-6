@@ -16,6 +16,7 @@
     "signUp": "Registrovat se",
     "signUpDescription": "Vytvořte si účet v Kvintetu.",
     "username": "Uživatelské jméno",
+    "usernameHint": "Váš avatar se vytváří z uživatelského jména.",
     "validation": {
       "emailInvalid": "Neplatný e-mail",
       "emailRequired": "Zadejte e-mail",

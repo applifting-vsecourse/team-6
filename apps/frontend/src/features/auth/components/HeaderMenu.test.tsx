@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { MobileAccount } from "@/features/auth/components/HeaderMenu"
 
-const useSession = vi.fn<() => { user: { name: string; username: string } | null }>()
+const useSession = vi.fn<() => { user: { id: string; name: string; username: string } | null }>()
 const signOut = vi.fn()
 
 vi.mock("@/features/auth/hooks/useSession", () => ({ useSession: () => useSession() }))
@@ -26,7 +26,7 @@ describe("MobileAccount", () => {
   })
 
   it("shows the user and signs out on click", async () => {
-    useSession.mockReturnValue({ user: { name: "Jana Nováková", username: "jana" } })
+    useSession.mockReturnValue({ user: { id: "u1", name: "Jana Nováková", username: "jana" } })
     render(<MobileAccount />)
 
     expect(screen.getByText("Jana Nováková")).toBeInTheDocument()

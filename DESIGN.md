@@ -52,6 +52,16 @@ Use the scale only: `1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 14, 16, 22, 24` (Tai
 - The submit button shows a pending state and is disabled while submitting.
 - Never disable a submit button just because the form is untouched — let the user try and show them what's wrong.
 
+## People are blobatars
+
+Kvintet shows no photos, so every person is represented by a generated avatar from [blobatar](https://blobatar.dev): the same string always renders the same creature, with nothing stored or uploaded. Use `Blobatar` from `@/components/ui/blobatar` wherever a person appears (chat messages, member lists, kvintet cards) — never initials, stock icons or a hand-rolled avatar.
+
+- **Seed:** the user's `username`, falling back to `id` when there is none. Use the same seed everywhere, or one person turns into two faces. Never seed from the e-mail (it is private).
+- **Static by default.** A static blobatar is one `<img>`; an animated one is ~12 SVG nodes. Lists and chat (many avatars, small) stay static.
+- **Animated only for a single, large avatar** — a sign-up preview, a profile header: `AvatarPreview` (`features/auth/components/`) idles and its eyes follow the cursor (`useGaze`). Motion is invisible under ~40px, so don't animate small ones. It switches itself off for `prefers-reduced-motion` and on touch.
+- **Decorative by default** (no alt text) because the name is written next to it. If an avatar stands alone, pass `blobatar={{ title: name }}`.
+- **Tests:** jsdom lacks `matchMedia`/`ResizeObserver`, so a test that renders `AvatarPreview` mocks `@blobatar/react/gaze` (see `SignUpForm.test.tsx`).
+
 ## Every list has three states
 
 Loading, empty, and error — all three, always. An empty list renders an empty state with one sentence saying what would appear here, not a blank area. An error renders the message and a way to retry.

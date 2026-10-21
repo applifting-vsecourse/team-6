@@ -4,6 +4,9 @@ import { describe, expect, it, vi } from "vitest"
 
 import { SignUpForm } from "@/features/auth/components/SignUpForm"
 
+// The gaze driver needs browser APIs jsdom lacks (matchMedia, ResizeObserver).
+vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
+
 async function fillForm(password: string, passwordConfirmation: string) {
   await userEvent.type(screen.getByLabelText("Name"), "Jana Nováková")
   await userEvent.type(screen.getByLabelText("Username"), "jana")
@@ -14,6 +17,23 @@ async function fillForm(password: string, passwordConfirmation: string) {
 }
 
 describe("SignUpForm", () => {
+  it("updates the avatar preview as the username is typed", async () => {
+    const { container } = render(
+      <SignUpForm
+        isLoading={false}
+        onSubmit={vi.fn()}
+      />,
+    )
+    const preview = () => container.querySelector("[data-slot=avatar]")?.innerHTML
+
+    await userEvent.type(screen.getByLabelText("Username"), "jana")
+    const before = preview()
+    await userEvent.type(screen.getByLabelText("Username"), "2")
+
+    expect(before).toBeTruthy()
+    expect(preview()).not.toBe(before)
+  })
+
   it("rejects passwords that do not match", async () => {
     const onSubmit = vi.fn()
     render(

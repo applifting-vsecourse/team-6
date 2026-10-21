@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { AppHeader } from "@/features/auth/components/AppHeader"
 
-const useSession = vi.fn<() => { user: { name: string; username: string } | null }>()
+const useSession = vi.fn<() => { user: { id: string; name: string; username: string } | null }>()
 
 vi.mock("@/features/auth/hooks/useSession", () => ({ useSession: () => useSession() }))
 vi.mock("@/features/auth/hooks/useSignOut", () => ({
@@ -35,7 +35,7 @@ describe("AppHeader", () => {
   })
 
   it("shows navigation and the mobile menu when signed in", () => {
-    useSession.mockReturnValue({ user: { name: "Jana Nováková", username: "jana" } })
+    useSession.mockReturnValue({ user: { id: "u1", name: "Jana Nováková", username: "jana" } })
     render(<AppHeader />)
 
     expect(screen.getByRole("button", { name: "Open menu" })).toBeInTheDocument()
