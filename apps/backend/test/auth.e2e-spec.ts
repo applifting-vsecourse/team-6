@@ -58,9 +58,10 @@ describe('auth against a real Postgres', () => {
     const user = await prisma.user.findFirstOrThrow();
     expect(user.role).toBe('user');
     expect(user.codeOfConductVersion).toBe(CODE_OF_CONDUCT_VERSION);
-    expect(user.codeOfConductAcceptedAt?.getTime()).toBeGreaterThanOrEqual(
-      before,
-    );
+    const acceptedAt = user.codeOfConductAcceptedAt;
+    expect(acceptedAt).not.toBeNull();
+    expect(acceptedAt?.getTime()).toBeGreaterThanOrEqual(before);
+    expect(acceptedAt?.getTime()).toBeLessThanOrEqual(Date.now());
   });
 
   it('rejects a sign-up that brings its own consent timestamp', async () => {
