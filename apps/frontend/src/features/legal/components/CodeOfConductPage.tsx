@@ -1,6 +1,6 @@
 import { Trans, useTranslation } from "react-i18next"
 
-import { SUPPORT_EMAIL } from "@/features/legal/constants"
+import { SUPPORT_EMAIL } from "@/config/support"
 
 const RULES = ["rule1", "rule2", "rule3", "rule4", "rule5"] as const
 const REPORT_STEPS = ["reportStep1", "reportStep2", "reportStep3"] as const

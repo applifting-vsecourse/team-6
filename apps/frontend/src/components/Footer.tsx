@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
-import { SUPPORT_EMAIL } from "@/features/legal/constants"
+import { SUPPORT_EMAIL } from "@/config/support"
 
 export function Footer() {
   const { t } = useTranslation()
