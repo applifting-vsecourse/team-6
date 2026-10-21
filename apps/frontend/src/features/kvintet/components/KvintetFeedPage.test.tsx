@@ -68,9 +68,7 @@ describe("KvintetFeedPage", () => {
   })
 
   it("lists the open proposals with their count", async () => {
-    serve(() =>
-      Promise.resolve([kvintet("k1", "From Excel to Python"), kvintet("k2", "Spanish")]),
-    )
+    serve(() => Promise.resolve([kvintet("k1", "From Excel to Python"), kvintet("k2", "Spanish")]))
     renderPage()
 
     expect(await screen.findByRole("heading", { name: "From Excel to Python" })).toBeInTheDocument()

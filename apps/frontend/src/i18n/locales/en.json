@@ -90,76 +90,6 @@
     "unexpected": "An unexpected error occurred.",
     "validation_failed": "Some of the entered values are not valid."
   },
-  "landing": {
-    "caption": "No photos, no ratings – just people and topics.",
-    "createAccount": "Create an account",
-    "goToOverview": "Go to overview",
-    "heroText": "Kvintet seats five people at one table who can learn something from each other. You pick the group by topic, not by who you already know.",
-    "heroTitle": "Find your <em>kvintet</em>.",
-    "howItWorks": "How it works",
-    "step1Text": "Your role, what you can teach and what you want to learn. Tags, no photos.",
-    "step1Title": "Tell us about yourself",
-    "step2Text": "You see every group that fits you – roles and interests, names stay hidden until the group forms.",
-    "step2Title": "Pick a proposal",
-    "step3Text": "With five members it forms on its own. With three or four, when everyone votes yes. Then the group chat opens.",
-    "step3Title": "Form your kvintet"
-  },
-  "layout": {
-    "closeMenu": "Close menu",
-    "contactSupport": "Contact support",
-    "mainNavigation": "Main navigation",
-    "menu": "Menu",
-    "openMenu": "Open menu"
-  },
-  "meetingFrequency": {
-    "BIWEEKLY": "every 14 days",
-    "MONTHLY": "once a month",
-    "WEEKLY": "every week"
-  },
-  "nav": {
-    "overview": "Overview",
-    "kvintetFeed": "Proposals",
-    "kvintetFeedDisabled": "You are already in a kvintet, so you can't browse other proposals."
-  },
-  "onboarding": {
-    "title": "Onboarding"
-  },
-  "overview": {
-    "greeting": "Welcome, <em>{{name}}</em>",
-    "greetingAnonymous": "Welcome",
-    "title": "Overview"
-  },
-  "tags": {
-    "board-games": "Board games",
-    "cooking": "Cooking",
-    "copywriting": "Copywriting",
-    "data-analysis": "Data analysis",
-    "excel": "Excel",
-    "hiking": "Hiking",
-    "interviewing": "Interviewing",
-    "music": "Music",
-    "negotiation": "Negotiation",
-    "public-speaking": "Public speaking",
-    "python": "Python",
-    "roadmapping": "Roadmapping",
-    "running": "Running",
-    "social-media": "Social media",
-    "spanish": "Spanish",
-    "sql": "SQL",
-    "startups": "Startups",
-    "statistics": "Statistics",
-    "travel": "Travel",
-    "ux-design": "UX design"
-  },
-  "validation": {
-    "invalid": "Invalid value",
-    "isEmail": "Invalid email",
-    "isNotEmpty": "Value is required",
-    "isString": "Value must be text",
-    "maxLength": "Value is too long",
-    "minLength": "Value is too short",
-    "whitelistValidation": "Unexpected field"
-  },
   "kvintet": {
     "alreadyMember": "You are already in a proposal.",
     "count_one": "{{formatted}} proposal",
@@ -212,5 +142,75 @@
       "titleRequired": "Enter a topic",
       "titleTooLong": "The topic can be at most {{max}} characters"
     }
+  },
+  "landing": {
+    "caption": "No photos, no ratings – just people and topics.",
+    "createAccount": "Create an account",
+    "goToOverview": "Go to overview",
+    "heroText": "Kvintet seats five people at one table who can learn something from each other. You pick the group by topic, not by who you already know.",
+    "heroTitle": "Find your <em>kvintet</em>.",
+    "howItWorks": "How it works",
+    "step1Text": "Your role, what you can teach and what you want to learn. Tags, no photos.",
+    "step1Title": "Tell us about yourself",
+    "step2Text": "You see every group that fits you – roles and interests, names stay hidden until the group forms.",
+    "step2Title": "Pick a proposal",
+    "step3Text": "With five members it forms on its own. With three or four, when everyone votes yes. Then the group chat opens.",
+    "step3Title": "Form your kvintet"
+  },
+  "layout": {
+    "closeMenu": "Close menu",
+    "contactSupport": "Contact support",
+    "mainNavigation": "Main navigation",
+    "menu": "Menu",
+    "openMenu": "Open menu"
+  },
+  "meetingFrequency": {
+    "BIWEEKLY": "every 14 days",
+    "MONTHLY": "once a month",
+    "WEEKLY": "every week"
+  },
+  "nav": {
+    "kvintetFeed": "Proposals",
+    "kvintetFeedDisabled": "You are already in a kvintet, so you can't browse other proposals.",
+    "overview": "Overview"
+  },
+  "onboarding": {
+    "title": "Onboarding"
+  },
+  "overview": {
+    "greeting": "Welcome, <em>{{name}}</em>",
+    "greetingAnonymous": "Welcome",
+    "title": "Overview"
+  },
+  "tags": {
+    "board-games": "Board games",
+    "cooking": "Cooking",
+    "copywriting": "Copywriting",
+    "data-analysis": "Data analysis",
+    "excel": "Excel",
+    "hiking": "Hiking",
+    "interviewing": "Interviewing",
+    "music": "Music",
+    "negotiation": "Negotiation",
+    "public-speaking": "Public speaking",
+    "python": "Python",
+    "roadmapping": "Roadmapping",
+    "running": "Running",
+    "social-media": "Social media",
+    "spanish": "Spanish",
+    "sql": "SQL",
+    "startups": "Startups",
+    "statistics": "Statistics",
+    "travel": "Travel",
+    "ux-design": "UX design"
+  },
+  "validation": {
+    "invalid": "Invalid value",
+    "isEmail": "Invalid email",
+    "isNotEmpty": "Value is required",
+    "isString": "Value must be text",
+    "maxLength": "Value is too long",
+    "minLength": "Value is too short",
+    "whitelistValidation": "Unexpected field"
   }
 }

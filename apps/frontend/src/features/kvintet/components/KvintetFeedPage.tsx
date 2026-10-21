@@ -45,9 +45,7 @@ export function KvintetFeedPage() {
 
         <section className="flex flex-col gap-4 rounded-lg border border-primary px-5 py-4 sm:flex-row sm:items-center sm:gap-6">
           <div className="flex flex-1 flex-col gap-0.5">
-            <p className="text-base font-semibold text-foreground">
-              {t("kvintet.startOwn.title")}
-            </p>
+            <p className="text-base font-semibold text-foreground">{t("kvintet.startOwn.title")}</p>
             <p className="text-sm text-body">{t("kvintet.startOwn.text")}</p>
           </div>
           <Button
