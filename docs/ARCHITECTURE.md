@@ -86,7 +86,7 @@ erDiagram
 
 **Admin account:** `user.role` already exists and users cannot set it through the API. The admin registers normally, then someone sets `role = 'admin'` in the database.
 
-**Sign-up consent:** `codeOfConductAcceptedAt` and `codeOfConductVersion` are BetterAuth additional fields with `input: false`, like `role`. A sign-up hook rejects a request without the consent flag and sets both values on the server. The client never sends the timestamp or the version.
+**Sign-up consent:** `codeOfConductAcceptedAt` and `codeOfConductVersion` are BetterAuth additional fields with `input: false`, like `role`. A `databaseHooks.user.create.before` hook (`shared/auth/hooks/code-of-conduct.hook.ts`) rejects a sign-up whose body lacks `acceptCodeOfConduct: true` with `CODE_OF_CONDUCT_REQUIRED` and sets both values on the server; the current version is the `CODE_OF_CONDUCT_VERSION` constant in `shared/auth/code-of-conduct.ts` (bump it when the text changes). The client sends only the flag, never the timestamp or the version (BetterAuth answers 400 if it does). Any code that signs users up server-side, like the seed, must pass the flag too.
 
 ### Critical flows
 

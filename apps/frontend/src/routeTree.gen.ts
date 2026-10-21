@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtectedPagesRouteImport } from './routes/_ProtectedPages'
+import { Route as CodeOfConductRouteImport } from './routes/code-of-conduct'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ProtectedPagesOnboardingRouteImport } from './routes/_ProtectedPages/onboarding'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const ProtectedPagesRoute = ProtectedPagesRouteImport.update({
   id: '/_ProtectedPages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CodeOfConductRoute = CodeOfConductRouteImport.update({
+  id: '/code-of-conduct',
+  path: '/code-of-conduct',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -49,6 +55,7 @@ const ProtectedPagesOverviewRoute = ProtectedPagesOverviewRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/code-of-conduct': typeof CodeOfConductRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/onboarding': typeof ProtectedPagesOnboardingRoute
@@ -56,6 +63,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/code-of-conduct': typeof CodeOfConductRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/onboarding': typeof ProtectedPagesOnboardingRoute
@@ -65,6 +73,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_ProtectedPages': typeof ProtectedPagesRouteWithChildren
+  '/code-of-conduct': typeof CodeOfConductRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/_ProtectedPages/onboarding': typeof ProtectedPagesOnboardingRoute
@@ -72,13 +81,26 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/signup' | '/onboarding' | '/overview'
+  fullPaths:
+    | '/'
+    | '/code-of-conduct'
+    | '/login'
+    | '/signup'
+    | '/onboarding'
+    | '/overview'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup' | '/onboarding' | '/overview'
+  to:
+    | '/'
+    | '/code-of-conduct'
+    | '/login'
+    | '/signup'
+    | '/onboarding'
+    | '/overview'
   id:
     | '__root__'
     | '/'
     | '/_ProtectedPages'
+    | '/code-of-conduct'
     | '/login'
     | '/signup'
     | '/_ProtectedPages/onboarding'
@@ -88,6 +110,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProtectedPagesRoute: typeof ProtectedPagesRouteWithChildren
+  CodeOfConductRoute: typeof CodeOfConductRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
 }
@@ -106,6 +129,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof ProtectedPagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/code-of-conduct': {
+      id: '/code-of-conduct'
+      path: '/code-of-conduct'
+      fullPath: '/code-of-conduct'
+      preLoaderRoute: typeof CodeOfConductRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -156,6 +186,7 @@ const ProtectedPagesRouteWithChildren = ProtectedPagesRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedPagesRoute: ProtectedPagesRouteWithChildren,
+  CodeOfConductRoute: CodeOfConductRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
 }
