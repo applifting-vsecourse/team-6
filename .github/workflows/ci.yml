@@ -8,6 +8,18 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: quacker
+          POSTGRES_PASSWORD: quacker
+          POSTGRES_DB: quacker_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U quacker -d quacker_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v5
 
@@ -41,6 +53,11 @@ jobs:
 
       - name: Test backend
         run: pnpm backend test
+
+      - name: Integration tests backend
+        run: pnpm backend test:integration
+        env:
+          TEST_DATABASE_URL: postgresql://quacker:quacker@localhost:5432/quacker_test
 
       - name: Test frontend
         run: pnpm frontend test:ci

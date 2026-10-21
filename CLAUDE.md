@@ -16,6 +16,7 @@ Backend modules and frontend features follow the layering in [`docs/ARCHITECTURE
 - `pnpm dev` — everything: env files, Postgres (Docker), migrate, seed, both dev servers
 - `pnpm check-all` — lint + type-check + tests + build (same as CI)
 - `pnpm backend test` / `pnpm frontend test:ci` — unit tests
+- `pnpm backend test:integration` — `*.e2e-spec.ts` in `apps/backend/test/` against a real Postgres (`TEST_DATABASE_URL`, default `localhost:5433/quacker_test`; the name must end in `_test`, create the database once)
 - `pnpm backend prisma:migrations:run` — create/apply migrations after schema changes
 
 ## Conventions

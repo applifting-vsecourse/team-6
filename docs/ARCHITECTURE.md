@@ -160,7 +160,7 @@ Routes (TanStack Router, file-based). Guards are pathless layout routes (`_Authe
 ## 5. Testing
 
 - Unit tests for services, and especially for `matching`.
-- Claim, join, vote, leave and delete-account need integration tests against a real Postgres. The race tests fire N requests with `Promise.all` at the last spot or the fifth seat. Also cover "leave after the others voted". The first story that needs them adds a `postgres` service container to `ci.yml`. Never point tests at the production database.
+- Claim, join, vote, leave and delete-account need integration tests against a real Postgres. The race tests fire N requests with `Promise.all` at the last spot or the fifth seat. Also cover "leave after the others voted". The first story that needs them adds a `postgres` service container to `ci.yml`. Never point tests at the production database. They live in `apps/backend/test/*.e2e-spec.ts` and run with `pnpm backend test:integration` against a `*_test` database (refused otherwise); `ci.yml` provides the `postgres` service.
 - Auth: a sign-up payload with `role: "admin"` or its own consent timestamp is ignored, and sign-up without consent fails.
 - Every route has a test for 401 (no session), 403 (not onboarded, not admin, not a member). A non-member never gets data from another kvintet.
 - All free text (offers, messages) has a maximum length in its DTO. Rate limiting is not part of the MVP.
