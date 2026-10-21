@@ -4,6 +4,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { MobileAccount } from "@/features/auth/components/HeaderMenu"
 
+// The gaze driver needs browser APIs jsdom lacks (matchMedia, ResizeObserver).
+vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
+
 const useSession = vi.fn<() => { user: { id: string; name: string; username: string } | null }>()
 const signOut = vi.fn()
 

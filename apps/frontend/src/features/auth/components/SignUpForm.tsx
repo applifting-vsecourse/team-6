@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
-import { AvatarPreview } from "@/features/auth/components/AvatarPreview"
+import { GazeBlobatar } from "@/features/auth/components/GazeBlobatar"
 
 const PASSWORD_MIN_LENGTH = 8
 
@@ -108,7 +108,10 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
                     {...field}
                   />
                 </FormControl>
-                <AvatarPreview name={field.value.trim()} />
+                <GazeBlobatar
+                  name={field.value.trim()}
+                  className="size-16"
+                />
               </div>
               <FormDescription>{t("auth.usernameHint")}</FormDescription>
               <FormMessage />

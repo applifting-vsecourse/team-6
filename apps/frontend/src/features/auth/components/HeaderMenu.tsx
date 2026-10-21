@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+import { GazeBlobatar } from "@/features/auth/components/GazeBlobatar"
 import { useSession } from "@/features/auth/hooks/useSession"
 import { useSignOut } from "@/features/auth/hooks/useSignOut"
 
@@ -41,9 +42,11 @@ export function HeaderMenu() {
           size="sm"
           className="hidden text-sm font-normal text-body md:inline-flex"
         >
-          <Blobatar
+          <GazeBlobatar
             name={user.username ?? user.id}
-            size="sm"
+            animate="hover"
+            travel={7}
+            className="size-8"
           />
           {user.name}
           <ChevronDown aria-hidden />
