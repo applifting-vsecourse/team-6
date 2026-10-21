@@ -1,15 +1,16 @@
 import { useState } from "react"
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
 import { AuthLayout } from "@/components/AuthLayout"
 import { Seo } from "@/components/Seo"
+import { getErrorMessage } from "@/lib/errorMessage"
 
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
 import { AppHeader } from "@/features/auth/components/AppHeader"
 import { SignUpForm } from "@/features/auth/components/SignUpForm"
 import { useSignUp } from "@/features/auth/hooks/useSignUp"
-import { signUpErrorMessage } from "@/features/auth/lib/sign-up-error"
 
 export const Route = createFileRoute("/signup")({
   component: SignUpPage,
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/signup")({
 })
 
 function SignUpPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const signUp = useSignUp()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -41,25 +43,25 @@ function SignUpPage() {
       })
       await navigate({ to: ROUTES.overview })
     } catch (error) {
-      setErrorMessage(signUpErrorMessage(error))
+      setErrorMessage(getErrorMessage(error, "errors.signUpFailed"))
     }
   }
 
   return (
     <>
-      <Seo title="Registrovat se" />
+      <Seo title={t("auth.signUp")} />
       <AuthLayout
         header={<AppHeader />}
-        title="Registrovat se"
-        description="Vytvořte si účet v Kvintetu."
+        title={t("auth.signUp")}
+        description={t("auth.signUpDescription")}
         footer={
           <>
-            Už máte účet?{" "}
+            {t("auth.haveAccount")}{" "}
             <Link
               to={ROUTES.login}
               className="text-foreground underline underline-offset-4"
             >
-              Přihlásit se
+              {t("auth.signIn")}
             </Link>
           </>
         }

@@ -30,7 +30,7 @@ describe("MobileAccount", () => {
     render(<MobileAccount />)
 
     expect(screen.getByText("Jana Nováková")).toBeInTheDocument()
-    await userEvent.click(screen.getByRole("button", { name: "Odhlásit se" }))
+    await userEvent.click(screen.getByRole("button", { name: "Sign out" }))
 
     expect(signOut).toHaveBeenCalledOnce()
   })

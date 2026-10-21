@@ -1,17 +1,18 @@
 import { useState } from "react"
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
 import { ROUTES } from "@/app/routes"
 import { AuthLayout } from "@/components/AuthLayout"
 import { Seo } from "@/components/Seo"
+import { getErrorMessage } from "@/lib/errorMessage"
 
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
 import { AppHeader } from "@/features/auth/components/AppHeader"
 import { SignInForm } from "@/features/auth/components/SignInForm"
 import { useSignIn } from "@/features/auth/hooks/useSignIn"
 import { decodeRedirectUri } from "@/features/auth/lib/redirect"
-import { signInErrorMessage } from "@/features/auth/lib/sign-in-error"
 
 const loginSearchParamsSchema = z.object({
   from: z.string().optional(),
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/login")({
 })
 
 function LoginPage() {
+  const { t } = useTranslation()
   const { from } = Route.useSearch()
   const redirectTo = from ? decodeRedirectUri(from) : ROUTES.overview
   const navigate = useNavigate()
@@ -40,25 +42,25 @@ function LoginPage() {
       await signIn.mutateAsync(values)
       await navigate({ to: redirectTo })
     } catch (error) {
-      setErrorMessage(signInErrorMessage(error))
+      setErrorMessage(getErrorMessage(error, "errors.signInFailed"))
     }
   }
 
   return (
     <>
-      <Seo title="Přihlásit se" />
+      <Seo title={t("auth.signIn")} />
       <AuthLayout
         header={<AppHeader hasAccount={false} />}
-        title="Přihlásit se"
-        description="Vítejte zpět v Kvintetu."
+        title={t("auth.signIn")}
+        description={t("auth.signInDescription")}
         footer={
           <>
-            Nemáte účet?{" "}
+            {t("auth.noAccount")}{" "}
             <Link
               to={ROUTES.signup}
               className="text-foreground underline underline-offset-4"
             >
-              Registrovat se
+              {t("auth.signUp")}
             </Link>
           </>
         }

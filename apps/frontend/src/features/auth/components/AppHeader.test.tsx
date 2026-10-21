@@ -29,8 +29,8 @@ describe("AppHeader", () => {
     useSession.mockReturnValue({ user: null })
     render(<AppHeader />)
 
-    expect(screen.getByRole("link", { name: "Přihlásit se" })).toBeInTheDocument()
-    expect(screen.queryByRole("button", { name: "Otevřít menu" })).not.toBeInTheDocument()
+    expect(screen.getByRole("link", { name: "Sign in" })).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "Open menu" })).not.toBeInTheDocument()
     expect(screen.queryByRole("navigation")).not.toBeInTheDocument()
   })
 
@@ -38,15 +38,15 @@ describe("AppHeader", () => {
     useSession.mockReturnValue({ user: { name: "Jana Nováková", username: "jana" } })
     render(<AppHeader />)
 
-    expect(screen.getByRole("button", { name: "Otevřít menu" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Open menu" })).toBeInTheDocument()
     expect(screen.getByRole("navigation")).toBeInTheDocument()
-    expect(screen.queryByRole("link", { name: "Přihlásit se" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("link", { name: "Sign in" })).not.toBeInTheDocument()
   })
 
   it("leaves the account link out when hasAccount is false", () => {
     useSession.mockReturnValue({ user: null })
     render(<AppHeader hasAccount={false} />)
 
-    expect(screen.queryByRole("link", { name: "Přihlásit se" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("link", { name: "Sign in" })).not.toBeInTheDocument()
   })
 })

@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 
 import { HeaderLogo } from "@/components/Header/HeaderLogo"
 import { HeaderNav } from "@/components/Header/HeaderNav"
+import { LanguageSwitcher } from "@/components/Header/LanguageSwitcher"
 import { MobileMenu } from "@/components/Header/MobileMenu"
 
 type HeaderProps = {
@@ -20,6 +21,7 @@ export function Header({ hasNav = false, userMenu, mobileAccount }: HeaderProps)
         <HeaderLogo />
         {hasNav ? <HeaderNav className="hidden md:flex" /> : null}
         <div className="ml-auto flex items-center gap-5">
+          <LanguageSwitcher />
           {userMenu}
           {hasNav ? <MobileMenu account={mobileAccount} /> : null}
         </div>

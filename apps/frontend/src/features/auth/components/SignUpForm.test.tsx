@@ -5,12 +5,12 @@ import { describe, expect, it, vi } from "vitest"
 import { SignUpForm } from "@/features/auth/components/SignUpForm"
 
 async function fillForm(password: string, passwordConfirmation: string) {
-  await userEvent.type(screen.getByLabelText("Jméno"), "Jana Nováková")
-  await userEvent.type(screen.getByLabelText("Uživatelské jméno"), "jana")
-  await userEvent.type(screen.getByLabelText("E-mail"), "jana@novak.cz")
-  await userEvent.type(screen.getByLabelText("Heslo"), password)
-  await userEvent.type(screen.getByLabelText("Potvrzení hesla"), passwordConfirmation)
-  await userEvent.click(screen.getByRole("button", { name: "Registrovat se" }))
+  await userEvent.type(screen.getByLabelText("Name"), "Jana Nováková")
+  await userEvent.type(screen.getByLabelText("Username"), "jana")
+  await userEvent.type(screen.getByLabelText("Email"), "jana@novak.cz")
+  await userEvent.type(screen.getByLabelText("Password"), password)
+  await userEvent.type(screen.getByLabelText("Confirm password"), passwordConfirmation)
+  await userEvent.click(screen.getByRole("button", { name: "Sign up" }))
 }
 
 describe("SignUpForm", () => {
@@ -25,7 +25,7 @@ describe("SignUpForm", () => {
 
     await fillForm("tajneheslo", "jineheslo")
 
-    expect(await screen.findByText("Hesla se musí shodovat")).toBeInTheDocument()
+    expect(await screen.findByText("Passwords must match")).toBeInTheDocument()
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
@@ -40,7 +40,7 @@ describe("SignUpForm", () => {
 
     await fillForm("kratke", "kratke")
 
-    expect(await screen.findByText("Heslo musí mít alespoň 8 znaků")).toBeInTheDocument()
+    expect(await screen.findByText("Password must be at least 8 characters")).toBeInTheDocument()
     expect(onSubmit).not.toHaveBeenCalled()
   })
 

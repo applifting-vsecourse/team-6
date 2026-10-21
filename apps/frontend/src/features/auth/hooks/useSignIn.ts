@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { authKeys } from "@/lib/auth-keys"
+import { toAuthError } from "@/lib/errorMessage"
 
 import { authClient } from "@/features/auth/lib/auth-client"
 
@@ -16,9 +17,7 @@ export function useSignIn() {
   return useMutation({
     mutationFn: async ({ email, password, rememberMe = false }: SignInInput) => {
       const { error } = await authClient.signIn.email({ email, password, rememberMe })
-      if (error) {
-        throw Object.assign(new Error(error.message ?? "Sign in failed"), { code: error.code })
-      }
+      if (error) throw toAuthError(error)
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: authKeys.session() })

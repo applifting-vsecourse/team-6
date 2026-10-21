@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import { ChevronDown, LogOut } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
 import { Button } from "@/components/ui/button"
@@ -16,6 +17,7 @@ import { useSession } from "@/features/auth/hooks/useSession"
 import { useSignOut } from "@/features/auth/hooks/useSignOut"
 
 export function HeaderMenu() {
+  const { t } = useTranslation()
   const { user } = useSession()
   const signOut = useSignOut()
 
@@ -25,7 +27,7 @@ export function HeaderMenu() {
         to={ROUTES.login}
         className="text-label font-semibold text-foreground"
       >
-        Přihlásit se
+        {t("auth.signIn")}
       </Link>
     )
   }
@@ -58,7 +60,7 @@ export function HeaderMenu() {
           disabled={signOut.isPending}
         >
           <LogOut className="size-4" />
-          Odhlásit se
+          {t("auth.signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -67,6 +69,7 @@ export function HeaderMenu() {
 
 /** Account block of the mobile menu sheet: who is signed in, and sign out. */
 export function MobileAccount() {
+  const { t } = useTranslation()
   const { user } = useSession()
   const signOut = useSignOut()
 
@@ -81,7 +84,7 @@ export function MobileAccount() {
         disabled={signOut.isPending}
         className="h-auto self-start p-0 text-body underline"
       >
-        Odhlásit se
+        {t("auth.signOut")}
       </Button>
     </div>
   )

@@ -1,4 +1,7 @@
+import { useTranslation } from "react-i18next"
+
 import { Button } from "@/components/ui/button"
+import { getErrorMessage } from "@/lib/errorMessage"
 
 import { ErrorLayout } from "./ErrorLayout"
 
@@ -7,11 +10,13 @@ type RootErrorBoundaryProps = {
 }
 
 export function RootErrorBoundary({ error }: RootErrorBoundaryProps) {
+  const { t } = useTranslation()
+
   return (
     <ErrorLayout
-      title="Něco se pokazilo"
-      description={error.message || "Došlo k neočekávané chybě."}
-      action={<Button onClick={() => window.location.reload()}>Načíst znovu</Button>}
+      title={t("errors.somethingWentWrong")}
+      description={getErrorMessage(error)}
+      action={<Button onClick={() => window.location.reload()}>{t("common.reload")}</Button>}
     />
   )
 }

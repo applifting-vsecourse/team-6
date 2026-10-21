@@ -14,10 +14,10 @@ describe("SignInForm", () => {
       />,
     )
 
-    await userEvent.click(screen.getByRole("button", { name: "Přihlásit se" }))
+    await userEvent.click(screen.getByRole("button", { name: "Sign in" }))
 
-    expect(await screen.findByText("Zadejte e-mail")).toBeInTheDocument()
-    expect(screen.getByText("Zadejte heslo")).toBeInTheDocument()
+    expect(await screen.findByText("Email is required")).toBeInTheDocument()
+    expect(screen.getByText("Password is required")).toBeInTheDocument()
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
@@ -30,9 +30,9 @@ describe("SignInForm", () => {
       />,
     )
 
-    await userEvent.type(screen.getByLabelText("E-mail"), "  jana@novak.cz ")
-    await userEvent.type(screen.getByLabelText("Heslo"), " tajneheslo  ")
-    await userEvent.click(screen.getByRole("button", { name: "Přihlásit se" }))
+    await userEvent.type(screen.getByLabelText("Email"), "  jana@novak.cz ")
+    await userEvent.type(screen.getByLabelText("Password"), " tajneheslo  ")
+    await userEvent.click(screen.getByRole("button", { name: "Sign in" }))
 
     expect(onSubmit).toHaveBeenCalledWith(
       { email: "jana@novak.cz", password: "tajneheslo" },
@@ -44,12 +44,12 @@ describe("SignInForm", () => {
     render(
       <SignInForm
         isLoading
-        errorMessage="Přihlášení se nezdařilo."
+        errorMessage="Sign in failed"
         onSubmit={vi.fn()}
       />,
     )
 
-    expect(screen.getByRole("alert")).toHaveTextContent("Přihlášení se nezdařilo.")
-    expect(screen.getByRole("button", { name: "Přihlásit se" })).toBeDisabled()
+    expect(screen.getByRole("alert")).toHaveTextContent("Sign in failed")
+    expect(screen.getByRole("button", { name: "Sign in" })).toBeDisabled()
   })
 })
