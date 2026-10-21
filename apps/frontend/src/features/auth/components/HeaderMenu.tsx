@@ -3,6 +3,7 @@ import { ChevronDown, LogOut } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
+import { Blobatar } from "@/components/ui/blobatar"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -13,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+import { GazeBlobatar } from "@/features/auth/components/GazeBlobatar"
 import { useSession } from "@/features/auth/hooks/useSession"
 import { useSignOut } from "@/features/auth/hooks/useSignOut"
 
@@ -40,6 +42,12 @@ export function HeaderMenu() {
           size="sm"
           className="hidden text-sm font-normal text-body md:inline-flex"
         >
+          <GazeBlobatar
+            name={user.username || user.id}
+            animate="hover"
+            travel={7}
+            className="size-8"
+          />
           {user.name}
           <ChevronDown aria-hidden />
         </Button>
@@ -76,8 +84,14 @@ export function MobileAccount() {
   if (!user) return null
 
   return (
-    <div className="flex flex-col gap-0.5 border-t border-border pt-4">
-      <p className="font-semibold text-foreground">{user.name}</p>
+    <div className="flex flex-col gap-0.5">
+      <div className="flex items-center gap-2">
+        <Blobatar
+          name={user.username || user.id}
+          size="sm"
+        />
+        <p className="font-semibold text-foreground">{user.name}</p>
+      </div>
       <Button
         variant="link"
         onClick={() => signOut.mutate()}

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtectedPagesRouteImport } from './routes/_ProtectedPages'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ProtectedPagesOnboardingRouteImport } from './routes/_ProtectedPages/onboarding'
 import { Route as ProtectedPagesOverviewRouteImport } from './routes/_ProtectedPages/overview'
 
 const IndexRoute = IndexRouteImport.update({
@@ -34,6 +35,12 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtectedPagesOnboardingRoute =
+  ProtectedPagesOnboardingRouteImport.update({
+    id: '/onboarding',
+    path: '/onboarding',
+    getParentRoute: () => ProtectedPagesRoute,
+  } as any)
 const ProtectedPagesOverviewRoute = ProtectedPagesOverviewRouteImport.update({
   id: '/overview',
   path: '/overview',
@@ -44,12 +51,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/onboarding': typeof ProtectedPagesOnboardingRoute
   '/overview': typeof ProtectedPagesOverviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/onboarding': typeof ProtectedPagesOnboardingRoute
   '/overview': typeof ProtectedPagesOverviewRoute
 }
 export interface FileRoutesById {
@@ -58,19 +67,21 @@ export interface FileRoutesById {
   '/_ProtectedPages': typeof ProtectedPagesRouteWithChildren
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/_ProtectedPages/onboarding': typeof ProtectedPagesOnboardingRoute
   '/_ProtectedPages/overview': typeof ProtectedPagesOverviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/signup' | '/overview'
+  fullPaths: '/' | '/login' | '/signup' | '/onboarding' | '/overview'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup' | '/overview'
+  to: '/' | '/login' | '/signup' | '/onboarding' | '/overview'
   id:
     | '__root__'
     | '/'
     | '/_ProtectedPages'
     | '/login'
     | '/signup'
+    | '/_ProtectedPages/onboarding'
     | '/_ProtectedPages/overview'
   fileRoutesById: FileRoutesById
 }
@@ -111,6 +122,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_ProtectedPages/onboarding': {
+      id: '/_ProtectedPages/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof ProtectedPagesOnboardingRouteImport
+      parentRoute: typeof ProtectedPagesRoute
+    }
     '/_ProtectedPages/overview': {
       id: '/_ProtectedPages/overview'
       path: '/overview'
@@ -122,10 +140,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface ProtectedPagesRouteChildren {
+  ProtectedPagesOnboardingRoute: typeof ProtectedPagesOnboardingRoute
   ProtectedPagesOverviewRoute: typeof ProtectedPagesOverviewRoute
 }
 
 const ProtectedPagesRouteChildren: ProtectedPagesRouteChildren = {
+  ProtectedPagesOnboardingRoute: ProtectedPagesOnboardingRoute,
   ProtectedPagesOverviewRoute: ProtectedPagesOverviewRoute,
 }
 

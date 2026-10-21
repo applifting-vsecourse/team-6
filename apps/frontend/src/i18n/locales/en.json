@@ -15,6 +15,7 @@
     "signUp": "Sign up",
     "signUpDescription": "Create your Kvintet account.",
     "username": "Username",
+    "usernameHint": "Your avatar is generated from your username.",
     "validation": {
       "emailInvalid": "Invalid email",
       "emailRequired": "Email is required",
@@ -84,6 +85,9 @@
   },
   "nav": {
     "overview": "Overview"
+  },
+  "onboarding": {
+    "title": "Onboarding"
   },
   "overview": {
     "greeting": "Welcome, <em>{{name}}</em>",

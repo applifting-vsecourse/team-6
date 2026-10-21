@@ -12,7 +12,7 @@ import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOpt
 import { AppHeader } from "@/features/auth/components/AppHeader"
 import { SignInForm } from "@/features/auth/components/SignInForm"
 import { useSignIn } from "@/features/auth/hooks/useSignIn"
-import { decodeRedirectUri } from "@/features/auth/lib/redirect"
+import { postSignInLocation } from "@/features/auth/lib/redirect"
 
 const loginSearchParamsSchema = z.object({
   from: z.string().optional(),
@@ -21,17 +21,17 @@ const loginSearchParamsSchema = z.object({
 export const Route = createFileRoute("/login")({
   component: LoginPage,
   validateSearch: loginSearchParamsSchema,
-  loader: async ({ context }) => {
+  loaderDeps: ({ search }) => ({ from: search.from }),
+  loader: async ({ context, deps }) => {
     const session = await context.queryClient.ensureQueryData(authSessionQueryOptions())
     if (!session) return
-    throw redirect({ to: ROUTES.overview })
+    throw redirect(postSignInLocation(deps.from))
   },
 })
 
 function LoginPage() {
   const { t } = useTranslation()
   const { from } = Route.useSearch()
-  const redirectTo = from ? decodeRedirectUri(from) : ROUTES.overview
   const navigate = useNavigate()
   const signIn = useSignIn()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -40,7 +40,7 @@ function LoginPage() {
     setErrorMessage(null)
     try {
       await signIn.mutateAsync(values)
-      await navigate({ to: redirectTo })
+      await navigate(postSignInLocation(from))
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "errors.signInFailed"))
     }
@@ -58,7 +58,7 @@ function LoginPage() {
             {t("auth.noAccount")}{" "}
             <Link
               to={ROUTES.signup}
-              className="text-foreground underline underline-offset-4"
+              className="font-medium text-foreground underline underline-offset-4"
             >
               {t("auth.signUp")}
             </Link>
