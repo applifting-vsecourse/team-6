@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  HttpException,
   Logger,
   NotFoundException,
   UnauthorizedException,
@@ -86,6 +87,13 @@ describe('AllExceptionsFilter', () => {
       body: { statusCode: 409, code: 'kvintet_not_open' },
     });
     expect(run(new ConflictException())).toMatchObject({
+      body: { code: 'conflict' },
+    });
+  });
+
+  it('falls back to the status code when the response body is null', () => {
+    expect(run(new HttpException(null as never, 409))).toMatchObject({
+      status: 409,
       body: { code: 'conflict' },
     });
   });

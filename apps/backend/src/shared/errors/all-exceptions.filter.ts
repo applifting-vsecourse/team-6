@@ -23,6 +23,7 @@ const STATUS_CODES: Record<number, string> = {
 const codeOf = (exception: HttpException): string | undefined => {
   const body = exception.getResponse();
   return typeof body === 'object' &&
+    body !== null &&
     'code' in body &&
     typeof body.code === 'string'
     ? body.code
