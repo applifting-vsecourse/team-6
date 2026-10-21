@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Logger,
   NotFoundException,
   UnauthorizedException,
@@ -72,6 +73,20 @@ describe('AllExceptionsFilter', () => {
     expect(run(exception)).toMatchObject({
       status,
       body: { statusCode: status, code },
+    });
+  });
+
+  it('uses the code an exception carries over the one for its status', () => {
+    const exception = new ConflictException({
+      code: 'kvintet_not_open',
+      message: 'full',
+    });
+    expect(run(exception)).toMatchObject({
+      status: 409,
+      body: { statusCode: 409, code: 'kvintet_not_open' },
+    });
+    expect(run(new ConflictException())).toMatchObject({
+      body: { code: 'conflict' },
     });
   });
 
