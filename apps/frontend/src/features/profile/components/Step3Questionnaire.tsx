@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
+import { cn } from "@/lib/utils"
 
 import type { MeetingFrequency } from "@/features/profile/api/profileApi"
 
@@ -36,6 +37,7 @@ export function Step3Questionnaire({
   )
   const [note, setNote] = useState(initialData.note)
   const [error, setError] = useState<string | null>(null)
+  const frequencySectionRef = useRef<HTMLDivElement | null>(null)
 
   const expectationOptions: {
     id: string
@@ -73,6 +75,7 @@ export function Step3Questionnaire({
     e.preventDefault()
     if (!meetingFrequency) {
       setError(t("onboarding.step3.frequencyRequired"))
+      frequencySectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
       return
     }
     setError(null)
@@ -117,10 +120,26 @@ export function Step3Questionnaire({
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 border-t border-border pt-6">
-        <h3 className="font-serif text-subheading font-semibold text-foreground">
-          {t("onboarding.step3.frequencyTitle")}
-        </h3>
+      <div
+        ref={frequencySectionRef}
+        className={cn(
+          "flex flex-col gap-3 border-t border-border pt-6 transition-colors",
+          error && "rounded-lg border border-destructive/60 bg-destructive/5 p-4",
+        )}
+      >
+        <div className="flex flex-col gap-1">
+          <h3 className="font-serif text-subheading font-semibold text-foreground">
+            {t("onboarding.step3.frequencyTitle")}
+          </h3>
+          {error && (
+            <p
+              className="text-sm font-medium text-destructive"
+              role="alert"
+            >
+              {error}
+            </p>
+          )}
+        </div>
 
         <RadioGroup
           value={meetingFrequency ?? ""}
@@ -143,7 +162,6 @@ export function Step3Questionnaire({
             </label>
           ))}
         </RadioGroup>
-        {error && <p className="text-sm text-destructive">{error}</p>}
       </div>
 
       <div className="flex flex-col gap-3 border-t border-border pt-6">

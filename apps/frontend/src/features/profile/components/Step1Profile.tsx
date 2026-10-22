@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
@@ -33,11 +33,13 @@ export function Step1Profile({ initialData, allTags, onContinue }: Step1ProfileP
   const [learnTagIds, setLearnTagIds] = useState<string[]>(initialData.learnTagIds)
   const [interestTagIds, setInterestTagIds] = useState<string[]>(initialData.interestTagIds)
   const [error, setError] = useState<string | null>(null)
+  const roleSectionRef = useRef<HTMLDivElement | null>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (roles.length === 0) {
       setError(t("onboarding.step1.roleRequired"))
+      roleSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
       return
     }
     setError(null)
@@ -60,17 +62,19 @@ export function Step1Profile({ initialData, allTags, onContinue }: Step1ProfileP
         <p className="text-lg text-foreground/80">{t("onboarding.step1.description")}</p>
       </div>
 
-      <RoleSelector
-        selectedRoles={roles}
-        onSelectRole={(role) => {
-          setRoles((prev) => (prev.includes(role) ? prev : [...prev, role]))
-          if (error) setError(null)
-        }}
-        onRemoveRole={(role) => {
-          setRoles((prev) => prev.filter((r) => r !== role))
-        }}
-        error={error}
-      />
+      <div ref={roleSectionRef}>
+        <RoleSelector
+          selectedRoles={roles}
+          onSelectRole={(role) => {
+            setRoles((prev) => (prev.includes(role) ? prev : [...prev, role]))
+            if (error) setError(null)
+          }}
+          onRemoveRole={(role) => {
+            setRoles((prev) => prev.filter((r) => r !== role))
+          }}
+          error={error}
+        />
+      </div>
 
       <TagSelector
         title={t("onboarding.step1.teachTitle")}

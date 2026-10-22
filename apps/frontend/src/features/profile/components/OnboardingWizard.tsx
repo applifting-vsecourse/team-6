@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
@@ -78,6 +78,19 @@ function OnboardingWizardForm({ userId, profile, allTags, allCities }: Onboardin
 
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const wizardTopRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const scrollToTop = () => {
+      window.scrollTo?.({ top: 0, left: 0, behavior: "smooth" })
+      document.documentElement?.scrollTo?.({ top: 0, left: 0, behavior: "smooth" })
+      wizardTopRef.current?.scrollIntoView?.({ behavior: "smooth", block: "start" })
+    }
+
+    scrollToTop()
+    const timer = setTimeout(scrollToTop, 50)
+    return () => clearTimeout(timer)
+  }, [currentStep])
 
   const [step1Data, setStep1Data] = useState<{
     roles?: string[]
@@ -170,7 +183,10 @@ function OnboardingWizardForm({ userId, profile, allTags, allCities }: Onboardin
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div
+      ref={wizardTopRef}
+      className="flex scroll-mt-6 flex-col gap-8"
+    >
       <div className="flex flex-col gap-2">
         <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
           {t("onboarding.stepProgress", { current: currentStep, total: 3 })}

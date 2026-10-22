@@ -72,6 +72,7 @@ describe("OnboardingWizard", () => {
     // Step 2
     expect(await screen.findByText("When and where can you meet?")).toBeInTheDocument()
     await userEvent.click(screen.getByLabelText("Weekdays"))
+    await userEvent.click(screen.getByLabelText("Evenings"))
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
 
     // Step 3
@@ -85,6 +86,7 @@ describe("OnboardingWizard", () => {
         roles: ["software-engineer"],
         position: "software-engineer",
         weekdays: true,
+        evenings: true,
         expectations: ["learn_new"],
         meetingFrequency: "WEEKLY",
         completeOnboarding: true,

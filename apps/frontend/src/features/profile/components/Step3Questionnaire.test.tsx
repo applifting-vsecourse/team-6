@@ -7,6 +7,9 @@ import { Step3Questionnaire } from "./Step3Questionnaire"
 describe("Step3Questionnaire", () => {
   it("requires meeting frequency before submitting", async () => {
     const onFinish = vi.fn()
+    const scrollIntoViewMock = vi.fn()
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
+
     render(
       <Step3Questionnaire
         initialData={{
@@ -22,6 +25,7 @@ describe("Step3Questionnaire", () => {
     await userEvent.click(screen.getByRole("button", { name: "Finish" }))
     expect(onFinish).not.toHaveBeenCalled()
     expect(screen.getByText("Select how often you want to meet")).toBeInTheDocument()
+    expect(scrollIntoViewMock).toHaveBeenCalled()
   })
 
   it("allows selecting expectations, frequency, and entering note", async () => {

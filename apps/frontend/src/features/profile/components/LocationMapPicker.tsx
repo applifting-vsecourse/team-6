@@ -43,6 +43,17 @@ export function LocationMapPicker({
   const markerRef = useRef<L.Marker | null>(null)
   const circleRef = useRef<L.Circle | null>(null)
 
+  const radiusRef = useRef<number>(currentRadius)
+  const latLngRef = useRef({ lat: currentLat, lng: currentLng })
+
+  useEffect(() => {
+    radiusRef.current = currentRadius
+  }, [currentRadius])
+
+  useEffect(() => {
+    latLngRef.current = { lat: currentLat, lng: currentLng }
+  }, [currentLat, currentLng])
+
   const presetRadii = [5, 10, 25, 50, 100, 150]
 
   const updateLocation = useCallback(
@@ -52,6 +63,8 @@ export function LocationMapPicker({
       setCurrentLat(roundedLat)
       setCurrentLng(roundedLng)
       setCurrentRadius(rad)
+      radiusRef.current = rad
+      latLngRef.current = { lat: roundedLat, lng: roundedLng }
       onChange({ latitude: roundedLat, longitude: roundedLng, radiusKm: rad })
     },
     [onChange],
@@ -66,7 +79,7 @@ export function LocationMapPicker({
     try {
       const map = L.map(mapContainerRef.current, {
         center: [currentLat, currentLng],
-        zoom: currentRadius > 50 ? 8 : 10,
+        zoom: radiusRef.current > 50 ? 8 : 10,
         scrollWheelZoom: false,
       })
 
@@ -94,7 +107,7 @@ export function LocationMapPicker({
       }).addTo(map)
 
       const circle = L.circle([currentLat, currentLng], {
-        radius: currentRadius * 1000,
+        radius: radiusRef.current * 1000,
         color: "#16a34a",
         fillColor: "#22c55e",
         fillOpacity: 0.18,
@@ -111,13 +124,15 @@ export function LocationMapPicker({
         const target = e.target as L.Marker
         const pos = target.getLatLng()
         circle.setLatLng(pos)
-        updateLocation(pos.lat, pos.lng, currentRadius)
+        circle.setRadius(radiusRef.current * 1000)
+        updateLocation(pos.lat, pos.lng, radiusRef.current)
       })
 
       map.on("click", (e: L.LeafletMouseEvent) => {
         marker.setLatLng(e.latlng)
         circle.setLatLng(e.latlng)
-        updateLocation(e.latlng.lat, e.latlng.lng, currentRadius)
+        circle.setRadius(radiusRef.current * 1000)
+        updateLocation(e.latlng.lat, e.latlng.lng, radiusRef.current)
       })
 
       mapInstanceRef.current = map
@@ -141,64 +156,66 @@ export function LocationMapPicker({
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Request user's current location on initial mount if not previously saved
-  useEffect(() => {
-    if (latitude !== null && longitude !== null) return
+  const locateUser = useCallback(
+    (isManual = false) => {
+      if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
+        if (isManual) {
+          setLocationNote(t("onboarding.step2.geolocationUnavailable"))
+        }
+        return
+      }
 
-    if (typeof navigator !== "undefined" && "geolocation" in navigator) {
+      setIsLocating(true)
+      if (isManual) setLocationNote(null)
+
       navigator.geolocation.getCurrentPosition(
         (pos) => {
+          setIsLocating(false)
           const lat = pos.coords.latitude
           const lng = pos.coords.longitude
-          updateLocation(lat, lng, currentRadius)
+          const activeRadius = radiusRef.current
+          updateLocation(lat, lng, activeRadius)
 
           if (mapInstanceRef.current && markerRef.current && circleRef.current) {
             markerRef.current.setLatLng([lat, lng])
             circleRef.current.setLatLng([lat, lng])
-            mapInstanceRef.current.setView([lat, lng], 10)
+            circleRef.current.setRadius(activeRadius * 1000)
+            mapInstanceRef.current.setView([lat, lng], 11)
           }
         },
-        () => {
-          // Fallback location already defaulted to Middle of Europe
+        (err) => {
+          setIsLocating(false)
+          if (isManual) {
+            if (err.code === err.PERMISSION_DENIED) {
+              setLocationNote(t("onboarding.step2.geolocationDenied"))
+            } else {
+              setLocationNote(t("onboarding.step2.geolocationUnavailable"))
+            }
+          }
         },
-        { timeout: 5000, enableHighAccuracy: false },
+        { timeout: 10000, enableHighAccuracy: false, maximumAge: 300000 },
       )
-    }
-  }, [latitude, longitude]) // eslint-disable-line react-hooks/exhaustive-deps
+    },
+    [t, updateLocation],
+  )
+
+  // Auto-locate center on mount if no previous coordinates were stored
+  const autoLocateAttemptedRef = useRef(false)
+  useEffect(() => {
+    if (latitude !== null && longitude !== null) return
+    if (autoLocateAttemptedRef.current) return
+    autoLocateAttemptedRef.current = true
+    locateUser(false)
+  }, [latitude, longitude, locateUser])
 
   const handleUseCurrentLocation = () => {
-    if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
-      setLocationNote(t("onboarding.step2.geolocationUnavailable"))
-      return
-    }
-
-    setIsLocating(true)
-    setLocationNote(null)
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setIsLocating(false)
-        const lat = pos.coords.latitude
-        const lng = pos.coords.longitude
-        updateLocation(lat, lng, currentRadius)
-
-        if (mapInstanceRef.current && markerRef.current && circleRef.current) {
-          markerRef.current.setLatLng([lat, lng])
-          circleRef.current.setLatLng([lat, lng])
-          mapInstanceRef.current.setView([lat, lng], 11)
-        }
-      },
-      () => {
-        setIsLocating(false)
-        setLocationNote(t("onboarding.step2.geolocationDenied"))
-      },
-      { timeout: 8000, enableHighAccuracy: true },
-    )
+    locateUser(true)
   }
 
   const handleRadiusChange = (newRadius: number) => {
     setCurrentRadius(newRadius)
-    updateLocation(currentLat, currentLng, newRadius)
+    radiusRef.current = newRadius
+    updateLocation(latLngRef.current.lat, latLngRef.current.lng, newRadius)
 
     if (circleRef.current) {
       circleRef.current.setRadius(newRadius * 1000)

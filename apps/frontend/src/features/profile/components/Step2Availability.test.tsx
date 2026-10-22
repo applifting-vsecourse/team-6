@@ -70,4 +70,67 @@ describe("Step2Availability", () => {
     await userEvent.click(screen.getByRole("button", { name: "Back" }))
     expect(onBack).toHaveBeenCalled()
   })
+
+  it("requires day and time-of-day options and scrolls into view on error", async () => {
+    const onContinue = vi.fn()
+    const scrollIntoViewMock = vi.fn()
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
+
+    render(
+      <Step2Availability
+        initialData={{
+          weekdays: false,
+          weekends: false,
+          mornings: false,
+          afternoons: false,
+          evenings: false,
+          cityId: null,
+          radiusKm: 25,
+        }}
+        cities={mockCities}
+        onBack={vi.fn()}
+        onContinue={onContinue}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole("button", { name: "Continue" }))
+
+    expect(onContinue).not.toHaveBeenCalled()
+    expect(
+      screen.getByText("Please select at least one day option (weekdays or weekends)."),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText("Please select at least one time of day (morning, afternoon, or evening)."),
+    ).toBeInTheDocument()
+    expect(scrollIntoViewMock).toHaveBeenCalled()
+
+    // Select day -> day error disappears
+    await userEvent.click(screen.getByLabelText("Weekdays"))
+    expect(
+      screen.queryByText("Please select at least one day option (weekdays or weekends)."),
+    ).not.toBeInTheDocument()
+
+    // Still missing time of day
+    await userEvent.click(screen.getByRole("button", { name: "Continue" }))
+    expect(onContinue).not.toHaveBeenCalled()
+
+    // Select time of day -> time error disappears and form can continue
+    await userEvent.click(screen.getByLabelText("Mornings"))
+    expect(
+      screen.queryByText(
+        "Please select at least one time of day (morning, afternoon, or evening).",
+      ),
+    ).not.toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole("button", { name: "Continue" }))
+    expect(onContinue).toHaveBeenCalledWith(
+      expect.objectContaining({
+        weekdays: true,
+        weekends: false,
+        mornings: true,
+        afternoons: false,
+        evenings: false,
+      }),
+    )
+  })
 })

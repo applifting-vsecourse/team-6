@@ -13,6 +13,9 @@ const mockTags = [
 describe("Step1Profile", () => {
   it("renders role field and requires it before continuing", async () => {
     const onContinue = vi.fn()
+    const scrollIntoViewMock = vi.fn()
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock
+
     render(
       <Step1Profile
         initialData={{
@@ -30,6 +33,7 @@ describe("Step1Profile", () => {
 
     expect(onContinue).not.toHaveBeenCalled()
     expect(screen.getByText("Select at least one role")).toBeInTheDocument()
+    expect(scrollIntoViewMock).toHaveBeenCalled()
   })
 
   it("submits position and selected tags", async () => {
