@@ -220,6 +220,7 @@
       "geolocationDenied": "Location access was denied. You can select the center directly on the map.",
       "geolocationUnavailable": "Geolocation is not supported in this browser.",
       "locating": "Locating…",
+      "locationRequired": "Please select a location on the map or choose a city.",
       "mapHint": "Drag the pin or click on the map to set the center, and adjust the radius slider to choose the area where you want to see other Kvinteds.",
       "mapTitle": "Geographic Area & Meeting Radius",
       "mornings": "Mornings",

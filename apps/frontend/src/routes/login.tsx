@@ -29,7 +29,7 @@ export const Route = createFileRoute("/login")({
     if (!session) return
     const profile = await context.queryClient
       .ensureQueryData(profileQueryOptions(session.user.id))
-      .catch(() => null)
+      .catch(() => undefined)
     const hasOnboarded = isOnboarded(profile)
     throw redirect(postSignInLocation(deps.from, hasOnboarded))
   },
@@ -49,8 +49,8 @@ function LoginPage() {
       await signIn.mutateAsync(values)
       const session = await queryClient.fetchQuery(authSessionQueryOptions())
       const profile = session?.user.id
-        ? await queryClient.fetchQuery(profileQueryOptions(session.user.id)).catch(() => null)
-        : null
+        ? await queryClient.fetchQuery(profileQueryOptions(session.user.id)).catch(() => undefined)
+        : undefined
       const hasOnboarded = isOnboarded(profile)
       await navigate(postSignInLocation(from, hasOnboarded))
     } catch (error) {

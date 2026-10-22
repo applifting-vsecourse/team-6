@@ -224,6 +224,7 @@
       "geolocationDenied": "Přístup k poloze byl zamítnut. Střed můžete zvolit přímo na mapě.",
       "geolocationUnavailable": "Geolokace není v tomto prohlížeči podporována.",
       "locating": "Zjišťuji polohu…",
+      "locationRequired": "Zvolte polohu na mapě nebo vyberte město.",
       "mapHint": "Přetažením bodu nebo kliknutím na mapu zvolte střed a posuvníkem nastavte rádius oblasti, ve které chcete vidět ostatní Kvintedy.",
       "mapTitle": "Geografická oblast a rádius",
       "mornings": "Dopoledne",

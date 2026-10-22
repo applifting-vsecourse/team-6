@@ -43,8 +43,8 @@ describe("Step2Availability", () => {
       evenings: true,
       cityId: "c_praha",
       radiusKm: 10,
-      latitude: 50,
-      longitude: 15,
+      latitude: null,
+      longitude: null,
     })
   })
 
@@ -114,12 +114,25 @@ describe("Step2Availability", () => {
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
     expect(onContinue).not.toHaveBeenCalled()
 
-    // Select time of day -> time error disappears and form can continue
+    // Select time of day -> time error disappears
     await userEvent.click(screen.getByLabelText("Mornings"))
     expect(
       screen.queryByText(
         "Please select at least one time of day (morning, afternoon, or evening).",
       ),
+    ).not.toBeInTheDocument()
+
+    // Still missing location
+    await userEvent.click(screen.getByRole("button", { name: "Continue" }))
+    expect(onContinue).not.toHaveBeenCalled()
+    expect(
+      screen.getByText("Please select a location on the map or choose a city."),
+    ).toBeInTheDocument()
+
+    // Select city -> location error disappears and form can continue
+    await userEvent.selectOptions(screen.getByLabelText("City"), "c_praha")
+    expect(
+      screen.queryByText("Please select a location on the map or choose a city."),
     ).not.toBeInTheDocument()
 
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
@@ -130,6 +143,9 @@ describe("Step2Availability", () => {
         mornings: true,
         afternoons: false,
         evenings: false,
+        cityId: "c_praha",
+        latitude: 50.07,
+        longitude: 14.43,
       }),
     )
   })

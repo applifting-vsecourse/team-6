@@ -3,15 +3,11 @@ import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
 import type { City } from "@/features/profile/api/profileApi"
-import {
-  DEFAULT_EUROPE_LAT,
-  DEFAULT_EUROPE_LNG,
-  DEFAULT_RADIUS_KM,
-  LocationMapPicker,
-} from "@/features/profile/components/LocationMapPicker"
+import { DEFAULT_RADIUS_KM, LocationMapPicker } from "@/features/profile/components/LocationMapPicker"
 
 export type Step2Data = {
   weekdays: boolean
@@ -32,7 +28,7 @@ type Step2AvailabilityProps = {
   onContinue: (data: Step2Data) => void
 }
 
-export function Step2Availability({ initialData, onBack, onContinue }: Step2AvailabilityProps) {
+export function Step2Availability({ initialData, cities, onBack, onContinue }: Step2AvailabilityProps) {
   const { t } = useTranslation()
 
   const [hasWeekdays, setHasWeekdays] = useState(initialData.weekdays)
@@ -40,7 +36,7 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
   const [hasMornings, setHasMornings] = useState(initialData.mornings)
   const [hasAfternoons, setHasAfternoons] = useState(initialData.afternoons)
   const [hasEvenings, setHasEvenings] = useState(initialData.evenings)
-  const [cityId] = useState(initialData.cityId ?? null)
+  const [cityId, setCityId] = useState(initialData.cityId ?? null)
   const [radiusKm, setRadiusKm] = useState(
     initialData.radiusKm > 0 ? initialData.radiusKm : DEFAULT_RADIUS_KM,
   )
@@ -49,9 +45,11 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
 
   const [daysError, setDaysError] = useState<string | null>(null)
   const [timeOfDayError, setTimeOfDayError] = useState<string | null>(null)
+  const [locationError, setLocationError] = useState<string | null>(null)
 
   const daysSectionRef = useRef<HTMLDivElement | null>(null)
   const timeOfDaySectionRef = useRef<HTMLDivElement | null>(null)
+  const mapSectionRef = useRef<HTMLDivElement | null>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -75,6 +73,16 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
       setTimeOfDayError(null)
     }
 
+    if (!cityId && (latitude == null || longitude == null)) {
+      setLocationError(t("onboarding.step2.locationRequired"))
+      if (!hasError) {
+        mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+      }
+      hasError = true
+    } else {
+      setLocationError(null)
+    }
+
     if (hasError) return
 
     onContinue({
@@ -85,8 +93,8 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
       evenings: hasEvenings,
       cityId,
       radiusKm,
-      latitude: latitude ?? DEFAULT_EUROPE_LAT,
-      longitude: longitude ?? DEFAULT_EUROPE_LNG,
+      latitude,
+      longitude,
     })
   }
 
@@ -203,13 +211,54 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 border-t border-border pt-6">
+      <div
+        ref={mapSectionRef}
+        className="flex flex-col gap-3 border-t border-border pt-6"
+      >
         <div className="flex flex-col gap-0.5">
           <h3 className="font-serif text-subheading font-semibold text-foreground">
             {t("onboarding.step2.whereTitle")}
           </h3>
           <p className="text-sm text-muted-foreground">{t("onboarding.step2.whereHint")}</p>
         </div>
+
+        {cities && cities.length > 0 && (
+          <div className="flex flex-col gap-1.5">
+            <Label
+              htmlFor="city-select"
+              className="text-sm font-medium text-foreground"
+            >
+              {t("onboarding.step2.city")}
+            </Label>
+            <select
+              id="city-select"
+              value={cityId ?? ""}
+              onChange={(e) => {
+                const selectedId = e.target.value || null
+                setCityId(selectedId)
+                if (selectedId) {
+                  const city = cities.find((c) => c.id === selectedId)
+                  if (city) {
+                    setLatitude(city.lat)
+                    setLongitude(city.lng)
+                    setLocationError(null)
+                  }
+                }
+              }}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              <option value="">{t("onboarding.step2.selectCity")}</option>
+              {cities.map((city) => (
+                <option
+                  key={city.id}
+                  value={city.id}
+                >
+                  {city.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <LocationMapPicker
           latitude={latitude}
@@ -219,8 +268,18 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
             setLatitude(loc.latitude)
             setLongitude(loc.longitude)
             setRadiusKm(loc.radiusKm)
+            setLocationError(null)
           }}
         />
+
+        {locationError && (
+          <p
+            role="alert"
+            className="text-sm font-medium text-destructive"
+          >
+            {locationError}
+          </p>
+        )}
       </div>
 
       <div className="flex items-center justify-between pt-2">

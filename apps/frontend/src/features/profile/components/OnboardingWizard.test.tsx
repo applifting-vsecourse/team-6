@@ -74,6 +74,7 @@ describe("OnboardingWizard", () => {
     expect(await screen.findByText("When and where can you meet?")).toBeInTheDocument()
     await userEvent.click(screen.getByLabelText("Weekdays"))
     await userEvent.click(screen.getByLabelText("Evenings"))
+    await userEvent.selectOptions(screen.getByLabelText("City"), "c_praha")
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
 
     // Step 3
