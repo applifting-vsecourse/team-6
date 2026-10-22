@@ -62,19 +62,21 @@ export class ProfileController {
     @User() user: Identity,
     @Body() dto: SaveProfileDto,
   ): Promise<ProfileResponseDto> {
-    const roles =
-      dto.roles && dto.roles.length > 0
+    const rolesProvided = dto.roles !== undefined || dto.position !== undefined;
+    const roles = rolesProvided
+      ? dto.roles && dto.roles.length > 0
         ? dto.roles
         : dto.position
           ? [dto.position]
-          : [];
-    const position = roles[0] ?? dto.position;
+          : []
+      : undefined;
+    const position = rolesProvided ? (roles?.[0] ?? dto.position) : undefined;
 
     const profile = await this.profileService.saveProfile(user.id, {
       position,
       roles,
-      latitude: dto.latitude ?? null,
-      longitude: dto.longitude ?? null,
+      latitude: dto.latitude,
+      longitude: dto.longitude,
       teachTagIds: dto.teachTagIds,
       learnTagIds: dto.learnTagIds,
       interestTagIds: dto.interestTagIds,
@@ -83,8 +85,8 @@ export class ProfileController {
       mornings: dto.mornings,
       afternoons: dto.afternoons,
       evenings: dto.evenings,
-      cityId: dto.cityId ?? null,
-      radiusKm: dto.radiusKm ?? null,
+      cityId: dto.cityId,
+      radiusKm: dto.radiusKm,
       expectations: dto.expectations,
       meetingFrequency: dto.meetingFrequency,
       note: dto.note,

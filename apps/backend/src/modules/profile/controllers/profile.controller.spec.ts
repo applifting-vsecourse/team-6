@@ -6,6 +6,7 @@ import {
 } from '@/modules/profile/domain/profile.entity';
 import { ProfileService } from '@/modules/profile/services/profile.service';
 import { Identity } from '@/shared/auth/domain/identity';
+import { BadRequestException } from '@nestjs/common';
 import type { Response } from 'express';
 import { ProfileController } from './profile.controller';
 
@@ -203,7 +204,7 @@ describe('ProfileController', () => {
       );
     });
 
-    it('falls back to empty roles and position when neither is provided', async (): Promise<void> => {
+    it('leaves roles and position undefined when neither is provided to preserve existing values', async (): Promise<void> => {
       const savedProfile = new ProfileEntity(
         'u1',
         null,
@@ -239,7 +240,28 @@ describe('ProfileController', () => {
         'u1',
         expect.objectContaining({
           position: undefined,
-          roles: [],
+          roles: undefined,
+        }),
+      );
+    });
+
+    it('passes completeOnboarding: true to service and propagates validation errors when service rejects incomplete profile', async (): Promise<void> => {
+      const validationError = new BadRequestException({
+        code: 'PROFILE_ROLE_REQUIRED',
+        message: 'At least one role is required to complete onboarding',
+      });
+      service.saveProfile.mockRejectedValue(validationError);
+
+      await expect(
+        controller.saveProfile(mockUser, {
+          completeOnboarding: true,
+        }),
+      ).rejects.toThrow(BadRequestException);
+
+      expect(service.saveProfile).toHaveBeenCalledWith(
+        'u1',
+        expect.objectContaining({
+          completeOnboarding: true,
         }),
       );
     });

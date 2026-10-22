@@ -30,7 +30,15 @@ export class ProfileRepository {
     let parsedExpectations: string[] = [];
     if (profile.expectations) {
       try {
-        parsedExpectations = JSON.parse(profile.expectations);
+        const parsed = JSON.parse(profile.expectations);
+        if (
+          Array.isArray(parsed) &&
+          parsed.every((item) => typeof item === 'string')
+        ) {
+          parsedExpectations = parsed;
+        } else {
+          parsedExpectations = [profile.expectations];
+        }
       } catch {
         parsedExpectations = [profile.expectations];
       }
@@ -74,13 +82,18 @@ export class ProfileRepository {
     userId: string,
     data: SaveProfileData,
   ): Promise<ProfileEntity> {
-    const roles =
-      data.roles && data.roles.length > 0
+    const rolesProvided =
+      data.roles !== undefined || data.position !== undefined;
+    const roles = rolesProvided
+      ? data.roles && data.roles.length > 0
         ? data.roles
         : data.position
           ? [data.position]
-          : [];
-    const position = roles[0] ?? data.position ?? null;
+          : []
+      : undefined;
+    const position = rolesProvided
+      ? (roles?.[0] ?? data.position ?? null)
+      : undefined;
 
     await this.prisma.$transaction(async (tx) => {
       if (data.cityId) {
@@ -97,9 +110,9 @@ export class ProfileRepository {
 
       const allTagIds = [
         ...new Set([
-          ...data.teachTagIds,
-          ...data.learnTagIds,
-          ...data.interestTagIds,
+          ...(data.teachTagIds ?? []),
+          ...(data.learnTagIds ?? []),
+          ...(data.interestTagIds ?? []),
         ]),
       ];
 
@@ -146,36 +159,40 @@ export class ProfileRepository {
         where: { userId },
         create: {
           userId,
-          position,
-          roles,
+          position: position ?? null,
+          roles: roles ?? [],
           latitude: data.latitude ?? null,
           longitude: data.longitude ?? null,
           expectations: data.expectations
             ? JSON.stringify(data.expectations)
             : null,
           meetingFrequency: data.meetingFrequency ?? null,
-          weekdays: data.weekdays,
-          weekends: data.weekends,
-          mornings: data.mornings,
-          afternoons: data.afternoons,
-          evenings: data.evenings,
+          weekdays: data.weekdays ?? false,
+          weekends: data.weekends ?? false,
+          mornings: data.mornings ?? false,
+          afternoons: data.afternoons ?? false,
+          evenings: data.evenings ?? false,
           cityId: data.cityId ?? null,
           radiusKm: data.radiusKm ?? null,
           note: data.note ?? null,
           onboardingCompletedAt,
         },
         update: {
-          position,
-          roles,
-          latitude: data.latitude ?? null,
-          longitude: data.longitude ?? null,
-          weekdays: data.weekdays,
-          weekends: data.weekends,
-          mornings: data.mornings,
-          afternoons: data.afternoons,
-          evenings: data.evenings,
-          cityId: data.cityId ?? null,
-          radiusKm: data.radiusKm ?? null,
+          ...(position !== undefined ? { position } : {}),
+          ...(roles !== undefined ? { roles } : {}),
+          ...(data.latitude !== undefined ? { latitude: data.latitude } : {}),
+          ...(data.longitude !== undefined
+            ? { longitude: data.longitude }
+            : {}),
+          ...(data.weekdays !== undefined ? { weekdays: data.weekdays } : {}),
+          ...(data.weekends !== undefined ? { weekends: data.weekends } : {}),
+          ...(data.mornings !== undefined ? { mornings: data.mornings } : {}),
+          ...(data.afternoons !== undefined
+            ? { afternoons: data.afternoons }
+            : {}),
+          ...(data.evenings !== undefined ? { evenings: data.evenings } : {}),
+          ...(data.cityId !== undefined ? { cityId: data.cityId } : {}),
+          ...(data.radiusKm !== undefined ? { radiusKm: data.radiusKm } : {}),
           ...(data.expectations !== undefined
             ? {
                 expectations: data.expectations
@@ -193,34 +210,41 @@ export class ProfileRepository {
         },
       });
 
-      // Replace profile tags
-      await tx.profileTag.deleteMany({
-        where: { userId },
-      });
+      const tagsProvided =
+        data.teachTagIds !== undefined ||
+        data.learnTagIds !== undefined ||
+        data.interestTagIds !== undefined;
 
-      const profileTagCreates = [
-        ...data.teachTagIds.map((tagId) => ({
-          userId,
-          tagId: tagMap.get(tagId)!,
-          kind: TagKind.TEACH,
-        })),
-        ...data.learnTagIds.map((tagId) => ({
-          userId,
-          tagId: tagMap.get(tagId)!,
-          kind: TagKind.LEARN,
-        })),
-        ...data.interestTagIds.map((tagId) => ({
-          userId,
-          tagId: tagMap.get(tagId)!,
-          kind: TagKind.INTEREST,
-        })),
-      ];
-
-      if (profileTagCreates.length > 0) {
-        await tx.profileTag.createMany({
-          data: profileTagCreates,
-          skipDuplicates: true,
+      if (tagsProvided) {
+        // Replace profile tags
+        await tx.profileTag.deleteMany({
+          where: { userId },
         });
+
+        const profileTagCreates = [
+          ...(data.teachTagIds ?? []).map((tagId) => ({
+            userId,
+            tagId: tagMap.get(tagId)!,
+            kind: TagKind.TEACH,
+          })),
+          ...(data.learnTagIds ?? []).map((tagId) => ({
+            userId,
+            tagId: tagMap.get(tagId)!,
+            kind: TagKind.LEARN,
+          })),
+          ...(data.interestTagIds ?? []).map((tagId) => ({
+            userId,
+            tagId: tagMap.get(tagId)!,
+            kind: TagKind.INTEREST,
+          })),
+        ];
+
+        if (profileTagCreates.length > 0) {
+          await tx.profileTag.createMany({
+            data: profileTagCreates,
+            skipDuplicates: true,
+          });
+        }
       }
     });
 

@@ -158,6 +158,49 @@ describe('ProfileRepository', () => {
       expect(result?.roles).toEqual(['Designer']);
     });
 
+    it('handles expectations JSON parse fallback when parsed JSON is not a string array (e.g. number or object)', async (): Promise<void> => {
+      const dbProfileWithNumber = {
+        userId: 'u1',
+        position: 'Designer',
+        roles: ['Designer'],
+        expectations: '123',
+        meetingFrequency: null,
+        weekdays: false,
+        weekends: false,
+        mornings: false,
+        afternoons: false,
+        evenings: false,
+        cityId: null,
+        city: null,
+        radiusKm: null,
+        note: null,
+        onboardingCompletedAt: null,
+        latitude: null,
+        longitude: null,
+        tags: [],
+      };
+
+      prisma.profile.findUnique.mockResolvedValue(dbProfileWithNumber);
+      const resultWithNumber = await repository.findByUserId('u1');
+      expect(resultWithNumber?.expectations).toEqual(['123']);
+
+      const dbProfileWithObject = {
+        ...dbProfileWithNumber,
+        expectations: '{"key": "value"}',
+      };
+      prisma.profile.findUnique.mockResolvedValue(dbProfileWithObject);
+      const resultWithObject = await repository.findByUserId('u1');
+      expect(resultWithObject?.expectations).toEqual(['{"key": "value"}']);
+
+      const dbProfileWithMixedArray = {
+        ...dbProfileWithNumber,
+        expectations: '["valid", 123]',
+      };
+      prisma.profile.findUnique.mockResolvedValue(dbProfileWithMixedArray);
+      const resultWithMixed = await repository.findByUserId('u1');
+      expect(resultWithMixed?.expectations).toEqual(['["valid", 123]']);
+    });
+
     it('handles roles fallback to empty array when neither roles nor position exist', async (): Promise<void> => {
       const dbProfile = {
         userId: 'u1',
@@ -447,16 +490,46 @@ describe('ProfileRepository', () => {
         .mockResolvedValue({} as ProfileEntity);
 
       await repository.saveProfile('u1', {
-        ...validData,
+        roles: undefined,
+        position: undefined,
+        latitude: undefined,
+        longitude: undefined,
+        cityId: undefined,
+        radiusKm: undefined,
+        weekdays: undefined,
+        weekends: undefined,
+        mornings: undefined,
+        afternoons: undefined,
+        evenings: undefined,
         expectations: undefined,
         meetingFrequency: undefined,
-        note: undefined,
+        note: 'updated note only',
+        teachTagIds: undefined,
+        learnTagIds: undefined,
+        interestTagIds: undefined,
       });
 
       const upsertCall = txMock.profile.upsert.mock.calls[0][0];
+      expect(upsertCall.update).toEqual({
+        note: 'updated note only',
+      });
+      expect(upsertCall.update).not.toHaveProperty('roles');
+      expect(upsertCall.update).not.toHaveProperty('position');
+      expect(upsertCall.update).not.toHaveProperty('latitude');
+      expect(upsertCall.update).not.toHaveProperty('longitude');
+      expect(upsertCall.update).not.toHaveProperty('cityId');
+      expect(upsertCall.update).not.toHaveProperty('radiusKm');
+      expect(upsertCall.update).not.toHaveProperty('weekdays');
+      expect(upsertCall.update).not.toHaveProperty('weekends');
+      expect(upsertCall.update).not.toHaveProperty('mornings');
+      expect(upsertCall.update).not.toHaveProperty('afternoons');
+      expect(upsertCall.update).not.toHaveProperty('evenings');
       expect(upsertCall.update).not.toHaveProperty('expectations');
       expect(upsertCall.update).not.toHaveProperty('meetingFrequency');
-      expect(upsertCall.update).not.toHaveProperty('note');
+
+      // Tags are preserved when tag arrays are undefined
+      expect(txMock.profileTag.deleteMany).not.toHaveBeenCalled();
+      expect(txMock.profileTag.createMany).not.toHaveBeenCalled();
     });
 
     it('stores null position when neither roles nor position is provided', async (): Promise<void> => {

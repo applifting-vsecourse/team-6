@@ -30,11 +30,17 @@ export class ProfileService {
     data: SaveProfileData,
     existing?: ProfileEntity | null,
   ): void {
+    const effectiveRoles =
+      data.roles !== undefined ? data.roles : (existing?.roles ?? []);
+    const effectivePosition =
+      data.position !== undefined
+        ? data.position
+        : (existing?.position ?? null);
     const hasRole =
-      (data.roles &&
-        data.roles.length > 0 &&
-        data.roles.some((r) => r.trim().length > 0)) ||
-      Boolean(data.position?.trim());
+      (effectiveRoles &&
+        effectiveRoles.length > 0 &&
+        effectiveRoles.some((r) => r.trim().length > 0)) ||
+      Boolean(effectivePosition?.trim());
     if (!hasRole) {
       throw new BadRequestException({
         code: 'PROFILE_ROLE_REQUIRED',
@@ -42,8 +48,15 @@ export class ProfileService {
       });
     }
 
+    const effectiveLat =
+      data.latitude !== undefined ? data.latitude : existing?.latitude;
+    const effectiveLng =
+      data.longitude !== undefined ? data.longitude : existing?.longitude;
+    const effectiveCityId =
+      data.cityId !== undefined ? data.cityId : existing?.cityId;
     const hasLocation =
-      (data.latitude != null && data.longitude != null) || Boolean(data.cityId);
+      (effectiveLat != null && effectiveLng != null) ||
+      Boolean(effectiveCityId);
     if (!hasLocation) {
       throw new BadRequestException({
         code: 'PROFILE_LOCATION_REQUIRED',
@@ -52,12 +65,23 @@ export class ProfileService {
       });
     }
 
-    const hasAvailability =
-      data.weekdays ||
-      data.weekends ||
-      data.mornings ||
-      data.afternoons ||
-      data.evenings;
+    const effectiveWeekdays =
+      data.weekdays !== undefined ? data.weekdays : existing?.weekdays;
+    const effectiveWeekends =
+      data.weekends !== undefined ? data.weekends : existing?.weekends;
+    const effectiveMornings =
+      data.mornings !== undefined ? data.mornings : existing?.mornings;
+    const effectiveAfternoons =
+      data.afternoons !== undefined ? data.afternoons : existing?.afternoons;
+    const effectiveEvenings =
+      data.evenings !== undefined ? data.evenings : existing?.evenings;
+    const hasAvailability = Boolean(
+      effectiveWeekdays ||
+      effectiveWeekends ||
+      effectiveMornings ||
+      effectiveAfternoons ||
+      effectiveEvenings,
+    );
     if (!hasAvailability) {
       throw new BadRequestException({
         code: 'PROFILE_AVAILABILITY_REQUIRED',
@@ -66,12 +90,11 @@ export class ProfileService {
       });
     }
 
-    const hasFrequency = Boolean(
+    const effectiveFrequency =
       data.meetingFrequency !== undefined
         ? data.meetingFrequency
-        : existing?.meetingFrequency,
-    );
-    if (!hasFrequency) {
+        : existing?.meetingFrequency;
+    if (!effectiveFrequency) {
       throw new BadRequestException({
         code: 'PROFILE_FREQUENCY_REQUIRED',
         message: 'Meeting frequency is required to complete onboarding',

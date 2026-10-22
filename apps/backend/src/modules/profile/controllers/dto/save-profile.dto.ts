@@ -1,5 +1,5 @@
 import { MeetingFrequency } from '@/modules/profile/domain/profile.entity';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   ArrayMaxSize,
   IsArray,
@@ -33,7 +33,8 @@ export class SaveProfileDto {
   @MaxLength(100, { each: true })
   roles?: string[];
 
-  @ApiProperty({ example: ['1', '2'] })
+  @ApiPropertyOptional({ example: ['1', '2'] })
+  @IsOptional()
   @IsArray()
   @ArrayMaxSize(50)
   @IsString({ each: true })
@@ -41,9 +42,10 @@ export class SaveProfileDto {
     each: true,
     message: 'Tag ID must be a positive numeric ID within range',
   })
-  teachTagIds!: string[];
+  teachTagIds?: string[];
 
-  @ApiProperty({ example: ['3', '4'] })
+  @ApiPropertyOptional({ example: ['3', '4'] })
+  @IsOptional()
   @IsArray()
   @ArrayMaxSize(50)
   @IsString({ each: true })
@@ -51,9 +53,10 @@ export class SaveProfileDto {
     each: true,
     message: 'Tag ID must be a positive numeric ID within range',
   })
-  learnTagIds!: string[];
+  learnTagIds?: string[];
 
-  @ApiProperty({ example: ['5', '6'] })
+  @ApiPropertyOptional({ example: ['5', '6'] })
+  @IsOptional()
   @IsArray()
   @ArrayMaxSize(50)
   @IsString({ each: true })
@@ -61,27 +64,32 @@ export class SaveProfileDto {
     each: true,
     message: 'Tag ID must be a positive numeric ID within range',
   })
-  interestTagIds!: string[];
+  interestTagIds?: string[];
 
-  @ApiProperty({ example: true })
+  @ApiPropertyOptional({ example: true })
+  @IsOptional()
   @IsBoolean()
-  weekdays!: boolean;
+  weekdays?: boolean;
 
-  @ApiProperty({ example: false })
+  @ApiPropertyOptional({ example: false })
+  @IsOptional()
   @IsBoolean()
-  weekends!: boolean;
+  weekends?: boolean;
 
-  @ApiProperty({ example: false })
+  @ApiPropertyOptional({ example: false })
+  @IsOptional()
   @IsBoolean()
-  mornings!: boolean;
+  mornings?: boolean;
 
-  @ApiProperty({ example: false })
+  @ApiPropertyOptional({ example: false })
+  @IsOptional()
   @IsBoolean()
-  afternoons!: boolean;
+  afternoons?: boolean;
 
-  @ApiProperty({ example: true })
+  @ApiPropertyOptional({ example: true })
+  @IsOptional()
   @IsBoolean()
-  evenings!: boolean;
+  evenings?: boolean;
 
   @ApiPropertyOptional({ example: 'city_praha' })
   @IsOptional()

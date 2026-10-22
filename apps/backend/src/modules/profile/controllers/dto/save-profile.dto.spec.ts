@@ -157,5 +157,13 @@ describe('SaveProfileDto validation', () => {
       const errors = await validate(dto);
       expect(errors.some((e) => e.property === 'expectations')).toBe(true);
     });
+
+    it('allows partial payloads with optional fields omitted', async (): Promise<void> => {
+      const dto = plainToInstance(SaveProfileDto, {
+        note: 'Only updating note',
+      });
+      const errors = await validate(dto);
+      expect(errors).toHaveLength(0);
+    });
   });
 });

@@ -423,4 +423,55 @@ describe('ProfileService', () => {
       );
     }
   });
+
+  it('rejects completeOnboarding with an empty payload for a new user', async (): Promise<void> => {
+    repository.findByUserId.mockResolvedValue(null);
+    try {
+      await service.saveProfile('u1', {
+        completeOnboarding: true,
+      });
+      fail('Expected BadRequestException');
+    } catch (err) {
+      expect(err).toBeInstanceOf(BadRequestException);
+      expect((err as BadRequestException).getResponse()).toEqual(
+        expect.objectContaining({ code: 'PROFILE_ROLE_REQUIRED' }),
+      );
+    }
+  });
+
+  it('allows onboarded user to perform partial update omitting required fields without erasing them', async (): Promise<void> => {
+    const existingOnboarded = new ProfileEntity(
+      'u1',
+      'Engineer',
+      null,
+      MeetingFrequency.WEEKLY,
+      true,
+      false,
+      false,
+      false,
+      false,
+      'c1',
+      'Praha',
+      25,
+      null,
+      new Date('2026-10-21T12:00:00Z'),
+      [],
+      ['software-engineer'],
+      50.08,
+      14.43,
+    );
+    repository.findByUserId.mockResolvedValue(existingOnboarded);
+    const updatedEntity = {} as ProfileEntity;
+    repository.saveProfile.mockResolvedValue(updatedEntity);
+
+    const result = await service.saveProfile('u1', {
+      note: 'Just updating the note',
+    });
+
+    expect(result).toBe(updatedEntity);
+    expect(repository.saveProfile).toHaveBeenCalledWith(
+      'u1',
+      expect.objectContaining({ note: 'Just updating the note' }),
+    );
+  });
 });

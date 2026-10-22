@@ -21,14 +21,14 @@ export class ProfileTagEntity {
 export interface SaveProfileData {
   position?: string;
   roles?: string[];
-  teachTagIds: string[];
-  learnTagIds: string[];
-  interestTagIds: string[];
-  weekdays: boolean;
-  weekends: boolean;
-  mornings: boolean;
-  afternoons: boolean;
-  evenings: boolean;
+  teachTagIds?: string[];
+  learnTagIds?: string[];
+  interestTagIds?: string[];
+  weekdays?: boolean;
+  weekends?: boolean;
+  mornings?: boolean;
+  afternoons?: boolean;
+  evenings?: boolean;
   cityId?: string | null;
   radiusKm?: number | null;
   latitude?: number | null;
