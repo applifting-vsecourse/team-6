@@ -119,6 +119,16 @@ enum MeetingFrequency {
   @@map("meeting_frequency")
 }
 
+model City {
+  id       String    @id @default(cuid())
+  name     String
+  lat      Float
+  lng      Float
+  profiles Profile[]
+
+  @@map("city")
+}
+
 // Reference data: inserted by migrations, never by the seed script.
 model Category {
   id        Int       @id @default(autoincrement())
@@ -130,8 +140,6 @@ model Category {
 }
 
 // Reference data: inserted by migrations, never by the seed script.
-// shortcut: placeholder tag list copied from the Figma mocks, replace it with the real
-// list when the onboarding story (#7) decides it; add a migration, don't edit this one.
 model Tag {
   id          Int          @id @default(autoincrement())
   slug        String       @unique
@@ -140,20 +148,6 @@ model Tag {
   @@map("tag")
 }
 
-// Minimal on purpose: the kvintet feed only reads `position` and `meetingFrequency`.
-// shortcut: stand-in for the profile, the onboarding story (#7) replaces it with the
-// full profile + questionnaire and the screens that write it; nothing writes it yet.
-model Profile {
-  userId           String            @id
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  position         String?
-  meetingFrequency MeetingFrequency?
-  tags             ProfileTag[]
-
-  @@map("profile")
-}
-
-// shortcut: written by nothing yet, onboarding (#7) will own how tags are picked and saved.
 model ProfileTag {
   userId  String
   profile Profile        @relation(fields: [userId], references: [userId], onDelete: Cascade)
@@ -163,6 +157,32 @@ model ProfileTag {
 
   @@id([userId, tagId, kind])
   @@map("profile_tag")
+}
+
+model Profile {
+  userId                String            @id
+  user                  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  position              String?
+  roles                 String[]          @default([])
+  latitude              Float?
+  longitude             Float?
+  expectations          String?
+  meetingFrequency      MeetingFrequency?
+  weekdays              Boolean           @default(false)
+  weekends              Boolean           @default(false)
+  mornings              Boolean           @default(false)
+  afternoons            Boolean           @default(false)
+  evenings              Boolean           @default(false)
+  cityId                String?
+  city                  City?             @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  radiusKm              Int?
+  note                  String?           @db.Text
+  onboardingCompletedAt DateTime?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  tags                  ProfileTag[]
+
+  @@map("profile")
 }
 
 // FORMING kvintets are open to new members and listed in the feed. "group" is an SQL reserved word.

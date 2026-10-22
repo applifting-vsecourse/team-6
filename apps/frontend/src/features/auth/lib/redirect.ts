@@ -12,8 +12,8 @@ export const decodeRedirectUri = (encoded: string) => {
   }
 }
 
-// shortcut: onboarding doesn't exist yet, so everyone counts as onboarded; replace with the profile check in the onboarding story.
-export const isOnboarded = () => true
+export const isOnboarded = (profile?: { onboardingCompletedAt?: string | Date | null } | null) =>
+  profile === undefined ? true : Boolean(profile?.onboardingCompletedAt)
 
 // `from` comes from the URL. The URL parser resolves "//host", "/\host" and "/<tab>/host" to another origin like a browser does.
 const isSameOriginPath = (target: string) =>

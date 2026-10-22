@@ -12,6 +12,7 @@ globalThis.ResizeObserver ??= class {
 // jsdom lacks the pointer-capture and scroll APIs Radix Select calls when it opens.
 Object.assign(Element.prototype, {
   hasPointerCapture: () => false,
+  setPointerCapture: () => undefined,
   releasePointerCapture: () => undefined,
   scrollIntoView: () => undefined,
 })

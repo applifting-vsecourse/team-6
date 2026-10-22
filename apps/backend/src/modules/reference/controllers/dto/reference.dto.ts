@@ -1,7 +1,10 @@
-export class CategoryDto {
-  slug!: string;
-}
+import {
+  CategoryDto,
+  CityDto,
+  ReferenceResponseDto,
+  TagDto,
+} from './reference-response.dto';
 
-export class ReferenceDto {
-  categories!: CategoryDto[];
-}
+export { CategoryDto, CityDto, TagDto };
+
+export class ReferenceDto extends ReferenceResponseDto {}

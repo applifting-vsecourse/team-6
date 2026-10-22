@@ -1,0 +1,261 @@
+import { PrismaService } from '@/core/prisma/prisma.service';
+import {
+  MeetingFrequency,
+  ProfileEntity,
+  ProfileTagEntity,
+  SaveProfileData,
+  TagKind,
+} from '@/modules/profile/domain/profile.entity';
+import { BadRequestException, Injectable } from '@nestjs/common';
+
+@Injectable()
+export class ProfileRepository {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findByUserId(userId: string): Promise<ProfileEntity | null> {
+    const profile = await this.prisma.profile.findUnique({
+      where: { userId },
+      include: {
+        city: true,
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
+      },
+    });
+
+    if (!profile) return null;
+
+    let parsedExpectations: string[] = [];
+    if (profile.expectations) {
+      try {
+        const parsed = JSON.parse(profile.expectations);
+        if (
+          Array.isArray(parsed) &&
+          parsed.every((item) => typeof item === 'string')
+        ) {
+          parsedExpectations = parsed;
+        } else {
+          parsedExpectations = [profile.expectations];
+        }
+      } catch {
+        parsedExpectations = [profile.expectations];
+      }
+    }
+
+    const tags = profile.tags.map(
+      (pt) =>
+        new ProfileTagEntity(String(pt.tagId), pt.tag.slug, pt.kind as TagKind),
+    );
+
+    const roles =
+      profile.roles && profile.roles.length > 0
+        ? profile.roles
+        : profile.position
+          ? [profile.position]
+          : [];
+
+    return new ProfileEntity(
+      profile.userId,
+      profile.position,
+      parsedExpectations,
+      profile.meetingFrequency as MeetingFrequency | null,
+      profile.weekdays,
+      profile.weekends,
+      profile.mornings,
+      profile.afternoons,
+      profile.evenings,
+      profile.cityId,
+      profile.city?.name ?? null,
+      profile.radiusKm,
+      profile.note,
+      profile.onboardingCompletedAt,
+      tags,
+      roles,
+      profile.latitude,
+      profile.longitude,
+    );
+  }
+
+  async saveProfile(
+    userId: string,
+    data: SaveProfileData,
+  ): Promise<ProfileEntity> {
+    const rolesProvided =
+      data.roles !== undefined || data.position !== undefined;
+    const roles = rolesProvided
+      ? data.roles && data.roles.length > 0
+        ? data.roles
+        : data.position
+          ? [data.position]
+          : []
+      : undefined;
+    const position = rolesProvided
+      ? (roles?.[0] ?? data.position ?? null)
+      : undefined;
+
+    await this.prisma.$transaction(async (tx) => {
+      if (data.cityId) {
+        const city = await tx.city.findUnique({
+          where: { id: data.cityId },
+        });
+        if (!city) {
+          throw new BadRequestException({
+            code: 'CITY_NOT_FOUND',
+            message: 'City does not exist',
+          });
+        }
+      }
+
+      const allTagIds = [
+        ...new Set([
+          ...(data.teachTagIds ?? []),
+          ...(data.learnTagIds ?? []),
+          ...(data.interestTagIds ?? []),
+        ]),
+      ];
+
+      const tagMap = new Map<string, number>();
+      if (allTagIds.length > 0) {
+        const numericIds = allTagIds.map((id) => parseInt(id, 10));
+        const hasInvalidOrOverflow = numericIds.some(
+          (n) => Number.isNaN(n) || n <= 0 || n > 2147483647,
+        );
+        if (hasInvalidOrOverflow) {
+          throw new BadRequestException({
+            code: 'TAGS_NOT_FOUND',
+            message: 'One or more tags do not exist',
+          });
+        }
+
+        const existingTags = await tx.tag.findMany({
+          where: { id: { in: numericIds } },
+          select: { id: true },
+        });
+
+        for (const t of existingTags) {
+          tagMap.set(String(t.id), t.id);
+        }
+
+        const missing = allTagIds.filter((id) => !tagMap.has(id));
+        if (missing.length > 0) {
+          throw new BadRequestException({
+            code: 'TAGS_NOT_FOUND',
+            message: 'One or more tags do not exist',
+          });
+        }
+      }
+
+      const existing = await tx.profile.findUnique({
+        where: { userId },
+      });
+
+      const onboardingCompletedAt = data.completeOnboarding
+        ? (existing?.onboardingCompletedAt ?? new Date())
+        : (existing?.onboardingCompletedAt ?? null);
+
+      await tx.profile.upsert({
+        where: { userId },
+        create: {
+          userId,
+          position: position ?? null,
+          roles: roles ?? [],
+          latitude: data.latitude ?? null,
+          longitude: data.longitude ?? null,
+          expectations: data.expectations
+            ? JSON.stringify(data.expectations)
+            : null,
+          meetingFrequency: data.meetingFrequency ?? null,
+          weekdays: data.weekdays ?? false,
+          weekends: data.weekends ?? false,
+          mornings: data.mornings ?? false,
+          afternoons: data.afternoons ?? false,
+          evenings: data.evenings ?? false,
+          cityId: data.cityId ?? null,
+          radiusKm: data.radiusKm ?? null,
+          note: data.note ?? null,
+          onboardingCompletedAt,
+        },
+        update: {
+          ...(position !== undefined ? { position } : {}),
+          ...(roles !== undefined ? { roles } : {}),
+          ...(data.latitude !== undefined ? { latitude: data.latitude } : {}),
+          ...(data.longitude !== undefined
+            ? { longitude: data.longitude }
+            : {}),
+          ...(data.weekdays !== undefined ? { weekdays: data.weekdays } : {}),
+          ...(data.weekends !== undefined ? { weekends: data.weekends } : {}),
+          ...(data.mornings !== undefined ? { mornings: data.mornings } : {}),
+          ...(data.afternoons !== undefined
+            ? { afternoons: data.afternoons }
+            : {}),
+          ...(data.evenings !== undefined ? { evenings: data.evenings } : {}),
+          ...(data.cityId !== undefined ? { cityId: data.cityId } : {}),
+          ...(data.radiusKm !== undefined ? { radiusKm: data.radiusKm } : {}),
+          ...(data.expectations !== undefined
+            ? {
+                expectations: data.expectations
+                  ? JSON.stringify(data.expectations)
+                  : null,
+              }
+            : {}),
+          ...(data.meetingFrequency !== undefined
+            ? { meetingFrequency: data.meetingFrequency ?? null }
+            : {}),
+          ...(data.note !== undefined ? { note: data.note ?? null } : {}),
+          ...(data.completeOnboarding && !existing?.onboardingCompletedAt
+            ? { onboardingCompletedAt: new Date() }
+            : {}),
+        },
+      });
+
+      const kindsToDelete: TagKind[] = [];
+      if (data.teachTagIds !== undefined) kindsToDelete.push(TagKind.TEACH);
+      if (data.learnTagIds !== undefined) kindsToDelete.push(TagKind.LEARN);
+      if (data.interestTagIds !== undefined)
+        kindsToDelete.push(TagKind.INTEREST);
+
+      if (kindsToDelete.length > 0) {
+        // Replace profile tags for provided kinds only
+        await tx.profileTag.deleteMany({
+          where: {
+            userId,
+            kind: { in: kindsToDelete },
+          },
+        });
+
+        const profileTagCreates = [
+          ...(data.teachTagIds ?? []).map((tagId) => ({
+            userId,
+            tagId: tagMap.get(tagId)!,
+            kind: TagKind.TEACH,
+          })),
+          ...(data.learnTagIds ?? []).map((tagId) => ({
+            userId,
+            tagId: tagMap.get(tagId)!,
+            kind: TagKind.LEARN,
+          })),
+          ...(data.interestTagIds ?? []).map((tagId) => ({
+            userId,
+            tagId: tagMap.get(tagId)!,
+            kind: TagKind.INTEREST,
+          })),
+        ];
+
+        if (profileTagCreates.length > 0) {
+          await tx.profileTag.createMany({
+            data: profileTagCreates,
+            skipDuplicates: true,
+          });
+        }
+      }
+    });
+
+    const result = await this.findByUserId(userId);
+    if (!result) {
+      throw new Error('Failed to retrieve profile after save');
+    }
+    return result;
+  }
+}

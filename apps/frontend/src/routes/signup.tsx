@@ -43,7 +43,7 @@ function SignUpPage() {
         username: values.username,
         acceptCodeOfConduct: values.acceptCodeOfConduct,
       })
-      await navigate({ to: ROUTES.overview })
+      await navigate({ to: ROUTES.onboarding })
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "errors.signUpFailed"))
     }

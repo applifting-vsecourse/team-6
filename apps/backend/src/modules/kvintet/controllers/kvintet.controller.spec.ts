@@ -1,7 +1,11 @@
+import { PrismaService } from '@/core/prisma/prisma.service';
 import { KvintetController } from '@/modules/kvintet/controllers/kvintet.controller';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
 import { KvintetService } from '@/modules/kvintet/services/kvintet.service';
 import { AuthenticatedUserGuard } from '@/shared/auth/guards/authenticated-user.guard';
+import { OnboardedGuard } from '@/shared/auth/guards/onboarded.guard';
+import type { BetterAuth } from '@/shared/auth/providers/better-auth.provider';
+import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { mock } from 'jest-mock-extended';
 
 // The real guard pulls in the better-auth provider (.tsx email templates, ESM-only
@@ -14,10 +18,33 @@ jest.mock('@/shared/auth/utils/get-session-from-request', () => ({
 }));
 
 describe('KvintetController', () => {
-  it('requires a signed-in user on every route', () => {
+  it('requires a signed-in and onboarded user on every route', () => {
     const guards = Reflect.getMetadata('__guards__', KvintetController);
 
     expect(guards).toContain(AuthenticatedUserGuard);
+    expect(guards).toContain(OnboardedGuard);
+  });
+
+  it('rejects a non-onboarded user with 403 Forbidden', async () => {
+    const prisma = {
+      profile: {
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ onboardingCompletedAt: null }),
+      },
+    } as unknown as PrismaService;
+    const guard = new OnboardedGuard({} as BetterAuth, prisma);
+    const context = {
+      switchToHttp: () => ({
+        getRequest: () => ({
+          session: { user: { id: 'u1' } },
+        }),
+      }),
+    } as unknown as ExecutionContext;
+
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      ForbiddenException,
+    );
   });
 
   it('answers the feed with an allow-list of fields and nothing else', async () => {

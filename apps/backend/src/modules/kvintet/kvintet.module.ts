@@ -9,5 +9,6 @@ import { Module } from '@nestjs/common';
   imports: [PrismaModule, AuthModule],
   controllers: [KvintetController],
   providers: [KvintetService, KvintetRepository],
+  exports: [KvintetService],
 })
 export class KvintetModule {}
