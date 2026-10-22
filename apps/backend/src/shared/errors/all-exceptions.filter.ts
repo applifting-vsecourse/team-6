@@ -18,6 +18,18 @@ const STATUS_CODES: Record<number, string> = {
   [HttpStatus.CONFLICT]: 'conflict',
 };
 
+// A thrown exception can carry its own stable code, e.g.
+// `new ConflictException({ code: 'kvintet_not_open', message: '...' })`.
+const codeOf = (exception: HttpException): string | undefined => {
+  const body = exception.getResponse();
+  return typeof body === 'object' &&
+    body !== null &&
+    'code' in body &&
+    typeof body.code === 'string'
+    ? body.code
+    : undefined;
+};
+
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
@@ -38,7 +50,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
       const statusCode = exception.getStatus();
       return response.status(statusCode).json({
         statusCode,
-        code: STATUS_CODES[statusCode] ?? `http_${statusCode}`,
+        code:
+          codeOf(exception) ?? STATUS_CODES[statusCode] ?? `http_${statusCode}`,
         message: exception.message,
       });
     }

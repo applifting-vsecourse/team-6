@@ -3,19 +3,21 @@ import { Link } from "@tanstack/react-router"
 import { Menu, X } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
+import { DisabledNavItem } from "@/components/Header/DisabledNavItem"
 import { LanguageSwitcher } from "@/components/Header/LanguageSwitcher"
-import { NAV_ITEMS } from "@/components/Header/nav"
+import { NAV_ITEMS, type NavDisabled } from "@/components/Header/nav"
 import { LogoMark } from "@/components/LogoMark"
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 
 type MobileMenuProps = {
   hasNav?: boolean
+  navDisabled?: NavDisabled
   // Account block (name + sign out). Passed as a slot so `components/` doesn't
   // have to import from `features/auth`.
   account?: ReactNode
 }
 
-export function MobileMenu({ hasNav = false, account }: MobileMenuProps) {
+export function MobileMenu({ hasNav = false, navDisabled, account }: MobileMenuProps) {
   const { t } = useTranslation()
 
   return (
@@ -50,19 +52,30 @@ export function MobileMenu({ hasNav = false, account }: MobileMenuProps) {
             aria-label={t("layout.mainNavigation")}
             className="flex flex-col px-4 py-2"
           >
-            {NAV_ITEMS.map((item) => (
-              <SheetClose
-                asChild
-                key={item.to}
-              >
-                <Link
-                  to={item.to}
-                  className="flex items-center gap-2.5 border-b border-border py-4 font-serif text-xl font-semibold text-foreground before:hidden before:h-5 before:w-0.75 before:bg-foreground data-[status=active]:before:block"
+            {NAV_ITEMS.map((item) => {
+              const reason = navDisabled?.[item.to]
+              return reason ? (
+                <DisabledNavItem
+                  key={item.to}
+                  reason={reason}
+                  className="flex items-center gap-2.5 border-b border-border py-4 font-serif text-xl font-semibold"
                 >
                   {t(item.labelKey)}
-                </Link>
-              </SheetClose>
-            ))}
+                </DisabledNavItem>
+              ) : (
+                <SheetClose
+                  asChild
+                  key={item.to}
+                >
+                  <Link
+                    to={item.to}
+                    className="flex items-center gap-2.5 border-b border-border py-4 font-serif text-xl font-semibold text-foreground before:hidden before:h-5 before:w-0.75 before:bg-foreground data-[status=active]:before:block"
+                  >
+                    {t(item.labelKey)}
+                  </Link>
+                </SheetClose>
+              )
+            })}
           </nav>
         ) : null}
         <div className="mx-4 flex items-center justify-between border-b border-border py-4">

@@ -88,7 +88,106 @@ model User {
   username        String? @db.VarChar(50)
   displayUsername String? @db.VarChar(50)
 
+  profile         Profile?
+  kvintetMember   KvintetMember?
+
   @@unique([email])
   @@unique([username])
   @@map("user")
+}
+
+enum KvintetStatus {
+  FORMING
+  ACTIVE
+
+  @@map("kvintet_status")
+}
+
+enum ProfileTagKind {
+  TEACH
+  LEARN
+  INTEREST
+
+  @@map("profile_tag_kind")
+}
+
+enum MeetingFrequency {
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+
+  @@map("meeting_frequency")
+}
+
+// Reference data: inserted by migrations, never by the seed script.
+model Category {
+  id        Int       @id @default(autoincrement())
+  slug      String    @unique
+  sortOrder Int
+  kvintets  Kvintet[]
+
+  @@map("category")
+}
+
+// Reference data: inserted by migrations, never by the seed script.
+// shortcut: placeholder tag list copied from the Figma mocks, replace it with the real
+// list when the onboarding story (#7) decides it; add a migration, don't edit this one.
+model Tag {
+  id          Int          @id @default(autoincrement())
+  slug        String       @unique
+  profileTags ProfileTag[]
+
+  @@map("tag")
+}
+
+// Minimal on purpose: the kvintet feed only reads `position` and `meetingFrequency`.
+// shortcut: stand-in for the profile, the onboarding story (#7) replaces it with the
+// full profile + questionnaire and the screens that write it; nothing writes it yet.
+model Profile {
+  userId           String            @id
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  position         String?
+  meetingFrequency MeetingFrequency?
+  tags             ProfileTag[]
+
+  @@map("profile")
+}
+
+// shortcut: written by nothing yet, onboarding (#7) will own how tags are picked and saved.
+model ProfileTag {
+  userId  String
+  profile Profile        @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  tagId   Int
+  tag     Tag            @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  kind    ProfileTagKind
+
+  @@id([userId, tagId, kind])
+  @@map("profile_tag")
+}
+
+// FORMING kvintets are open to new members and listed in the feed. "group" is an SQL reserved word.
+model Kvintet {
+  id          String          @id @default(uuid()) @db.Uuid
+  status      KvintetStatus   @default(FORMING)
+  title       String
+  description String?
+  categoryId  Int
+  category    Category        @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime        @default(now())
+  activatedAt DateTime?
+  members     KvintetMember[]
+
+  @@index([status, createdAt])
+  @@map("kvintet")
+}
+
+model KvintetMember {
+  kvintetId String   @db.Uuid
+  kvintet   Kvintet  @relation(fields: [kvintetId], references: [id], onDelete: Cascade)
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt  DateTime @default(now())
+
+  @@id([kvintetId, userId])
+  @@map("kvintet_member")
 }

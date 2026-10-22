@@ -30,6 +30,13 @@
       "usernameRequired": "Username is required"
     }
   },
+  "categories": {
+    "business": "Business",
+    "languages": "Languages",
+    "leisure": "Leisure",
+    "personal-development": "Personal development",
+    "technology": "Technology"
+  },
   "codeOfConduct": {
     "intro": "Kvintet is a place for people who want to meet and learn from each other. To keep it pleasant for everyone, we follow a few simple rules.",
     "reportIntro": "Report a broken rule or a problem with a specific person to <email>{{email}}</email>.",
@@ -53,6 +60,7 @@
     "reload": "Reload"
   },
   "errors": {
+    "already_in_kvintet": "You are already in a proposal or a kvintet.",
     "auth": {
       "CODE_OF_CONDUCT_REQUIRED": "You must accept the code of conduct.",
       "EMAIL_NOT_VERIFIED": "Verify your email first.",
@@ -71,6 +79,7 @@
     "conflict": "This conflicts with existing data.",
     "forbidden": "You don't have access to this.",
     "internal_error": "Something went wrong on our side. Please try again.",
+    "kvintet_not_open": "This proposal is full or no longer open.",
     "not_found": "We couldn't find what you were looking for.",
     "pageNotFound": "Page not found",
     "pageNotFoundDescription": "The page you're looking for doesn't exist or has been moved.",
@@ -80,6 +89,59 @@
     "unauthorized": "You need to sign in first.",
     "unexpected": "An unexpected error occurred.",
     "validation_failed": "Some of the entered values are not valid."
+  },
+  "kvintet": {
+    "alreadyMember": "You are already in a proposal.",
+    "count_one": "{{formatted}} proposal",
+    "count_other": "{{formatted}} proposals",
+    "dialog": {
+      "cancel": "Cancel",
+      "category": "Category",
+      "categoryHint": "Others find the proposal by category in the filter.",
+      "categoryPlaceholder": "Choose a category",
+      "description": "You will be its first member. Others will see the topic, your role and tags – not your name.",
+      "details": "Short description (optional)",
+      "detailsPlaceholder": "e.g. I run a 10-person agency and want to share what works for us.",
+      "submit": "Start proposal",
+      "title": "Start a new proposal",
+      "topic": "Topic or problem",
+      "topicHint": "What should the group talk about?"
+    },
+    "empty": {
+      "text": "Proposals that fit your profile will show up here.",
+      "title": "No proposals for you yet"
+    },
+    "error": {
+      "retry": "Try again",
+      "text": "Something went wrong on our side. Please try again.",
+      "title": "Couldn't load proposals"
+    },
+    "interests": "Interests: {{tags}}",
+    "join": "Join this proposal",
+    "joined": "You joined the proposal.",
+    "learns": "Wants to learn: {{tags}}",
+    "loading": "Loading proposals…",
+    "member": "Member",
+    "namesHidden": "You will see the names once the kvintet forms.",
+    "seats": "{{filled}} of {{total}}",
+    "startOwn": {
+      "button": "Start a new proposal",
+      "text": "Start your own on a topic that interests you – others will join you.",
+      "title": "Nothing fits?"
+    },
+    "started": "Your proposal is open. Others can join it now.",
+    "subtitle": "Every group that fits your profile. Choose by topic – you can only be in one proposal at a time.",
+    "suitsAll": "Suits everyone: {{value}}",
+    "teaches": "Teaches: {{tags}}",
+    "title": "Proposals for you",
+    "vacancy": "Free seat",
+    "vacancyHint": "It could be you.",
+    "validation": {
+      "categoryRequired": "Choose a category",
+      "descriptionTooLong": "The description can be at most {{max}} characters",
+      "titleRequired": "Enter a topic",
+      "titleTooLong": "The topic can be at most {{max}} characters"
+    }
   },
   "landing": {
     "caption": "No photos, no ratings – just people and topics.",
@@ -102,7 +164,14 @@
     "menu": "Menu",
     "openMenu": "Open menu"
   },
+  "meetingFrequency": {
+    "BIWEEKLY": "every 14 days",
+    "MONTHLY": "once a month",
+    "WEEKLY": "every week"
+  },
   "nav": {
+    "kvintetFeed": "Proposals",
+    "kvintetFeedDisabled": "You are already in a kvintet, so you can't browse other proposals.",
     "overview": "Overview"
   },
   "onboarding": {
@@ -112,6 +181,28 @@
     "greeting": "Welcome, <em>{{name}}</em>",
     "greetingAnonymous": "Welcome",
     "title": "Overview"
+  },
+  "tags": {
+    "board-games": "Board games",
+    "cooking": "Cooking",
+    "copywriting": "Copywriting",
+    "data-analysis": "Data analysis",
+    "excel": "Excel",
+    "hiking": "Hiking",
+    "interviewing": "Interviewing",
+    "music": "Music",
+    "negotiation": "Negotiation",
+    "public-speaking": "Public speaking",
+    "python": "Python",
+    "roadmapping": "Roadmapping",
+    "running": "Running",
+    "social-media": "Social media",
+    "spanish": "Spanish",
+    "sql": "SQL",
+    "startups": "Startups",
+    "statistics": "Statistics",
+    "travel": "Travel",
+    "ux-design": "UX design"
   },
   "validation": {
     "invalid": "Invalid value",
