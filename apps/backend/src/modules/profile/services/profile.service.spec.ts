@@ -119,7 +119,8 @@ describe('ProfileService', () => {
     });
   });
 
-  it('allows saving partial profile when completeOnboarding is false', async (): Promise<void> => {
+  it('allows saving partial profile when completeOnboarding is false for un-onboarded user', async (): Promise<void> => {
+    repository.findByUserId.mockResolvedValue(null);
     repository.saveProfile.mockResolvedValue({} as ProfileEntity);
 
     await service.saveProfile('u1', {
@@ -138,6 +139,87 @@ describe('ProfileService', () => {
       completeOnboarding: false,
     });
 
+    expect(repository.saveProfile).toHaveBeenCalled();
+  });
+
+  it('throws BadRequestException when already-onboarded user saves incomplete profile with completeOnboarding false', async (): Promise<void> => {
+    const existingOnboarded = new ProfileEntity(
+      'u1',
+      'Engineer',
+      null,
+      null,
+      true,
+      false,
+      false,
+      false,
+      false,
+      'c1',
+      'Praha',
+      25,
+      null,
+      new Date('2026-10-21T12:00:00Z'),
+      [],
+    );
+    repository.findByUserId.mockResolvedValue(existingOnboarded);
+
+    await expect(
+      service.saveProfile('u1', {
+        position: '',
+        roles: [],
+        teachTagIds: [],
+        learnTagIds: [],
+        interestTagIds: [],
+        weekdays: false,
+        weekends: false,
+        mornings: false,
+        afternoons: false,
+        evenings: false,
+        cityId: null,
+        radiusKm: null,
+        completeOnboarding: false,
+      }),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('allows already-onboarded user to update profile when required fields are preserved', async (): Promise<void> => {
+    const existingOnboarded = new ProfileEntity(
+      'u1',
+      'Engineer',
+      null,
+      null,
+      true,
+      false,
+      false,
+      false,
+      false,
+      'c1',
+      'Praha',
+      25,
+      null,
+      new Date('2026-10-21T12:00:00Z'),
+      [],
+    );
+    repository.findByUserId.mockResolvedValue(existingOnboarded);
+    const updatedEntity = {} as ProfileEntity;
+    repository.saveProfile.mockResolvedValue(updatedEntity);
+
+    const result = await service.saveProfile('u1', {
+      position: 'Senior Engineer',
+      roles: ['software-engineer'],
+      teachTagIds: [],
+      learnTagIds: [],
+      interestTagIds: [],
+      weekdays: true,
+      weekends: false,
+      mornings: true,
+      afternoons: false,
+      evenings: false,
+      cityId: 'c1',
+      radiusKm: 25,
+      completeOnboarding: false,
+    });
+
+    expect(result).toBe(updatedEntity);
     expect(repository.saveProfile).toHaveBeenCalled();
   });
 

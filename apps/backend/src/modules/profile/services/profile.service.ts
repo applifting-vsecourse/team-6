@@ -17,7 +17,10 @@ export class ProfileService {
     userId: string,
     data: SaveProfileData,
   ): Promise<ProfileEntity> {
-    if (data.completeOnboarding) {
+    const existing = await this.profileRepository.findByUserId(userId);
+    const isOnboarded = Boolean(existing?.onboardingCompletedAt);
+
+    if (data.completeOnboarding || isOnboarded) {
       this.validateCompleteProfile(data);
     }
     return this.profileRepository.saveProfile(userId, data);

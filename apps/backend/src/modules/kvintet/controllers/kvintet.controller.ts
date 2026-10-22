@@ -2,6 +2,7 @@ import { KvintetService } from '@/modules/kvintet/services/kvintet.service';
 import { User } from '@/shared/auth/decorators/user.decorator';
 import { Identity } from '@/shared/auth/domain/identity';
 import { AuthenticatedUserGuard } from '@/shared/auth/guards/authenticated-user.guard';
+import { OnboardedGuard } from '@/shared/auth/guards/onboarded.guard';
 import {
   Body,
   Controller,
@@ -19,7 +20,7 @@ import { StartedKvintetDto, StartKvintetDto } from './dto/start-kvintet.dto';
 
 @ApiTags('kvintets')
 @ApiCookieAuth()
-@UseGuards(AuthenticatedUserGuard)
+@UseGuards(AuthenticatedUserGuard, OnboardedGuard)
 @Controller('kvintets')
 export class KvintetController {
   constructor(private readonly service: KvintetService) {}
