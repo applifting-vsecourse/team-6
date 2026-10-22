@@ -19,13 +19,13 @@ void i18n
     supportedLngs: locales.map((l) => l.code),
     // "en-US" / "cs-CZ" resolve to the base language
     nonExplicitSupportedLngs: true,
-    fallbackLng: "en",
+    fallbackLng: "cs",
     detection: { order: ["localStorage", "navigator"], caches: ["localStorage"] },
     interpolation: { escapeValue: false },
   })
 
 const syncHtmlLang = () => {
-  document.documentElement.lang = i18n.resolvedLanguage ?? "en"
+  document.documentElement.lang = i18n.resolvedLanguage ?? "cs"
 }
 i18n.on("languageChanged", syncHtmlLang)
 syncHtmlLang()
