@@ -69,7 +69,11 @@ type StartKvintetDialogProps = {
   defaultCategory?: string
 }
 
-export function StartKvintetDialog({ isOpen, onOpenChange, defaultCategory }: StartKvintetDialogProps) {
+export function StartKvintetDialog({
+  isOpen,
+  onOpenChange,
+  defaultCategory,
+}: StartKvintetDialogProps) {
   const { t } = useTranslation()
   const label = useSlugLabel()
   const schema = useMemo(() => createSchema(t), [t])

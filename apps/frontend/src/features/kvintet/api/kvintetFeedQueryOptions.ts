@@ -32,5 +32,9 @@ export const kvintetFeedQueryOptions = (category?: string) =>
     queryFn: async () =>
       z
         .array(feedKvintetSchema)
-        .parse(await api.get("kvintets/feed", { searchParams: category ? { category } : undefined }).json()),
+        .parse(
+          await api
+            .get("kvintets/feed", { searchParams: category ? { category } : undefined })
+            .json(),
+        ),
   })
