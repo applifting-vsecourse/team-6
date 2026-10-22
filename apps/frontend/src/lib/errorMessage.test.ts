@@ -47,6 +47,41 @@ describe("getErrorMessage", () => {
     expect(getErrorMessage(error, "errors.signUpFailed")).toBe("Sign up failed")
   })
 
+  it("translates profile and reference error codes in both English and Czech", async () => {
+    expect(getErrorMessage(httpError({ code: "PROFILE_ROLE_REQUIRED" }))).toBe(
+      "At least one role is required.",
+    )
+    expect(getErrorMessage(httpError({ code: "PROFILE_LOCATION_REQUIRED" }))).toBe(
+      "Location coordinates or city is required.",
+    )
+    expect(getErrorMessage(httpError({ code: "PROFILE_AVAILABILITY_REQUIRED" }))).toBe(
+      "At least one availability slot is required.",
+    )
+    expect(getErrorMessage(httpError({ code: "CITY_NOT_FOUND" }))).toBe(
+      "Selected city was not found.",
+    )
+    expect(getErrorMessage(httpError({ code: "TAGS_NOT_FOUND" }))).toBe(
+      "One or more selected tags do not exist.",
+    )
+
+    await i18n.changeLanguage("cs")
+    expect(getErrorMessage(httpError({ code: "PROFILE_ROLE_REQUIRED" }))).toBe(
+      "Je vyžadována alespoň jedna role.",
+    )
+    expect(getErrorMessage(httpError({ code: "PROFILE_LOCATION_REQUIRED" }))).toBe(
+      "Je vyžadována poloha (souřadnice nebo město).",
+    )
+    expect(getErrorMessage(httpError({ code: "PROFILE_AVAILABILITY_REQUIRED" }))).toBe(
+      "Je vyžadován alespoň jeden časový slot.",
+    )
+    expect(getErrorMessage(httpError({ code: "CITY_NOT_FOUND" }))).toBe(
+      "Vybrané město nebylo nalezeno.",
+    )
+    expect(getErrorMessage(httpError({ code: "TAGS_NOT_FOUND" }))).toBe(
+      "Jeden nebo více vybraných štítků neexistuje.",
+    )
+  })
+
   it("follows the active language", async () => {
     await i18n.changeLanguage("cs")
     expect(getErrorMessage(httpError({ code: "unauthorized" }))).toBe(

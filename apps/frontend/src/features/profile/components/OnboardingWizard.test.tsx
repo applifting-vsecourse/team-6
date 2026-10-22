@@ -29,8 +29,8 @@ vi.mock("@/features/profile/api/profileApi", async (importOriginal) => {
         Promise.resolve({
           cities: [{ id: "c_praha", name: "Praha", lat: 50.07, lng: 14.43 }],
           tags: [
-            { id: "t_excel", slug: "excel" },
-            { id: "t_python", slug: "python" },
+            { id: "1", slug: "excel" },
+            { id: "2", slug: "python" },
           ],
         }),
     }),

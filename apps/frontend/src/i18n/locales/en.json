@@ -64,6 +64,11 @@
     "saving": "Saving…"
   },
   "errors": {
+    "CITY_NOT_FOUND": "Selected city was not found.",
+    "PROFILE_AVAILABILITY_REQUIRED": "At least one availability slot is required.",
+    "PROFILE_LOCATION_REQUIRED": "Location coordinates or city is required.",
+    "PROFILE_ROLE_REQUIRED": "At least one role is required.",
+    "TAGS_NOT_FOUND": "One or more selected tags do not exist.",
     "already_in_kvintet": "You are already in a proposal or a kvintet.",
     "auth": {
       "CODE_OF_CONDUCT_REQUIRED": "You must accept the code of conduct.",

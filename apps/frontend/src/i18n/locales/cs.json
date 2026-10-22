@@ -66,6 +66,11 @@
     "saving": "Ukládání…"
   },
   "errors": {
+    "CITY_NOT_FOUND": "Vybrané město nebylo nalezeno.",
+    "PROFILE_AVAILABILITY_REQUIRED": "Je vyžadován alespoň jeden časový slot.",
+    "PROFILE_LOCATION_REQUIRED": "Je vyžadována poloha (souřadnice nebo město).",
+    "PROFILE_ROLE_REQUIRED": "Je vyžadována alespoň jedna role.",
+    "TAGS_NOT_FOUND": "Jeden nebo více vybraných štítků neexistuje.",
     "already_in_kvintet": "Už jste členem návrhu nebo kvintetu.",
     "auth": {
       "CODE_OF_CONDUCT_REQUIRED": "Musíte souhlasit s kodexem chování.",

@@ -5,9 +5,9 @@ import { SaveProfileDto } from './save-profile.dto';
 describe('SaveProfileDto validation', () => {
   const createValidDto = (): Record<string, unknown> => ({
     roles: ['software-engineer'],
-    teachTagIds: ['t1'],
-    learnTagIds: ['t2'],
-    interestTagIds: ['t3'],
+    teachTagIds: ['1'],
+    learnTagIds: ['2'],
+    interestTagIds: ['3'],
     weekdays: true,
     weekends: false,
     mornings: true,
@@ -95,10 +95,31 @@ describe('SaveProfileDto validation', () => {
     it('rejects teachTagIds array exceeding 50 items', async (): Promise<void> => {
       const dto = plainToInstance(SaveProfileDto, {
         ...createValidDto(),
-        teachTagIds: Array.from({ length: 51 }, (_, i) => `tag-${i}`),
+        teachTagIds: Array.from({ length: 51 }, (_, i) => `${i + 1}`),
       });
       const errors = await validate(dto);
       expect(errors.some((e) => e.property === 'teachTagIds')).toBe(true);
+    });
+
+    it('rejects non-numeric tag IDs like slug strings or empty string', async (): Promise<void> => {
+      const invalidTagIds = ['tag_excel', 'python', '', '0', '-5', '1.5'];
+      for (const invalidId of invalidTagIds) {
+        const dto = plainToInstance(SaveProfileDto, {
+          ...createValidDto(),
+          teachTagIds: [invalidId],
+        });
+        const errors = await validate(dto);
+        expect(errors.some((e) => e.property === 'teachTagIds')).toBe(true);
+      }
+    });
+
+    it('accepts valid positive integer strings as tag IDs', async (): Promise<void> => {
+      const dto = plainToInstance(SaveProfileDto, {
+        ...createValidDto(),
+        teachTagIds: ['1', '42', '1000'],
+      });
+      const errors = await validate(dto);
+      expect(errors.some((e) => e.property === 'teachTagIds')).toBe(false);
     });
 
     it('rejects expectations array exceeding 20 items', async (): Promise<void> => {

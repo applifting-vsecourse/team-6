@@ -9,6 +9,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Matches,
   Max,
   MaxLength,
   Min,
@@ -32,25 +33,34 @@ export class SaveProfileDto {
   @MaxLength(100, { each: true })
   roles?: string[];
 
-  @ApiProperty({ example: ['tag_excel', 'tag_spanish'] })
+  @ApiProperty({ example: ['1', '2'] })
   @IsArray()
   @ArrayMaxSize(50)
   @IsString({ each: true })
-  @MaxLength(100, { each: true })
+  @Matches(/^[1-9]\d*$/, {
+    each: true,
+    message: 'Tag ID must be a positive numeric ID',
+  })
   teachTagIds!: string[];
 
-  @ApiProperty({ example: ['tag_python', 'tag_sql'] })
+  @ApiProperty({ example: ['3', '4'] })
   @IsArray()
   @ArrayMaxSize(50)
   @IsString({ each: true })
-  @MaxLength(100, { each: true })
+  @Matches(/^[1-9]\d*$/, {
+    each: true,
+    message: 'Tag ID must be a positive numeric ID',
+  })
   learnTagIds!: string[];
 
-  @ApiProperty({ example: ['tag_hiking', 'tag_board_games'] })
+  @ApiProperty({ example: ['5', '6'] })
   @IsArray()
   @ArrayMaxSize(50)
   @IsString({ each: true })
-  @MaxLength(100, { each: true })
+  @Matches(/^[1-9]\d*$/, {
+    each: true,
+    message: 'Tag ID must be a positive numeric ID',
+  })
   interestTagIds!: string[];
 
   @ApiProperty({ example: true })

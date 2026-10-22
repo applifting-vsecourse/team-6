@@ -92,9 +92,10 @@ export class ProfileRepository {
           where: { id: data.cityId },
         });
         if (!city) {
-          throw new BadRequestException(
-            `City with id '${data.cityId}' does not exist`,
-          );
+          throw new BadRequestException({
+            code: 'CITY_NOT_FOUND',
+            message: 'City does not exist',
+          });
         }
       }
 
@@ -108,29 +109,22 @@ export class ProfileRepository {
 
       const tagMap = new Map<string, number>();
       if (allTagIds.length > 0) {
-        const numericIds = allTagIds
-          .map((id) => Number(id))
-          .filter((n) => !Number.isNaN(n));
+        const numericIds = allTagIds.map((id) => parseInt(id, 10));
         const existingTags = await tx.tag.findMany({
-          where: {
-            OR: [
-              ...(numericIds.length > 0 ? [{ id: { in: numericIds } }] : []),
-              { slug: { in: allTagIds } },
-            ],
-          },
-          select: { id: true, slug: true },
+          where: { id: { in: numericIds } },
+          select: { id: true },
         });
 
         for (const t of existingTags) {
           tagMap.set(String(t.id), t.id);
-          tagMap.set(t.slug, t.id);
         }
 
         const missing = allTagIds.filter((id) => !tagMap.has(id));
         if (missing.length > 0) {
-          throw new BadRequestException(
-            `Tag(s) do not exist: ${missing.join(', ')}`,
-          );
+          throw new BadRequestException({
+            code: 'TAGS_NOT_FOUND',
+            message: 'One or more tags do not exist',
+          });
         }
       }
 

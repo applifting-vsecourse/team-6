@@ -192,9 +192,9 @@ describe('ProfileRepository', () => {
   describe('saveProfile', () => {
     const validData = {
       roles: ['frontend-dev', 'designer'],
-      teachTagIds: ['t1'],
-      learnTagIds: ['t2'],
-      interestTagIds: ['t3'],
+      teachTagIds: ['1'],
+      learnTagIds: ['2'],
+      interestTagIds: ['3'],
       weekdays: true,
       weekends: false,
       mornings: true,
@@ -210,40 +210,74 @@ describe('ProfileRepository', () => {
       completeOnboarding: true,
     };
 
-    it('validates cityId and throws BadRequestException if city does not exist', async (): Promise<void> => {
+    it('validates cityId and throws BadRequestException with CITY_NOT_FOUND if city does not exist', async (): Promise<void> => {
       txMock.city.findUnique.mockResolvedValue(null);
 
-      await expect(repository.saveProfile('u1', validData)).rejects.toThrow(
-        BadRequestException,
-      );
+      try {
+        await repository.saveProfile('u1', validData);
+        fail('Expected BadRequestException');
+      } catch (err) {
+        expect(err).toBeInstanceOf(BadRequestException);
+        expect((err as BadRequestException).getResponse()).toEqual(
+          expect.objectContaining({ code: 'CITY_NOT_FOUND' }),
+        );
+      }
       expect(txMock.city.findUnique).toHaveBeenCalledWith({
         where: { id: 'c1' },
       });
       expect(txMock.profile.upsert).not.toHaveBeenCalled();
     });
 
-    it('validates tagIds and throws BadRequestException if any tag does not exist', async (): Promise<void> => {
+    it('validates tagIds and throws BadRequestException with TAGS_NOT_FOUND if any tag does not exist', async (): Promise<void> => {
       txMock.city.findUnique.mockResolvedValue({ id: 'c1', name: 'Praha' });
-      // Only t1 and t2 exist, but t3 is missing
-      txMock.tag.findMany.mockResolvedValue([
-        { id: 1, slug: 't1' },
-        { id: 2, slug: 't2' },
-      ]);
+      // Only id 1 and id 2 exist, but id 3 is missing
+      txMock.tag.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }]);
 
-      await expect(repository.saveProfile('u1', validData)).rejects.toThrow(
-        BadRequestException,
-      );
-      expect(txMock.tag.findMany).toHaveBeenCalled();
+      try {
+        await repository.saveProfile('u1', validData);
+        fail('Expected BadRequestException');
+      } catch (err) {
+        expect(err).toBeInstanceOf(BadRequestException);
+        expect((err as BadRequestException).getResponse()).toEqual(
+          expect.objectContaining({ code: 'TAGS_NOT_FOUND' }),
+        );
+      }
+      expect(txMock.tag.findMany).toHaveBeenCalledWith({
+        where: { id: { in: [1, 2, 3] } },
+        select: { id: true },
+      });
       expect(txMock.profile.upsert).not.toHaveBeenCalled();
+    });
+
+    it('strictly resolves tags by numeric id without slug fallback', async (): Promise<void> => {
+      txMock.city.findUnique.mockResolvedValue({ id: 'c1', name: 'Praha' });
+      txMock.tag.findMany.mockResolvedValue([{ id: 1 }]);
+
+      // If id 999 is queried, it searches strictly by numeric id in tx.tag.findMany
+      try {
+        await repository.saveProfile('u1', {
+          ...validData,
+          teachTagIds: ['999'],
+          learnTagIds: [],
+          interestTagIds: [],
+        });
+        fail('Expected BadRequestException');
+      } catch (err) {
+        expect(err).toBeInstanceOf(BadRequestException);
+        expect((err as BadRequestException).getResponse()).toEqual(
+          expect.objectContaining({ code: 'TAGS_NOT_FOUND' }),
+        );
+      }
+
+      expect(txMock.tag.findMany).toHaveBeenCalledWith({
+        where: { id: { in: [999] } },
+        select: { id: true },
+      });
     });
 
     it('saves profile, replaces tags, and sets onboardingCompletedAt when onboarding complete', async (): Promise<void> => {
       txMock.city.findUnique.mockResolvedValue({ id: 'c1', name: 'Praha' });
-      txMock.tag.findMany.mockResolvedValue([
-        { id: 1, slug: 't1' },
-        { id: 2, slug: 't2' },
-        { id: 3, slug: 't3' },
-      ]);
+      txMock.tag.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }, { id: 3 }]);
       txMock.profile.findUnique.mockResolvedValue(null); // No existing profile
       txMock.profile.upsert.mockResolvedValue({});
       txMock.profileTag.deleteMany.mockResolvedValue({});
@@ -306,11 +340,7 @@ describe('ProfileRepository', () => {
     it('preserves existing onboardingCompletedAt timestamp if already completed', async (): Promise<void> => {
       const existingDate = new Date('2026-10-01T12:00:00Z');
       txMock.city.findUnique.mockResolvedValue({ id: 'c1', name: 'Praha' });
-      txMock.tag.findMany.mockResolvedValue([
-        { id: 1, slug: 't1' },
-        { id: 2, slug: 't2' },
-        { id: 3, slug: 't3' },
-      ]);
+      txMock.tag.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }, { id: 3 }]);
       txMock.profile.findUnique.mockResolvedValue({
         onboardingCompletedAt: existingDate,
       });

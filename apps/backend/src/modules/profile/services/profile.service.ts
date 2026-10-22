@@ -33,17 +33,20 @@ export class ProfileService {
         data.roles.some((r) => r.trim().length > 0)) ||
       Boolean(data.position?.trim());
     if (!hasRole) {
-      throw new BadRequestException(
-        'At least one role is required to complete onboarding',
-      );
+      throw new BadRequestException({
+        code: 'PROFILE_ROLE_REQUIRED',
+        message: 'At least one role is required to complete onboarding',
+      });
     }
 
     const hasLocation =
       (data.latitude != null && data.longitude != null) || Boolean(data.cityId);
     if (!hasLocation) {
-      throw new BadRequestException(
-        'Location coordinates or city is required to complete onboarding',
-      );
+      throw new BadRequestException({
+        code: 'PROFILE_LOCATION_REQUIRED',
+        message:
+          'Location coordinates or city is required to complete onboarding',
+      });
     }
 
     const hasAvailability =
@@ -53,9 +56,11 @@ export class ProfileService {
       data.afternoons ||
       data.evenings;
     if (!hasAvailability) {
-      throw new BadRequestException(
-        'At least one availability slot is required to complete onboarding',
-      );
+      throw new BadRequestException({
+        code: 'PROFILE_AVAILABILITY_REQUIRED',
+        message:
+          'At least one availability slot is required to complete onboarding',
+      });
     }
   }
 }

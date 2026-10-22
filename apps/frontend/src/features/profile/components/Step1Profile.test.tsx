@@ -5,9 +5,9 @@ import { describe, expect, it, vi } from "vitest"
 import { Step1Profile } from "./Step1Profile"
 
 const mockTags = [
-  { id: "t_excel", slug: "excel" },
-  { id: "t_python", slug: "python" },
-  { id: "t_hiking", slug: "hiking" },
+  { id: "1", slug: "excel" },
+  { id: "2", slug: "python" },
+  { id: "3", slug: "hiking" },
 ]
 
 describe("Step1Profile", () => {
@@ -55,7 +55,7 @@ describe("Step1Profile", () => {
     expect(onContinue).toHaveBeenCalledWith({
       roles: ["marketing-specialist"],
       position: "marketing-specialist",
-      teachTagIds: ["t_excel"],
+      teachTagIds: ["1"],
       learnTagIds: [],
       interestTagIds: [],
     })

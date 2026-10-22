@@ -224,8 +224,8 @@ describe('ProfileService', () => {
   });
 
   it('throws BadRequestException when completing onboarding without roles', async (): Promise<void> => {
-    await expect(
-      service.saveProfile('u1', {
+    try {
+      await service.saveProfile('u1', {
         position: '',
         roles: [],
         teachTagIds: [],
@@ -239,13 +239,19 @@ describe('ProfileService', () => {
         cityId: 'c1',
         radiusKm: 10,
         completeOnboarding: true,
-      }),
-    ).rejects.toThrow(BadRequestException);
+      });
+      fail('Expected BadRequestException');
+    } catch (err) {
+      expect(err).toBeInstanceOf(BadRequestException);
+      expect((err as BadRequestException).getResponse()).toEqual(
+        expect.objectContaining({ code: 'PROFILE_ROLE_REQUIRED' }),
+      );
+    }
   });
 
   it('throws BadRequestException when completing onboarding without location', async (): Promise<void> => {
-    await expect(
-      service.saveProfile('u1', {
+    try {
+      await service.saveProfile('u1', {
         position: 'Engineer',
         roles: ['software-engineer'],
         teachTagIds: [],
@@ -260,13 +266,19 @@ describe('ProfileService', () => {
         latitude: null,
         longitude: null,
         completeOnboarding: true,
-      }),
-    ).rejects.toThrow(BadRequestException);
+      });
+      fail('Expected BadRequestException');
+    } catch (err) {
+      expect(err).toBeInstanceOf(BadRequestException);
+      expect((err as BadRequestException).getResponse()).toEqual(
+        expect.objectContaining({ code: 'PROFILE_LOCATION_REQUIRED' }),
+      );
+    }
   });
 
   it('throws BadRequestException when completing onboarding without any availability slot', async (): Promise<void> => {
-    await expect(
-      service.saveProfile('u1', {
+    try {
+      await service.saveProfile('u1', {
         position: 'Engineer',
         roles: ['software-engineer'],
         teachTagIds: [],
@@ -279,7 +291,13 @@ describe('ProfileService', () => {
         evenings: false,
         cityId: 'c1',
         completeOnboarding: true,
-      }),
-    ).rejects.toThrow(BadRequestException);
+      });
+      fail('Expected BadRequestException');
+    } catch (err) {
+      expect(err).toBeInstanceOf(BadRequestException);
+      expect((err as BadRequestException).getResponse()).toEqual(
+        expect.objectContaining({ code: 'PROFILE_AVAILABILITY_REQUIRED' }),
+      );
+    }
   });
 });
