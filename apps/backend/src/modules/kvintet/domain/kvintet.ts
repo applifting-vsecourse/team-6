@@ -43,3 +43,36 @@ export type StartOutcome =
 
 export type JoinOutcome =
   'joined' | 'not_found' | 'not_open' | 'already_member';
+
+export type KvintetStatusType = 'FORMING' | 'ACTIVE';
+
+export interface KvintetMemberDetails {
+  userId: string;
+  name: string | null;
+  role: string | null;
+  teachTags: string[];
+  learnTags: string[];
+  interestTags: string[];
+  hasVoted: boolean;
+  isCurrentUser: boolean;
+}
+
+export interface KvintetVoteStatus {
+  canVote: boolean;
+  userHasVoted: boolean;
+  votedCount: number;
+  totalCount: number;
+}
+
+export interface KvintetDetails {
+  id: string;
+  title: string;
+  status: KvintetStatusType;
+  createdAt: Date;
+  activatedAt: Date | null;
+  commonPreferences: string | null;
+  capacity: number;
+  openSeatsCount: number;
+  members: KvintetMemberDetails[];
+  voteStatus: KvintetVoteStatus;
+}

@@ -1,8 +1,10 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
 import { KvintetController } from '@/modules/kvintet/controllers/kvintet.controller';
+import { KvintetDetails } from '@/modules/kvintet/domain/kvintet';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
 import { KvintetService } from '@/modules/kvintet/services/kvintet.service';
 import { AuthenticatedUserGuard } from '@/shared/auth/guards/authenticated-user.guard';
+import { MemberGuard } from '@/shared/auth/guards/member.guard';
 import { OnboardedGuard } from '@/shared/auth/guards/onboarded.guard';
 import type { BetterAuth } from '@/shared/auth/providers/better-auth.provider';
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
@@ -92,5 +94,89 @@ describe('KvintetController', () => {
       'position',
       'teach',
     ]);
+  });
+
+  describe('member endpoints', () => {
+    const mockDetails: KvintetDetails = {
+      id: 'k1',
+      title: 'AI v práci',
+      status: 'FORMING',
+      createdAt: new Date('2026-10-21T10:00:00Z'),
+      activatedAt: null,
+      commonPreferences: 'PRAHA · VEČERY',
+      capacity: 5,
+      openSeatsCount: 1,
+      members: [],
+      voteStatus: {
+        canVote: true,
+        userHasVoted: false,
+        votedCount: 3,
+        totalCount: 4,
+      },
+    };
+
+    const mockUser = {
+      id: 'u1',
+      email: 'a@b.c',
+      name: 'A',
+      role: 'user' as const,
+    };
+
+    it('requires MemberGuard on getMyKvintet, vote, and leave', () => {
+      const getMyKvintetGuards = Reflect.getMetadata(
+        '__guards__',
+        KvintetController.prototype.getMyKvintet,
+      );
+      const voteGuards = Reflect.getMetadata(
+        '__guards__',
+        KvintetController.prototype.vote,
+      );
+      const leaveGuards = Reflect.getMetadata(
+        '__guards__',
+        KvintetController.prototype.leave,
+      );
+
+      expect(getMyKvintetGuards).toContain(MemberGuard);
+      expect(voteGuards).toContain(MemberGuard);
+      expect(leaveGuards).toContain(MemberGuard);
+    });
+
+    it('getMyKvintet returns formatted details', async () => {
+      const service = mock<KvintetService>();
+      service.getMyKvintet.mockResolvedValue(mockDetails);
+      const controller = new KvintetController(service);
+
+      const result = await controller.getMyKvintet(mockUser);
+
+      expect(service.getMyKvintet).toHaveBeenCalledWith('u1');
+      expect(result.id).toBe('k1');
+      expect(result.createdAt).toBe('2026-10-21T10:00:00.000Z');
+      expect(result.activatedAt).toBeNull();
+    });
+
+    it('vote returns updated formatted details', async () => {
+      const service = mock<KvintetService>();
+      service.vote.mockResolvedValue({
+        ...mockDetails,
+        activatedAt: new Date('2026-10-21T12:00:00Z'),
+      });
+      const controller = new KvintetController(service);
+
+      const result = await controller.vote(mockUser);
+
+      expect(service.vote).toHaveBeenCalledWith('u1');
+      expect(result.activatedAt).toBe('2026-10-21T12:00:00.000Z');
+    });
+
+    it('leave returns success response', async () => {
+      const service = mock<KvintetService>();
+      service.leave.mockResolvedValue({ success: true });
+      const controller = new KvintetController(service);
+
+      const result = await controller.leave(mockUser);
+
+      expect(service.leave).toHaveBeenCalledWith('u1');
+      expect(result).toEqual({ success: true });
+    });
   });
 });

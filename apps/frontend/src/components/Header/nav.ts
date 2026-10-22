@@ -4,6 +4,7 @@ import { ROUTES } from "@/app/routes"
 export const NAV_ITEMS = [
   { to: ROUTES.overview, labelKey: "nav.overview" },
   { to: ROUTES.kvintetFeed, labelKey: "nav.kvintetFeed" },
+  { to: ROUTES.myKvintet, labelKey: "nav.myKvintet" },
 ] as const
 
 /** Nav items that are shown but cannot be used, mapped to the reason shown in a tooltip. */

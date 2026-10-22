@@ -7,11 +7,18 @@ import {
 import {
   JoinOutcome,
   KVINTET_CAPACITY,
+  KvintetDetails,
+  KvintetMemberDetails,
   NewKvintet,
   OpenKvintet,
   StartOutcome,
 } from '@/modules/kvintet/domain/kvintet';
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 const isUniqueViolation = (error: unknown): boolean =>
   error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -134,5 +141,297 @@ export class KvintetRepository {
       if (isUniqueViolation(error)) return 'already_member';
       throw error;
     }
+  }
+
+  async findMembership(userId: string): Promise<{
+    kvintetId: string;
+    userId: string;
+    joinedAt: Date;
+    kvintet: {
+      id: string;
+      status: KvintetStatus;
+      title: string;
+      createdAt: Date;
+      activatedAt: Date | null;
+    };
+  } | null> {
+    return this.prisma.kvintetMember.findUnique({
+      where: { userId },
+      include: { kvintet: true },
+    });
+  }
+
+  async findKvintetDetailsByUserId(
+    userId: string,
+  ): Promise<KvintetDetails | null> {
+    const membership = await this.prisma.kvintetMember.findUnique({
+      where: { userId },
+      include: {
+        kvintet: {
+          include: {
+            members: {
+              include: {
+                user: {
+                  include: {
+                    profile: {
+                      include: {
+                        tags: {
+                          include: {
+                            tag: true,
+                          },
+                        },
+                        city: true,
+                      },
+                    },
+                  },
+                },
+              },
+              orderBy: { joinedAt: 'asc' },
+            },
+            votes: true,
+          },
+        },
+      },
+    });
+
+    if (!membership || !membership.kvintet) {
+      return null;
+    }
+
+    const { kvintet } = membership;
+    const isKvintetActive = kvintet.status === 'ACTIVE';
+
+    const members: KvintetMemberDetails[] = kvintet.members.map((m) => {
+      const isCurrentUser = m.userId === userId;
+      const profile = m.user.profile;
+      const tags = profile?.tags ?? [];
+
+      const teachTags = tags
+        .filter((t) => t.kind === 'TEACH')
+        .map((t) => t.tag.slug);
+      const learnTags = tags
+        .filter((t) => t.kind === 'LEARN')
+        .map((t) => t.tag.slug);
+      const interestTags = tags
+        .filter((t) => t.kind === 'INTEREST')
+        .map((t) => t.tag.slug);
+
+      const hasVoted = kvintet.votes.some((v) => v.userId === m.userId);
+
+      const name = isKvintetActive || isCurrentUser ? m.user.name : null;
+      const role =
+        profile?.position ??
+        (profile?.roles && profile.roles.length > 0
+          ? profile.roles.join(', ')
+          : null);
+
+      return {
+        userId: m.userId,
+        name,
+        role,
+        teachTags,
+        learnTags,
+        interestTags,
+        hasVoted,
+        isCurrentUser,
+      };
+    });
+
+    const userHasVoted = kvintet.votes.some((v) => v.userId === userId);
+    const totalCount = members.length;
+    const votedCount = kvintet.votes.length;
+    const canVote =
+      kvintet.status === 'FORMING' &&
+      totalCount >= 3 &&
+      totalCount <= 4 &&
+      !userHasVoted;
+
+    const cities = members
+      .map(
+        (m) =>
+          kvintet.members.find((km) => km.userId === m.userId)?.user.profile
+            ?.city?.name,
+      )
+      .filter((c): c is string => Boolean(c));
+    const commonCity = cities.length > 0 ? cities[0] : 'Praha';
+
+    const commonPreferences = `${commonCity.toUpperCase()} · VEČERY · JEDNOU ZA 14 DNÍ`;
+
+    return {
+      id: kvintet.id,
+      title: kvintet.title ?? 'Kvintet',
+      status: kvintet.status,
+      createdAt: kvintet.createdAt,
+      activatedAt: kvintet.activatedAt,
+      commonPreferences,
+      capacity: KVINTET_CAPACITY,
+      openSeatsCount: Math.max(0, KVINTET_CAPACITY - totalCount),
+      members,
+      voteStatus: {
+        canVote,
+        userHasVoted,
+        votedCount,
+        totalCount,
+      },
+    };
+  }
+
+  async vote(kvintetId: string, userId: string): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      const locked = await tx.$queryRaw<Array<{ id: string }>>`
+        SELECT id FROM "kvintet" WHERE id = ${kvintetId}::uuid FOR UPDATE
+      `;
+
+      if (!locked || locked.length === 0) {
+        throw new NotFoundException({
+          statusCode: 404,
+          code: 'not_found',
+          message: 'Kvintet not found',
+        });
+      }
+
+      const kvintet = await tx.kvintet.findUnique({
+        where: { id: kvintetId },
+        include: {
+          members: true,
+          votes: true,
+        },
+      });
+
+      if (!kvintet) {
+        throw new NotFoundException({
+          statusCode: 404,
+          code: 'not_found',
+          message: 'Kvintet not found',
+        });
+      }
+
+      if (kvintet.status !== 'FORMING') {
+        throw new BadRequestException({
+          statusCode: 400,
+          code: 'bad_request',
+          message: 'Voting is only available for proposals',
+        });
+      }
+
+      const memberCount = kvintet.members.length;
+      if (memberCount < 3 || memberCount > 4) {
+        throw new BadRequestException({
+          statusCode: 400,
+          code: 'bad_request',
+          message: 'Voting requires 3 or 4 members',
+        });
+      }
+
+      const isMember = kvintet.members.some((m) => m.userId === userId);
+      if (!isMember) {
+        throw new BadRequestException({
+          statusCode: 400,
+          code: 'bad_request',
+          message: 'Caller is not a member of this kvintet',
+        });
+      }
+
+      const existingVote = kvintet.votes.some((v) => v.userId === userId);
+      if (existingVote) {
+        throw new ConflictException({
+          statusCode: 409,
+          code: 'conflict',
+          message: 'User has already voted',
+        });
+      }
+
+      await tx.kvintetVote.create({
+        data: {
+          kvintetId,
+          userId,
+        },
+      });
+
+      const updatedVotesCount = kvintet.votes.length + 1;
+      if (updatedVotesCount >= memberCount) {
+        await tx.kvintet.update({
+          where: { id: kvintetId },
+          data: {
+            status: 'ACTIVE',
+            activatedAt: new Date(),
+          },
+        });
+      }
+    });
+  }
+
+  async leave(kvintetId: string, userId: string): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      const locked = await tx.$queryRaw<Array<{ id: string }>>`
+        SELECT id FROM "kvintet" WHERE id = ${kvintetId}::uuid FOR UPDATE
+      `;
+
+      if (!locked || locked.length === 0) {
+        throw new NotFoundException({
+          statusCode: 404,
+          code: 'not_found',
+          message: 'Kvintet not found',
+        });
+      }
+
+      const kvintet = await tx.kvintet.findUnique({
+        where: { id: kvintetId },
+        include: {
+          members: true,
+          votes: true,
+        },
+      });
+
+      if (!kvintet) {
+        throw new NotFoundException({
+          statusCode: 404,
+          code: 'not_found',
+          message: 'Kvintet not found',
+        });
+      }
+
+      const isMember = kvintet.members.some((m) => m.userId === userId);
+      if (!isMember) {
+        throw new BadRequestException({
+          statusCode: 400,
+          code: 'bad_request',
+          message: 'Caller is not a member of this kvintet',
+        });
+      }
+
+      await tx.kvintetMember.delete({
+        where: {
+          kvintetId_userId: {
+            kvintetId,
+            userId,
+          },
+        },
+      });
+
+      const remainingMembers = kvintet.members.filter(
+        (m) => m.userId !== userId,
+      );
+
+      if (remainingMembers.length === 0) {
+        await tx.kvintet.delete({
+          where: { id: kvintetId },
+        });
+      } else if (kvintet.status === 'FORMING') {
+        const remainingVotes = kvintet.votes.filter((v) => v.userId !== userId);
+        if (
+          remainingMembers.length >= 3 &&
+          remainingVotes.length === remainingMembers.length
+        ) {
+          await tx.kvintet.update({
+            where: { id: kvintetId },
+            data: {
+              status: 'ACTIVE',
+              activatedAt: new Date(),
+            },
+          });
+        }
+      }
+    });
   }
 }

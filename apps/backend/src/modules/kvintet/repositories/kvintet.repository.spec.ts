@@ -189,4 +189,41 @@ describe('KvintetRepository (Postgres)', () => {
       ],
     });
   });
+
+  it('retrieves kvintet details, votes, and leaves', async () => {
+    const users = await createUsers(3, 'voting');
+    const kvintetId = await createKvintet(users);
+
+    const details = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(details).not.toBeNull();
+    expect(details?.id).toBe(kvintetId);
+    expect(details?.status).toBe('FORMING');
+    expect(details?.members).toHaveLength(3);
+    expect(details?.voteStatus.canVote).toBe(true);
+    expect(details?.voteStatus.userHasVoted).toBe(false);
+
+    // Vote user 0
+    await repository.vote(kvintetId, users[0]);
+    const afterVote0 = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(afterVote0?.voteStatus.votedCount).toBe(1);
+    expect(afterVote0?.voteStatus.userHasVoted).toBe(true);
+    expect(afterVote0?.status).toBe('FORMING');
+
+    // Vote user 1
+    await repository.vote(kvintetId, users[1]);
+
+    // Vote user 2 - should activate since all 3 voted
+    await repository.vote(kvintetId, users[2]);
+    const afterVoteAll = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(afterVoteAll?.status).toBe('ACTIVE');
+    expect(afterVoteAll?.activatedAt).not.toBeNull();
+
+    // Leave user 0
+    await repository.leave(kvintetId, users[0]);
+    const afterLeave0 = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(afterLeave0).toBeNull();
+
+    const forUser1 = await repository.findKvintetDetailsByUserId(users[1]);
+    expect(forUser1?.members).toHaveLength(2);
+  });
 });
