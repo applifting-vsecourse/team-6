@@ -1,4 +1,5 @@
 import { Plus, X } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { cn } from "@/lib/utils"
 
@@ -17,6 +18,8 @@ export function TagBadge({
   actionAriaLabel,
   className,
 }: TagBadgeProps) {
+  const { t } = useTranslation()
+
   if (variant === "selected") {
     return (
       <span
@@ -30,7 +33,7 @@ export function TagBadge({
           <button
             type="button"
             onClick={onAction}
-            aria-label={actionAriaLabel ?? `Remove ${label}`}
+            aria-label={actionAriaLabel ?? t("onboarding.step1.removeTag", { name: label })}
             className="inline-flex size-4 items-center justify-center rounded-full opacity-80 hover:opacity-100 focus-visible:ring-1 focus-visible:ring-primary-foreground focus-visible:outline-none"
           >
             <X className="size-3 stroke-[2.5]" />
@@ -45,7 +48,7 @@ export function TagBadge({
       <button
         type="button"
         onClick={onAction}
-        aria-label={actionAriaLabel ?? `Add ${label}`}
+        aria-label={actionAriaLabel ?? t("onboarding.step1.addTag", { name: label })}
         className={cn(
           "inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-sm font-normal text-foreground transition-colors select-none hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
           className,

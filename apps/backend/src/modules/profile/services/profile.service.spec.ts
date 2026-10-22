@@ -186,7 +186,7 @@ describe('ProfileService', () => {
       'u1',
       'Engineer',
       null,
-      null,
+      MeetingFrequency.WEEKLY,
       true,
       false,
       false,
@@ -297,6 +297,31 @@ describe('ProfileService', () => {
       expect(err).toBeInstanceOf(BadRequestException);
       expect((err as BadRequestException).getResponse()).toEqual(
         expect.objectContaining({ code: 'PROFILE_AVAILABILITY_REQUIRED' }),
+      );
+    }
+  });
+
+  it('throws BadRequestException when completing onboarding without meeting frequency', async (): Promise<void> => {
+    try {
+      await service.saveProfile('u1', {
+        position: 'Engineer',
+        roles: ['software-engineer'],
+        teachTagIds: [],
+        learnTagIds: [],
+        interestTagIds: [],
+        weekdays: true,
+        weekends: false,
+        mornings: false,
+        afternoons: false,
+        evenings: false,
+        cityId: 'c1',
+        completeOnboarding: true,
+      });
+      fail('Expected BadRequestException');
+    } catch (err) {
+      expect(err).toBeInstanceOf(BadRequestException);
+      expect((err as BadRequestException).getResponse()).toEqual(
+        expect.objectContaining({ code: 'PROFILE_FREQUENCY_REQUIRED' }),
       );
     }
   });

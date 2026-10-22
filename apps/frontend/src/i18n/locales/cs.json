@@ -69,6 +69,7 @@
     "CITY_NOT_FOUND": "Vybrané město nebylo nalezeno.",
     "ONBOARDING_REQUIRED": "Před přístupem k tomuto obsahu prosím dokončete onboarding.",
     "PROFILE_AVAILABILITY_REQUIRED": "Je vyžadován alespoň jeden časový slot.",
+    "PROFILE_FREQUENCY_REQUIRED": "Je vyžadována frekvence setkávání.",
     "PROFILE_LOCATION_REQUIRED": "Je vyžadována poloha (souřadnice nebo město).",
     "PROFILE_ROLE_REQUIRED": "Je vyžadována alespoň jedna role.",
     "TAGS_NOT_FOUND": "Jeden nebo více vybraných štítků neexistuje.",

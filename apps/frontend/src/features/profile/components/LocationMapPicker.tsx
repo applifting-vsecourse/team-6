@@ -295,18 +295,16 @@ export function LocationMapPicker({
 
         <div className="flex flex-wrap gap-1.5 pt-1">
           {presetRadii.map((rad) => (
-            <button
+            <Button
               key={rad}
               type="button"
+              variant={currentRadius === rad ? "default" : "outline"}
+              size="sm"
               onClick={() => handleRadiusChange(rad)}
-              className={`rounded-md border px-2.5 py-1 text-xs font-medium transition-colors ${
-                currentRadius === rad
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-background text-foreground hover:bg-muted"
-              }`}
+              className="h-7 px-2.5 py-1 text-xs font-medium"
             >
               {t("onboarding.step2.radiusOption", { count: formatNumber(rad) })}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
