@@ -40,13 +40,15 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps = {}) {
     )
   }
 
-  if (referenceQuery.isError) {
+  if (referenceQuery.isError || profileQuery.isError) {
     return (
       <Alert
         variant="destructive"
         className="my-8"
       >
-        <AlertDescription>{getErrorMessage(referenceQuery.error)}</AlertDescription>
+        <AlertDescription>
+          {getErrorMessage(referenceQuery.error ?? profileQuery.error)}
+        </AlertDescription>
       </Alert>
     )
   }
@@ -166,10 +168,10 @@ function OnboardingWizardForm({ userId, profile, allTags, allCities }: Onboardin
         mornings: step2Data.mornings,
         afternoons: step2Data.afternoons,
         evenings: step2Data.evenings,
-        cityId: step2Data.cityId ?? undefined,
+        cityId: step2Data.cityId ?? null,
         radiusKm: step2Data.radiusKm,
-        latitude: step2Data.latitude ?? undefined,
-        longitude: step2Data.longitude ?? undefined,
+        latitude: step2Data.latitude ?? null,
+        longitude: step2Data.longitude ?? null,
         expectations: data.expectations,
         meetingFrequency: data.meetingFrequency,
         note: data.note,

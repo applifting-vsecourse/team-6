@@ -158,61 +158,41 @@ export function LocationMapPicker({
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const locateUser = useCallback(
-    (isManual = false) => {
-      if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
-        if (isManual) {
+  const handleUseCurrentLocation = useCallback(() => {
+    if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
+      setLocationNote(t("onboarding.step2.geolocationUnavailable"))
+      return
+    }
+
+    setIsLocating(true)
+    setLocationNote(null)
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setIsLocating(false)
+        const lat = pos.coords.latitude
+        const lng = pos.coords.longitude
+        const activeRadius = radiusRef.current
+        updateLocation(lat, lng, activeRadius)
+
+        if (mapInstanceRef.current && markerRef.current && circleRef.current) {
+          markerRef.current.setLatLng([lat, lng])
+          circleRef.current.setLatLng([lat, lng])
+          circleRef.current.setRadius(activeRadius * 1000)
+          mapInstanceRef.current.setView([lat, lng], 11)
+        }
+      },
+      (err) => {
+        setIsLocating(false)
+        if (err.code === err.PERMISSION_DENIED) {
+          setLocationNote(t("onboarding.step2.geolocationDenied"))
+        } else {
           setLocationNote(t("onboarding.step2.geolocationUnavailable"))
         }
-        return
-      }
-
-      setIsLocating(true)
-      if (isManual) setLocationNote(null)
-
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setIsLocating(false)
-          const lat = pos.coords.latitude
-          const lng = pos.coords.longitude
-          const activeRadius = radiusRef.current
-          updateLocation(lat, lng, activeRadius)
-
-          if (mapInstanceRef.current && markerRef.current && circleRef.current) {
-            markerRef.current.setLatLng([lat, lng])
-            circleRef.current.setLatLng([lat, lng])
-            circleRef.current.setRadius(activeRadius * 1000)
-            mapInstanceRef.current.setView([lat, lng], 11)
-          }
-        },
-        (err) => {
-          setIsLocating(false)
-          if (isManual) {
-            if (err.code === err.PERMISSION_DENIED) {
-              setLocationNote(t("onboarding.step2.geolocationDenied"))
-            } else {
-              setLocationNote(t("onboarding.step2.geolocationUnavailable"))
-            }
-          }
-        },
-        { timeout: 10000, enableHighAccuracy: false, maximumAge: 300000 },
-      )
-    },
-    [t, updateLocation],
-  )
-
-  // Auto-locate center on mount if no previous coordinates were stored
-  const autoLocateAttemptedRef = useRef(false)
-  useEffect(() => {
-    if (latitude !== null && longitude !== null) return
-    if (autoLocateAttemptedRef.current) return
-    autoLocateAttemptedRef.current = true
-    locateUser(false)
-  }, [latitude, longitude, locateUser])
-
-  const handleUseCurrentLocation = () => {
-    locateUser(true)
-  }
+      },
+      { timeout: 10000, enableHighAccuracy: false, maximumAge: 300000 },
+    )
+  }, [t, updateLocation])
 
   const handleRadiusChange = (newRadius: number) => {
     setCurrentRadius(newRadius)
@@ -262,7 +242,16 @@ export function LocationMapPicker({
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
         <span className="flex items-center gap-1 font-mono">
           <MapPin className="h-3.5 w-3.5 text-primary" />
-          {currentLat.toFixed(4)}°, {currentLng.toFixed(4)}°
+          {formatNumber(currentLat, {
+            minimumFractionDigits: 4,
+            maximumFractionDigits: 4,
+          })}
+          °,{" "}
+          {formatNumber(currentLng, {
+            minimumFractionDigits: 4,
+            maximumFractionDigits: 4,
+          })}
+          °
         </span>
         <span className="font-medium text-foreground">
           {t("onboarding.step2.selectedRadius", { count: formatNumber(currentRadius) })}

@@ -18,6 +18,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   }
 })
 
+const mockProfileQueryFn = vi.fn().mockImplementation(() => Promise.resolve(null))
 const mockMutateAsync = vi.fn()
 vi.mock("@/features/profile/api/profileApi", async (importOriginal) => {
   const actual = await importOriginal<typeof ProfileApi>()
@@ -36,7 +37,7 @@ vi.mock("@/features/profile/api/profileApi", async (importOriginal) => {
     }),
     profileQueryOptions: () => ({
       queryKey: ["profile", "me"],
-      queryFn: () => Promise.resolve(null),
+      queryFn: mockProfileQueryFn,
     }),
     useSaveProfile: () => ({
       mutateAsync: mockMutateAsync,
@@ -107,5 +108,14 @@ describe("OnboardingWizard", () => {
 
     expect(await screen.findByText("Tell us about yourself")).toBeInTheDocument()
     expect(screen.getByText("UX/UI Designer")).toBeInTheDocument()
+  })
+
+  it("renders error alert when profile query fails", async () => {
+    mockProfileQueryFn.mockRejectedValueOnce(new Error("Network Error fetching profile"))
+
+    render(<OnboardingWizard />, { wrapper: createWrapper() })
+
+    expect(await screen.findByRole("alert")).toBeInTheDocument()
+    expect(screen.getByText("An unexpected error occurred.")).toBeInTheDocument()
   })
 })

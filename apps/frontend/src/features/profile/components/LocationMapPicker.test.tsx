@@ -37,28 +37,9 @@ describe("LocationMapPicker", () => {
     expect(screen.getByText("50 km radius")).toBeInTheDocument()
   })
 
-  it("attempts auto-location when latitude and longitude are null", () => {
+  it("does not automatically request geolocation on mount when latitude and longitude are null", () => {
     const onChange = vi.fn()
-    const mockPosition = {
-      coords: {
-        latitude: 50.087,
-        longitude: 14.421,
-        accuracy: 10,
-        altitude: null,
-        altitudeAccuracy: null,
-        heading: null,
-        speed: null,
-        toJSON: () => ({}),
-      },
-      timestamp: Date.now(),
-      toJSON: () => ({}),
-    } as unknown as GeolocationPosition
-
-    const mockGetCurrentPosition = vi
-      .fn()
-      .mockImplementation((success: (pos: GeolocationPosition) => void) => {
-        success(mockPosition)
-      })
+    const mockGetCurrentPosition = vi.fn()
 
     Object.defineProperty(globalThis.navigator, "geolocation", {
       value: {
@@ -77,14 +58,7 @@ describe("LocationMapPicker", () => {
       />,
     )
 
-    expect(mockGetCurrentPosition).toHaveBeenCalled()
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        latitude: 50.087,
-        longitude: 14.421,
-        radiusKm: 25,
-      }),
-    )
+    expect(mockGetCurrentPosition).not.toHaveBeenCalled()
   })
 
   it("triggers manual geolocation when clicking 'Use my location' button", async () => {
