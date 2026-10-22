@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { Slider } from "@/components/ui/slider"
 import { formatNumber } from "@/lib/date"
 
 import "leaflet/dist/leaflet.css"
@@ -281,15 +282,13 @@ export function LocationMapPicker({
           </span>
         </div>
 
-        <input
+        <Slider
           id="radius-slider"
-          type="range"
           min={5}
           max={200}
           step={5}
-          value={currentRadius}
-          onChange={(e) => handleRadiusChange(Number(e.target.value))}
-          className="h-2 w-full cursor-pointer accent-primary"
+          value={[currentRadius]}
+          onValueChange={([val]) => val !== undefined && handleRadiusChange(val)}
           aria-label={t("onboarding.step2.radiusSliderLabel")}
         />
 
