@@ -3,10 +3,8 @@ import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
-import type { City } from "@/features/profile/api/profileApi"
 import {
   DEFAULT_RADIUS_KM,
   LocationMapPicker,
@@ -18,7 +16,6 @@ export type Step2Data = {
   mornings: boolean
   afternoons: boolean
   evenings: boolean
-  cityId?: string | null
   radiusKm: number
   latitude?: number | null
   longitude?: number | null
@@ -26,14 +23,12 @@ export type Step2Data = {
 
 type Step2AvailabilityProps = {
   initialData: Step2Data
-  cities?: City[]
   onBack: () => void
   onContinue: (data: Step2Data) => void
 }
 
 export function Step2Availability({
   initialData,
-  cities,
   onBack,
   onContinue,
 }: Step2AvailabilityProps) {
@@ -44,7 +39,6 @@ export function Step2Availability({
   const [hasMornings, setHasMornings] = useState(initialData.mornings)
   const [hasAfternoons, setHasAfternoons] = useState(initialData.afternoons)
   const [hasEvenings, setHasEvenings] = useState(initialData.evenings)
-  const [cityId, setCityId] = useState(initialData.cityId ?? null)
   const [radiusKm, setRadiusKm] = useState(
     initialData.radiusKm > 0 ? initialData.radiusKm : DEFAULT_RADIUS_KM,
   )
@@ -81,7 +75,7 @@ export function Step2Availability({
       setTimeOfDayError(null)
     }
 
-    if (!cityId && (latitude == null || longitude == null)) {
+    if (latitude == null || longitude == null) {
       setLocationError(t("onboarding.step2.locationRequired"))
       if (!hasError) {
         mapSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
@@ -99,7 +93,6 @@ export function Step2Availability({
       mornings: hasMornings,
       afternoons: hasAfternoons,
       evenings: hasEvenings,
-      cityId,
       radiusKm,
       latitude,
       longitude,
@@ -229,44 +222,6 @@ export function Step2Availability({
           </h3>
           <p className="text-sm text-muted-foreground">{t("onboarding.step2.whereHint")}</p>
         </div>
-
-        {cities && cities.length > 0 && (
-          <div className="flex flex-col gap-1.5">
-            <Label
-              htmlFor="city-select"
-              className="text-sm font-medium text-foreground"
-            >
-              {t("onboarding.step2.city")}
-            </Label>
-            <select
-              id="city-select"
-              value={cityId ?? ""}
-              onChange={(e) => {
-                const selectedId = e.target.value || null
-                setCityId(selectedId)
-                if (selectedId) {
-                  const city = cities.find((c) => c.id === selectedId)
-                  if (city) {
-                    setLatitude(city.lat)
-                    setLongitude(city.lng)
-                    setLocationError(null)
-                  }
-                }
-              }}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-            >
-              <option value="">{t("onboarding.step2.selectCity")}</option>
-              {cities.map((city) => (
-                <option
-                  key={city.id}
-                  value={city.id}
-                >
-                  {city.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
 
         <LocationMapPicker
           latitude={latitude}

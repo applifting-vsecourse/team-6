@@ -4,10 +4,21 @@ import { describe, expect, it, vi } from "vitest"
 
 import { Step2Availability } from "./Step2Availability"
 
-const mockCities = [
-  { id: "c_praha", name: "Praha", lat: 50.07, lng: 14.43 },
-  { id: "c_brno", name: "Brno", lat: 49.19, lng: 16.6 },
-]
+vi.mock("@/features/profile/components/LocationMapPicker", () => ({
+  DEFAULT_RADIUS_KM: 25,
+  LocationMapPicker: ({
+    onChange,
+  }: {
+    onChange: (loc: { latitude: number; longitude: number; radiusKm: number }) => void
+  }) => (
+    <button
+      type="button"
+      onClick={() => onChange({ latitude: 50.07, longitude: 14.43, radiusKm: 10 })}
+    >
+      Pick on map
+    </button>
+  ),
+}))
 
 describe("Step2Availability", () => {
   it("allows selecting availability options and continuing", async () => {
@@ -22,10 +33,10 @@ describe("Step2Availability", () => {
           mornings: false,
           afternoons: false,
           evenings: false,
-          cityId: "c_praha",
           radiusKm: 10,
+          latitude: 50.07,
+          longitude: 14.43,
         }}
-        cities={mockCities}
         onBack={onBack}
         onContinue={onContinue}
       />,
@@ -41,10 +52,9 @@ describe("Step2Availability", () => {
       mornings: false,
       afternoons: false,
       evenings: true,
-      cityId: "c_praha",
       radiusKm: 10,
-      latitude: null,
-      longitude: null,
+      latitude: 50.07,
+      longitude: 14.43,
     })
   })
 
@@ -58,10 +68,10 @@ describe("Step2Availability", () => {
           mornings: false,
           afternoons: false,
           evenings: false,
-          cityId: "c_praha",
           radiusKm: 10,
+          latitude: 50.07,
+          longitude: 14.43,
         }}
-        cities={mockCities}
         onBack={onBack}
         onContinue={vi.fn()}
       />,
@@ -84,10 +94,8 @@ describe("Step2Availability", () => {
           mornings: false,
           afternoons: false,
           evenings: false,
-          cityId: null,
           radiusKm: 25,
         }}
-        cities={mockCities}
         onBack={vi.fn()}
         onContinue={onContinue}
       />,
@@ -126,13 +134,13 @@ describe("Step2Availability", () => {
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
     expect(onContinue).not.toHaveBeenCalled()
     expect(
-      screen.getByText("Please select a location on the map or choose a city."),
+      screen.getByText("Please select a location on the map."),
     ).toBeInTheDocument()
 
-    // Select city -> location error disappears and form can continue
-    await userEvent.selectOptions(screen.getByLabelText("City"), "c_praha")
+    // Pick a point on the map -> location error disappears and form can continue
+    await userEvent.click(screen.getByRole("button", { name: "Pick on map" }))
     expect(
-      screen.queryByText("Please select a location on the map or choose a city."),
+      screen.queryByText("Please select a location on the map."),
     ).not.toBeInTheDocument()
 
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
@@ -143,7 +151,7 @@ describe("Step2Availability", () => {
         mornings: true,
         afternoons: false,
         evenings: false,
-        cityId: "c_praha",
+        radiusKm: 10,
         latitude: 50.07,
         longitude: 14.43,
       }),

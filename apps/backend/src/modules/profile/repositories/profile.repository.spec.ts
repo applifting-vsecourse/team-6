@@ -478,6 +478,30 @@ describe('ProfileRepository', () => {
       );
     });
 
+    it('persists map coordinates and radius and clears the city when cityId is null', async (): Promise<void> => {
+      txMock.tag.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }, { id: 3 }]);
+      txMock.profile.findUnique.mockResolvedValue(null);
+      txMock.profile.upsert.mockResolvedValue({});
+      txMock.profileTag.deleteMany.mockResolvedValue({});
+      txMock.profileTag.createMany.mockResolvedValue({});
+      jest
+        .spyOn(repository, 'findByUserId')
+        .mockResolvedValue({} as ProfileEntity);
+
+      await repository.saveProfile('u1', { ...validData, cityId: null });
+
+      expect(txMock.city.findUnique).not.toHaveBeenCalled();
+      const upsertCall = txMock.profile.upsert.mock.calls[0][0];
+      const location = {
+        latitude: 50.1,
+        longitude: 14.5,
+        radiusKm: 15,
+        cityId: null,
+      };
+      expect(upsertCall.create).toEqual(expect.objectContaining(location));
+      expect(upsertCall.update).toEqual(expect.objectContaining(location));
+    });
+
     it('partial save keeps existing values by omitting undefined optional fields from update', async (): Promise<void> => {
       txMock.city.findUnique.mockResolvedValue({ id: 'c1', name: 'Praha' });
       txMock.tag.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }, { id: 3 }]);
