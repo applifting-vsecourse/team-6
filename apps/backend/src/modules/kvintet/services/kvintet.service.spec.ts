@@ -55,6 +55,40 @@ describe('KvintetService.feed', () => {
     expect(repository.findOpenKvintets).not.toHaveBeenCalled();
   });
 
+  it('passes a known category on to the repository', async () => {
+    const { repository, service } = setup();
+    repository.isMember.mockResolvedValue(false);
+    repository.categoryExists.mockResolvedValue(true);
+    repository.findOpenKvintets.mockResolvedValue([]);
+
+    await expect(service.feed('u1', 'languages')).resolves.toEqual([]);
+
+    expect(repository.categoryExists).toHaveBeenCalledWith('languages');
+    expect(repository.findOpenKvintets).toHaveBeenCalledWith('languages');
+  });
+
+  it('rejects an unknown category as a validation error on category', async () => {
+    const { repository, service } = setup();
+    repository.isMember.mockResolvedValue(false);
+    repository.categoryExists.mockResolvedValue(false);
+
+    const error = await service.feed('u1', 'nope').catch((e) => e);
+
+    expect(error).toBeInstanceOf(ValidationFailedException);
+    expect(repository.findOpenKvintets).not.toHaveBeenCalled();
+  });
+
+  it('does not look the category up when none is given', async () => {
+    const { repository, service } = setup();
+    repository.isMember.mockResolvedValue(false);
+    repository.findOpenKvintets.mockResolvedValue([]);
+
+    await service.feed('u1');
+
+    expect(repository.categoryExists).not.toHaveBeenCalled();
+    expect(repository.findOpenKvintets).toHaveBeenCalledWith(undefined);
+  });
+
   it('reports a meeting frequency only when every member agrees', async () => {
     const { repository, service } = setup();
     repository.isMember.mockResolvedValue(false);

@@ -72,6 +72,28 @@ export const seedDatabase = async (
     username: 'MigrationSeason',
   });
 
+  // One more kvintet owner per category, so the feed's category filter has something to show.
+  const linguist = await createUser(prisma, auth, {
+    email: 'quackinglinguist@example.com',
+    password: 'password6',
+    name: 'Quacking Linguist',
+    username: 'QuackingLinguist',
+  });
+
+  const founder = await createUser(prisma, auth, {
+    email: 'pondfounder@example.com',
+    password: 'password7',
+    name: 'Pond Founder',
+    username: 'PondFounder',
+  });
+
+  const cook = await createUser(prisma, auth, {
+    email: 'weekendcook@example.com',
+    password: 'password8',
+    name: 'Weekend Cook',
+    username: 'WeekendCook',
+  });
+
   // Has no profile and no kvintet, so this account sees the full feed.
   await createUser(prisma, auth, {
     email: 'pondadmin@example.com',
@@ -127,5 +149,48 @@ export const seedDatabase = async (
         },
       ],
     },
+    {
+      title: 'Spanish conversation over lunch',
+      category: 'languages',
+      members: [
+        {
+          userId: linguist.id,
+          position: 'Translator',
+          meetingFrequency: 'WEEKLY',
+          teach: ['copywriting'],
+          learn: ['spanish'],
+          interests: ['travel'],
+        },
+      ],
+    },
+    {
+      title: 'Negotiating your first client deal',
+      category: 'business',
+      members: [
+        {
+          userId: founder.id,
+          position: 'Startup founder',
+          meetingFrequency: 'BIWEEKLY',
+          teach: ['startups'],
+          learn: ['negotiation'],
+          interests: ['running'],
+        },
+      ],
+    },
+    {
+      title: 'Cooking together on Sundays',
+      category: 'leisure',
+      members: [
+        {
+          userId: cook.id,
+          position: 'Graphic designer',
+          meetingFrequency: 'MONTHLY',
+          teach: ['cooking'],
+          learn: ['music'],
+          interests: ['board-games'],
+        },
+      ],
+    },
+    // No demo kvintet in personal-development, so that filter shows the empty state.
   ]);
 };

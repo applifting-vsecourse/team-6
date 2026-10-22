@@ -112,7 +112,7 @@ Scope: matching **ranks and filters the kvintet feed** and nothing else. Users s
 
 Eligibility is advisory: it ranks and filters what the feed shows, but joining does not re-check it, so any onboarded user may join any open kvintet by id. The hard rules (size, one kvintet per user) are enforced in the Join flow.
 
-The feed shows each member's `position` and tags, as the story requires, plus `meetingFrequency` when every member picked the same one. **Names are revealed when the kvintet forms**, not when joining a kvintet. The `kvintet` module reads `profile`, `profile_tag` and `tag`; until the onboarding story lands the `profile` table only has `position` and `meetingFrequency`, and a member without a profile row is listed with a generic label. The feed has no matching yet: it returns every open kvintet, newest first. Filtering by category is its own story; the frontend keeps a `CategoryFilter` placeholder where the chips go. In a cohort of a few hundred, rare combinations could identify a person; this is an accepted risk for the pilot. A controller test compares the whole response shape against an allow-list, so a new field cannot leak by accident.
+The feed shows each member's `position` and tags, as the story requires, plus `meetingFrequency` when every member picked the same one. **Names are revealed when the kvintet forms**, not when joining a kvintet. The `kvintet` module reads `profile`, `profile_tag` and `tag`; until the onboarding story lands the `profile` table only has `position` and `meetingFrequency`, and a member without a profile row is listed with a generic label. The feed has no matching yet: it returns every open kvintet, newest first. `?category=<slug>` narrows it to one category; an unknown slug is a `400`, not an empty list. The feed page keeps the selected category in the URL (`/kvintet/feed?category=languages`), builds the `CategoryFilter` chips from `GET /reference` and treats a slug that is not in that list as "All", so a stale link never shows an error. In a cohort of a few hundred, rare combinations could identify a person; this is an accepted risk for the pilot. A controller test compares the whole response shape against an allow-list, so a new field cannot leak by accident.
 
 ### API
 
@@ -126,7 +126,7 @@ All routes are under `/api`, need a session unless marked public, and are docume
 | `GET /offers?category=`              | Board listing                       | auth            |
 | `POST /offers`                       | Post an offer                       | auth            |
 | `POST/DELETE /offers/:id/claim`      | Claim / release a spot              | auth            |
-| `GET /kvintets/feed`                 | Ranked open kvintets                | onboarded       |
+| `GET /kvintets/feed?category=`       | Ranked open kvintets                | onboarded       |
 | `GET /kvintets/membership`           | Is the caller in a kvintet?         | auth            |
 | `POST /kvintets`                     | Start a kvintet                     | onboarded       |
 | `POST /kvintets/:id/members`         | Join                                | onboarded       |

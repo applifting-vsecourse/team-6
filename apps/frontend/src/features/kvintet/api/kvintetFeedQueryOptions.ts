@@ -26,8 +26,11 @@ const feedKvintetSchema = z.object({
 
 export type FeedKvintet = z.infer<typeof feedKvintetSchema>
 
-export const kvintetFeedQueryOptions = () =>
+export const kvintetFeedQueryOptions = (category?: string) =>
   queryOptions({
-    queryKey: kvintetKeys.feed(),
-    queryFn: async () => z.array(feedKvintetSchema).parse(await api.get("kvintets/feed").json()),
+    queryKey: kvintetKeys.feed(category),
+    queryFn: async () =>
+      z
+        .array(feedKvintetSchema)
+        .parse(await api.get("kvintets/feed", { searchParams: category ? { category } : undefined }).json()),
   })

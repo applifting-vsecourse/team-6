@@ -68,12 +68,10 @@ describe('KvintetController', () => {
     ]);
     const controller = new KvintetController(new KvintetService(repository));
 
-    const [item] = await controller.feed({
-      id: 'u1',
-      email: 'a@b.c',
-      name: 'A',
-      role: 'user',
-    });
+    const [item] = await controller.feed(
+      { id: 'u1', email: 'a@b.c', name: 'A', role: 'user' },
+      {},
+    );
 
     // A new field on the feed must be added here on purpose: names, e-mails and
     // user ids must never reach this response.
