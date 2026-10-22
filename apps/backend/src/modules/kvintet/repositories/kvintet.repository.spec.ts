@@ -273,24 +273,57 @@ describe('KvintetRepository (Postgres)', () => {
     expect(kvintet).toBeNull();
   });
 
-  it('auto-activates kvintet on leave when all remaining members have voted', async () => {
-    const users = await createUsers(4, 'leave-activate');
+  it('clears votes when a member leaves, so the old roster cannot activate the kvintet', async () => {
+    const users = await createUsers(4, 'leave-reset');
     const kvintetId = await createKvintet(users);
 
-    // 3 out of 4 vote
     await repository.vote(kvintetId, users[0]);
     await repository.vote(kvintetId, users[1]);
     await repository.vote(kvintetId, users[2]);
 
-    const beforeLeave = await repository.findKvintetDetailsByUserId(users[0]);
-    expect(beforeLeave?.status).toBe('FORMING');
-
-    // 4th member leaves (unvoted) -> remaining 3 all voted
+    // 4th member leaves (unvoted): the remaining 3 voted for a group of 4
     await repository.leave(kvintetId, users[3]);
 
     const afterLeave = await repository.findKvintetDetailsByUserId(users[0]);
-    expect(afterLeave?.status).toBe('ACTIVE');
-    expect(afterLeave?.activatedAt).not.toBeNull();
+    expect(afterLeave?.status).toBe('FORMING');
     expect(afterLeave?.members).toHaveLength(3);
+    expect(afterLeave?.voteStatus.votedCount).toBe(0);
+    expect(afterLeave?.voteStatus.userHasVoted).toBe(false);
+  });
+
+  it('does not let votes for the old roster start a kvintet after a leave and a re-join', async () => {
+    const users = await createUsers(4, 'leave-join');
+    const kvintetId = await createKvintet(users.slice(0, 3));
+
+    await repository.vote(kvintetId, users[0]);
+    await repository.vote(kvintetId, users[1]);
+    await repository.leave(kvintetId, users[2]);
+    await repository.join(users[3], kvintetId);
+
+    // users[0] and users[1] never agreed to users[3]: one vote is not enough
+    await repository.vote(kvintetId, users[3]);
+
+    const details = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(details?.status).toBe('FORMING');
+    expect(details?.voteStatus.votedCount).toBe(1);
+  });
+
+  it("hides other members' names while FORMING and shows them once ACTIVE", async () => {
+    const users = await createUsers(3, 'names');
+    const kvintetId = await createKvintet(users);
+
+    const forming = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(forming?.status).toBe('FORMING');
+    for (const member of forming?.members ?? []) {
+      expect(member.name).toBe(member.isCurrentUser ? users[0] : null);
+    }
+
+    for (const user of users) await repository.vote(kvintetId, user);
+
+    const active = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(active?.status).toBe('ACTIVE');
+    expect(active?.members.map((m) => m.name).sort()).toEqual(
+      [...users].sort(),
+    );
   });
 });

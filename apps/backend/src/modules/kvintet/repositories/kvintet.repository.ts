@@ -129,6 +129,8 @@ export class KvintetRepository {
         const members = await tx.kvintetMember.count({ where: { kvintetId } });
         if (members >= KVINTET_CAPACITY) return 'not_open';
 
+        // Votes agreed to the old roster; everyone must vote again.
+        await tx.kvintetVote.deleteMany({ where: { kvintetId } });
         await tx.kvintetMember.create({ data: { kvintetId, userId } });
         if (members + 1 === KVINTET_CAPACITY) {
           await tx.kvintet.update({
@@ -459,19 +461,8 @@ export class KvintetRepository {
           where: { id: kvintetId },
         });
       } else if (kvintet.status === 'FORMING') {
-        const remainingVotes = kvintet.votes.filter((v) => v.userId !== userId);
-        if (
-          remainingMembers.length >= 3 &&
-          remainingVotes.length === remainingMembers.length
-        ) {
-          await tx.kvintet.update({
-            where: { id: kvintetId },
-            data: {
-              status: 'ACTIVE',
-              activatedAt: new Date(),
-            },
-          });
-        }
+        // Votes agreed to the old roster; the rest must vote again.
+        await tx.kvintetVote.deleteMany({ where: { kvintetId } });
       }
     });
   }
