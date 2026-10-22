@@ -100,13 +100,14 @@ export function ActiveKvintetView({ kvintet, onLeave, isLeaving }: ActiveKvintet
 
           {/* Leave kvintet */}
           <div className="border-t border-border pt-4">
-            <button
+            <Button
               type="button"
+              variant="link"
               onClick={() => setIsLeaveDialogOpen(true)}
-              className="text-left text-sm font-semibold text-foreground underline underline-offset-4 hover:text-muted-foreground"
+              className="h-auto justify-start p-0 text-sm font-semibold text-foreground underline hover:text-muted-foreground"
             >
               {t("kvintet.actions.leaveKvintet")}
-            </button>
+            </Button>
             <p className="mt-1 text-xs text-muted-foreground">
               {t("kvintet.actions.leaveKvintetHint")}
             </p>
