@@ -1,4 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
+
+import { getErrorMessage } from "@/lib/errorMessage"
 
 import {
   leaveKvintet,
@@ -16,7 +19,8 @@ export function useMyKvintet() {
     onSuccess: (updated) => {
       queryClient.setQueryData(kvintetKeys.mine(), updated)
     },
-    onError: () => {
+    onError: (error) => {
+      toast.error(getErrorMessage(error))
       void queryClient.invalidateQueries({ queryKey: kvintetKeys.mine() })
     },
   })
@@ -28,6 +32,10 @@ export function useMyKvintet() {
       void queryClient.invalidateQueries({ queryKey: kvintetKeys.mine() })
       void queryClient.invalidateQueries({ queryKey: kvintetKeys.membership() })
       void queryClient.invalidateQueries({ queryKey: kvintetKeys.feed() })
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error))
+      void queryClient.invalidateQueries({ queryKey: kvintetKeys.mine() })
     },
   })
 

@@ -57,7 +57,15 @@ describe("MyKvintetPage", () => {
       status: "FORMING",
       createdAt: "2026-10-21T10:00:00.000Z",
       activatedAt: null,
-      commonPreferences: "PRAHA",
+      commonPreferences: {
+        city: "Praha",
+        meetingFrequency: "BIWEEKLY",
+        weekdays: false,
+        weekends: false,
+        mornings: false,
+        afternoons: false,
+        evenings: true,
+      },
       capacity: 5,
       openSeatsCount: 2,
       members: [
@@ -107,7 +115,15 @@ describe("MyKvintetPage", () => {
       status: "ACTIVE",
       createdAt: "2026-10-21T10:00:00.000Z",
       activatedAt: "2026-10-21T12:00:00.000Z",
-      commonPreferences: "PRAHA",
+      commonPreferences: {
+        city: "Praha",
+        meetingFrequency: "BIWEEKLY",
+        weekdays: false,
+        weekends: false,
+        mornings: false,
+        afternoons: false,
+        evenings: true,
+      },
       capacity: 5,
       openSeatsCount: 0,
       members: [

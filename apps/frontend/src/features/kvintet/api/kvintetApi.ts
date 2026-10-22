@@ -27,13 +27,25 @@ export const kvintetVoteStatusSchema = z.object({
 
 export type KvintetVoteStatus = z.infer<typeof kvintetVoteStatusSchema>
 
+export const commonPreferencesSchema = z.object({
+  city: z.string().nullable(),
+  meetingFrequency: z.enum(["WEEKLY", "BIWEEKLY", "MONTHLY"]).nullable(),
+  weekdays: z.boolean(),
+  weekends: z.boolean(),
+  mornings: z.boolean(),
+  afternoons: z.boolean(),
+  evenings: z.boolean(),
+})
+
+export type CommonPreferences = z.infer<typeof commonPreferencesSchema>
+
 export const kvintetDetailsSchema = z.object({
   id: z.string(),
   title: z.string(),
   status: z.enum(["FORMING", "ACTIVE"]),
   createdAt: z.string(),
   activatedAt: z.string().nullable(),
-  commonPreferences: z.string().nullable(),
+  commonPreferences: commonPreferencesSchema.nullable(),
   capacity: z.number(),
   openSeatsCount: z.number(),
   members: z.array(kvintetMemberSchema),

@@ -12,7 +12,15 @@ describe("ProposalKvintetView", () => {
     status: "FORMING",
     createdAt: "2026-10-21T10:00:00.000Z",
     activatedAt: null,
-    commonPreferences: "PRAHA · VEČERY · JEDNOU ZA 14 DNÍ",
+    commonPreferences: {
+      city: "Praha",
+      meetingFrequency: "BIWEEKLY",
+      weekdays: false,
+      weekends: false,
+      mornings: false,
+      afternoons: false,
+      evenings: true,
+    },
     capacity: 5,
     openSeatsCount: 1,
     members: [
@@ -86,9 +94,7 @@ describe("ProposalKvintetView", () => {
     expect(
       screen.getByRole("heading", { name: "AI v práci – co opravdu funguje" }),
     ).toBeInTheDocument()
-    expect(
-      screen.getByText("SUITS EVERYONE: PRAHA · VEČERY · JEDNOU ZA 14 DNÍ"),
-    ).toBeInTheDocument()
+    expect(screen.getByText("SUITS EVERYONE: PRAHA · EVENINGS · EVERY 14 DAYS")).toBeInTheDocument()
 
     // Vote banner
     expect(screen.getByText("Start now?")).toBeInTheDocument()

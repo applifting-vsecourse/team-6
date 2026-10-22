@@ -2,9 +2,11 @@ import { PrismaService } from '@/core/prisma/prisma.service';
 import {
   Prisma,
   type KvintetStatus,
+  type MeetingFrequency,
   type ProfileTagKind,
 } from '@/generated/prisma/client';
 import {
+  CommonPreferences,
   JoinOutcome,
   KVINTET_CAPACITY,
   KvintetDetails,
@@ -246,16 +248,55 @@ export class KvintetRepository {
       totalCount <= 4 &&
       !userHasVoted;
 
-    const cities = members
-      .map(
-        (m) =>
-          kvintet.members.find((km) => km.userId === m.userId)?.user.profile
-            ?.city?.name,
-      )
-      .filter((c): c is string => Boolean(c));
-    const commonCity = cities.length > 0 ? cities[0] : 'Praha';
+    const memberProfiles = kvintet.members.map((km) => km.user.profile);
+    const hasAnyProfile = memberProfiles.some(Boolean);
 
-    const commonPreferences = `${commonCity.toUpperCase()} · VEČERY · JEDNOU ZA 14 DNÍ`;
+    let commonPreferences: CommonPreferences | null = null;
+
+    if (hasAnyProfile && memberProfiles.length > 0) {
+      const cities = memberProfiles
+        .map((p) => p?.city?.name)
+        .filter((c): c is string => Boolean(c));
+      const sharedCity =
+        cities.length === memberProfiles.length && new Set(cities).size === 1
+          ? cities[0]
+          : null;
+
+      const frequencies = memberProfiles
+        .map((p) => p?.meetingFrequency)
+        .filter((f): f is MeetingFrequency => Boolean(f));
+      const sharedFrequency =
+        frequencies.length === memberProfiles.length &&
+        new Set(frequencies).size === 1
+          ? frequencies[0]
+          : null;
+
+      const weekdays = memberProfiles.every((p) => p?.weekdays === true);
+      const weekends = memberProfiles.every((p) => p?.weekends === true);
+      const mornings = memberProfiles.every((p) => p?.mornings === true);
+      const afternoons = memberProfiles.every((p) => p?.afternoons === true);
+      const evenings = memberProfiles.every((p) => p?.evenings === true);
+
+      if (
+        sharedCity ||
+        sharedFrequency ||
+        weekdays ||
+        weekends ||
+        mornings ||
+        afternoons ||
+        evenings
+      ) {
+        commonPreferences = {
+          city: sharedCity,
+          meetingFrequency: sharedFrequency,
+          weekdays,
+          weekends,
+          mornings,
+          afternoons,
+          evenings,
+        };
+      }
+    }
 
     return {
       id: kvintet.id,

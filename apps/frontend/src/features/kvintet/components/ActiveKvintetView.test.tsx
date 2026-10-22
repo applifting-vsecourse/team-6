@@ -12,7 +12,15 @@ describe("ActiveKvintetView", () => {
     status: "ACTIVE",
     createdAt: "2026-10-21T10:00:00.000Z",
     activatedAt: "2026-10-21T12:00:00.000Z",
-    commonPreferences: "PRAHA · VEČERY",
+    commonPreferences: {
+      city: "Praha",
+      meetingFrequency: "BIWEEKLY",
+      weekdays: false,
+      weekends: false,
+      mornings: false,
+      afternoons: false,
+      evenings: true,
+    },
     capacity: 5,
     openSeatsCount: 0,
     members: [
@@ -110,7 +118,10 @@ describe("ActiveKvintetView", () => {
 
     // Group chat block
     expect(screen.getByText("Group chat")).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Open messages" })).toBeInTheDocument()
+    const openMessagesButton = screen.getByRole("button", { name: "Open messages" })
+    expect(openMessagesButton).toBeInTheDocument()
+    expect(openMessagesButton).toBeDisabled()
+    expect(screen.getByText("Group chat will be available soon.")).toBeInTheDocument()
 
     // Leave kvintet
     expect(screen.getByRole("button", { name: "Leave kvintet" })).toBeInTheDocument()

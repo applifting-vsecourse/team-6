@@ -64,13 +64,23 @@ export interface KvintetVoteStatus {
   totalCount: number;
 }
 
+export interface CommonPreferences {
+  city: string | null;
+  meetingFrequency: MeetingFrequency | null;
+  weekdays: boolean;
+  weekends: boolean;
+  mornings: boolean;
+  afternoons: boolean;
+  evenings: boolean;
+}
+
 export interface KvintetDetails {
   id: string;
   title: string;
   status: KvintetStatusType;
   createdAt: Date;
   activatedAt: Date | null;
-  commonPreferences: string | null;
+  commonPreferences: CommonPreferences | null;
   capacity: number;
   openSeatsCount: number;
   members: KvintetMemberDetails[];

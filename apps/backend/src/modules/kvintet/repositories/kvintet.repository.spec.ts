@@ -1,5 +1,6 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
 
@@ -225,5 +226,71 @@ describe('KvintetRepository (Postgres)', () => {
 
     const forUser1 = await repository.findKvintetDetailsByUserId(users[1]);
     expect(forUser1?.members).toHaveLength(2);
+  });
+
+  it('rejects voting when kvintet is already ACTIVE', async () => {
+    const users = await createUsers(3, 'vote-active');
+    const kvintetId = await createKvintet(users);
+
+    await repository.vote(kvintetId, users[0]);
+    await repository.vote(kvintetId, users[1]);
+    await repository.vote(kvintetId, users[2]);
+
+    await expect(repository.vote(kvintetId, users[0])).rejects.toThrow(
+      BadRequestException,
+    );
+  });
+
+  it('rejects voting when proposal has fewer than 3 members', async () => {
+    const users = await createUsers(2, 'vote-few');
+    const kvintetId = await createKvintet(users);
+
+    await expect(repository.vote(kvintetId, users[0])).rejects.toThrow(
+      BadRequestException,
+    );
+  });
+
+  it('rejects double voting by the same user', async () => {
+    const users = await createUsers(3, 'double-vote');
+    const kvintetId = await createKvintet(users);
+
+    await repository.vote(kvintetId, users[0]);
+
+    await expect(repository.vote(kvintetId, users[0])).rejects.toThrow(
+      ConflictException,
+    );
+  });
+
+  it('deletes kvintet when the last member leaves', async () => {
+    const users = await createUsers(1, 'last-leave');
+    const kvintetId = await createKvintet(users);
+
+    await repository.leave(kvintetId, users[0]);
+
+    const kvintet = await prisma.kvintet.findUnique({
+      where: { id: kvintetId },
+    });
+    expect(kvintet).toBeNull();
+  });
+
+  it('auto-activates kvintet on leave when all remaining members have voted', async () => {
+    const users = await createUsers(4, 'leave-activate');
+    const kvintetId = await createKvintet(users);
+
+    // 3 out of 4 vote
+    await repository.vote(kvintetId, users[0]);
+    await repository.vote(kvintetId, users[1]);
+    await repository.vote(kvintetId, users[2]);
+
+    const beforeLeave = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(beforeLeave?.status).toBe('FORMING');
+
+    // 4th member leaves (unvoted) -> remaining 3 all voted
+    await repository.leave(kvintetId, users[3]);
+
+    const afterLeave = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(afterLeave?.status).toBe('ACTIVE');
+    expect(afterLeave?.activatedAt).not.toBeNull();
+    expect(afterLeave?.members).toHaveLength(3);
   });
 });

@@ -1,5 +1,32 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export class CommonPreferencesDto {
+  @ApiProperty({ example: 'Praha', nullable: true })
+  city!: string | null;
+
+  @ApiProperty({
+    enum: ['WEEKLY', 'BIWEEKLY', 'MONTHLY'],
+    example: 'BIWEEKLY',
+    nullable: true,
+  })
+  meetingFrequency!: 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY' | null;
+
+  @ApiProperty({ example: true })
+  weekdays!: boolean;
+
+  @ApiProperty({ example: false })
+  weekends!: boolean;
+
+  @ApiProperty({ example: false })
+  mornings!: boolean;
+
+  @ApiProperty({ example: false })
+  afternoons!: boolean;
+
+  @ApiProperty({ example: true })
+  evenings!: boolean;
+}
+
 export class KvintetMemberDto {
   @ApiProperty({ example: 'usr_123' })
   userId!: string;
@@ -56,8 +83,8 @@ export class KvintetDetailsDto {
   @ApiProperty({ example: '2026-10-21T12:00:00.000Z', nullable: true })
   activatedAt!: string | null;
 
-  @ApiProperty({ example: 'PRAHA · VEČERY · JEDNOU ZA 14 DNÍ', nullable: true })
-  commonPreferences!: string | null;
+  @ApiProperty({ type: CommonPreferencesDto, nullable: true })
+  commonPreferences!: CommonPreferencesDto | null;
 
   @ApiProperty({ example: 5 })
   capacity!: number;

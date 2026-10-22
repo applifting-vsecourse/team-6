@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next"
 import { Button } from "@/components/ui/button"
 
 import type { KvintetDetails } from "@/features/kvintet/api/kvintetApi"
+import { formatCommonPreferences } from "@/features/kvintet/lib/formatPreferences"
 
 import { KvintetCapacityIndicator } from "./KvintetCapacityIndicator"
 import { KvintetMemberList } from "./KvintetMemberList"
@@ -30,6 +31,8 @@ export function ProposalKvintetView({
   const canShowVoteBox = kvintet.members.length >= 3 && kvintet.members.length <= 4
   const remainingVotes = Math.max(0, kvintet.voteStatus.totalCount - kvintet.voteStatus.votedCount)
 
+  const formattedPreferences = formatCommonPreferences(kvintet.commonPreferences, t)
+
   return (
     <div className="flex flex-col gap-8">
       {/* Header section */}
@@ -42,10 +45,10 @@ export function ProposalKvintetView({
 
         <h1 className="text-title">{kvintet.title}</h1>
 
-        {kvintet.commonPreferences && (
+        {formattedPreferences && (
           <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
             {t("kvintet.proposalSubtitle", {
-              preferences: kvintet.commonPreferences,
+              preferences: formattedPreferences,
             })}
           </p>
         )}

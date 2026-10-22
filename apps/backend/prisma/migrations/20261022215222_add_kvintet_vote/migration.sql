@@ -1,6 +1,3 @@
--- AlterTable
-ALTER TABLE "profile" ALTER COLUMN "updatedAt" DROP DEFAULT;
-
 -- CreateTable
 CREATE TABLE "kvintet_vote" (
     "kvintetId" UUID NOT NULL,

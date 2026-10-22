@@ -112,9 +112,11 @@
       "reportIssue": "Nahlásit problém",
       "reportIssueHint": "Otevře e-mail na podporu. Hlášení jsou důvěrná."
     },
-    "activeSubtitle": "VZNIKL {{date}} · {{count}} ČLENŮ · VŠEM VYHOVUJE: {{preferences}}",
+    "activeSubtitle": "VZNIKL {{date}} · {{count}} ČLENŮ",
+    "activeSubtitleWithPreferences": "VZNIKL {{date}} · {{count}} ČLENŮ · VŠEM VYHOVUJE: {{preferences}}",
     "alreadyMember": "V návrhu už jste.",
     "chat": {
+      "comingSoon": "Skupinový chat bude dostupný již brzy.",
       "description": "Domluvte si první setkání ve skupinovém chatu.",
       "heading": "Skupinový chat",
       "openMessages": "Otevřít zprávy"
@@ -123,6 +125,9 @@
     "count_many": "{{formatted}} návrhu",
     "count_one": "{{formatted}} návrh",
     "count_other": "{{formatted}} návrhů",
+    "diagram": {
+      "memberNumber": "Člen {{number}}"
+    },
     "dialog": {
       "cancel": "Zrušit",
       "category": "Kategorie",
@@ -180,6 +185,13 @@
       "step1": "Se 3 nebo 4 členy může kvintet začít hned, když všichni hlasují pro.",
       "step2": "S 5 členy kvintet vznikne automaticky bez nutnosti hlasování.",
       "step3": "Pak uvidíte vzájemná jména a otevře se skupinový chat."
+    },
+    "preferences": {
+      "afternoons": "Odpoledne",
+      "evenings": "Večery",
+      "mornings": "Rána",
+      "weekdays": "Všední dny",
+      "weekends": "Víkendy"
     },
     "proposalSubtitle": "VŠEM VYHOVUJE: {{preferences}}",
     "seats": "{{filled}} z {{total}}",

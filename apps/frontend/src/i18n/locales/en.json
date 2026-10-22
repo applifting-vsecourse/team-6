@@ -110,15 +110,20 @@
       "reportIssue": "Report an issue",
       "reportIssueHint": "Opens an email to support. Reports are confidential."
     },
-    "activeSubtitle": "FORMED ON {{date}} · {{count}} MEMBERS · SUITS EVERYONE: {{preferences}}",
+    "activeSubtitle": "FORMED ON {{date}} · {{count}} MEMBERS",
+    "activeSubtitleWithPreferences": "FORMED ON {{date}} · {{count}} MEMBERS · SUITS EVERYONE: {{preferences}}",
     "alreadyMember": "You are already in a proposal.",
     "chat": {
+      "comingSoon": "Group chat will be available soon.",
       "description": "Arrange your first meeting in the group chat.",
       "heading": "Group chat",
       "openMessages": "Open messages"
     },
     "count_one": "{{formatted}} proposal",
     "count_other": "{{formatted}} proposals",
+    "diagram": {
+      "memberNumber": "Member {{number}}"
+    },
     "dialog": {
       "cancel": "Cancel",
       "category": "Category",
@@ -176,6 +181,13 @@
       "step1": "With 3 or 4 members, the kvintet can start right away if everyone votes yes.",
       "step2": "With 5 members, the kvintet forms automatically without voting.",
       "step3": "Then you'll see each other's names and the group chat opens."
+    },
+    "preferences": {
+      "afternoons": "Afternoons",
+      "evenings": "Evenings",
+      "mornings": "Mornings",
+      "weekdays": "Weekdays",
+      "weekends": "Weekends"
     },
     "proposalSubtitle": "SUITS EVERYONE: {{preferences}}",
     "seats": "{{filled}} of {{total}}",

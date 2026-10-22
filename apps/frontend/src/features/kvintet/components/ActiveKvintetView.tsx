@@ -6,6 +6,7 @@ import { SUPPORT_EMAIL } from "@/config/support"
 import { formatDate } from "@/lib/date"
 
 import type { KvintetDetails } from "@/features/kvintet/api/kvintetApi"
+import { formatCommonPreferences } from "@/features/kvintet/lib/formatPreferences"
 
 import { KvintetMemberList } from "./KvintetMemberList"
 import { KvintetTableDiagram } from "./KvintetTableDiagram"
@@ -25,6 +26,8 @@ export function ActiveKvintetView({ kvintet, onLeave, isLeaving }: ActiveKvintet
     ? formatDate(new Date(kvintet.activatedAt))
     : formatDate(new Date(kvintet.createdAt))
 
+  const formattedPreferences = formatCommonPreferences(kvintet.commonPreferences, t)
+
   return (
     <div className="flex flex-col gap-8">
       {/* Header section */}
@@ -38,11 +41,16 @@ export function ActiveKvintetView({ kvintet, onLeave, isLeaving }: ActiveKvintet
         <h1 className="text-title">{kvintet.title}</h1>
 
         <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
-          {t("kvintet.activeSubtitle", {
-            date: activatedDate,
-            count: kvintet.members.length,
-            preferences: kvintet.commonPreferences ?? "",
-          })}
+          {formattedPreferences
+            ? t("kvintet.activeSubtitleWithPreferences", {
+                date: activatedDate,
+                count: kvintet.members.length,
+                preferences: formattedPreferences,
+              })
+            : t("kvintet.activeSubtitle", {
+                date: activatedDate,
+                count: kvintet.members.length,
+              })}
         </p>
       </div>
 
@@ -69,12 +77,12 @@ export function ActiveKvintetView({ kvintet, onLeave, isLeaving }: ActiveKvintet
             <Button
               variant="default"
               className="mt-1 w-full"
-              onClick={() => {
-                // In future story: routes to /kvintet/chat
-              }}
+              disabled
+              aria-disabled="true"
             >
               {t("kvintet.chat.openMessages")}
             </Button>
+            <p className="text-xs text-muted-foreground">{t("kvintet.chat.comingSoon")}</p>
           </div>
 
           {/* Report issue */}

@@ -65,7 +65,7 @@ export function KvintetTableDiagram({ members }: KvintetTableDiagramProps) {
             // Format first name or you
             const firstName = member.name
               ? member.name.split(" ")[0]
-              : (member.role ?? `Člen ${idx + 1}`)
+              : (member.role ?? String(t("kvintet.diagram.memberNumber", { number: idx + 1 })))
             const label = member.isCurrentUser
               ? `${firstName} ${String(t("kvintet.members.you"))}`
               : firstName
