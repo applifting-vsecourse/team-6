@@ -7,7 +7,10 @@ import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
 import type { City } from "@/features/profile/api/profileApi"
-import { DEFAULT_RADIUS_KM, LocationMapPicker } from "@/features/profile/components/LocationMapPicker"
+import {
+  DEFAULT_RADIUS_KM,
+  LocationMapPicker,
+} from "@/features/profile/components/LocationMapPicker"
 
 export type Step2Data = {
   weekdays: boolean
@@ -28,7 +31,12 @@ type Step2AvailabilityProps = {
   onContinue: (data: Step2Data) => void
 }
 
-export function Step2Availability({ initialData, cities, onBack, onContinue }: Step2AvailabilityProps) {
+export function Step2Availability({
+  initialData,
+  cities,
+  onBack,
+  onContinue,
+}: Step2AvailabilityProps) {
   const { t } = useTranslation()
 
   const [hasWeekdays, setHasWeekdays] = useState(initialData.weekdays)
@@ -245,7 +253,7 @@ export function Step2Availability({ initialData, cities, onBack, onContinue }: S
                   }
                 }
               }}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
             >
               <option value="">{t("onboarding.step2.selectCity")}</option>
               {cities.map((city) => (
