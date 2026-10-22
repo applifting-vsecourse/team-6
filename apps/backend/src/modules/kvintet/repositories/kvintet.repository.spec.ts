@@ -261,6 +261,19 @@ describe('KvintetRepository (Postgres)', () => {
     );
   });
 
+  it('lets a member leave an ACTIVE kvintet, which stays ACTIVE with the rest', async () => {
+    const users = await createUsers(4, 'active-leave');
+    const kvintetId = await createKvintet(users);
+    for (const user of users) await repository.vote(kvintetId, user);
+
+    await repository.leave(kvintetId, users[0]);
+
+    expect(await repository.findKvintetDetailsByUserId(users[0])).toBeNull();
+    const remaining = await repository.findKvintetDetailsByUserId(users[1]);
+    expect(remaining?.status).toBe('ACTIVE');
+    expect(remaining?.members).toHaveLength(3);
+  });
+
   it('deletes kvintet when the last member leaves', async () => {
     const users = await createUsers(1, 'last-leave');
     const kvintetId = await createKvintet(users);
