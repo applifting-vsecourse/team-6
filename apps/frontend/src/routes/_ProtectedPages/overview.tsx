@@ -114,7 +114,9 @@ function OverviewPage() {
             </h2>
             <p className="text-base text-foreground/80">{t("overview.nextStep.description")}</p>
             <div className="pt-1">
-              <Button type="button">{t("overview.nextStep.button")}</Button>
+              <Button asChild>
+                <Link to={ROUTES.kvintetFeed}>{t("overview.nextStep.button")}</Link>
+              </Button>
             </div>
             <div className="mt-2 flex flex-col gap-2 border-t border-border pt-5">
               <p className="text-sm text-foreground/80">{t("overview.howItWorks.p1")}</p>
