@@ -190,6 +190,7 @@ describe('KvintetService.getMyKvintet', () => {
       {
         userId: 'u1',
         name: 'Jana Nováková',
+        username: 'jana',
         role: 'Marketingová specialistka',
         teachTags: ['Excel'],
         learnTags: ['Python'],

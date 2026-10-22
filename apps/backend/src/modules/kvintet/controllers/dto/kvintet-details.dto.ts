@@ -34,6 +34,9 @@ export class KvintetMemberDto {
   @ApiProperty({ example: 'Jana Nováková', nullable: true })
   name!: string | null;
 
+  @ApiProperty({ example: 'jana', nullable: true })
+  username!: string | null;
+
   @ApiProperty({ example: 'Marketingová specialistka', nullable: true })
   role!: string | null;
 

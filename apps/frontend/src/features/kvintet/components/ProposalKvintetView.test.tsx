@@ -26,6 +26,7 @@ describe("ProposalKvintetView", () => {
     members: [
       {
         userId: "u1",
+        username: null,
         name: "Jana Nováková",
         role: "Marketingová specialistka",
         teachTags: ["Excel", "španělštinu"],
@@ -36,6 +37,7 @@ describe("ProposalKvintetView", () => {
       },
       {
         userId: "u2",
+        username: null,
         name: null, // Hidden in proposal view
         role: "Backend vývojář",
         teachTags: ["Python", "SQL"],
@@ -46,6 +48,7 @@ describe("ProposalKvintetView", () => {
       },
       {
         userId: "u3",
+        username: null,
         name: null,
         role: "Datová analytička",
         teachTags: ["statistiku"],
@@ -56,6 +59,7 @@ describe("ProposalKvintetView", () => {
       },
       {
         userId: "u4",
+        username: null,
         name: null,
         role: "Produktový manažer",
         teachTags: ["roadmapping"],

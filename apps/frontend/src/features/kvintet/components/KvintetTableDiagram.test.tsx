@@ -1,15 +1,19 @@
 import { render, screen } from "@testing-library/react"
-import { describe, expect, it } from "vitest"
+import userEvent from "@testing-library/user-event"
+import { describe, expect, it, vi } from "vitest"
 
 import type { KvintetMember } from "@/features/kvintet/api/kvintetApi"
 
 import { KvintetTableDiagram } from "./KvintetTableDiagram"
 
+vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
+
 describe("KvintetTableDiagram", () => {
-  it("renders member labels with name, role, and localized fallback", () => {
+  it("renders a blobatar per member, labelled with name, role, or localized fallback", async () => {
     const members: KvintetMember[] = [
       {
         userId: "u1",
+        username: null,
         name: "Jana Nováková",
         role: "Designer",
         teachTags: [],
@@ -20,6 +24,7 @@ describe("KvintetTableDiagram", () => {
       },
       {
         userId: "u2",
+        username: null,
         name: null,
         role: "Developer",
         teachTags: [],
@@ -30,6 +35,7 @@ describe("KvintetTableDiagram", () => {
       },
       {
         userId: "u3",
+        username: null,
         name: null,
         role: null,
         teachTags: [],
@@ -42,11 +48,11 @@ describe("KvintetTableDiagram", () => {
 
     render(<KvintetTableDiagram members={members} />)
 
-    // Current user label: Jana (you)
-    expect(screen.getByText("Jana (you)")).toBeInTheDocument()
-    // Member 2 label: Developer
-    expect(screen.getByText("Developer")).toBeInTheDocument()
-    // Member 3 label with translated fallback: Member 3
-    expect(screen.getByText("Member 3")).toBeInTheDocument()
+    expect(screen.getByRole("img", { name: "Jana Nováková (you)" })).toBeInTheDocument()
+    expect(screen.getByRole("img", { name: "Developer" })).toBeInTheDocument()
+    expect(screen.getByRole("img", { name: "Member 3" })).toBeInTheDocument()
+
+    await userEvent.hover(screen.getByRole("img", { name: "Jana Nováková (you)" }))
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("Jana Nováková (you)")
   })
 })

@@ -223,6 +223,7 @@ export class KvintetRepository {
       const hasVoted = kvintet.votes.some((v) => v.userId === m.userId);
 
       const name = isKvintetActive || isCurrentUser ? m.user.name : null;
+      const username = isKvintetActive ? m.user.username : null;
       const role =
         profile?.position ??
         (profile?.roles && profile.roles.length > 0
@@ -232,6 +233,7 @@ export class KvintetRepository {
       return {
         userId: m.userId,
         name,
+        username,
         role,
         teachTags,
         learnTags,

@@ -24,6 +24,8 @@ vi.mock("@tanstack/react-router", () => ({
   ),
 }))
 
+vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
+
 describe("MyKvintetPage", () => {
   beforeEach(() => {
     mockUseMyKvintet.mockReset()
@@ -71,6 +73,7 @@ describe("MyKvintetPage", () => {
       members: [
         {
           userId: "u1",
+          username: null,
           name: "Jana",
           role: "Designérka",
           teachTags: ["UX"],
@@ -129,6 +132,7 @@ describe("MyKvintetPage", () => {
       members: [
         {
           userId: "u1",
+          username: null,
           name: "Jana Nováková",
           role: "Designérka",
           teachTags: ["UX"],
@@ -139,6 +143,7 @@ describe("MyKvintetPage", () => {
         },
         {
           userId: "u2",
+          username: null,
           name: "Petr Svoboda",
           role: "Vývojář",
           teachTags: ["TS"],

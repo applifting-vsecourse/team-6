@@ -8,6 +8,7 @@ import { kvintetKeys } from "./kvintetKeys"
 export const kvintetMemberSchema = z.object({
   userId: z.string(),
   name: z.string().nullable(),
+  username: z.string().nullable(),
   role: z.string().nullable(),
   teachTags: z.array(z.string()),
   learnTags: z.array(z.string()),

@@ -5,6 +5,8 @@ import type { KvintetDetails } from "@/features/kvintet/api/kvintetApi"
 
 import { ActiveKvintetView } from "./ActiveKvintetView"
 
+vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
+
 describe("ActiveKvintetView", () => {
   const mockActiveKvintet: KvintetDetails = {
     id: "k1",
@@ -26,6 +28,7 @@ describe("ActiveKvintetView", () => {
     members: [
       {
         userId: "u1",
+        username: null,
         name: "Jana Nováková",
         role: "Marketingová specialistka",
         teachTags: ["Excel", "španělštinu"],
@@ -36,6 +39,7 @@ describe("ActiveKvintetView", () => {
       },
       {
         userId: "u2",
+        username: null,
         name: "Petr Svoboda",
         role: "Backend vývojář",
         teachTags: ["Python", "SQL"],
@@ -46,6 +50,7 @@ describe("ActiveKvintetView", () => {
       },
       {
         userId: "u3",
+        username: null,
         name: "Eva Horáková",
         role: "Datová analytička",
         teachTags: ["statistiku"],
@@ -56,6 +61,7 @@ describe("ActiveKvintetView", () => {
       },
       {
         userId: "u4",
+        username: null,
         name: "Ondřej Dvořák",
         role: "Produktový manažer",
         teachTags: ["roadmapping"],
@@ -66,6 +72,7 @@ describe("ActiveKvintetView", () => {
       },
       {
         userId: "u5",
+        username: null,
         name: "Lucie Malá",
         role: "UX designérka",
         teachTags: ["UX design"],

@@ -29,6 +29,7 @@ describe('KvintetRepository (Postgres)', () => {
       data: {
         id,
         name: id,
+        username: id,
         email: `${id}@example.com`,
         emailVerified: true,
         createdAt: now,
@@ -329,6 +330,7 @@ describe('KvintetRepository (Postgres)', () => {
     expect(forming?.status).toBe('FORMING');
     for (const member of forming?.members ?? []) {
       expect(member.name).toBe(member.isCurrentUser ? users[0] : null);
+      expect(member.username).toBeNull();
     }
 
     for (const user of users) await repository.vote(kvintetId, user);
@@ -336,6 +338,9 @@ describe('KvintetRepository (Postgres)', () => {
     const active = await repository.findKvintetDetailsByUserId(users[0]);
     expect(active?.status).toBe('ACTIVE');
     expect(active?.members.map((m) => m.name).sort()).toEqual(
+      [...users].sort(),
+    );
+    expect(active?.members.map((m) => m.username).sort()).toEqual(
       [...users].sort(),
     );
   });

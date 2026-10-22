@@ -49,6 +49,8 @@ export type KvintetStatusType = 'FORMING' | 'ACTIVE';
 export interface KvintetMemberDetails {
   userId: string;
   name: string | null;
+  /** Avatar seed; hidden like `name` until the kvintet is ACTIVE. */
+  username: string | null;
   role: string | null;
   teachTags: string[];
   learnTags: string[];
