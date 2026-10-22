@@ -27,11 +27,7 @@ type Step2AvailabilityProps = {
   onContinue: (data: Step2Data) => void
 }
 
-export function Step2Availability({
-  initialData,
-  onBack,
-  onContinue,
-}: Step2AvailabilityProps) {
+export function Step2Availability({ initialData, onBack, onContinue }: Step2AvailabilityProps) {
   const { t } = useTranslation()
 
   const [hasWeekdays, setHasWeekdays] = useState(initialData.weekdays)

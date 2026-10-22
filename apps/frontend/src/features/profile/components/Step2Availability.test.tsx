@@ -133,15 +133,11 @@ describe("Step2Availability", () => {
     // Still missing location
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
     expect(onContinue).not.toHaveBeenCalled()
-    expect(
-      screen.getByText("Please select a location on the map."),
-    ).toBeInTheDocument()
+    expect(screen.getByText("Please select a location on the map.")).toBeInTheDocument()
 
     // Pick a point on the map -> location error disappears and form can continue
     await userEvent.click(screen.getByRole("button", { name: "Pick on map" }))
-    expect(
-      screen.queryByText("Please select a location on the map."),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText("Please select a location on the map.")).not.toBeInTheDocument()
 
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
     expect(onContinue).toHaveBeenCalledWith(
