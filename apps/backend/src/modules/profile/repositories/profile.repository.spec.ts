@@ -431,5 +431,63 @@ describe('ProfileRepository', () => {
         }),
       );
     });
+
+    it('partial save keeps existing values by omitting undefined optional fields from update', async (): Promise<void> => {
+      txMock.city.findUnique.mockResolvedValue({ id: 'c1', name: 'Praha' });
+      txMock.tag.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }, { id: 3 }]);
+      txMock.profile.findUnique.mockResolvedValue({
+        onboardingCompletedAt: new Date(),
+      });
+      txMock.profile.upsert.mockResolvedValue({});
+      txMock.profileTag.deleteMany.mockResolvedValue({});
+      txMock.profileTag.createMany.mockResolvedValue({});
+
+      jest
+        .spyOn(repository, 'findByUserId')
+        .mockResolvedValue({} as ProfileEntity);
+
+      await repository.saveProfile('u1', {
+        ...validData,
+        expectations: undefined,
+        meetingFrequency: undefined,
+        note: undefined,
+      });
+
+      const upsertCall = txMock.profile.upsert.mock.calls[0][0];
+      expect(upsertCall.update).not.toHaveProperty('expectations');
+      expect(upsertCall.update).not.toHaveProperty('meetingFrequency');
+      expect(upsertCall.update).not.toHaveProperty('note');
+    });
+
+    it('stores null position when neither roles nor position is provided', async (): Promise<void> => {
+      txMock.profile.findUnique.mockResolvedValue(null);
+      jest
+        .spyOn(repository, 'findByUserId')
+        .mockResolvedValue({} as ProfileEntity);
+
+      await repository.saveProfile('u1', {
+        ...validData,
+        roles: [],
+        position: undefined,
+        cityId: null,
+        teachTagIds: [],
+        learnTagIds: [],
+        interestTagIds: [],
+        completeOnboarding: false,
+      });
+
+      expect(txMock.profile.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          create: expect.objectContaining({
+            position: null,
+            roles: [],
+          }),
+          update: expect.objectContaining({
+            position: null,
+            roles: [],
+          }),
+        }),
+      );
+    });
   });
 });

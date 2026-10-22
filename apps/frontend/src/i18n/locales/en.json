@@ -65,6 +65,7 @@
   },
   "errors": {
     "CITY_NOT_FOUND": "Selected city was not found.",
+    "ONBOARDING_REQUIRED": "Please complete onboarding before accessing this resource.",
     "PROFILE_AVAILABILITY_REQUIRED": "At least one availability slot is required.",
     "PROFILE_LOCATION_REQUIRED": "Location coordinates or city is required.",
     "PROFILE_ROLE_REQUIRED": "At least one role is required.",

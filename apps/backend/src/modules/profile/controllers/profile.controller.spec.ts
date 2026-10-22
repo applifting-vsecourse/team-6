@@ -238,7 +238,7 @@ describe('ProfileController', () => {
       expect(service.saveProfile).toHaveBeenCalledWith(
         'u1',
         expect.objectContaining({
-          position: '',
+          position: undefined,
           roles: [],
         }),
       );

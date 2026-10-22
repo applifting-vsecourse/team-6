@@ -8,7 +8,7 @@ import { Identity } from '@/shared/auth/domain/identity';
 import { AuthenticatedUserGuard } from '@/shared/auth/guards/authenticated-user.guard';
 import { Body, Controller, Get, Put, Res, UseGuards } from '@nestjs/common';
 import {
-  ApiBearerAuth,
+  ApiCookieAuth,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -18,7 +18,7 @@ import { ProfileResponseDto } from './dto/profile-response.dto';
 import { SaveProfileDto } from './dto/save-profile.dto';
 
 @ApiTags('profile')
-@ApiBearerAuth()
+@ApiCookieAuth()
 @UseGuards(AuthenticatedUserGuard)
 @Controller('me/profile')
 export class ProfileController {
@@ -68,7 +68,7 @@ export class ProfileController {
         : dto.position
           ? [dto.position]
           : [];
-    const position = roles[0] ?? dto.position ?? '';
+    const position = roles[0] ?? dto.position;
 
     const profile = await this.profileService.saveProfile(user.id, {
       position,

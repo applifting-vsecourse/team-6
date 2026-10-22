@@ -52,22 +52,34 @@ describe('OnboardedGuard', () => {
     );
   });
 
-  it('rejects a signed-in user without a profile with 403 Forbidden', async (): Promise<void> => {
+  it('rejects a signed-in user without a profile with 403 Forbidden and ONBOARDING_REQUIRED code', async (): Promise<void> => {
     const session = { user: { id: 'u1' } };
     const { guard, context } = setup(session, null);
 
-    await expect(guard.canActivate(context)).rejects.toThrow(
-      ForbiddenException,
-    );
+    try {
+      await guard.canActivate(context);
+      fail('Expected ForbiddenException');
+    } catch (err) {
+      expect(err).toBeInstanceOf(ForbiddenException);
+      expect((err as ForbiddenException).getResponse()).toEqual(
+        expect.objectContaining({ code: 'ONBOARDING_REQUIRED' }),
+      );
+    }
   });
 
-  it('rejects a user whose onboarding is incomplete with 403 Forbidden', async (): Promise<void> => {
+  it('rejects a user whose onboarding is incomplete with 403 Forbidden and ONBOARDING_REQUIRED code', async (): Promise<void> => {
     const session = { user: { id: 'u1' } };
     const { guard, context } = setup(session, { onboardingCompletedAt: null });
 
-    await expect(guard.canActivate(context)).rejects.toThrow(
-      ForbiddenException,
-    );
+    try {
+      await guard.canActivate(context);
+      fail('Expected ForbiddenException');
+    } catch (err) {
+      expect(err).toBeInstanceOf(ForbiddenException);
+      expect((err as ForbiddenException).getResponse()).toEqual(
+        expect.objectContaining({ code: 'ONBOARDING_REQUIRED' }),
+      );
+    }
   });
 
   it('allows an onboarded user through and stores session on request', async (): Promise<void> => {

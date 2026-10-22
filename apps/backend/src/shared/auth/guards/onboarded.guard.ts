@@ -40,7 +40,10 @@ export class OnboardedGuard implements CanActivate {
 
     if (!profile?.onboardingCompletedAt) {
       // 403: signed in, but profile / onboarding is not complete
-      throw new ForbiddenException();
+      throw new ForbiddenException({
+        code: 'ONBOARDING_REQUIRED',
+        message: 'Onboarding must be completed before accessing this resource',
+      });
     }
 
     return true;

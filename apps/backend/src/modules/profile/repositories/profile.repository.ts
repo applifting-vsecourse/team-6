@@ -74,10 +74,6 @@ export class ProfileRepository {
     userId: string,
     data: SaveProfileData,
   ): Promise<ProfileEntity> {
-    const expectationsString = data.expectations
-      ? JSON.stringify(data.expectations)
-      : null;
-
     const roles =
       data.roles && data.roles.length > 0
         ? data.roles
@@ -154,7 +150,9 @@ export class ProfileRepository {
           roles,
           latitude: data.latitude ?? null,
           longitude: data.longitude ?? null,
-          expectations: expectationsString,
+          expectations: data.expectations
+            ? JSON.stringify(data.expectations)
+            : null,
           meetingFrequency: data.meetingFrequency ?? null,
           weekdays: data.weekdays,
           weekends: data.weekends,
@@ -171,8 +169,6 @@ export class ProfileRepository {
           roles,
           latitude: data.latitude ?? null,
           longitude: data.longitude ?? null,
-          expectations: expectationsString,
-          meetingFrequency: data.meetingFrequency ?? null,
           weekdays: data.weekdays,
           weekends: data.weekends,
           mornings: data.mornings,
@@ -180,7 +176,17 @@ export class ProfileRepository {
           evenings: data.evenings,
           cityId: data.cityId ?? null,
           radiusKm: data.radiusKm ?? null,
-          note: data.note ?? null,
+          ...(data.expectations !== undefined
+            ? {
+                expectations: data.expectations
+                  ? JSON.stringify(data.expectations)
+                  : null,
+              }
+            : {}),
+          ...(data.meetingFrequency !== undefined
+            ? { meetingFrequency: data.meetingFrequency ?? null }
+            : {}),
+          ...(data.note !== undefined ? { note: data.note ?? null } : {}),
           ...(data.completeOnboarding && !existing?.onboardingCompletedAt
             ? { onboardingCompletedAt: new Date() }
             : {}),
