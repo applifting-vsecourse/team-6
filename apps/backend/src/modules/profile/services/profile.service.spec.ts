@@ -424,6 +424,37 @@ describe('ProfileService', () => {
     }
   });
 
+  it('completes onboarding with map coordinates only, without a city', async (): Promise<void> => {
+    repository.findByUserId.mockResolvedValue(null);
+    const saved = {} as ProfileEntity;
+    repository.saveProfile.mockResolvedValue(saved);
+
+    const result = await service.saveProfile('u1', {
+      position: 'Engineer',
+      roles: ['software-engineer'],
+      teachTagIds: [],
+      learnTagIds: [],
+      interestTagIds: [],
+      weekdays: true,
+      weekends: false,
+      mornings: false,
+      afternoons: false,
+      evenings: true,
+      cityId: null,
+      latitude: 50.07,
+      longitude: 14.43,
+      radiusKm: 10,
+      meetingFrequency: MeetingFrequency.WEEKLY,
+      completeOnboarding: true,
+    });
+
+    expect(result).toBe(saved);
+    expect(repository.saveProfile).toHaveBeenCalledWith(
+      'u1',
+      expect.objectContaining({ latitude: 50.07, longitude: 14.43 }),
+    );
+  });
+
   it('rejects completeOnboarding with an empty payload for a new user', async (): Promise<void> => {
     repository.findByUserId.mockResolvedValue(null);
     try {

@@ -12,7 +12,6 @@ import {
   profileQueryOptions,
   referenceQueryOptions,
   useSaveProfile,
-  type City,
   type MeetingFrequency,
   type ProfileResponse,
   type Tag,
@@ -54,14 +53,12 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps = {}) {
   }
 
   const allTags = referenceQuery.data?.tags ?? []
-  const allCities = referenceQuery.data?.cities ?? []
 
   return (
     <OnboardingWizardForm
       userId={userId}
       profile={profileQuery.data ?? null}
       allTags={allTags}
-      allCities={allCities}
     />
   )
 }
@@ -70,10 +67,9 @@ type OnboardingWizardFormProps = {
   userId?: string
   profile: ProfileResponse
   allTags: Tag[]
-  allCities: City[]
 }
 
-function OnboardingWizardForm({ userId, profile, allTags, allCities }: OnboardingWizardFormProps) {
+function OnboardingWizardForm({ userId, profile, allTags }: OnboardingWizardFormProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const saveProfileMutation = useSaveProfile(userId)
@@ -114,7 +110,6 @@ function OnboardingWizardForm({ userId, profile, allTags, allCities }: Onboardin
     mornings: boolean
     afternoons: boolean
     evenings: boolean
-    cityId?: string | null
     radiusKm: number
     latitude?: number | null
     longitude?: number | null
@@ -124,7 +119,6 @@ function OnboardingWizardForm({ userId, profile, allTags, allCities }: Onboardin
     mornings: profile?.mornings ?? false,
     afternoons: profile?.afternoons ?? false,
     evenings: profile?.evenings ?? false,
-    cityId: profile?.cityId ?? null,
     radiusKm: profile?.radiusKm ?? 25,
     latitude: profile?.latitude ?? null,
     longitude: profile?.longitude ?? null,
@@ -168,7 +162,7 @@ function OnboardingWizardForm({ userId, profile, allTags, allCities }: Onboardin
         mornings: step2Data.mornings,
         afternoons: step2Data.afternoons,
         evenings: step2Data.evenings,
-        cityId: step2Data.cityId ?? null,
+        cityId: null, // map coordinates are the only location source; clears any legacy city
         radiusKm: step2Data.radiusKm,
         latitude: step2Data.latitude ?? null,
         longitude: step2Data.longitude ?? null,
@@ -216,7 +210,6 @@ function OnboardingWizardForm({ userId, profile, allTags, allCities }: Onboardin
       {currentStep === 2 && (
         <Step2Availability
           initialData={step2Data}
-          cities={allCities}
           onBack={() => {
             setCurrentStep(1)
             window.scrollTo({ top: 0, behavior: "smooth" })
