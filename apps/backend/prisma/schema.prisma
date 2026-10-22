@@ -131,21 +131,35 @@ model City {
 
 // Reference data: inserted by migrations, never by the seed script.
 model Category {
-  id        Int       @id @default(autoincrement())
-  slug      String    @unique
+  id        Int           @id @default(autoincrement())
+  slug      String        @unique
   sortOrder Int
   kvintets  Kvintet[]
+  tags      TagCategory[]
 
   @@map("category")
 }
 
 // Reference data: inserted by migrations, never by the seed script.
 model Tag {
-  id          Int          @id @default(autoincrement())
-  slug        String       @unique
+  id          Int           @id @default(autoincrement())
+  slug        String        @unique
   profileTags ProfileTag[]
+  categories  TagCategory[]
 
   @@map("tag")
+}
+
+// Reference data: which categories a tag counts towards. Used to match a user's tags to a kvintet's one category.
+model TagCategory {
+  tagId      Int
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([tagId, categoryId])
+  @@index([categoryId])
+  @@map("tag_category")
 }
 
 model ProfileTag {

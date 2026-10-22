@@ -58,6 +58,8 @@ erDiagram
   user ||--o| kvintet_member : "is in (max 1)"
   profile ||--o{ profile_tag : has
   tag ||--o{ profile_tag : ""
+  tag ||--o{ tag_category : ""
+  category ||--o{ tag_category : ""
   city ||--o{ profile : "located in"
   category ||--o{ offer : ""
   offer ||--o{ offer_claim : ""
@@ -73,6 +75,7 @@ erDiagram
 | `profile`         | `userId` PK, `position`, `expectations`, `meetingFrequency` (enum), `weekdays`, `weekends`, `cityId`, `radiusKm`, `onboardingCompletedAt` | `onboardingCompletedAt IS NULL` means the user goes to onboarding                                                                                                                                                                                                            |
 | `tag`             | `id`, `slug` (unique)                                                                                                                     | Reference data. **Placeholder list** (from the Figma mocks), to be replaced by the onboarding story (#7); labels live in `tags.*` of the locale files                                                                                                                        |
 | `profile_tag`     | `userId`, `tagId`, `kind` (`TEACH` / `LEARN` / `INTEREST`)                                                                                | PK (`userId`, `tagId`, `kind`)                                                                                                                                                                                                                                               |
+| `tag_category`    | `tagId`, `categoryId`                                                                                                                     | PK (`tagId`, `categoryId`). Reference data: a tag may count towards several categories. This is how a user's tags are compared with a kvintet's single category; nothing reads it yet                                                                                       |
 | `city`            | `id`, `name`, `lat`, `lng`                                                                                                                | Reference data. Distance is haversine, computed in `matching`                                                                                                                                                                                                                |
 | `category`        | `id`, `slug` (unique), `sortOrder`                                                                                                        | Reference data, seeded by migration (technology, business, languages, personal-development, leisure). Shared by kvintets and the board                                                                                                                                       |
 | `offer`           | `id`, `authorId`, `title`, `description`, `place`, `startsAt`, `capacity`, `categoryId`                                                   | Index (`categoryId`, `startsAt`). `CHECK capacity >= 1`                                                                                                                                                                                                                      |
@@ -104,13 +107,15 @@ Each runs in one Prisma `$transaction` that first locks the parent row (`SELECT 
 
 ### Matching
 
-`matching` is pure functions over plain profile objects, unit-tested with fixed fixtures: `scoreMember`, `scoreGroup` (e.g. mean of member scores) and `isEligible` (hard filters: distance within both radii, availability overlap). Keep the weights and the threshold in one constant.
+`matching` is pure functions over plain profile objects, unit-tested with fixed fixtures: `scoreMember`, `scoreGroup` (e.g. mean of member scores). Keep the weights in one constant.
+
+Decided, not built yet (the data model is ready: `kvintet.categoryId`, `profile_tag`, `tag_category`): the main signal is **topic fit**, the user's tags that map to the kvintet's one category through `tag_category`, with `LEARN` and `INTEREST` weighted above `TEACH`. The kvintet side is its category only; members' tags and kvintet tags are not compared. Distance and availability overlap add a **soft score** and never hide a kvintet. A kvintet with zero topic fit still shows, ranked last, so a small pilot never gets an empty feed.
 
 Scope: matching **ranks and filters the kvintet feed** and nothing else. Users start kvintets themselves; the algorithm never creates groups or assigns people.
 
-`GET /api/kvintets/feed` loads the caller's profile and every `FORMING` kvintet with 1–4 members together with their profiles, filters by `isEligible`, scores, drops results under the threshold and sorts. Nothing is precomputed. A caller who is already in a kvintet gets `409` (the client redirects to `/overview` with a toast until the My kvintet page exists). So the header can grey out the feed link for members (tooltip: why) instead of bouncing them, `GET /kvintets/membership` answers `{ isMember }`; a direct visit to `/kvintet/feed` still ends in the redirect, so the feed never lists the caller's own kvintet.
+`GET /api/kvintets/feed` loads the caller's profile and every `FORMING` kvintet with 1–4 members together with their profiles, scores and sorts them. Nothing is precomputed. A caller who is already in a kvintet gets `409` (the client redirects to `/overview` with a toast until the My kvintet page exists). So the header can grey out the feed link for members (tooltip: why) instead of bouncing them, `GET /kvintets/membership` answers `{ isMember }`; a direct visit to `/kvintet/feed` still ends in the redirect, so the feed never lists the caller's own kvintet.
 
-Eligibility is advisory: it ranks and filters what the feed shows, but joining does not re-check it, so any onboarded user may join any open kvintet by id. The hard rules (size, one kvintet per user) are enforced in the Join flow.
+Matching is advisory: it only ranks what the feed shows, and joining does not re-check it, so any onboarded user may join any open kvintet by id. The hard rules (size, one kvintet per user) are enforced in the Join flow.
 
 The feed shows each member's `position` and tags, as the story requires, plus `meetingFrequency` when every member picked the same one. **Names are revealed when the kvintet forms**, not when joining a kvintet. The `kvintet` module reads `profile`, `profile_tag` and `tag`; until the onboarding story lands the `profile` table only has `position` and `meetingFrequency`, and a member without a profile row is listed with a generic label. The feed has no matching yet: it returns every open kvintet, newest first. Filtering by category is its own story; the frontend keeps a `CategoryFilter` placeholder where the chips go. In a cohort of a few hundred, rare combinations could identify a person; this is an accepted risk for the pilot. A controller test compares the whole response shape against an allow-list, so a new field cannot leak by accident.
 
