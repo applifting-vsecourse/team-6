@@ -11,7 +11,8 @@ export class ReferenceController {
   @Get()
   @ApiOperation({
     summary: 'Get reference data',
-    description: 'Returns read-only reference data: tags and cities',
+    description:
+      'Returns read-only reference data: categories, tags, and cities',
   })
   @ApiResponse({
     status: 200,

@@ -32,6 +32,13 @@
       "usernameRequired": "Zadejte uživatelské jméno"
     }
   },
+  "categories": {
+    "business": "Podnikání",
+    "languages": "Jazyky",
+    "leisure": "Volný čas",
+    "personal-development": "Osobní rozvoj",
+    "technology": "Technologie"
+  },
   "codeOfConduct": {
     "intro": "Kvintet je místo pro lidi, kteří se chtějí potkávat a učit se od sebe navzájem. Aby se tu všichni cítili dobře, držíme se několika jednoduchých pravidel.",
     "reportIntro": "Porušení pravidel nebo problém s konkrétním člověkem nahlaste na <email>{{email}}</email>.",
@@ -59,6 +66,7 @@
     "saving": "Ukládání…"
   },
   "errors": {
+    "already_in_kvintet": "Už jste členem návrhu nebo kvintetu.",
     "auth": {
       "CODE_OF_CONDUCT_REQUIRED": "Musíte souhlasit s kodexem chování.",
       "EMAIL_NOT_VERIFIED": "Nejdřív ověřte svůj e-mail.",
@@ -77,6 +85,7 @@
     "conflict": "Tohle je v rozporu s existujícími daty.",
     "forbidden": "Nemáte k tomu přístup.",
     "internal_error": "Na naší straně se něco pokazilo. Zkuste to prosím znovu.",
+    "kvintet_not_open": "Tento návrh je plný nebo už není otevřený.",
     "not_found": "Nepodařilo se najít, co hledáte.",
     "pageNotFound": "Stránka nenalezena",
     "pageNotFoundDescription": "Stránka, kterou hledáte, neexistuje nebo byla přesunuta.",
@@ -86,6 +95,61 @@
     "unauthorized": "Nejdřív se musíte přihlásit.",
     "unexpected": "Došlo k neočekávané chybě.",
     "validation_failed": "Některé zadané hodnoty nejsou platné."
+  },
+  "kvintet": {
+    "alreadyMember": "V návrhu už jste.",
+    "count_few": "{{formatted}} návrhy",
+    "count_many": "{{formatted}} návrhu",
+    "count_one": "{{formatted}} návrh",
+    "count_other": "{{formatted}} návrhů",
+    "dialog": {
+      "cancel": "Zrušit",
+      "category": "Kategorie",
+      "categoryHint": "Podle kategorie návrh najdou ostatní ve filtru.",
+      "categoryPlaceholder": "Vyberte kategorii",
+      "description": "Budete jeho prvním členem. Ostatní uvidí téma, vaši roli a štítky – ne vaše jméno.",
+      "details": "Krátký popis (nepovinné)",
+      "detailsPlaceholder": "např. Vedu agenturu s 10 lidmi a chci sdílet, co nám funguje.",
+      "submit": "Založit návrh",
+      "title": "Založit nový návrh",
+      "topic": "Téma nebo problém",
+      "topicHint": "O čem se má skupina bavit?"
+    },
+    "empty": {
+      "text": "Tady se objeví návrhy, které odpovídají vašemu profilu.",
+      "title": "Zatím pro vás nemáme žádný návrh"
+    },
+    "error": {
+      "retry": "Zkusit znovu",
+      "text": "Na naší straně se něco pokazilo. Zkuste to prosím znovu.",
+      "title": "Návrhy se nepodařilo načíst"
+    },
+    "interests": "Zájmy: {{tags}}",
+    "join": "Přidat se k návrhu",
+    "joined": "Přidali jste se k návrhu.",
+    "learns": "Chce se naučit: {{tags}}",
+    "loading": "Načítáme návrhy…",
+    "member": "Člen",
+    "namesHidden": "Jména uvidíte, až kvintet vznikne.",
+    "seats": "{{filled}} z {{total}}",
+    "startOwn": {
+      "button": "Založit nový návrh",
+      "text": "Založte vlastní s tématem, které vás zajímá – ostatní se přidají k vám.",
+      "title": "Nesedí vám žádný návrh?"
+    },
+    "started": "Váš návrh je otevřený. Ostatní se k němu teď mohou přidat.",
+    "subtitle": "Všechny skupiny, které odpovídají vašemu profilu. Vybírejte podle tématu – být můžete vždy jen v jednom návrhu.",
+    "suitsAll": "Všem vyhovuje: {{value}}",
+    "teaches": "Učí: {{tags}}",
+    "title": "Návrhy pro vás",
+    "vacancy": "Volné místo",
+    "vacancyHint": "Můžete to být vy.",
+    "validation": {
+      "categoryRequired": "Vyberte kategorii",
+      "descriptionTooLong": "Popis může mít nejvýše {{max}} znaků",
+      "titleRequired": "Zadejte téma",
+      "titleTooLong": "Téma může mít nejvýše {{max}} znaků"
+    }
   },
   "landing": {
     "caption": "Žádné fotky, žádná hodnocení – jen lidé a témata.",
@@ -108,7 +172,14 @@
     "menu": "Menu",
     "openMenu": "Otevřít menu"
   },
+  "meetingFrequency": {
+    "BIWEEKLY": "jednou za 14 dní",
+    "MONTHLY": "jednou za měsíc",
+    "WEEKLY": "každý týden"
+  },
   "nav": {
+    "kvintetFeed": "Návrhy",
+    "kvintetFeedDisabled": "Už jste v kvintetu, proto ostatní návrhy nelze procházet.",
     "overview": "Přehled"
   },
   "onboarding": {
@@ -306,6 +377,7 @@
     "graphql": "GraphQL",
     "hiking": "Turistika",
     "html-css": "HTML & CSS",
+    "interviewing": "Vedení pohovorů",
     "investing": "Investování",
     "java": "Java",
     "javascript": "JavaScript",
@@ -334,6 +406,7 @@
     "reading": "Čtení",
     "redis": "Redis",
     "rest-api": "REST API",
+    "roadmapping": "Roadmapping",
     "ruby": "Ruby",
     "running": "Běh",
     "rust": "Rust",

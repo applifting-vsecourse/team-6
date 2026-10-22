@@ -9,46 +9,13 @@ globalThis.ResizeObserver ??= class {
   disconnect = vi.fn()
 }
 
-if (typeof window !== "undefined") {
-  window.ResizeObserver =
-    window.ResizeObserver ??
-    class ResizeObserver {
-      observe(): void {
-        // no-op for tests
-      }
-      unobserve(): void {
-        // no-op for tests
-      }
-      disconnect(): void {
-        // no-op for tests
-      }
-    }
-}
-
-if (typeof Element !== "undefined") {
-  Object.defineProperty(Element.prototype, "hasPointerCapture", {
-    value: () => false,
-    writable: true,
-  })
-  Object.defineProperty(Element.prototype, "setPointerCapture", {
-    value: () => {
-      /* test mock */
-    },
-    writable: true,
-  })
-  Object.defineProperty(Element.prototype, "releasePointerCapture", {
-    value: () => {
-      /* test mock */
-    },
-    writable: true,
-  })
-  Object.defineProperty(Element.prototype, "scrollIntoView", {
-    value: () => {
-      /* test mock */
-    },
-    writable: true,
-  })
-}
+// jsdom lacks the pointer-capture and scroll APIs Radix Select calls when it opens.
+Object.assign(Element.prototype, {
+  hasPointerCapture: () => false,
+  setPointerCapture: () => undefined,
+  releasePointerCapture: () => undefined,
+  scrollIntoView: () => undefined,
+})
 
 // Tests assert on English text regardless of the machine's locale.
 await i18n.changeLanguage("en")

@@ -16,6 +16,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ProtectedPagesOnboardingRouteImport } from './routes/_ProtectedPages/onboarding'
 import { Route as ProtectedPagesOverviewRouteImport } from './routes/_ProtectedPages/overview'
+import { Route as ProtectedPagesKvintetFeedRouteImport } from './routes/_ProtectedPages/kvintet.feed'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +53,12 @@ const ProtectedPagesOverviewRoute = ProtectedPagesOverviewRouteImport.update({
   path: '/overview',
   getParentRoute: () => ProtectedPagesRoute,
 } as any)
+const ProtectedPagesKvintetFeedRoute =
+  ProtectedPagesKvintetFeedRouteImport.update({
+    id: '/kvintet/feed',
+    path: '/kvintet/feed',
+    getParentRoute: () => ProtectedPagesRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -60,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/onboarding': typeof ProtectedPagesOnboardingRoute
   '/overview': typeof ProtectedPagesOverviewRoute
+  '/kvintet/feed': typeof ProtectedPagesKvintetFeedRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -68,6 +76,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/onboarding': typeof ProtectedPagesOnboardingRoute
   '/overview': typeof ProtectedPagesOverviewRoute
+  '/kvintet/feed': typeof ProtectedPagesKvintetFeedRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -78,6 +87,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_ProtectedPages/onboarding': typeof ProtectedPagesOnboardingRoute
   '/_ProtectedPages/overview': typeof ProtectedPagesOverviewRoute
+  '/_ProtectedPages/kvintet/feed': typeof ProtectedPagesKvintetFeedRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/onboarding'
     | '/overview'
+    | '/kvintet/feed'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/onboarding'
     | '/overview'
+    | '/kvintet/feed'
   id:
     | '__root__'
     | '/'
@@ -105,6 +117,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_ProtectedPages/onboarding'
     | '/_ProtectedPages/overview'
+    | '/_ProtectedPages/kvintet/feed'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -166,17 +179,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedPagesOverviewRouteImport
       parentRoute: typeof ProtectedPagesRoute
     }
+    '/_ProtectedPages/kvintet/feed': {
+      id: '/_ProtectedPages/kvintet/feed'
+      path: '/kvintet/feed'
+      fullPath: '/kvintet/feed'
+      preLoaderRoute: typeof ProtectedPagesKvintetFeedRouteImport
+      parentRoute: typeof ProtectedPagesRoute
+    }
   }
 }
 
 interface ProtectedPagesRouteChildren {
   ProtectedPagesOnboardingRoute: typeof ProtectedPagesOnboardingRoute
   ProtectedPagesOverviewRoute: typeof ProtectedPagesOverviewRoute
+  ProtectedPagesKvintetFeedRoute: typeof ProtectedPagesKvintetFeedRoute
 }
 
 const ProtectedPagesRouteChildren: ProtectedPagesRouteChildren = {
   ProtectedPagesOnboardingRoute: ProtectedPagesOnboardingRoute,
   ProtectedPagesOverviewRoute: ProtectedPagesOverviewRoute,
+  ProtectedPagesKvintetFeedRoute: ProtectedPagesKvintetFeedRoute,
 }
 
 const ProtectedPagesRouteWithChildren = ProtectedPagesRoute._addFileChildren(

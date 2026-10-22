@@ -87,11 +87,28 @@ model User {
 
   username        String? @db.VarChar(50)
   displayUsername String? @db.VarChar(50)
+
   profile         Profile?
+  kvintetMember   KvintetMember?
 
   @@unique([email])
   @@unique([username])
   @@map("user")
+}
+
+enum KvintetStatus {
+  FORMING
+  ACTIVE
+
+  @@map("kvintet_status")
+}
+
+enum ProfileTagKind {
+  TEACH
+  LEARN
+  INTEREST
+
+  @@map("profile_tag_kind")
 }
 
 enum MeetingFrequency {
@@ -100,14 +117,6 @@ enum MeetingFrequency {
   MONTHLY
 
   @@map("meeting_frequency")
-}
-
-enum TagKind {
-  TEACH
-  LEARN
-  INTEREST
-
-  @@map("tag_kind")
 }
 
 model City {
@@ -120,48 +129,85 @@ model City {
   @@map("city")
 }
 
+// Reference data: inserted by migrations, never by the seed script.
+model Category {
+  id        Int       @id @default(autoincrement())
+  slug      String    @unique
+  sortOrder Int
+  kvintets  Kvintet[]
+
+  @@map("category")
+}
+
+// Reference data: inserted by migrations, never by the seed script.
 model Tag {
-  id        String       @id @default(cuid())
-  slug      String       @unique
-  createdAt DateTime     @default(now()) @map("created_at")
-  profiles  ProfileTag[]
+  id          Int          @id @default(autoincrement())
+  slug        String       @unique
+  profileTags ProfileTag[]
 
   @@map("tag")
 }
 
 model ProfileTag {
-  userId  String  @map("user_id")
-  tagId   String  @map("tag_id")
-  kind    TagKind
-  profile Profile @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  userId  String
+  profile Profile        @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  tagId   Int
+  tag     Tag            @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  kind    ProfileTagKind
 
   @@id([userId, tagId, kind])
   @@map("profile_tag")
 }
 
 model Profile {
-  userId                String            @id @map("user_id")
+  userId                String            @id
   user                  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   position              String?
   roles                 String[]          @default([])
-  latitude              Float?            @map("latitude")
-  longitude             Float?            @map("longitude")
+  latitude              Float?
+  longitude             Float?
   expectations          String?
-  meetingFrequency      MeetingFrequency? @map("meeting_frequency")
+  meetingFrequency      MeetingFrequency?
   weekdays              Boolean           @default(false)
   weekends              Boolean           @default(false)
   mornings              Boolean           @default(false)
   afternoons            Boolean           @default(false)
   evenings              Boolean           @default(false)
-  cityId                String?           @map("city_id")
+  cityId                String?
   city                  City?             @relation(fields: [cityId], references: [id], onDelete: SetNull)
-  radiusKm              Int?              @map("radius_km")
+  radiusKm              Int?
   note                  String?           @db.Text
-  onboardingCompletedAt DateTime?         @map("onboarding_completed_at")
-  createdAt             DateTime          @default(now()) @map("created_at")
-  updatedAt             DateTime          @updatedAt @map("updated_at")
+  onboardingCompletedAt DateTime?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
   tags                  ProfileTag[]
 
   @@map("profile")
+}
+
+// FORMING kvintets are open to new members and listed in the feed. "group" is an SQL reserved word.
+model Kvintet {
+  id          String          @id @default(uuid()) @db.Uuid
+  status      KvintetStatus   @default(FORMING)
+  title       String
+  description String?
+  categoryId  Int
+  category    Category        @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime        @default(now())
+  activatedAt DateTime?
+  members     KvintetMember[]
+
+  @@index([status, createdAt])
+  @@map("kvintet")
+}
+
+model KvintetMember {
+  kvintetId String   @db.Uuid
+  kvintet   Kvintet  @relation(fields: [kvintetId], references: [id], onDelete: Cascade)
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt  DateTime @default(now())
+
+  @@id([kvintetId, userId])
+  @@map("kvintet_member")
 }

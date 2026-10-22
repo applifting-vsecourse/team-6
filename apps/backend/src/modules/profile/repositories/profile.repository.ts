@@ -37,7 +37,8 @@ export class ProfileRepository {
     }
 
     const tags = profile.tags.map(
-      (pt) => new ProfileTagEntity(pt.tagId, pt.tag.slug, pt.kind as TagKind),
+      (pt) =>
+        new ProfileTagEntity(String(pt.tagId), pt.tag.slug, pt.kind as TagKind),
     );
 
     const roles =
@@ -105,16 +106,30 @@ export class ProfileRepository {
         ]),
       ];
 
+      const tagMap = new Map<string, number>();
       if (allTagIds.length > 0) {
+        const numericIds = allTagIds
+          .map((id) => Number(id))
+          .filter((n) => !Number.isNaN(n));
         const existingTags = await tx.tag.findMany({
-          where: { id: { in: allTagIds } },
-          select: { id: true },
+          where: {
+            OR: [
+              ...(numericIds.length > 0 ? [{ id: { in: numericIds } }] : []),
+              { slug: { in: allTagIds } },
+            ],
+          },
+          select: { id: true, slug: true },
         });
-        if (existingTags.length !== allTagIds.length) {
-          const existingIds = new Set(existingTags.map((t) => t.id));
-          const missingIds = allTagIds.filter((id) => !existingIds.has(id));
+
+        for (const t of existingTags) {
+          tagMap.set(String(t.id), t.id);
+          tagMap.set(t.slug, t.id);
+        }
+
+        const missing = allTagIds.filter((id) => !tagMap.has(id));
+        if (missing.length > 0) {
           throw new BadRequestException(
-            `Tag(s) do not exist: ${missingIds.join(', ')}`,
+            `Tag(s) do not exist: ${missing.join(', ')}`,
           );
         }
       }
@@ -176,17 +191,17 @@ export class ProfileRepository {
       const profileTagCreates = [
         ...data.teachTagIds.map((tagId) => ({
           userId,
-          tagId,
+          tagId: tagMap.get(tagId)!,
           kind: TagKind.TEACH,
         })),
         ...data.learnTagIds.map((tagId) => ({
           userId,
-          tagId,
+          tagId: tagMap.get(tagId)!,
           kind: TagKind.LEARN,
         })),
         ...data.interestTagIds.map((tagId) => ({
           userId,
-          tagId,
+          tagId: tagMap.get(tagId)!,
           kind: TagKind.INTEREST,
         })),
       ];

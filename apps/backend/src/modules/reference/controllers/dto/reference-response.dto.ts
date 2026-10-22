@@ -1,5 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export class CategoryDto {
+  @ApiProperty({ example: 'technology' })
+  slug!: string;
+}
+
 export class CityDto {
   @ApiProperty({ example: 'city_praha' })
   id!: string;
@@ -15,7 +20,7 @@ export class CityDto {
 }
 
 export class TagDto {
-  @ApiProperty({ example: 'tag_excel' })
+  @ApiProperty({ example: '1' })
   id!: string;
 
   @ApiProperty({ example: 'excel' })
@@ -23,6 +28,9 @@ export class TagDto {
 }
 
 export class ReferenceResponseDto {
+  @ApiProperty({ type: [CategoryDto] })
+  categories!: CategoryDto[];
+
   @ApiProperty({ type: [CityDto] })
   cities!: CityDto[];
 

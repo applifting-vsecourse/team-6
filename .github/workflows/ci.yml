@@ -8,6 +8,22 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    # Real Postgres for the backend integration tests (concurrent joins etc.).
+    # Matches DATABASE_URL in apps/backend/.env.example, which `env:check` copies.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: quacker
+          POSTGRES_PASSWORD: quacker
+          POSTGRES_DB: quacker
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U quacker -d quacker"
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 20
     steps:
       - uses: actions/checkout@v5
 
@@ -38,6 +54,9 @@ jobs:
 
       - name: Type-check frontend
         run: pnpm frontend type-check
+
+      - name: Migrate database
+        run: pnpm backend migrate
 
       - name: Test backend
         run: pnpm backend test
