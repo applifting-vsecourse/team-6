@@ -6,7 +6,7 @@ import {
   SaveProfileData,
   TagKind,
 } from '@/modules/profile/domain/profile.entity';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ProfileRepository {
@@ -86,6 +86,39 @@ export class ProfileRepository {
     const position = roles[0] ?? data.position ?? null;
 
     await this.prisma.$transaction(async (tx) => {
+      if (data.cityId) {
+        const city = await tx.city.findUnique({
+          where: { id: data.cityId },
+        });
+        if (!city) {
+          throw new BadRequestException(
+            `City with id '${data.cityId}' does not exist`,
+          );
+        }
+      }
+
+      const allTagIds = [
+        ...new Set([
+          ...data.teachTagIds,
+          ...data.learnTagIds,
+          ...data.interestTagIds,
+        ]),
+      ];
+
+      if (allTagIds.length > 0) {
+        const existingTags = await tx.tag.findMany({
+          where: { id: { in: allTagIds } },
+          select: { id: true },
+        });
+        if (existingTags.length !== allTagIds.length) {
+          const existingIds = new Set(existingTags.map((t) => t.id));
+          const missingIds = allTagIds.filter((id) => !existingIds.has(id));
+          throw new BadRequestException(
+            `Tag(s) do not exist: ${missingIds.join(', ')}`,
+          );
+        }
+      }
+
       const existing = await tx.profile.findUnique({
         where: { userId },
       });

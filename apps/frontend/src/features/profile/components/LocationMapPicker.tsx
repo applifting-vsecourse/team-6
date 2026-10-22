@@ -236,7 +236,7 @@ export function LocationMapPicker({
       <div
         ref={mapContainerRef}
         data-testid="location-map-container"
-        className="relative h-72 w-full overflow-hidden rounded-lg border border-border bg-muted/40 shadow-inner sm:h-80"
+        className="relative h-72 w-full overflow-hidden rounded-lg border border-border bg-muted/40 sm:h-80"
         style={{ zIndex: 0 }}
       />
 

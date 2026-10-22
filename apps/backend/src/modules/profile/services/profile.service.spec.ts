@@ -5,6 +5,7 @@ import {
   TagKind,
 } from '@/modules/profile/domain/profile.entity';
 import { ProfileRepository } from '@/modules/profile/repositories/profile.repository';
+import { BadRequestException } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 
 describe('ProfileService', () => {
@@ -116,5 +117,87 @@ describe('ProfileService', () => {
       note: undefined,
       completeOnboarding: true,
     });
+  });
+
+  it('allows saving partial profile when completeOnboarding is false', async (): Promise<void> => {
+    repository.saveProfile.mockResolvedValue({} as ProfileEntity);
+
+    await service.saveProfile('u1', {
+      position: '',
+      roles: [],
+      teachTagIds: [],
+      learnTagIds: [],
+      interestTagIds: [],
+      weekdays: false,
+      weekends: false,
+      mornings: false,
+      afternoons: false,
+      evenings: false,
+      cityId: null,
+      radiusKm: null,
+      completeOnboarding: false,
+    });
+
+    expect(repository.saveProfile).toHaveBeenCalled();
+  });
+
+  it('throws BadRequestException when completing onboarding without roles', async (): Promise<void> => {
+    await expect(
+      service.saveProfile('u1', {
+        position: '',
+        roles: [],
+        teachTagIds: [],
+        learnTagIds: [],
+        interestTagIds: [],
+        weekdays: true,
+        weekends: false,
+        mornings: false,
+        afternoons: false,
+        evenings: false,
+        cityId: 'c1',
+        radiusKm: 10,
+        completeOnboarding: true,
+      }),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('throws BadRequestException when completing onboarding without location', async (): Promise<void> => {
+    await expect(
+      service.saveProfile('u1', {
+        position: 'Engineer',
+        roles: ['software-engineer'],
+        teachTagIds: [],
+        learnTagIds: [],
+        interestTagIds: [],
+        weekdays: true,
+        weekends: false,
+        mornings: false,
+        afternoons: false,
+        evenings: false,
+        cityId: null,
+        latitude: null,
+        longitude: null,
+        completeOnboarding: true,
+      }),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('throws BadRequestException when completing onboarding without any availability slot', async (): Promise<void> => {
+    await expect(
+      service.saveProfile('u1', {
+        position: 'Engineer',
+        roles: ['software-engineer'],
+        teachTagIds: [],
+        learnTagIds: [],
+        interestTagIds: [],
+        weekdays: false,
+        weekends: false,
+        mornings: false,
+        afternoons: false,
+        evenings: false,
+        cityId: 'c1',
+        completeOnboarding: true,
+      }),
+    ).rejects.toThrow(BadRequestException);
   });
 });
