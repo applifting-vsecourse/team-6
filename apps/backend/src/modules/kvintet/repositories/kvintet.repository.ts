@@ -304,7 +304,7 @@ export class KvintetRepository {
 
     return {
       id: kvintet.id,
-      title: kvintet.title ?? 'Kvintet',
+      title: kvintet.title,
       status: kvintet.status,
       createdAt: kvintet.createdAt,
       activatedAt: kvintet.activatedAt,

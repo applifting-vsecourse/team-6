@@ -106,7 +106,7 @@
       "leaveKvintet": "Leave kvintet",
       "leaveKvintetHint": "If fewer than three members remain, the kvintet will be disbanded.",
       "leaveProposal": "Leave proposal",
-      "leaveProposalHint": "You can only be in one proposal at a time. Other members' votes remain valid.",
+      "leaveProposalHint": "You can only be in one proposal at a time. When someone joins or leaves, everyone's votes are reset.",
       "reportIssue": "Report an issue",
       "reportIssueHint": "Opens an email to support. Reports are confidential."
     },
@@ -134,7 +134,7 @@
       "details": "Short description (optional)",
       "detailsPlaceholder": "e.g. I run a 10-person agency and want to share what works for us.",
       "leaveActiveConfirm": "You will leave the active kvintet. If fewer than 3 members remain, the kvintet will be disbanded.",
-      "leaveProposalConfirm": "You will leave this proposal. Other members' votes remain valid.",
+      "leaveProposalConfirm": "You will leave this proposal. When someone joins or leaves, everyone's votes are reset.",
       "leaveTitle": "Are you sure you want to leave?",
       "submit": "Start proposal",
       "title": "Start a new proposal",
@@ -224,7 +224,7 @@
       "requirement": "The kvintet starts immediately once all members vote yes ({{remaining}} needed). With 5 members, it forms automatically.",
       "title": "Start now?",
       "voted": "Voted",
-      "votedHint": "Your vote has been recorded. Waiting for other members or a fifth member to join.",
+      "votedHint": "Your vote has been recorded. Waiting for other members or a fifth member to join. If anyone joins or leaves, votes reset and everyone votes again.",
       "voting": "Submitting…"
     }
   },

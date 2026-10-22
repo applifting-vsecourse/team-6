@@ -1,11 +1,7 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
 import type { BetterAuth } from '@/shared/auth/providers/better-auth.provider';
 import { getSessionFromRequest } from '@/shared/auth/utils/get-session-from-request';
-import {
-  ExecutionContext,
-  ForbiddenException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { MemberGuard } from './member.guard';
 
 jest.mock('@/shared/auth/providers/better-auth.provider', () => ({
@@ -56,15 +52,9 @@ describe('MemberGuard', () => {
     const session = { user: { id: 'u1' } };
     const { guard, context } = setup(session, null);
 
-    try {
-      await guard.canActivate(context);
-      fail('Expected ForbiddenException');
-    } catch (err) {
-      expect(err).toBeInstanceOf(ForbiddenException);
-      expect((err as ForbiddenException).getResponse()).toEqual(
-        expect.objectContaining({ code: 'forbidden' }),
-      );
-    }
+    await expect(guard.canActivate(context)).rejects.toMatchObject({
+      response: expect.objectContaining({ code: 'forbidden' }),
+    });
   });
 
   it('allows a member through and stores session and kvintetMember on request', async (): Promise<void> => {

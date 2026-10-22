@@ -108,7 +108,7 @@
       "leaveKvintet": "Opustit kvintet",
       "leaveKvintetHint": "Pokud zůstanou méně než tři členové, kvintet zanikne.",
       "leaveProposal": "Opustit návrh",
-      "leaveProposalHint": "Být můžete vždy jen v jednom návrhu. Hlasy ostatních zůstávají platné.",
+      "leaveProposalHint": "Být můžete vždy jen v jednom návrhu. Když někdo přijde nebo odejde, hlasy všech se vynulují.",
       "reportIssue": "Nahlásit problém",
       "reportIssueHint": "Otevře e-mail na podporu. Hlášení jsou důvěrná."
     },
@@ -138,7 +138,7 @@
       "details": "Krátký popis (nepovinné)",
       "detailsPlaceholder": "např. Vedu agenturu s 10 lidmi a chci sdílet, co nám funguje.",
       "leaveActiveConfirm": "Opustíte aktivní kvintet. Pokud ve skupině zůstanou méně než 3 členové, kvintet zanikne.",
-      "leaveProposalConfirm": "Opustíte tento návrh. Hlasy ostatních členů zůstávají platné.",
+      "leaveProposalConfirm": "Opustíte tento návrh. Když někdo přijde nebo odejde, hlasy všech se vynulují.",
       "leaveTitle": "Opravdu chcete odejít?",
       "submit": "Založit návrh",
       "title": "Založit nový návrh",
@@ -228,7 +228,7 @@
       "requirement": "Kvintet začne hned, jakmile budou všichni členové pro (zbývá ještě {{remaining}}). S 5 členy vznikne automaticky.",
       "title": "Začít hned?",
       "voted": "Hlasováno",
-      "votedHint": "Váš hlas byl zaznamenán. Čeká se na hlasy ostatních členů nebo na příchod 5. člena.",
+      "votedHint": "Váš hlas byl zaznamenán. Čeká se na hlasy ostatních členů nebo na příchod 5. člena. Když někdo přijde nebo odejde, hlasy se vynulují a hlasuje se znovu.",
       "voting": "Odesílání…"
     }
   },
