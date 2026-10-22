@@ -210,15 +210,19 @@ export class ProfileRepository {
         },
       });
 
-      const tagsProvided =
-        data.teachTagIds !== undefined ||
-        data.learnTagIds !== undefined ||
-        data.interestTagIds !== undefined;
+      const kindsToDelete: TagKind[] = [];
+      if (data.teachTagIds !== undefined) kindsToDelete.push(TagKind.TEACH);
+      if (data.learnTagIds !== undefined) kindsToDelete.push(TagKind.LEARN);
+      if (data.interestTagIds !== undefined)
+        kindsToDelete.push(TagKind.INTEREST);
 
-      if (tagsProvided) {
-        // Replace profile tags
+      if (kindsToDelete.length > 0) {
+        // Replace profile tags for provided kinds only
         await tx.profileTag.deleteMany({
-          where: { userId },
+          where: {
+            userId,
+            kind: { in: kindsToDelete },
+          },
         });
 
         const profileTagCreates = [

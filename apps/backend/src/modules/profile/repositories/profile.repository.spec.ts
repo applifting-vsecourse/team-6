@@ -388,7 +388,10 @@ describe('ProfileRepository', () => {
       );
 
       expect(txMock.profileTag.deleteMany).toHaveBeenCalledWith({
-        where: { userId: 'u1' },
+        where: {
+          userId: 'u1',
+          kind: { in: [TagKind.TEACH, TagKind.LEARN, TagKind.INTEREST] },
+        },
       });
       expect(txMock.profileTag.createMany).toHaveBeenCalledWith({
         data: [
@@ -530,6 +533,43 @@ describe('ProfileRepository', () => {
       // Tags are preserved when tag arrays are undefined
       expect(txMock.profileTag.deleteMany).not.toHaveBeenCalled();
       expect(txMock.profileTag.createMany).not.toHaveBeenCalled();
+    });
+
+    it('partial save deletes and updates only the tag kinds that were provided', async (): Promise<void> => {
+      txMock.tag.findMany.mockResolvedValue([{ id: 1 }]);
+      txMock.profile.findUnique.mockResolvedValue({
+        onboardingCompletedAt: new Date(),
+      });
+      txMock.profile.upsert.mockResolvedValue({});
+      txMock.profileTag.deleteMany.mockResolvedValue({});
+      txMock.profileTag.createMany.mockResolvedValue({});
+
+      jest
+        .spyOn(repository, 'findByUserId')
+        .mockResolvedValue({} as ProfileEntity);
+
+      await repository.saveProfile('u1', {
+        teachTagIds: ['1'],
+        learnTagIds: undefined,
+        interestTagIds: undefined,
+      });
+
+      expect(txMock.profileTag.deleteMany).toHaveBeenCalledWith({
+        where: {
+          userId: 'u1',
+          kind: { in: [TagKind.TEACH] },
+        },
+      });
+      expect(txMock.profileTag.createMany).toHaveBeenCalledWith({
+        data: [
+          {
+            userId: 'u1',
+            tagId: 1,
+            kind: TagKind.TEACH,
+          },
+        ],
+        skipDuplicates: true,
+      });
     });
 
     it('stores null position when neither roles nor position is provided', async (): Promise<void> => {
