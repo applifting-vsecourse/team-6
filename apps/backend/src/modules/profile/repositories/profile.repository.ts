@@ -110,6 +110,16 @@ export class ProfileRepository {
       const tagMap = new Map<string, number>();
       if (allTagIds.length > 0) {
         const numericIds = allTagIds.map((id) => parseInt(id, 10));
+        const hasInvalidOrOverflow = numericIds.some(
+          (n) => Number.isNaN(n) || n <= 0 || n > 2147483647,
+        );
+        if (hasInvalidOrOverflow) {
+          throw new BadRequestException({
+            code: 'TAGS_NOT_FOUND',
+            message: 'One or more tags do not exist',
+          });
+        }
+
         const existingTags = await tx.tag.findMany({
           where: { id: { in: numericIds } },
           select: { id: true },

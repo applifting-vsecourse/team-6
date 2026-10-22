@@ -275,6 +275,27 @@ describe('ProfileRepository', () => {
       });
     });
 
+    it('throws TAGS_NOT_FOUND without querying database when tag id overflows integer bounds', async (): Promise<void> => {
+      txMock.city.findUnique.mockResolvedValue({ id: 'c1', name: 'Praha' });
+
+      try {
+        await repository.saveProfile('u1', {
+          ...validData,
+          teachTagIds: ['99999999999'],
+          learnTagIds: [],
+          interestTagIds: [],
+        });
+        fail('Expected BadRequestException');
+      } catch (err) {
+        expect(err).toBeInstanceOf(BadRequestException);
+        expect((err as BadRequestException).getResponse()).toEqual(
+          expect.objectContaining({ code: 'TAGS_NOT_FOUND' }),
+        );
+      }
+
+      expect(txMock.tag.findMany).not.toHaveBeenCalled();
+    });
+
     it('saves profile, replaces tags, and sets onboardingCompletedAt when onboarding complete', async (): Promise<void> => {
       txMock.city.findUnique.mockResolvedValue({ id: 'c1', name: 'Praha' });
       txMock.tag.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }, { id: 3 }]);

@@ -37,9 +37,9 @@ export class SaveProfileDto {
   @IsArray()
   @ArrayMaxSize(50)
   @IsString({ each: true })
-  @Matches(/^[1-9]\d*$/, {
+  @Matches(/^[1-9]\d{0,8}$/, {
     each: true,
-    message: 'Tag ID must be a positive numeric ID',
+    message: 'Tag ID must be a positive numeric ID within range',
   })
   teachTagIds!: string[];
 
@@ -47,9 +47,9 @@ export class SaveProfileDto {
   @IsArray()
   @ArrayMaxSize(50)
   @IsString({ each: true })
-  @Matches(/^[1-9]\d*$/, {
+  @Matches(/^[1-9]\d{0,8}$/, {
     each: true,
-    message: 'Tag ID must be a positive numeric ID',
+    message: 'Tag ID must be a positive numeric ID within range',
   })
   learnTagIds!: string[];
 
@@ -57,9 +57,9 @@ export class SaveProfileDto {
   @IsArray()
   @ArrayMaxSize(50)
   @IsString({ each: true })
-  @Matches(/^[1-9]\d*$/, {
+  @Matches(/^[1-9]\d{0,8}$/, {
     each: true,
-    message: 'Tag ID must be a positive numeric ID',
+    message: 'Tag ID must be a positive numeric ID within range',
   })
   interestTagIds!: string[];
 

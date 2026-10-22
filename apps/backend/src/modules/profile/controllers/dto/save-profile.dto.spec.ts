@@ -122,6 +122,24 @@ describe('SaveProfileDto validation', () => {
       expect(errors.some((e) => e.property === 'teachTagIds')).toBe(false);
     });
 
+    it('rejects oversized tag IDs that exceed integer bounds', async (): Promise<void> => {
+      const oversizedIds = ['99999999999', '1000000000', '1234567890'];
+      for (const tagId of oversizedIds) {
+        for (const field of [
+          'teachTagIds',
+          'learnTagIds',
+          'interestTagIds',
+        ] as const) {
+          const dto = plainToInstance(SaveProfileDto, {
+            ...createValidDto(),
+            [field]: [tagId],
+          });
+          const errors = await validate(dto);
+          expect(errors.some((e) => e.property === field)).toBe(true);
+        }
+      }
+    });
+
     it('rejects expectations array exceeding 20 items', async (): Promise<void> => {
       const dto = plainToInstance(SaveProfileDto, {
         ...createValidDto(),
