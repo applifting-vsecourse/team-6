@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { formatNumber } from "@/lib/date"
 
 import "leaflet/dist/leaflet.css"
 
@@ -263,7 +264,7 @@ export function LocationMapPicker({
           {currentLat.toFixed(4)}°, {currentLng.toFixed(4)}°
         </span>
         <span className="font-medium text-foreground">
-          {t("onboarding.step2.selectedRadius", { count: currentRadius })}
+          {t("onboarding.step2.selectedRadius", { count: formatNumber(currentRadius) })}
         </span>
       </div>
 
@@ -275,7 +276,9 @@ export function LocationMapPicker({
           >
             {t("onboarding.step2.radiusSliderLabel")}
           </Label>
-          <span className="font-mono font-semibold text-primary">{currentRadius} km</span>
+          <span className="font-mono font-semibold text-primary">
+            {t("onboarding.step2.radiusOption", { count: formatNumber(currentRadius) })}
+          </span>
         </div>
 
         <input
@@ -302,7 +305,7 @@ export function LocationMapPicker({
                   : "border-border bg-background text-foreground hover:bg-muted"
               }`}
             >
-              {rad} km
+              {t("onboarding.step2.radiusOption", { count: formatNumber(rad) })}
             </button>
           ))}
         </div>

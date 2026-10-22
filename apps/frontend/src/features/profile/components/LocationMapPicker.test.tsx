@@ -24,7 +24,7 @@ describe("LocationMapPicker", () => {
     expect(screen.getByText("25 km radius")).toBeInTheDocument()
 
     // Click 50 km preset button
-    const preset50Btn = screen.getByRole("button", { name: "50 km" })
+    const preset50Btn = screen.getByRole("button", { name: "Up to 50 km" })
     await userEvent.click(preset50Btn)
 
     expect(onChange).toHaveBeenCalledWith(
