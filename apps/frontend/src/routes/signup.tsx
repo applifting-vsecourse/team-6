@@ -32,6 +32,7 @@ function SignUpPage() {
     name: string
     username: string
     password: string
+    acceptCodeOfConduct: boolean
   }) => {
     setErrorMessage(null)
     try {
@@ -40,6 +41,7 @@ function SignUpPage() {
         password: values.password,
         name: values.name,
         username: values.username,
+        acceptCodeOfConduct: values.acceptCodeOfConduct,
       })
       await navigate({ to: ROUTES.onboarding })
     } catch (error) {

@@ -1,13 +1,16 @@
 import { useMemo } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Link } from "@tanstack/react-router"
 import type { TFunction } from "i18next"
 import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { z } from "zod"
 
+import { ROUTES } from "@/app/routes"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Form,
   FormControl,
@@ -41,6 +44,9 @@ const createSchema = (t: TFunction) =>
         .string()
         .trim()
         .min(1, t("auth.validation.passwordConfirmationRequired")),
+      acceptCodeOfConduct: z.boolean().refine((isAccepted) => isAccepted, {
+        message: t("auth.validation.codeOfConductRequired"),
+      }),
     })
     .refine((values) => values.password === values.passwordConfirmation, {
       message: t("auth.validation.passwordsMatch"),
@@ -55,6 +61,7 @@ const defaultValues: FormValues = {
   username: "",
   password: "",
   passwordConfirmation: "",
+  acceptCodeOfConduct: false,
 }
 
 type SignUpFormProps = {
@@ -172,6 +179,42 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
                   {...field}
                 />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="acceptCodeOfConduct"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-start gap-3">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={(checked) => field.onChange(checked === true)}
+                    onBlur={field.onBlur}
+                    ref={field.ref}
+                    className="mt-0.5"
+                  />
+                </FormControl>
+                {/* block: the base label is flex, which would split the sentence around the link */}
+                <FormLabel className="block leading-snug font-normal">
+                  <Trans
+                    i18nKey="auth.acceptCodeOfConduct"
+                    components={{
+                      coc: (
+                        <Link
+                          to={ROUTES.codeOfConduct}
+                          target="_blank"
+                          className="font-medium text-foreground underline underline-offset-4"
+                        />
+                      ),
+                    }}
+                  />
+                </FormLabel>
+              </div>
               <FormMessage />
             </FormItem>
           )}

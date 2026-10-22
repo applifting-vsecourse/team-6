@@ -1,5 +1,6 @@
 {
   "auth": {
+    "acceptCodeOfConduct": "I have read and accept the <coc>code of conduct</coc>",
     "confirmPassword": "Confirm password",
     "email": "Email",
     "emailPlaceholder": "e.g. john@doe.com",
@@ -17,6 +18,7 @@
     "username": "Username",
     "usernameHint": "Your avatar is generated from your username.",
     "validation": {
+      "codeOfConductRequired": "You must accept the code of conduct",
       "emailInvalid": "Invalid email",
       "emailRequired": "Email is required",
       "nameRequired": "Name is required",
@@ -27,6 +29,22 @@
       "passwordsMatch": "Passwords must match",
       "usernameRequired": "Username is required"
     }
+  },
+  "codeOfConduct": {
+    "intro": "Kvintet is a place for people who want to meet and learn from each other. To keep it pleasant for everyone, we follow a few simple rules.",
+    "reportIntro": "Report a broken rule or a problem with a specific person to <email>{{email}}</email>.",
+    "reportStep1": "We read every report and confirm that we received it.",
+    "reportStep2": "We find out what happened and, depending on how serious it is, warn the person or restrict their access to the app.",
+    "reportStep3": "Reports are handled in confidence. We do not reveal who made the report.",
+    "reportTitle": "What happens after a report",
+    "rule1": "Treat others with respect. No insults, mockery or discrimination.",
+    "rule2": "Be honest. Give true information about yourself and do not pretend to be someone else.",
+    "rule3": "Protect others' privacy. Do not share anyone's personal data or group messages without their consent.",
+    "rule4": "No spam or advertising. Offers and messages should relate to the community.",
+    "rule5": "Keep your commitments. If you cannot make a meeting, let the others know in time.",
+    "rulesTitle": "Our rules",
+    "seoTitle": "Code of conduct",
+    "title": "Code of conduct"
   },
   "common": {
     "back": "Back",
@@ -40,6 +58,7 @@
   },
   "errors": {
     "auth": {
+      "CODE_OF_CONDUCT_REQUIRED": "You must accept the code of conduct.",
       "EMAIL_NOT_VERIFIED": "Verify your email first.",
       "INVALID_EMAIL": "This email is not valid.",
       "INVALID_EMAIL_OR_PASSWORD": "Sign in failed. Incorrect email or password.",

@@ -82,6 +82,9 @@ model User {
   accounts        Account[]
   role            UserRole  @default(user)
 
+  codeOfConductAcceptedAt DateTime?
+  codeOfConductVersion    String?
+
   username        String? @db.VarChar(50)
   displayUsername String? @db.VarChar(50)
   profile         Profile?
