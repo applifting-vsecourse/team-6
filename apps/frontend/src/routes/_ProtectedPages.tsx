@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
 import { PageLayout } from "@/components/PageLayout"
@@ -7,6 +8,7 @@ import { Seo } from "@/components/Seo"
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
 import { AppHeader } from "@/features/auth/components/AppHeader"
 import { encodeRedirectUri } from "@/features/auth/lib/redirect"
+import { useKvintetMembership } from "@/features/kvintet/hooks/useKvintetMembership"
 
 export const Route = createFileRoute("/_ProtectedPages")({
   loader: async ({ context, location }) => {
@@ -22,10 +24,15 @@ export const Route = createFileRoute("/_ProtectedPages")({
 })
 
 function Layout() {
+  const { t } = useTranslation()
+  const { isMember } = useKvintetMembership()
+  // Members can't browse other kvintets; say so instead of letting the page bounce them.
+  const navDisabled = isMember ? { [ROUTES.kvintetFeed]: t("nav.kvintetFeedDisabled") } : undefined
+
   return (
     <>
       <Seo />
-      <PageLayout header={<AppHeader />}>
+      <PageLayout header={<AppHeader navDisabled={navDisabled} />}>
         <Outlet />
       </PageLayout>
     </>

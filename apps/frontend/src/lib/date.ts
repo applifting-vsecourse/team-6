@@ -16,6 +16,13 @@ export function formatLongDate(date: string | number | Date) {
   )
 }
 
+// "Python, SQL and Excel" / "Python, SQL a Excel"
+export function formatList(items: string[]) {
+  return new Intl.ListFormat(i18n.resolvedLanguage, { style: "long", type: "conjunction" }).format(
+    items,
+  )
+}
+
 export function formatNumber(value: number, options?: Intl.NumberFormatOptions) {
   return new Intl.NumberFormat(i18n.resolvedLanguage, options).format(value)
 }

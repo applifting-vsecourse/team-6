@@ -9,5 +9,12 @@ globalThis.ResizeObserver ??= class {
   disconnect = vi.fn()
 }
 
+// jsdom lacks the pointer-capture and scroll APIs Radix Select calls when it opens.
+Object.assign(Element.prototype, {
+  hasPointerCapture: () => false,
+  releasePointerCapture: () => undefined,
+  scrollIntoView: () => undefined,
+})
+
 // Tests assert on English text regardless of the machine's locale.
 await i18n.changeLanguage("en")

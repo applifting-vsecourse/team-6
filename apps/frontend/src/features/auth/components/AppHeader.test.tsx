@@ -49,6 +49,20 @@ describe("AppHeader", () => {
     expect(screen.queryByRole("navigation")).not.toBeInTheDocument()
   })
 
+  it("greys out a nav item that is unavailable and explains why in a tooltip", async () => {
+    useSession.mockReturnValue({ user: { id: "u1", name: "Jana Nováková", username: "jana" } })
+    render(<AppHeader navDisabled={{ "/kvintet/feed": "You are already in a proposal." }} />)
+
+    const item = screen.getByRole("link", { name: "Proposals" })
+    expect(item).toHaveAttribute("aria-disabled", "true")
+    expect(item).not.toHaveAttribute("href")
+    expect(screen.getByRole("link", { name: "Overview" })).toHaveAttribute("href", "/overview")
+
+    await userEvent.hover(item)
+
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("You are already in a proposal.")
+  })
+
   it("shows navigation and the mobile menu when signed in", () => {
     useSession.mockReturnValue({ user: { id: "u1", name: "Jana Nováková", username: "jana" } })
     render(<AppHeader />)
