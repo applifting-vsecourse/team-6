@@ -93,6 +93,11 @@ describe("ProposalKvintetView", () => {
     // Vote banner
     expect(screen.getByText("Start now?")).toBeInTheDocument()
     expect(screen.getByText("3 of 4 members want to start now.")).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        "The kvintet starts immediately once all members vote yes (1 needed). With 5 members, it forms automatically.",
+      ),
+    ).toBeInTheDocument()
 
     const voteButton = screen.getByRole("button", { name: "Yes, start now" })
     expect(voteButton).toBeInTheDocument()
@@ -118,5 +123,36 @@ describe("ProposalKvintetView", () => {
 
     // Leave proposal action
     expect(screen.getByRole("button", { name: "Leave proposal" })).toBeInTheDocument()
+  })
+
+  it("renders explanation when there are fewer than 3 members and voting hasn't started yet", () => {
+    const fewMembersKvintet: KvintetDetails = {
+      ...mockKvintet,
+      members: [mockKvintet.members[0]!],
+      voteStatus: {
+        canVote: false,
+        userHasVoted: false,
+        votedCount: 0,
+        totalCount: 1,
+      },
+    }
+
+    render(
+      <ProposalKvintetView
+        kvintet={fewMembersKvintet}
+        onVote={vi.fn()}
+        isVoting={false}
+        onLeave={vi.fn()}
+        isLeaving={false}
+      />,
+    )
+
+    expect(screen.getByText("Early start voting")).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        "Voting opens when 3 members join (currently 1 of 5). With 3 or 4 members, a kvintet can start early if everyone agrees. With 5 members, it forms automatically.",
+      ),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "Yes, start now" })).not.toBeInTheDocument()
   })
 })

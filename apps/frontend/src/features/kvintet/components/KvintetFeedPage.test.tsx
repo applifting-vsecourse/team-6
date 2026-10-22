@@ -104,14 +104,14 @@ describe("KvintetFeedPage", () => {
     expect(screen.queryByText("Couldn't load proposals")).not.toBeInTheDocument()
   })
 
-  it("joins a proposal, confirms and leaves for Overview", async () => {
+  it("joins a proposal, confirms and leaves for My kvintet", async () => {
     serve(() => Promise.resolve([kvintet("k1", "From Excel to Python")]))
     renderPage()
 
     await userEvent.click(await screen.findByRole("button", { name: "Join this proposal" }))
 
     expect(api.post).toHaveBeenCalledWith("kvintets/k1/members")
-    await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/overview" }))
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/kvintet" }))
     expect(toast.success).toHaveBeenCalledWith("You joined the proposal.")
   })
 
@@ -148,7 +148,7 @@ describe("starting a proposal", () => {
     expect(api.post).not.toHaveBeenCalled()
   })
 
-  it("creates the proposal and leaves for Overview", async () => {
+  it("creates the proposal and leaves for My kvintet", async () => {
     await openDialog()
 
     await userEvent.type(
@@ -164,7 +164,7 @@ describe("starting a proposal", () => {
         json: { title: "How to use AI in a small firm", categorySlug: "technology" },
       }),
     )
-    await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/overview" }))
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/kvintet" }))
     expect(toast.success).toHaveBeenCalledWith("Your proposal is open. Others can join it now.")
   })
 

@@ -173,8 +173,8 @@
     "namesHidden": "You will see the names once the kvintet forms.",
     "nextSteps": {
       "heading": "What happens next",
-      "step1": "With five members, the kvintet is formed automatically.",
-      "step2": "With three or four, it forms when everyone votes in favor.",
+      "step1": "With 3 or 4 members, the kvintet can start right away if everyone votes yes.",
+      "step2": "With 5 members, the kvintet forms automatically without voting.",
       "step3": "Then you'll see each other's names and the group chat opens."
     },
     "proposalSubtitle": "SUITS EVERYONE: {{preferences}}",
@@ -207,8 +207,12 @@
       "button": "Yes, start now",
       "countText": "{{voted}} of {{total}} members want to start now.",
       "hint": "Cast your vote too – or wait for the fifth member, then the kvintet forms automatically.",
+      "notStartedHint": "Voting opens when 3 members join (currently {{count}} of 5). With 3 or 4 members, a kvintet can start early if everyone agrees. With 5 members, it forms automatically.",
+      "notStartedTitle": "Early start voting",
+      "requirement": "The kvintet starts immediately once all members vote yes ({{remaining}} needed). With 5 members, it forms automatically.",
       "title": "Start now?",
       "voted": "Voted",
+      "votedHint": "Your vote has been recorded. Waiting for other members or a fifth member to join.",
       "voting": "Submitting…"
     }
   },

@@ -69,6 +69,7 @@ export function MobileMenu({ hasNav = false, navDisabled, account }: MobileMenuP
                 >
                   <Link
                     to={item.to}
+                    activeOptions={{ exact: true }}
                     className="flex items-center gap-2.5 border-b border-border py-4 font-serif text-xl font-semibold text-foreground before:hidden before:h-5 before:w-0.75 before:bg-foreground data-[status=active]:before:block"
                   >
                     {t(item.labelKey)}

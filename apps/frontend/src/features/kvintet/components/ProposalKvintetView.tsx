@@ -28,6 +28,7 @@ export function ProposalKvintetView({
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false)
 
   const canShowVoteBox = kvintet.members.length >= 3 && kvintet.members.length <= 4
+  const remainingVotes = Math.max(0, kvintet.voteStatus.totalCount - kvintet.voteStatus.votedCount)
 
   return (
     <div className="flex flex-col gap-8">
@@ -51,9 +52,9 @@ export function ProposalKvintetView({
       </div>
 
       {/* Vote banner */}
-      {canShowVoteBox && (
+      {canShowVoteBox ? (
         <div className="flex flex-col items-start justify-between gap-4 rounded-lg border border-primary/30 bg-card p-6 sm:flex-row sm:items-center">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1.5">
             <span className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
               {t("kvintet.vote.title")}
             </span>
@@ -63,7 +64,14 @@ export function ProposalKvintetView({
                 total: kvintet.voteStatus.totalCount,
               })}
             </p>
-            <p className="text-sm text-muted-foreground">{t("kvintet.vote.hint")}</p>
+            <p className="text-sm font-medium text-foreground/80">
+              {t("kvintet.vote.requirement", { remaining: remainingVotes })}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {kvintet.voteStatus.userHasVoted
+                ? t("kvintet.vote.votedHint")
+                : t("kvintet.vote.hint")}
+            </p>
           </div>
 
           <div className="shrink-0">
@@ -81,6 +89,17 @@ export function ProposalKvintetView({
               </Button>
             )}
           </div>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-1.5 rounded-lg border border-border bg-card/60 p-6">
+          <span className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
+            {t("kvintet.vote.notStartedTitle")}
+          </span>
+          <p className="text-sm text-muted-foreground">
+            {t("kvintet.vote.notStartedHint", {
+              count: kvintet.members.length,
+            })}
+          </p>
         </div>
       )}
 

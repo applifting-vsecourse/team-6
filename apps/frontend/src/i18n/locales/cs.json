@@ -177,9 +177,9 @@
     "namesHidden": "Jména uvidíte, až kvintet vznikne.",
     "nextSteps": {
       "heading": "Co bude dál",
-      "step1": "S pěti členy kvintet vznikne automaticky.",
-      "step2": "Se třemi nebo čtyřmi vznikne, když všichni hlasují pro.",
-      "step3": "Pak uvidíte svá jména a otevře se skupinový chat."
+      "step1": "Se 3 nebo 4 členy může kvintet začít hned, když všichni hlasují pro.",
+      "step2": "S 5 členy kvintet vznikne automaticky bez nutnosti hlasování.",
+      "step3": "Pak uvidíte vzájemná jména a otevře se skupinový chat."
     },
     "proposalSubtitle": "VŠEM VYHOVUJE: {{preferences}}",
     "seats": "{{filled}} z {{total}}",
@@ -211,8 +211,12 @@
       "button": "Ano, začít hned",
       "countText": "{{voted}} ze {{total}} členů chtějí začít hned.",
       "hint": "Hlasujte také – nebo počkejte na pátého člena, pak kvintet vznikne sám.",
+      "notStartedHint": "Hlasování o předčasném vzniku začne při 3 členech (nyní {{count}} z 5). Se 3 nebo 4 členy může kvintet začít dříve, pokud budou všichni pro. V 5 členech vznikne automaticky.",
+      "notStartedTitle": "Hlasování o předčasném vzniku",
+      "requirement": "Kvintet začne hned, jakmile budou všichni členové pro (zbývá ještě {{remaining}}). S 5 členy vznikne automaticky.",
       "title": "Začít hned?",
       "voted": "Hlasováno",
+      "votedHint": "Váš hlas byl zaznamenán. Čeká se na hlasy ostatních členů nebo na příchod 5. člena.",
       "voting": "Odesílání…"
     }
   },
