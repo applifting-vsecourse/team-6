@@ -34,9 +34,7 @@ export class ProfileService {
       (data.roles &&
         data.roles.length > 0 &&
         data.roles.some((r) => r.trim().length > 0)) ||
-      Boolean(data.position?.trim()) ||
-      Boolean(existing?.roles?.length) ||
-      Boolean(existing?.position?.trim());
+      Boolean(data.position?.trim());
     if (!hasRole) {
       throw new BadRequestException({
         code: 'PROFILE_ROLE_REQUIRED',
@@ -45,10 +43,7 @@ export class ProfileService {
     }
 
     const hasLocation =
-      (data.latitude != null && data.longitude != null) ||
-      Boolean(data.cityId) ||
-      (existing?.latitude != null && existing?.longitude != null) ||
-      Boolean(existing?.cityId);
+      (data.latitude != null && data.longitude != null) || Boolean(data.cityId);
     if (!hasLocation) {
       throw new BadRequestException({
         code: 'PROFILE_LOCATION_REQUIRED',
@@ -62,12 +57,7 @@ export class ProfileService {
       data.weekends ||
       data.mornings ||
       data.afternoons ||
-      data.evenings ||
-      existing?.weekdays ||
-      existing?.weekends ||
-      existing?.mornings ||
-      existing?.afternoons ||
-      existing?.evenings;
+      data.evenings;
     if (!hasAvailability) {
       throw new BadRequestException({
         code: 'PROFILE_AVAILABILITY_REQUIRED',
@@ -77,7 +67,9 @@ export class ProfileService {
     }
 
     const hasFrequency = Boolean(
-      data.meetingFrequency ?? existing?.meetingFrequency,
+      data.meetingFrequency !== undefined
+        ? data.meetingFrequency
+        : existing?.meetingFrequency,
     );
     if (!hasFrequency) {
       throw new BadRequestException({

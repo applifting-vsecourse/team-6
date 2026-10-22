@@ -142,12 +142,12 @@ describe('ProfileService', () => {
     expect(repository.saveProfile).toHaveBeenCalled();
   });
 
-  it('throws BadRequestException when already-onboarded user saves incomplete profile with completeOnboarding false', async (): Promise<void> => {
+  it('throws BadRequestException when already-onboarded user saves profile without roles', async (): Promise<void> => {
     const existingOnboarded = new ProfileEntity(
       'u1',
       'Engineer',
       null,
-      null,
+      MeetingFrequency.WEEKLY,
       true,
       false,
       false,
@@ -162,10 +162,102 @@ describe('ProfileService', () => {
     );
     repository.findByUserId.mockResolvedValue(existingOnboarded);
 
-    await expect(
-      service.saveProfile('u1', {
+    try {
+      await service.saveProfile('u1', {
         position: '',
         roles: [],
+        teachTagIds: [],
+        learnTagIds: [],
+        interestTagIds: [],
+        weekdays: true,
+        weekends: false,
+        mornings: true,
+        afternoons: false,
+        evenings: false,
+        cityId: 'c1',
+        radiusKm: 25,
+        completeOnboarding: false,
+      });
+      fail('Expected BadRequestException');
+    } catch (err) {
+      expect(err).toBeInstanceOf(BadRequestException);
+      expect((err as BadRequestException).getResponse()).toEqual(
+        expect.objectContaining({ code: 'PROFILE_ROLE_REQUIRED' }),
+      );
+    }
+  });
+
+  it('throws BadRequestException when already-onboarded user saves profile without location', async (): Promise<void> => {
+    const existingOnboarded = new ProfileEntity(
+      'u1',
+      'Engineer',
+      null,
+      MeetingFrequency.WEEKLY,
+      true,
+      false,
+      false,
+      false,
+      false,
+      'c1',
+      'Praha',
+      25,
+      null,
+      new Date('2026-10-21T12:00:00Z'),
+      [],
+    );
+    repository.findByUserId.mockResolvedValue(existingOnboarded);
+
+    try {
+      await service.saveProfile('u1', {
+        position: 'Engineer',
+        roles: ['software-engineer'],
+        teachTagIds: [],
+        learnTagIds: [],
+        interestTagIds: [],
+        weekdays: true,
+        weekends: false,
+        mornings: true,
+        afternoons: false,
+        evenings: false,
+        cityId: null,
+        latitude: null,
+        longitude: null,
+        radiusKm: 25,
+        completeOnboarding: false,
+      });
+      fail('Expected BadRequestException');
+    } catch (err) {
+      expect(err).toBeInstanceOf(BadRequestException);
+      expect((err as BadRequestException).getResponse()).toEqual(
+        expect.objectContaining({ code: 'PROFILE_LOCATION_REQUIRED' }),
+      );
+    }
+  });
+
+  it('throws BadRequestException when already-onboarded user saves profile without availability', async (): Promise<void> => {
+    const existingOnboarded = new ProfileEntity(
+      'u1',
+      'Engineer',
+      null,
+      MeetingFrequency.WEEKLY,
+      true,
+      false,
+      false,
+      false,
+      false,
+      'c1',
+      'Praha',
+      25,
+      null,
+      new Date('2026-10-21T12:00:00Z'),
+      [],
+    );
+    repository.findByUserId.mockResolvedValue(existingOnboarded);
+
+    try {
+      await service.saveProfile('u1', {
+        position: 'Engineer',
+        roles: ['software-engineer'],
         teachTagIds: [],
         learnTagIds: [],
         interestTagIds: [],
@@ -174,11 +266,17 @@ describe('ProfileService', () => {
         mornings: false,
         afternoons: false,
         evenings: false,
-        cityId: null,
-        radiusKm: null,
+        cityId: 'c1',
+        radiusKm: 25,
         completeOnboarding: false,
-      }),
-    ).rejects.toThrow(BadRequestException);
+      });
+      fail('Expected BadRequestException');
+    } catch (err) {
+      expect(err).toBeInstanceOf(BadRequestException);
+      expect((err as BadRequestException).getResponse()).toEqual(
+        expect.objectContaining({ code: 'PROFILE_AVAILABILITY_REQUIRED' }),
+      );
+    }
   });
 
   it('allows already-onboarded user to update profile when required fields are preserved', async (): Promise<void> => {
