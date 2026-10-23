@@ -58,7 +58,7 @@ Kvintet shows no photos, so every person is represented by a generated avatar fr
 
 - **Seed:** the user's `username`, falling back to `id` when there is none. Use the same seed everywhere, or one person turns into two faces. Never seed from the e-mail (it is private).
 - **Static by default.** A static blobatar is one `<img>`; an animated one is ~12 SVG nodes. Lists and chat (many avatars, small) stay static.
-- **Animation is opt-in, through `GazeBlobatar`** (`features/auth/components/`): its eyes follow the cursor. One large avatar (sign-up preview, profile header) uses `animate="always"`; the single nav-bar avatar uses `animate="hover"` with a larger `travel`. Never animate avatars in a list or chat. It switches itself off for `prefers-reduced-motion` and on touch.
+- **Animation is opt-in, through `GazeBlobatar`** (`components/`): its eyes follow the cursor. One large avatar (sign-up preview, profile header) uses `animate="always"`; the single nav-bar avatar uses `animate="hover"` with a larger `travel`. Never animate avatars in a list or chat. It switches itself off for `prefers-reduced-motion` and on touch.
 - **Decorative by default** (no alt text) because the name is written next to it. If an avatar stands alone, pass `blobatar={{ title: name }}`.
 - **Tests:** jsdom lacks `matchMedia`/`ResizeObserver`, so a test that renders `GazeBlobatar` mocks `@blobatar/react/gaze` (see `SignUpForm.test.tsx`).
 

@@ -210,18 +210,31 @@ model Kvintet {
   createdAt   DateTime        @default(now())
   activatedAt DateTime?
   members     KvintetMember[]
+  votes       KvintetVote[]
 
   @@index([status, createdAt])
   @@map("kvintet")
 }
 
 model KvintetMember {
-  kvintetId String   @db.Uuid
-  kvintet   Kvintet  @relation(fields: [kvintetId], references: [id], onDelete: Cascade)
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  joinedAt  DateTime @default(now())
+  kvintetId String       @db.Uuid
+  kvintet   Kvintet      @relation(fields: [kvintetId], references: [id], onDelete: Cascade)
+  userId    String       @unique
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt  DateTime     @default(now())
+  vote      KvintetVote?
 
   @@id([kvintetId, userId])
   @@map("kvintet_member")
+}
+
+model KvintetVote {
+  kvintetId String        @db.Uuid
+  userId    String
+  createdAt DateTime      @default(now())
+  kvintet   Kvintet       @relation(fields: [kvintetId], references: [id], onDelete: Cascade)
+  member    KvintetMember @relation(fields: [kvintetId, userId], references: [kvintetId, userId], onDelete: Cascade)
+
+  @@id([kvintetId, userId])
+  @@map("kvintet_vote")
 }

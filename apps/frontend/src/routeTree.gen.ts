@@ -16,6 +16,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ProtectedPagesOnboardingRouteImport } from './routes/_ProtectedPages/onboarding'
 import { Route as ProtectedPagesOverviewRouteImport } from './routes/_ProtectedPages/overview'
+import { Route as ProtectedPagesKvintetIndexRouteImport } from './routes/_ProtectedPages/kvintet.index'
 import { Route as ProtectedPagesKvintetFeedRouteImport } from './routes/_ProtectedPages/kvintet.feed'
 
 const IndexRoute = IndexRouteImport.update({
@@ -53,6 +54,12 @@ const ProtectedPagesOverviewRoute = ProtectedPagesOverviewRouteImport.update({
   path: '/overview',
   getParentRoute: () => ProtectedPagesRoute,
 } as any)
+const ProtectedPagesKvintetIndexRoute =
+  ProtectedPagesKvintetIndexRouteImport.update({
+    id: '/kvintet/',
+    path: '/kvintet/',
+    getParentRoute: () => ProtectedPagesRoute,
+  } as any)
 const ProtectedPagesKvintetFeedRoute =
   ProtectedPagesKvintetFeedRouteImport.update({
     id: '/kvintet/feed',
@@ -68,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof ProtectedPagesOnboardingRoute
   '/overview': typeof ProtectedPagesOverviewRoute
   '/kvintet/feed': typeof ProtectedPagesKvintetFeedRoute
+  '/kvintet/': typeof ProtectedPagesKvintetIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -77,6 +85,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof ProtectedPagesOnboardingRoute
   '/overview': typeof ProtectedPagesOverviewRoute
   '/kvintet/feed': typeof ProtectedPagesKvintetFeedRoute
+  '/kvintet': typeof ProtectedPagesKvintetIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -88,6 +97,7 @@ export interface FileRoutesById {
   '/_ProtectedPages/onboarding': typeof ProtectedPagesOnboardingRoute
   '/_ProtectedPages/overview': typeof ProtectedPagesOverviewRoute
   '/_ProtectedPages/kvintet/feed': typeof ProtectedPagesKvintetFeedRoute
+  '/_ProtectedPages/kvintet/': typeof ProtectedPagesKvintetIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/overview'
     | '/kvintet/feed'
+    | '/kvintet/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/overview'
     | '/kvintet/feed'
+    | '/kvintet'
   id:
     | '__root__'
     | '/'
@@ -118,6 +130,7 @@ export interface FileRouteTypes {
     | '/_ProtectedPages/onboarding'
     | '/_ProtectedPages/overview'
     | '/_ProtectedPages/kvintet/feed'
+    | '/_ProtectedPages/kvintet/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -179,6 +192,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedPagesOverviewRouteImport
       parentRoute: typeof ProtectedPagesRoute
     }
+    '/_ProtectedPages/kvintet/': {
+      id: '/_ProtectedPages/kvintet/'
+      path: '/kvintet'
+      fullPath: '/kvintet/'
+      preLoaderRoute: typeof ProtectedPagesKvintetIndexRouteImport
+      parentRoute: typeof ProtectedPagesRoute
+    }
     '/_ProtectedPages/kvintet/feed': {
       id: '/_ProtectedPages/kvintet/feed'
       path: '/kvintet/feed'
@@ -193,12 +213,14 @@ interface ProtectedPagesRouteChildren {
   ProtectedPagesOnboardingRoute: typeof ProtectedPagesOnboardingRoute
   ProtectedPagesOverviewRoute: typeof ProtectedPagesOverviewRoute
   ProtectedPagesKvintetFeedRoute: typeof ProtectedPagesKvintetFeedRoute
+  ProtectedPagesKvintetIndexRoute: typeof ProtectedPagesKvintetIndexRoute
 }
 
 const ProtectedPagesRouteChildren: ProtectedPagesRouteChildren = {
   ProtectedPagesOnboardingRoute: ProtectedPagesOnboardingRoute,
   ProtectedPagesOverviewRoute: ProtectedPagesOverviewRoute,
   ProtectedPagesKvintetFeedRoute: ProtectedPagesKvintetFeedRoute,
+  ProtectedPagesKvintetIndexRoute: ProtectedPagesKvintetIndexRoute,
 }
 
 const ProtectedPagesRouteWithChildren = ProtectedPagesRoute._addFileChildren(

@@ -1,8 +1,12 @@
-import { OpenKvintet } from '@/modules/kvintet/domain/kvintet';
+import { KvintetDetails, OpenKvintet } from '@/modules/kvintet/domain/kvintet';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
 import { KvintetService } from '@/modules/kvintet/services/kvintet.service';
 import { ValidationFailedException } from '@/shared/errors/validation.pipe';
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { mock } from 'jest-mock-extended';
 
 const member = (
@@ -161,5 +165,162 @@ describe('KvintetService.join', () => {
 
     expect(error).toBeInstanceOf(ConflictException);
     expect(conflictCode(error)).toBe(code);
+  });
+});
+
+describe('KvintetService.getMyKvintet', () => {
+  const mockDetails: KvintetDetails = {
+    id: 'k1',
+    title: 'AI v práci',
+    status: 'FORMING',
+    createdAt: new Date('2026-10-21T10:00:00Z'),
+    activatedAt: null,
+    commonPreferences: {
+      city: 'Praha',
+      meetingFrequency: 'BIWEEKLY',
+      weekdays: true,
+      weekends: false,
+      mornings: false,
+      afternoons: false,
+      evenings: true,
+    },
+    capacity: 5,
+    openSeatsCount: 1,
+    members: [
+      {
+        userId: 'u1',
+        name: 'Jana Nováková',
+        username: 'jana',
+        role: 'Marketingová specialistka',
+        teachTags: ['Excel'],
+        learnTags: ['Python'],
+        interestTags: ['Turistika'],
+        hasVoted: false,
+        isCurrentUser: true,
+      },
+    ],
+    voteStatus: {
+      canVote: true,
+      userHasVoted: false,
+      votedCount: 3,
+      totalCount: 4,
+    },
+  };
+
+  it('returns kvintet details if caller is a member', async (): Promise<void> => {
+    const { repository, service } = setup();
+    repository.findKvintetDetailsByUserId.mockResolvedValue(mockDetails);
+
+    const result = await service.getMyKvintet('u1');
+
+    expect(result).toEqual(mockDetails);
+    expect(repository.findKvintetDetailsByUserId).toHaveBeenCalledWith('u1');
+  });
+
+  it('throws 403 Forbidden if caller has no kvintet', async (): Promise<void> => {
+    const { repository, service } = setup();
+    repository.findKvintetDetailsByUserId.mockResolvedValue(null);
+
+    await expect(service.getMyKvintet('u1')).rejects.toThrow(
+      ForbiddenException,
+    );
+  });
+});
+
+describe('KvintetService.vote', () => {
+  const mockDetails: KvintetDetails = {
+    id: 'k1',
+    title: 'AI v práci',
+    status: 'FORMING',
+    createdAt: new Date('2026-10-21T10:00:00Z'),
+    activatedAt: null,
+    commonPreferences: {
+      city: 'Praha',
+      meetingFrequency: 'BIWEEKLY',
+      weekdays: true,
+      weekends: false,
+      mornings: false,
+      afternoons: false,
+      evenings: true,
+    },
+    capacity: 5,
+    openSeatsCount: 1,
+    members: [],
+    voteStatus: {
+      canVote: true,
+      userHasVoted: false,
+      votedCount: 3,
+      totalCount: 4,
+    },
+  };
+
+  it('casts vote and returns updated details', async (): Promise<void> => {
+    const { repository, service } = setup();
+    repository.findMembership.mockResolvedValue({
+      kvintetId: 'k1',
+      userId: 'u1',
+      joinedAt: new Date(),
+      kvintet: {} as never,
+    });
+    repository.vote.mockResolvedValue(undefined);
+    repository.findKvintetDetailsByUserId.mockResolvedValue({
+      ...mockDetails,
+      voteStatus: {
+        ...mockDetails.voteStatus,
+        votedCount: 4,
+        userHasVoted: true,
+      },
+    });
+
+    const result = await service.vote('u1');
+
+    expect(repository.vote).toHaveBeenCalledWith('k1', 'u1');
+    expect(result.voteStatus.votedCount).toBe(4);
+  });
+
+  it('throws 403 Forbidden if user is not in a kvintet', async (): Promise<void> => {
+    const { repository, service } = setup();
+    repository.findMembership.mockResolvedValue(null);
+
+    await expect(service.vote('u1')).rejects.toThrow(ForbiddenException);
+  });
+
+  it('throws 404 if kvintet details disappear after vote', async (): Promise<void> => {
+    const { repository, service } = setup();
+    repository.findMembership.mockResolvedValue({
+      kvintetId: 'k1',
+      userId: 'u1',
+      joinedAt: new Date(),
+      kvintet: {} as never,
+    });
+    repository.vote.mockResolvedValue(undefined);
+    repository.findKvintetDetailsByUserId.mockResolvedValue(null);
+
+    await expect(service.vote('u1')).rejects.toThrow(NotFoundException);
+  });
+});
+
+describe('KvintetService.leave', () => {
+  it('removes member from kvintet', async (): Promise<void> => {
+    const { repository, service } = setup();
+    repository.findMembership.mockResolvedValue({
+      kvintetId: 'k1',
+      userId: 'u1',
+      joinedAt: new Date(),
+      kvintet: {} as never,
+    });
+    repository.leave.mockResolvedValue(undefined);
+
+    const result = await service.leave('u1');
+
+    expect(repository.leave).toHaveBeenCalledWith('k1', 'u1');
+    expect(result).toEqual({ success: true });
+  });
+
+  it('throws 403 Forbidden if caller has no kvintet', async (): Promise<void> => {
+    const { repository, service } = setup();
+    repository.findMembership.mockResolvedValue(null);
+
+    await expect(service.leave('u1')).rejects.toThrow(ForbiddenException);
   });
 });

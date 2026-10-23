@@ -1,5 +1,6 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
 
@@ -28,6 +29,7 @@ describe('KvintetRepository (Postgres)', () => {
       data: {
         id,
         name: id,
+        username: id,
         email: `${id}@example.com`,
         emailVerified: true,
         createdAt: now,
@@ -188,5 +190,158 @@ describe('KvintetRepository (Postgres)', () => {
         },
       ],
     });
+  });
+
+  it('retrieves kvintet details, votes, and leaves', async () => {
+    const users = await createUsers(3, 'voting');
+    const kvintetId = await createKvintet(users);
+
+    const details = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(details).not.toBeNull();
+    expect(details?.id).toBe(kvintetId);
+    expect(details?.status).toBe('FORMING');
+    expect(details?.members).toHaveLength(3);
+    expect(details?.voteStatus.canVote).toBe(true);
+    expect(details?.voteStatus.userHasVoted).toBe(false);
+
+    // Vote user 0
+    await repository.vote(kvintetId, users[0]);
+    const afterVote0 = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(afterVote0?.voteStatus.votedCount).toBe(1);
+    expect(afterVote0?.voteStatus.userHasVoted).toBe(true);
+    expect(afterVote0?.status).toBe('FORMING');
+
+    // Vote user 1
+    await repository.vote(kvintetId, users[1]);
+
+    // Vote user 2 - should activate since all 3 voted
+    await repository.vote(kvintetId, users[2]);
+    const afterVoteAll = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(afterVoteAll?.status).toBe('ACTIVE');
+    expect(afterVoteAll?.activatedAt).not.toBeNull();
+
+    // Leave user 0
+    await repository.leave(kvintetId, users[0]);
+    const afterLeave0 = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(afterLeave0).toBeNull();
+
+    const forUser1 = await repository.findKvintetDetailsByUserId(users[1]);
+    expect(forUser1?.members).toHaveLength(2);
+  });
+
+  it('rejects voting when kvintet is already ACTIVE', async () => {
+    const users = await createUsers(3, 'vote-active');
+    const kvintetId = await createKvintet(users);
+
+    await repository.vote(kvintetId, users[0]);
+    await repository.vote(kvintetId, users[1]);
+    await repository.vote(kvintetId, users[2]);
+
+    await expect(repository.vote(kvintetId, users[0])).rejects.toThrow(
+      BadRequestException,
+    );
+  });
+
+  it('rejects voting when proposal has fewer than 3 members', async () => {
+    const users = await createUsers(2, 'vote-few');
+    const kvintetId = await createKvintet(users);
+
+    await expect(repository.vote(kvintetId, users[0])).rejects.toThrow(
+      BadRequestException,
+    );
+  });
+
+  it('rejects double voting by the same user', async () => {
+    const users = await createUsers(3, 'double-vote');
+    const kvintetId = await createKvintet(users);
+
+    await repository.vote(kvintetId, users[0]);
+
+    await expect(repository.vote(kvintetId, users[0])).rejects.toThrow(
+      ConflictException,
+    );
+  });
+
+  it('lets a member leave an ACTIVE kvintet, which stays ACTIVE with the rest', async () => {
+    const users = await createUsers(4, 'active-leave');
+    const kvintetId = await createKvintet(users);
+    for (const user of users) await repository.vote(kvintetId, user);
+
+    await repository.leave(kvintetId, users[0]);
+
+    expect(await repository.findKvintetDetailsByUserId(users[0])).toBeNull();
+    const remaining = await repository.findKvintetDetailsByUserId(users[1]);
+    expect(remaining?.status).toBe('ACTIVE');
+    expect(remaining?.members).toHaveLength(3);
+  });
+
+  it('deletes kvintet when the last member leaves', async () => {
+    const users = await createUsers(1, 'last-leave');
+    const kvintetId = await createKvintet(users);
+
+    await repository.leave(kvintetId, users[0]);
+
+    const kvintet = await prisma.kvintet.findUnique({
+      where: { id: kvintetId },
+    });
+    expect(kvintet).toBeNull();
+  });
+
+  it('clears votes when a member leaves, so the old roster cannot activate the kvintet', async () => {
+    const users = await createUsers(4, 'leave-reset');
+    const kvintetId = await createKvintet(users);
+
+    await repository.vote(kvintetId, users[0]);
+    await repository.vote(kvintetId, users[1]);
+    await repository.vote(kvintetId, users[2]);
+
+    // 4th member leaves (unvoted): the remaining 3 voted for a group of 4
+    await repository.leave(kvintetId, users[3]);
+
+    const afterLeave = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(afterLeave?.status).toBe('FORMING');
+    expect(afterLeave?.members).toHaveLength(3);
+    expect(afterLeave?.voteStatus.votedCount).toBe(0);
+    expect(afterLeave?.voteStatus.userHasVoted).toBe(false);
+  });
+
+  it('does not let votes for the old roster start a kvintet after a leave and a re-join', async () => {
+    const users = await createUsers(4, 'leave-join');
+    const kvintetId = await createKvintet(users.slice(0, 3));
+
+    await repository.vote(kvintetId, users[0]);
+    await repository.vote(kvintetId, users[1]);
+    await repository.leave(kvintetId, users[2]);
+    await repository.join(users[3], kvintetId);
+
+    // users[0] and users[1] never agreed to users[3]: one vote is not enough
+    await repository.vote(kvintetId, users[3]);
+
+    const details = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(details?.status).toBe('FORMING');
+    expect(details?.voteStatus.votedCount).toBe(1);
+  });
+
+  it("hides other members' names while FORMING and shows them once ACTIVE", async () => {
+    const users = await createUsers(3, 'names');
+    const kvintetId = await createKvintet(users);
+
+    const forming = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(forming?.status).toBe('FORMING');
+    for (const member of forming?.members ?? []) {
+      expect(member.name).toBe(member.isCurrentUser ? users[0] : null);
+      expect(member.username).toBeNull();
+    }
+
+    for (const user of users) await repository.vote(kvintetId, user);
+
+    const active = await repository.findKvintetDetailsByUserId(users[0]);
+    expect(active?.status).toBe('ACTIVE');
+    expect(active?.members.map((m) => m.name).sort()).toEqual(
+      [...users].sort(),
+    );
+    expect(active?.members.map((m) => m.username).sort()).toEqual(
+      [...users].sort(),
+    );
   });
 });

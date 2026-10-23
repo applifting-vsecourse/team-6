@@ -102,17 +102,40 @@
     "validation_failed": "Some of the entered values are not valid."
   },
   "kvintet": {
+    "actions": {
+      "leaveKvintet": "Leave kvintet",
+      "leaveKvintetHint": "If fewer than three members remain, the kvintet will be disbanded.",
+      "leaveProposal": "Leave proposal",
+      "leaveProposalHint": "You can only be in one proposal at a time. When someone joins or leaves, everyone's votes are reset.",
+      "reportIssue": "Report an issue",
+      "reportIssueHint": "Opens an email to support. Reports are confidential."
+    },
+    "activeSubtitle": "FORMED ON {{date}} · {{count}} MEMBERS",
+    "activeSubtitleWithPreferences": "FORMED ON {{date}} · {{count}} MEMBERS · SUITS EVERYONE: {{preferences}}",
     "alreadyMember": "You are already in a proposal.",
+    "chat": {
+      "comingSoon": "Group chat will be available soon.",
+      "description": "Arrange your first meeting in the group chat.",
+      "heading": "Group chat",
+      "openMessages": "Open messages"
+    },
     "count_one": "{{formatted}} proposal",
     "count_other": "{{formatted}} proposals",
+    "diagram": {
+      "memberNumber": "Member {{number}}"
+    },
     "dialog": {
       "cancel": "Cancel",
       "category": "Category",
       "categoryHint": "Others find the proposal by category in the filter.",
       "categoryPlaceholder": "Choose a category",
+      "confirmLeave": "Leave",
       "description": "You will be its first member. Others will see the topic, your role and tags – not your name.",
       "details": "Short description (optional)",
       "detailsPlaceholder": "e.g. I run a 10-person agency and want to share what works for us.",
+      "leaveActiveConfirm": "You will leave the active kvintet. If fewer than 3 members remain, the kvintet will be disbanded.",
+      "leaveProposalConfirm": "You will leave this proposal. When someone joins or leaves, everyone's votes are reset.",
+      "leaveTitle": "Are you sure you want to leave?",
       "submit": "Start proposal",
       "title": "Start a new proposal",
       "topic": "Topic or problem",
@@ -121,6 +144,11 @@
     "empty": {
       "text": "Proposals that fit your profile will show up here.",
       "title": "No proposals for you yet"
+    },
+    "emptyState": {
+      "description": "Your group will appear here once you join a proposal.",
+      "title": "You are not in any kvintet yet",
+      "viewProposals": "Browse proposals"
     },
     "error": {
       "retry": "Try again",
@@ -133,7 +161,35 @@
     "learns": "Wants to learn: {{tags}}",
     "loading": "Loading proposals…",
     "member": "Member",
+    "members": {
+      "capacity": "{{count}} of 5",
+      "heading": "Members",
+      "namesHiddenHint": "You will see names once the kvintet is formed.",
+      "notVoted": "Not voted",
+      "openSeat": "Open seat",
+      "teaches": "Teaches {{tags}}",
+      "votedYes": "For",
+      "waitingForFifth": "Waiting for the fifth member.",
+      "waitingForMember": "Waiting for another member.",
+      "wantsToLearn": "wants to learn {{tags}}",
+      "you": "(you)"
+    },
+    "myKvintetTitle": "My kvintet",
     "namesHidden": "You will see the names once the kvintet forms.",
+    "nextSteps": {
+      "heading": "What happens next",
+      "step1": "With 3 or 4 members, the kvintet can start right away if everyone votes yes.",
+      "step2": "With 5 members, the kvintet forms automatically without voting.",
+      "step3": "Then you'll see each other's names and the group chat opens."
+    },
+    "preferences": {
+      "afternoons": "Afternoons",
+      "evenings": "Evenings",
+      "mornings": "Mornings",
+      "weekdays": "Weekdays",
+      "weekends": "Weekends"
+    },
+    "proposalSubtitle": "SUITS EVERYONE: {{preferences}}",
     "seats": "{{filled}} of {{total}}",
     "startOwn": {
       "button": "Start a new proposal",
@@ -141,8 +197,14 @@
       "title": "Nothing fits?"
     },
     "started": "Your proposal is open. Others can join it now.",
+    "statusActive": "Active kvintet",
+    "statusProposal": "Proposal · {{count}} of 5",
     "subtitle": "Every group that fits your profile. Choose by topic – you can only be in one proposal at a time.",
     "suitsAll": "Suits everyone: {{value}}",
+    "table": {
+      "description": "Arrange your first meeting in the group chat. You run the kvintet yourselves – no facilitator, no ratings.",
+      "title": "Five people, <em className=\"italic\">one table.</em>"
+    },
     "teaches": "Teaches: {{tags}}",
     "title": "Proposals for you",
     "vacancy": "Free seat",
@@ -152,6 +214,18 @@
       "descriptionTooLong": "The description can be at most {{max}} characters",
       "titleRequired": "Enter a topic",
       "titleTooLong": "The topic can be at most {{max}} characters"
+    },
+    "vote": {
+      "button": "Yes, start now",
+      "countText": "{{voted}} of {{total}} members want to start now.",
+      "hint": "Cast your vote too – or wait for the fifth member, then the kvintet forms automatically.",
+      "notStartedHint": "Voting opens when 3 members join (currently {{count}} of 5). With 3 or 4 members, a kvintet can start early if everyone agrees. With 5 members, it forms automatically.",
+      "notStartedTitle": "Early start voting",
+      "requirement": "The kvintet starts immediately once all members vote yes ({{remaining}} needed). With 5 members, it forms automatically.",
+      "title": "Start now?",
+      "voted": "Voted",
+      "votedHint": "Your vote has been recorded. Waiting for other members or a fifth member to join. If anyone joins or leaves, votes reset and everyone votes again.",
+      "voting": "Submitting…"
     }
   },
   "landing": {
@@ -183,6 +257,7 @@
   "nav": {
     "kvintetFeed": "Proposals",
     "kvintetFeedDisabled": "You are already in a kvintet, so you can't browse other proposals.",
+    "myKvintet": "My kvintet",
     "overview": "Overview"
   },
   "onboarding": {

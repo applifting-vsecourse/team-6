@@ -1,12 +1,14 @@
 import {
   FeedItem,
   KVINTET_CAPACITY,
+  KvintetDetails,
   NewKvintet,
 } from '@/modules/kvintet/domain/kvintet';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
 import { ValidationFailedException } from '@/shared/errors/validation.pipe';
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -73,5 +75,57 @@ export class KvintetService {
         message: 'The kvintet is full or no longer open',
       });
     }
+  }
+
+  async getMyKvintet(userId: string): Promise<KvintetDetails> {
+    const details = await this.repository.findKvintetDetailsByUserId(userId);
+
+    if (!details) {
+      throw new ForbiddenException({
+        statusCode: 403,
+        code: 'forbidden',
+        message: 'Caller is not a member of any kvintet',
+      });
+    }
+
+    return details;
+  }
+
+  async vote(userId: string): Promise<KvintetDetails> {
+    const membership = await this.repository.findMembership(userId);
+    if (!membership) {
+      throw new ForbiddenException({
+        statusCode: 403,
+        code: 'forbidden',
+        message: 'Caller is not a member of any kvintet',
+      });
+    }
+
+    await this.repository.vote(membership.kvintetId, userId);
+    const updated = await this.repository.findKvintetDetailsByUserId(userId);
+
+    if (!updated) {
+      throw new NotFoundException({
+        statusCode: 404,
+        code: 'not_found',
+        message: 'Kvintet not found after voting',
+      });
+    }
+
+    return updated;
+  }
+
+  async leave(userId: string): Promise<{ success: boolean }> {
+    const membership = await this.repository.findMembership(userId);
+    if (!membership) {
+      throw new ForbiddenException({
+        statusCode: 403,
+        code: 'forbidden',
+        message: 'Caller is not a member of any kvintet',
+      });
+    }
+
+    await this.repository.leave(membership.kvintetId, userId);
+    return { success: true };
   }
 }
