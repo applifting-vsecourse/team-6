@@ -27,11 +27,18 @@ export class KvintetService {
     return { isMember: await this.repository.isMember(userId) };
   }
 
-  async feed(userId: string): Promise<FeedItem[]> {
+  async feed(userId: string, categorySlug?: string): Promise<FeedItem[]> {
     // The feed never lists the caller's own kvintet; the client sends them elsewhere.
     if (await this.repository.isMember(userId)) throw alreadyInKvintet();
 
-    const kvintets = await this.repository.findOpenKvintets();
+    // An unknown slug is a client error, not an empty feed.
+    if (categorySlug && !(await this.repository.categoryExists(categorySlug))) {
+      throw new ValidationFailedException([
+        { field: 'category', code: 'isIn' },
+      ]);
+    }
+
+    const kvintets = await this.repository.findOpenKvintets(categorySlug);
     return kvintets.map((kvintet) => {
       const frequencies = new Set(
         kvintet.members.map((member) => member.meetingFrequency),

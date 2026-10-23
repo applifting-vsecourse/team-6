@@ -149,6 +149,11 @@
       "text": "Tady se objeví návrhy, které odpovídají vašemu profilu.",
       "title": "Zatím pro vás nemáme žádný návrh"
     },
+    "emptyFiltered": {
+      "showAll": "Zrušit filtr",
+      "text": "Zkuste jinou kategorii, nebo založte vlastní návrh v této kategorii.",
+      "title": "V kategorii {{category}} zatím není žádný návrh"
+    },
     "emptyState": {
       "description": "Vaše skupina se tu objeví, až se přidáte k návrhu.",
       "title": "Zatím nejste v žádném kvintetu",
@@ -158,6 +163,10 @@
       "retry": "Zkusit znovu",
       "text": "Na naší straně se něco pokazilo. Zkuste to prosím znovu.",
       "title": "Návrhy se nepodařilo načíst"
+    },
+    "filter": {
+      "all": "Vše",
+      "label": "Kategorie"
     },
     "interests": "Zájmy: {{tags}}",
     "join": "Přidat se k návrhu",

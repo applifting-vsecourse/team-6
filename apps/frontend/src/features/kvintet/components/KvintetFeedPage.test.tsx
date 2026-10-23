@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { render, screen, waitFor } from "@testing-library/react"
+import { render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { HTTPError } from "ky"
 import { toast } from "sonner"
@@ -45,12 +45,17 @@ const serve = (feed: () => Promise<unknown>) =>
         ({ json: () => (path === "reference" ? Promise.resolve(reference) : feed()) }) as never,
     )
 
-const renderPage = () =>
+const onCategoryChange = vi.fn()
+
+const renderPage = (category?: string) =>
   render(
     <QueryClientProvider
       client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
     >
-      <KvintetFeedPage />
+      <KvintetFeedPage
+        category={category}
+        onCategoryChange={onCategoryChange}
+      />
     </QueryClientProvider>,
   )
 
@@ -126,6 +131,81 @@ describe("KvintetFeedPage", () => {
       expect(toast.error).toHaveBeenCalledWith("This proposal is full or no longer open."),
     )
     expect(navigate).not.toHaveBeenCalled()
+  })
+})
+
+describe("category filter", () => {
+  const feedRequests = () =>
+    vi.mocked(api.get).mock.calls.filter(([path]) => path === "kvintets/feed")
+
+  it("offers every category after All, with All selected by default", async () => {
+    serve(() => Promise.resolve([kvintet("k1", "From Excel to Python")]))
+    renderPage()
+
+    expect(await screen.findByRole("radio", { name: "All" })).toHaveAttribute("data-state", "on")
+    expect(screen.getByRole("radio", { name: "Technology" })).toHaveAttribute("data-state", "off")
+    expect(screen.getByRole("radio", { name: "Languages" })).toHaveAttribute("data-state", "off")
+  })
+
+  it("asks the server for the selected category", async () => {
+    serve(() => Promise.resolve([kvintet("k1", "Spanish")]))
+    renderPage("languages")
+
+    expect(await screen.findByRole("heading", { name: "Spanish" })).toBeInTheDocument()
+    expect(screen.getByRole("radio", { name: "Languages" })).toHaveAttribute("data-state", "on")
+    expect(feedRequests()).toEqual([["kvintets/feed", { searchParams: { category: "languages" } }]])
+  })
+
+  it("reports the chosen chip, and undefined for All", async () => {
+    serve(() => Promise.resolve([kvintet("k1", "Spanish")]))
+    renderPage("languages")
+
+    await userEvent.click(await screen.findByRole("radio", { name: "Technology" }))
+    expect(onCategoryChange).toHaveBeenLastCalledWith("technology")
+
+    await userEvent.click(screen.getByRole("radio", { name: "All" }))
+    expect(onCategoryChange).toHaveBeenLastCalledWith(undefined)
+  })
+
+  it("keeps the selection when the selected chip is pressed again", async () => {
+    serve(() => Promise.resolve([kvintet("k1", "Spanish")]))
+    renderPage("languages")
+
+    await userEvent.click(await screen.findByRole("radio", { name: "Languages" }))
+
+    expect(onCategoryChange).not.toHaveBeenCalled()
+  })
+
+  it("treats an unknown category from the URL as All and never sends it", async () => {
+    serve(() => Promise.resolve([kvintet("k1", "Spanish")]))
+    renderPage("bogus")
+
+    expect(await screen.findByRole("heading", { name: "Spanish" })).toBeInTheDocument()
+    expect(screen.getByRole("radio", { name: "All" })).toHaveAttribute("data-state", "on")
+    expect(feedRequests()).toEqual([["kvintets/feed", { searchParams: undefined }]])
+  })
+
+  it("says so when nothing is in the category, and lets the user clear the filter", async () => {
+    serve(() => Promise.resolve([]))
+    renderPage("languages")
+
+    expect(await screen.findByText("No proposals in Languages yet")).toBeInTheDocument()
+    expect(screen.queryByText("Nothing fits?")).not.toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole("button", { name: "Clear filter" }))
+    expect(onCategoryChange).toHaveBeenCalledWith(undefined)
+  })
+
+  it("starts a proposal in the filtered category from the empty state", async () => {
+    serve(() => Promise.resolve([]))
+    renderPage("languages")
+
+    // The "nothing fits?" box is on screen while loading, so wait for the empty state first.
+    await screen.findByText("No proposals in Languages yet")
+    await userEvent.click(screen.getByRole("button", { name: "Start a new proposal" }))
+
+    const dialog = await screen.findByRole("dialog")
+    expect(within(dialog).getByRole("combobox")).toHaveTextContent("Languages")
   })
 })
 

@@ -49,6 +49,21 @@ describe('KvintetController', () => {
     );
   });
 
+  it('passes the category query on to the feed', async () => {
+    const repository = mock<KvintetRepository>();
+    repository.isMember.mockResolvedValue(false);
+    repository.categoryExists.mockResolvedValue(true);
+    repository.findOpenKvintets.mockResolvedValue([]);
+    const controller = new KvintetController(new KvintetService(repository));
+
+    await controller.feed(
+      { id: 'u1', email: 'a@b.c', name: 'A', role: 'user' },
+      { category: 'languages' },
+    );
+
+    expect(repository.findOpenKvintets).toHaveBeenCalledWith('languages');
+  });
+
   it('answers the feed with an allow-list of fields and nothing else', async () => {
     const repository = mock<KvintetRepository>();
     repository.isMember.mockResolvedValue(false);
@@ -70,12 +85,10 @@ describe('KvintetController', () => {
     ]);
     const controller = new KvintetController(new KvintetService(repository));
 
-    const [item] = await controller.feed({
-      id: 'u1',
-      email: 'a@b.c',
-      name: 'A',
-      role: 'user',
-    });
+    const [item] = await controller.feed(
+      { id: 'u1', email: 'a@b.c', name: 'A', role: 'user' },
+      {},
+    );
 
     // A new field on the feed must be added here on purpose: names, e-mails and
     // user ids must never reach this response.
