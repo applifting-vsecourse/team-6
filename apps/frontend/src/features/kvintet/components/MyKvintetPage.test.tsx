@@ -46,7 +46,13 @@ describe("MyKvintetPage", () => {
       leaveError: null,
     })
 
-    render(<MyKvintetPage />)
+    render(
+      <MyKvintetPage
+        tab="overview"
+        onTabChange={vi.fn()}
+        renderChat={() => null}
+      />,
+    )
 
     expect(screen.getByText("You are not in any kvintet yet")).toBeInTheDocument()
     expect(screen.getByRole("link", { name: "Browse proposals" })).toBeInTheDocument()
@@ -105,7 +111,13 @@ describe("MyKvintetPage", () => {
       leaveError: null,
     })
 
-    render(<MyKvintetPage />)
+    render(
+      <MyKvintetPage
+        tab="overview"
+        onTabChange={vi.fn()}
+        renderChat={() => null}
+      />,
+    )
 
     expect(screen.getByText("Proposal · 1 of 5")).toBeInTheDocument()
     expect(screen.getByText("Designérka (you)")).toBeInTheDocument()
@@ -175,7 +187,13 @@ describe("MyKvintetPage", () => {
       leaveError: null,
     })
 
-    render(<MyKvintetPage />)
+    render(
+      <MyKvintetPage
+        tab="overview"
+        onTabChange={vi.fn()}
+        renderChat={() => null}
+      />,
+    )
 
     expect(screen.getByText("Active kvintet")).toBeInTheDocument()
     expect(screen.getAllByText(/Petr Svoboda/).length).toBeGreaterThan(0)

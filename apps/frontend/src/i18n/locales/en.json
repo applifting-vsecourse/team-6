@@ -37,6 +37,21 @@
     "personal-development": "Personal development",
     "technology": "Technology"
   },
+  "chat": {
+    "composer": {
+      "label": "Message",
+      "placeholder": "Write a message…",
+      "send": "Send",
+      "sending": "Sending…"
+    },
+    "deletedMember": "Deleted member",
+    "empty": "No messages yet. Say hello to your kvintet.",
+    "error": "We couldn't load the messages.",
+    "newMessages": "New messages",
+    "retry": "Try again",
+    "showEarlier": "Show earlier messages",
+    "you": "You"
+  },
   "codeOfConduct": {
     "intro": "Kvintet is a place for people who want to meet and learn from each other. To keep it pleasant for everyone, we follow a few simple rules.",
     "reportIntro": "Report a broken rule or a problem with a specific person to <email>{{email}}</email>.",
@@ -90,6 +105,7 @@
     "conflict": "This conflicts with existing data.",
     "forbidden": "You don't have access to this.",
     "internal_error": "Something went wrong on our side. Please try again.",
+    "kvintet_not_active": "This kvintet's chat opens once the kvintet is active.",
     "kvintet_not_open": "This proposal is full or no longer open.",
     "not_found": "We couldn't find what you were looking for.",
     "pageNotFound": "Page not found",
@@ -113,12 +129,6 @@
     "activeSubtitle": "FORMED ON {{date}} · {{count}} MEMBERS",
     "activeSubtitleWithPreferences": "FORMED ON {{date}} · {{count}} MEMBERS · SUITS EVERYONE: {{preferences}}",
     "alreadyMember": "You are already in a proposal.",
-    "chat": {
-      "comingSoon": "Group chat will be available soon.",
-      "description": "Arrange your first meeting in the group chat.",
-      "heading": "Group chat",
-      "openMessages": "Open messages"
-    },
     "count_one": "{{formatted}} proposal",
     "count_other": "{{formatted}} proposals",
     "diagram": {
@@ -213,6 +223,10 @@
     "table": {
       "description": "Arrange your first meeting in the group chat. You run the kvintet yourselves – no facilitator, no ratings.",
       "title": "Five people, <em className=\"italic\">one table.</em>"
+    },
+    "tabs": {
+      "messages": "Messages",
+      "overview": "Overview"
     },
     "teaches": "Teaches: {{tags}}",
     "title": "Proposals for you",

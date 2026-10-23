@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Seo } from "@/components/Seo"
@@ -5,12 +6,19 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 
 import { useMyKvintet } from "@/features/kvintet/hooks/useMyKvintet"
+import type { KvintetTab } from "@/features/kvintet/lib/kvintetTab"
 
 import { ActiveKvintetView } from "./ActiveKvintetView"
 import { EmptyKvintetState } from "./EmptyKvintetState"
 import { ProposalKvintetView } from "./ProposalKvintetView"
 
-export function MyKvintetPage() {
+type MyKvintetPageProps = {
+  tab: KvintetTab
+  onTabChange: (tab: KvintetTab) => void
+  renderChat: (currentUserId: string | undefined) => ReactNode
+}
+
+export function MyKvintetPage({ tab, onTabChange, renderChat }: MyKvintetPageProps) {
   const { t } = useTranslation()
   const {
     data: kvintet,
@@ -58,6 +66,9 @@ export function MyKvintetPage() {
         ) : kvintet.status === "ACTIVE" ? (
           <ActiveKvintetView
             kvintet={kvintet}
+            tab={tab}
+            onTabChange={onTabChange}
+            renderChat={renderChat}
             onLeave={leave}
             isLeaving={isLeaving}
           />

@@ -42,7 +42,7 @@ Pilot scale: ≤ 500 users, tens online at once. One backend container and one P
 Shared (`src/shared/…`):
 
 - **Guards:** `AuthenticatedUserGuard` (signed in), `OnboardedGuard` (profile complete), `AdminGuard` (`role === 'admin'`), `MemberGuard` (caller is in a kvintet; chat additionally requires it to be `ACTIVE`).
-- **Errors:** a global exception filter (`shared/errors`) returns `{ statusCode, code, message }` with a stable `code`; the English `message` is for logs and developers, never shown to users. Validation failures (global `ValidationPipe`) use `code: "validation_failed"` plus `errors: [{ field, code }]`, where `code` is the failed class-validator constraint (`isNotEmpty`, `maxLength`, …). The frontend translates by code. A thrown `HttpException` can carry its own code (`new ConflictException({ code: 'kvintet_not_open', message })`); otherwise the code comes from the status. Codes in use: `already_in_kvintet` (409: join, start or feed while the caller already has a kvintet) and `kvintet_not_open` (409: join a kvintet that is full or no longer `FORMING`).
+- **Errors:** a global exception filter (`shared/errors`) returns `{ statusCode, code, message }` with a stable `code`; the English `message` is for logs and developers, never shown to users. Validation failures (global `ValidationPipe`) use `code: "validation_failed"` plus `errors: [{ field, code }]`, where `code` is the failed class-validator constraint (`isNotEmpty`, `maxLength`, …). The frontend translates by code. A thrown `HttpException` can carry its own code (`new ConflictException({ code: 'kvintet_not_open', message })`); otherwise the code comes from the status. Codes in use: `already_in_kvintet` (409: join, start or feed while the caller already has a kvintet), `kvintet_not_open` (409: join a kvintet that is full or no longer `FORMING`) and `kvintet_not_active` (409: read or send chat messages before the kvintet is `ACTIVE`).
 
 A transaction never spans repositories of different modules. When one use case must write data of two modules, the module that owns the use case writes both, through its own repository (see Leave).
 
@@ -103,7 +103,7 @@ Each runs in one Prisma `$transaction` that first locks the parent row (`SELECT 
 - **Leave** — lock the kvintet; delete the member; in an `ACTIVE` kvintet insert a `SYSTEM` message, written by the `kvintet` repository; in a `FORMING` kvintet delete all votes (the roster changed, so earlier votes no longer count; it never auto-activates); delete the kvintet if it is empty. An `ACTIVE` kvintet that drops below 3 members stays active; nothing else happens.
 - **Delete account** — one `account` service call: run the Leave flow if the user is in a kvintet, then delete the user. Other tables go by cascade, as story "Delete my account" asks: offers the user posted disappear together with the claims on them. Do not rely on the cascade alone for the membership, because it skips the Leave rules and leaves empty kvintets in the feed.
 - **Board listing** — `startsAt > now()` and claim count `< capacity`, filtered by category. "Full" and "past" are never stored.
-- **Chat** — only members of an `ACTIVE` kvintet can read or write. Clients poll with `after=<last message id>`; the server returns messages with `id > after` ordered by `id`. A request without a cursor returns the last 50; with a cursor it returns at most 100 (`after=0` must not return the whole history), and the client keeps polling until a page comes back shorter than the limit. Sending a message locks the `kvintet` row and then re-checks that the caller is still a member and the kvintet is `ACTIVE`; the guard alone is not enough, because a concurrent Leave can pass it. Sequence ids are assigned at insert, not at commit, so every message insert (user or `SYSTEM`) first locks the `kvintet` row. That makes ids commit in order per kvintet and a poll can never skip a message. Message bodies have a maximum length in the DTO and are rendered as text, never HTML.
+- **Chat** — only members of an `ACTIVE` kvintet can read or write. Clients poll with `after=<last message id>`; the server returns messages with `id > after` ordered by `id`. A request without a cursor returns the last 50; with `after` it returns at most 100 (`after=0` must not return the whole history), and the client keeps polling until a page comes back shorter than the limit. `before=<oldest id the client has>` returns up to 50 older messages (ascending) for the "Show earlier messages" button; `after` and `before` together are rejected as `validation_failed`. Messages carry the author's name and username (members of an active kvintet see each other's names anyway); `authorId`, name and username are `null` once the author deleted their account, and the UI shows a translated "Deleted member". The client does not append the reply to a sent message to its cache but polls right away, because another member's lower id may be newer than the cache and a cursor past it would skip it. Sending a message locks the `kvintet` row and then re-checks that the caller is still a member and the kvintet is `ACTIVE`; the guard alone is not enough, because a concurrent Leave can pass it. Sequence ids are assigned at insert, not at commit, so every message insert (user or `SYSTEM`) first locks the `kvintet` row. That makes ids commit in order per kvintet and a poll can never skip a message. Message bodies have a maximum length in the DTO and are rendered as text, never HTML.
 
 ### Matching
 
@@ -123,24 +123,24 @@ The feed shows each member's `position` and tags, as the story requires, plus `m
 
 All routes are under `/api`, need a session unless marked public, and are documented in Swagger.
 
-| Method & path                        | Purpose                             | Guard           |
-| ------------------------------------ | ----------------------------------- | --------------- |
-| `GET /reference`                     | Categories (tags, cities to follow) | public          |
-| `GET/PUT /me/profile`                | Read / save profile + questionnaire | auth            |
-| `DELETE /me`                         | Delete account                      | auth            |
-| `GET /offers?category=`              | Board listing                       | auth            |
-| `POST /offers`                       | Post an offer                       | auth            |
-| `POST/DELETE /offers/:id/claim`      | Claim / release a spot              | auth            |
-| `GET /kvintets/feed?category=`       | Ranked open kvintets                | onboarded       |
-| `GET /kvintets/membership`           | Is the caller in a kvintet?         | auth            |
-| `POST /kvintets`                     | Start a kvintet                     | onboarded       |
-| `POST /kvintets/:id/members`         | Join                                | onboarded       |
-| `GET /kvintets/mine`                 | My kvintet, members, vote status    | member          |
-| `POST /kvintets/mine/vote`           | Vote to start                       | member          |
-| `DELETE /kvintets/mine/membership`   | Leave                               | member          |
-| `GET /kvintets/mine/messages?after=` | Messages after a cursor             | member (active) |
-| `POST /kvintets/mine/messages`       | Send a message                      | member (active) |
-| `GET /admin/stats`                   | Aggregated numbers                  | admin           |
+| Method & path                                | Purpose                                 | Guard           |
+| -------------------------------------------- | --------------------------------------- | --------------- |
+| `GET /reference`                             | Categories (tags, cities to follow)     | public          |
+| `GET/PUT /me/profile`                        | Read / save profile + questionnaire     | auth            |
+| `DELETE /me`                                 | Delete account                          | auth            |
+| `GET /offers?category=`                      | Board listing                           | auth            |
+| `POST /offers`                               | Post an offer                           | auth            |
+| `POST/DELETE /offers/:id/claim`              | Claim / release a spot                  | auth            |
+| `GET /kvintets/feed?category=`               | Ranked open kvintets                    | onboarded       |
+| `GET /kvintets/membership`                   | Is the caller in a kvintet?             | auth            |
+| `POST /kvintets`                             | Start a kvintet                         | onboarded       |
+| `POST /kvintets/:id/members`                 | Join                                    | onboarded       |
+| `GET /kvintets/mine`                         | My kvintet, members, vote status        | member          |
+| `POST /kvintets/mine/vote`                   | Vote to start                           | member          |
+| `DELETE /kvintets/mine/membership`           | Leave                                   | member          |
+| `GET /kvintets/mine/messages?after=&before=` | Latest page, or after / before a cursor | member (active) |
+| `POST /kvintets/mine/messages`               | Send a message                          | member (active) |
+| `GET /admin/stats`                           | Aggregated numbers                      | admin           |
 
 Member-only routes use `mine` instead of `:id`, so a client cannot address someone else's kvintet. Membership comes from the session.
 
@@ -155,7 +155,9 @@ Routes (TanStack Router, file-based). Guards are pathless layout routes (`_Authe
 | `/overview`, `/profile`                      | signed in + onboarded    |
 | `/board`, `/board/new`                       | signed in + onboarded    |
 | `/kvintet/feed`, `/kvintet`                  | signed in + onboarded    |
-| `/admin`                                     | admin                    |
+
+The chat is not a route of its own: an `ACTIVE` kvintet's `/kvintet` page has an Overview and a Messages tab (`/kvintet?tab=messages`), and the chat is mounted, and polled, only while that tab is open. Features may not import each other, so the `kvintet` feature takes the chat as a render prop that the route supplies.
+| `/admin` | admin |
 
 - Features live in `src/features/{account,profile,board,kvintet,chat,admin,legal}`. Business decisions stay in hooks and on the server, not in components.
 - Filters that change the list (board category) live in the URL search params.

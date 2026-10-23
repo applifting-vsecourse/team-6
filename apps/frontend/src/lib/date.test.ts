@@ -1,6 +1,6 @@
 import i18n from "@/i18n"
 
-import { formatDate, formatLongDate, formatNumber } from "./date"
+import { formatDate, formatLongDate, formatNumber, formatTime } from "./date"
 
 afterEach(() => i18n.changeLanguage("en"))
 
@@ -16,6 +16,11 @@ describe("locale formatting", () => {
     expect(czech.number).toBe("1 234,5")
     expect(czech.date).not.toBe(english.date)
     expect(czech.date).toContain("2026")
+  })
+
+  it("writes the time of day without a date", () => {
+    expect(formatTime(date)).toMatch(/^\d{1,2}:\d{2}/)
+    expect(formatTime(date)).not.toContain("2026")
   })
 
   it("writes the long date in the active language", async () => {
