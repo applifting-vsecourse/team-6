@@ -1,7 +1,9 @@
 import { queryOptions } from "@tanstack/react-query"
 import { z } from "zod"
 
-import { api, HTTPError } from "@/lib/api-client"
+import { api } from "@/lib/api-client"
+
+import { isApiError } from "@/features/kvintet/lib/apiError"
 
 import { kvintetKeys } from "./kvintetKeys"
 
@@ -63,13 +65,9 @@ export const myKvintetQueryOptions = () =>
         const json = await api.get("kvintets/mine").json<unknown>()
         return kvintetDetailsSchema.parse(json)
       } catch (error) {
-        if (
-          error instanceof HTTPError &&
-          (error.response.status === 403 || error.response.status === 404)
-        ) {
-          // User is authenticated but is not a member of any kvintet (empty state)
-          return null
-        }
+        // The backend's MemberGuard answers `forbidden` for a signed-in user who is in no
+        // kvintet (empty state). Any other failure, including other 403/404s, must surface.
+        if (isApiError(error, "forbidden")) return null
         throw error
       }
     },
