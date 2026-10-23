@@ -1,10 +1,17 @@
+import { useMemo } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Link } from "@tanstack/react-router"
+import type { TFunction } from "i18next"
 import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
+import { Trans, useTranslation } from "react-i18next"
 import { z } from "zod"
 
+import { ROUTES } from "@/app/routes"
+import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Form,
   FormControl,
@@ -16,20 +23,36 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
-const schema = z
-  .object({
-    email: z.string().trim().min(1, "Zadejte e-mail").email("Zadejte platný e-mail"),
-    name: z.string().trim().min(1, "Zadejte jméno"),
-    username: z.string().trim().min(1, "Zadejte uživatelské jméno"),
-    password: z.string().trim().min(8, "Heslo musí mít alespoň 8 znaků"),
-    passwordConfirmation: z.string().trim().min(1, "Potvrďte heslo"),
-  })
-  .refine((values) => values.password === values.passwordConfirmation, {
-    message: "Hesla se musí shodovat",
-    path: ["passwordConfirmation"],
-  })
+const PASSWORD_MIN_LENGTH = 8
 
-type FormValues = z.infer<typeof schema>
+const createSchema = (t: TFunction) =>
+  z
+    .object({
+      email: z
+        .string()
+        .trim()
+        .min(1, t("auth.validation.emailRequired"))
+        .email(t("auth.validation.emailInvalid")),
+      name: z.string().trim().min(1, t("auth.validation.nameRequired")),
+      username: z.string().trim().min(1, t("auth.validation.usernameRequired")),
+      password: z
+        .string()
+        .trim()
+        .min(PASSWORD_MIN_LENGTH, t("auth.validation.passwordMin", { count: PASSWORD_MIN_LENGTH })),
+      passwordConfirmation: z
+        .string()
+        .trim()
+        .min(1, t("auth.validation.passwordConfirmationRequired")),
+      acceptCodeOfConduct: z.boolean().refine((isAccepted) => isAccepted, {
+        message: t("auth.validation.codeOfConductRequired"),
+      }),
+    })
+    .refine((values) => values.password === values.passwordConfirmation, {
+      message: t("auth.validation.passwordsMatch"),
+      path: ["passwordConfirmation"],
+    })
+
+type FormValues = z.infer<ReturnType<typeof createSchema>>
 
 const defaultValues: FormValues = {
   email: "",
@@ -37,6 +60,7 @@ const defaultValues: FormValues = {
   username: "",
   password: "",
   passwordConfirmation: "",
+  acceptCodeOfConduct: false,
 }
 
 type SignUpFormProps = {
@@ -46,6 +70,8 @@ type SignUpFormProps = {
 }
 
 export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProps) {
+  const { t } = useTranslation()
+  const schema = useMemo(() => createSchema(t), [t])
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues,
@@ -63,7 +89,7 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Jméno</FormLabel>
+              <FormLabel>{t("auth.name")}</FormLabel>
               <FormControl>
                 <Input
                   autoComplete="name"
@@ -80,13 +106,20 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Uživatelské jméno</FormLabel>
-              <FormControl>
-                <Input
-                  autoComplete="username"
-                  {...field}
+              <FormLabel>{t("auth.username")}</FormLabel>
+              <div className="flex items-center gap-3">
+                <FormControl>
+                  <Input
+                    autoComplete="username"
+                    {...field}
+                  />
+                </FormControl>
+                <GazeBlobatar
+                  name={field.value.trim()}
+                  className="size-16"
                 />
-              </FormControl>
+              </div>
+              <FormDescription>{t("auth.usernameHint")}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -97,11 +130,11 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>E-mail</FormLabel>
+              <FormLabel>{t("auth.email")}</FormLabel>
               <FormControl>
                 <Input
                   type="email"
-                  placeholder="jana@novak.cz"
+                  placeholder={t("auth.emailPlaceholder")}
                   autoComplete="email"
                   {...field}
                 />
@@ -116,7 +149,7 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Heslo</FormLabel>
+              <FormLabel>{t("auth.password")}</FormLabel>
               <FormControl>
                 <Input
                   type="password"
@@ -124,7 +157,9 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
                   {...field}
                 />
               </FormControl>
-              <FormDescription>Alespoň 8 znaků</FormDescription>
+              <FormDescription>
+                {t("auth.passwordHint", { count: PASSWORD_MIN_LENGTH })}
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -135,7 +170,7 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           name="passwordConfirmation"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Potvrzení hesla</FormLabel>
+              <FormLabel>{t("auth.confirmPassword")}</FormLabel>
               <FormControl>
                 <Input
                   type="password"
@@ -143,6 +178,42 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
                   {...field}
                 />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="acceptCodeOfConduct"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-start gap-3">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={(checked) => field.onChange(checked === true)}
+                    onBlur={field.onBlur}
+                    ref={field.ref}
+                    className="mt-0.5"
+                  />
+                </FormControl>
+                {/* block: the base label is flex, which would split the sentence around the link */}
+                <FormLabel className="block leading-snug font-normal">
+                  <Trans
+                    i18nKey="auth.acceptCodeOfConduct"
+                    components={{
+                      coc: (
+                        <Link
+                          to={ROUTES.codeOfConduct}
+                          target="_blank"
+                          className="font-medium text-foreground underline underline-offset-4"
+                        />
+                      ),
+                    }}
+                  />
+                </FormLabel>
+              </div>
               <FormMessage />
             </FormItem>
           )}
@@ -161,7 +232,7 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           disabled={isLoading}
         >
           {isLoading ? <Loader2 className="size-4 animate-spin" /> : null}
-          Registrovat se
+          {t("auth.signUp")}
         </Button>
       </form>
     </Form>

@@ -16,5 +16,8 @@
     "lib": "@/lib",
     "utils": "@/lib/utils",
     "ui": "@/components/ui"
+  },
+  "registries": {
+    "@blobatar": "https://blobatar.dev/r/{name}.json"
   }
 }

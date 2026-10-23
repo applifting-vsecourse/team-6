@@ -1,6 +1,7 @@
 import { queryOptions } from "@tanstack/react-query"
 
 import { authKeys } from "@/lib/auth-keys"
+import { toAuthError } from "@/lib/errorMessage"
 
 import { authClient } from "@/features/auth/lib/auth-client"
 
@@ -21,7 +22,7 @@ export const authSessionQueryOptions = () =>
     queryKey: authKeys.session(),
     queryFn: async (): Promise<Session> => {
       const { data, error } = await authClient.getSession()
-      if (error) throw new Error(error.message ?? "Failed to load session")
+      if (error) throw toAuthError(error)
       if (!data?.user) return null
 
       const user = data.user as typeof data.user & {

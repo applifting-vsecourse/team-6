@@ -18,7 +18,7 @@ type AuthLayoutProps = {
 export function AuthLayout({ title, description, children, footer, header }: AuthLayoutProps) {
   return (
     <PageLayout header={header}>
-      <section className="mx-auto w-full max-w-120 px-4 pt-16 pb-24">
+      <section className="mx-auto w-full max-w-lg px-4 pt-16 pb-24">
         <h1 className="text-title">{title}</h1>
         <p className="mt-2 text-lg text-body">{description}</p>
 

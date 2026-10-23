@@ -11,9 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtectedPagesRouteImport } from './routes/_ProtectedPages'
+import { Route as CodeOfConductRouteImport } from './routes/code-of-conduct'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ProtectedPagesOnboardingRouteImport } from './routes/_ProtectedPages/onboarding'
 import { Route as ProtectedPagesOverviewRouteImport } from './routes/_ProtectedPages/overview'
+import { Route as ProtectedPagesKvintetIndexRouteImport } from './routes/_ProtectedPages/kvintet.index'
+import { Route as ProtectedPagesKvintetFeedRouteImport } from './routes/_ProtectedPages/kvintet.feed'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,6 +26,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const ProtectedPagesRoute = ProtectedPagesRouteImport.update({
   id: '/_ProtectedPages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CodeOfConductRoute = CodeOfConductRouteImport.update({
+  id: '/code-of-conduct',
+  path: '/code-of-conduct',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -34,49 +43,100 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtectedPagesOnboardingRoute =
+  ProtectedPagesOnboardingRouteImport.update({
+    id: '/onboarding',
+    path: '/onboarding',
+    getParentRoute: () => ProtectedPagesRoute,
+  } as any)
 const ProtectedPagesOverviewRoute = ProtectedPagesOverviewRouteImport.update({
   id: '/overview',
   path: '/overview',
   getParentRoute: () => ProtectedPagesRoute,
 } as any)
+const ProtectedPagesKvintetIndexRoute =
+  ProtectedPagesKvintetIndexRouteImport.update({
+    id: '/kvintet/',
+    path: '/kvintet/',
+    getParentRoute: () => ProtectedPagesRoute,
+  } as any)
+const ProtectedPagesKvintetFeedRoute =
+  ProtectedPagesKvintetFeedRouteImport.update({
+    id: '/kvintet/feed',
+    path: '/kvintet/feed',
+    getParentRoute: () => ProtectedPagesRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/code-of-conduct': typeof CodeOfConductRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/onboarding': typeof ProtectedPagesOnboardingRoute
   '/overview': typeof ProtectedPagesOverviewRoute
+  '/kvintet/feed': typeof ProtectedPagesKvintetFeedRoute
+  '/kvintet/': typeof ProtectedPagesKvintetIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/code-of-conduct': typeof CodeOfConductRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/onboarding': typeof ProtectedPagesOnboardingRoute
   '/overview': typeof ProtectedPagesOverviewRoute
+  '/kvintet/feed': typeof ProtectedPagesKvintetFeedRoute
+  '/kvintet': typeof ProtectedPagesKvintetIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_ProtectedPages': typeof ProtectedPagesRouteWithChildren
+  '/code-of-conduct': typeof CodeOfConductRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/_ProtectedPages/onboarding': typeof ProtectedPagesOnboardingRoute
   '/_ProtectedPages/overview': typeof ProtectedPagesOverviewRoute
+  '/_ProtectedPages/kvintet/feed': typeof ProtectedPagesKvintetFeedRoute
+  '/_ProtectedPages/kvintet/': typeof ProtectedPagesKvintetIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/signup' | '/overview'
+  fullPaths:
+    | '/'
+    | '/code-of-conduct'
+    | '/login'
+    | '/signup'
+    | '/onboarding'
+    | '/overview'
+    | '/kvintet/feed'
+    | '/kvintet/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup' | '/overview'
+  to:
+    | '/'
+    | '/code-of-conduct'
+    | '/login'
+    | '/signup'
+    | '/onboarding'
+    | '/overview'
+    | '/kvintet/feed'
+    | '/kvintet'
   id:
     | '__root__'
     | '/'
     | '/_ProtectedPages'
+    | '/code-of-conduct'
     | '/login'
     | '/signup'
+    | '/_ProtectedPages/onboarding'
     | '/_ProtectedPages/overview'
+    | '/_ProtectedPages/kvintet/feed'
+    | '/_ProtectedPages/kvintet/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProtectedPagesRoute: typeof ProtectedPagesRouteWithChildren
+  CodeOfConductRoute: typeof CodeOfConductRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
 }
@@ -97,6 +157,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedPagesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/code-of-conduct': {
+      id: '/code-of-conduct'
+      path: '/code-of-conduct'
+      fullPath: '/code-of-conduct'
+      preLoaderRoute: typeof CodeOfConductRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -111,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_ProtectedPages/onboarding': {
+      id: '/_ProtectedPages/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof ProtectedPagesOnboardingRouteImport
+      parentRoute: typeof ProtectedPagesRoute
+    }
     '/_ProtectedPages/overview': {
       id: '/_ProtectedPages/overview'
       path: '/overview'
@@ -118,15 +192,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedPagesOverviewRouteImport
       parentRoute: typeof ProtectedPagesRoute
     }
+    '/_ProtectedPages/kvintet/': {
+      id: '/_ProtectedPages/kvintet/'
+      path: '/kvintet'
+      fullPath: '/kvintet/'
+      preLoaderRoute: typeof ProtectedPagesKvintetIndexRouteImport
+      parentRoute: typeof ProtectedPagesRoute
+    }
+    '/_ProtectedPages/kvintet/feed': {
+      id: '/_ProtectedPages/kvintet/feed'
+      path: '/kvintet/feed'
+      fullPath: '/kvintet/feed'
+      preLoaderRoute: typeof ProtectedPagesKvintetFeedRouteImport
+      parentRoute: typeof ProtectedPagesRoute
+    }
   }
 }
 
 interface ProtectedPagesRouteChildren {
+  ProtectedPagesOnboardingRoute: typeof ProtectedPagesOnboardingRoute
   ProtectedPagesOverviewRoute: typeof ProtectedPagesOverviewRoute
+  ProtectedPagesKvintetFeedRoute: typeof ProtectedPagesKvintetFeedRoute
+  ProtectedPagesKvintetIndexRoute: typeof ProtectedPagesKvintetIndexRoute
 }
 
 const ProtectedPagesRouteChildren: ProtectedPagesRouteChildren = {
+  ProtectedPagesOnboardingRoute: ProtectedPagesOnboardingRoute,
   ProtectedPagesOverviewRoute: ProtectedPagesOverviewRoute,
+  ProtectedPagesKvintetFeedRoute: ProtectedPagesKvintetFeedRoute,
+  ProtectedPagesKvintetIndexRoute: ProtectedPagesKvintetIndexRoute,
 }
 
 const ProtectedPagesRouteWithChildren = ProtectedPagesRoute._addFileChildren(
@@ -136,6 +230,7 @@ const ProtectedPagesRouteWithChildren = ProtectedPagesRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedPagesRoute: ProtectedPagesRouteWithChildren,
+  CodeOfConductRoute: CodeOfConductRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
 }

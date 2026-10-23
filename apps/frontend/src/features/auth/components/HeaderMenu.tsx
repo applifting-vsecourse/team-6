@@ -1,7 +1,10 @@
 import { Link } from "@tanstack/react-router"
 import { ChevronDown, LogOut } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
+import { GazeBlobatar } from "@/components/GazeBlobatar"
+import { Blobatar } from "@/components/ui/blobatar"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -16,6 +19,7 @@ import { useSession } from "@/features/auth/hooks/useSession"
 import { useSignOut } from "@/features/auth/hooks/useSignOut"
 
 export function HeaderMenu() {
+  const { t } = useTranslation()
   const { user } = useSession()
   const signOut = useSignOut()
 
@@ -25,7 +29,7 @@ export function HeaderMenu() {
         to={ROUTES.login}
         className="text-label font-semibold text-foreground"
       >
-        Přihlásit se
+        {t("auth.signIn")}
       </Link>
     )
   }
@@ -38,6 +42,12 @@ export function HeaderMenu() {
           size="sm"
           className="hidden text-sm font-normal text-body md:inline-flex"
         >
+          <GazeBlobatar
+            name={user.username || user.id}
+            animate="hover"
+            travel={7}
+            className="size-8"
+          />
           {user.name}
           <ChevronDown aria-hidden />
         </Button>
@@ -58,7 +68,7 @@ export function HeaderMenu() {
           disabled={signOut.isPending}
         >
           <LogOut className="size-4" />
-          Odhlásit se
+          {t("auth.signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -67,21 +77,28 @@ export function HeaderMenu() {
 
 /** Account block of the mobile menu sheet: who is signed in, and sign out. */
 export function MobileAccount() {
+  const { t } = useTranslation()
   const { user } = useSession()
   const signOut = useSignOut()
 
   if (!user) return null
 
   return (
-    <div className="flex flex-col gap-0.5 border-t border-border pt-4">
-      <p className="font-semibold text-foreground">{user.name}</p>
+    <div className="flex flex-col gap-0.5">
+      <div className="flex items-center gap-2">
+        <Blobatar
+          name={user.username || user.id}
+          size="sm"
+        />
+        <p className="font-semibold text-foreground">{user.name}</p>
+      </div>
       <Button
         variant="link"
         onClick={() => signOut.mutate()}
         disabled={signOut.isPending}
         className="h-auto self-start p-0 text-body underline"
       >
-        Odhlásit se
+        {t("auth.signOut")}
       </Button>
     </div>
   )

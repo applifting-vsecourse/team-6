@@ -12,6 +12,7 @@ export function useSignOut() {
   return useMutation({
     mutationFn: () => authClient.signOut().then(() => undefined),
     onSuccess: async () => {
+      queryClient.clear()
       await queryClient.invalidateQueries({ queryKey: authKeys.session() })
       await navigate({ to: "/login" })
     },
