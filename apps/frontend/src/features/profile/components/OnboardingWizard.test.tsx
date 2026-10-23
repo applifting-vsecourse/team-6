@@ -9,6 +9,22 @@ import type * as ProfileApi from "@/features/profile/api/profileApi"
 
 import { OnboardingWizard } from "./OnboardingWizard"
 
+vi.mock("@/features/profile/components/LocationMapPicker", () => ({
+  DEFAULT_RADIUS_KM: 25,
+  LocationMapPicker: ({
+    onChange,
+  }: {
+    onChange: (loc: { latitude: number; longitude: number; radiusKm: number }) => void
+  }) => (
+    <button
+      type="button"
+      onClick={() => onChange({ latitude: 50.07, longitude: 14.43, radiusKm: 10 })}
+    >
+      Pick on map
+    </button>
+  ),
+}))
+
 const mockNavigate = vi.fn()
 vi.mock("@tanstack/react-router", async (importOriginal) => {
   const actual = await importOriginal<typeof Router>()
@@ -74,7 +90,7 @@ describe("OnboardingWizard", () => {
     expect(await screen.findByText("When and where can you meet?")).toBeInTheDocument()
     await userEvent.click(screen.getByLabelText("Weekdays"))
     await userEvent.click(screen.getByLabelText("Evenings"))
-    await userEvent.selectOptions(screen.getByLabelText("City"), "c_praha")
+    await userEvent.click(screen.getByRole("button", { name: "Pick on map" }))
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
 
     // Step 3
@@ -89,12 +105,42 @@ describe("OnboardingWizard", () => {
         position: "software-engineer",
         weekdays: true,
         evenings: true,
+        cityId: null,
+        latitude: 50.07,
+        longitude: 14.43,
+        radiusKm: 10,
         expectations: ["learn_new"],
         meetingFrequency: "WEEKLY",
         completeOnboarding: true,
       }),
     )
     expect(mockNavigate).toHaveBeenCalledWith({ to: "/overview" })
+  })
+
+  it("keeps a saved map location when the user does not touch the map", async () => {
+    mockMutateAsync.mockResolvedValue({})
+    mockProfileQueryFn.mockResolvedValueOnce({
+      roles: ["software-engineer"],
+      position: "software-engineer",
+      weekdays: true,
+      latitude: 49.19,
+      longitude: 16.6,
+      radiusKm: 30,
+      meetingFrequency: "WEEKLY",
+      expectations: ["learn_new"],
+    })
+    render(<OnboardingWizard />, { wrapper: createWrapper() })
+
+    expect(await screen.findByText("Tell us about yourself")).toBeInTheDocument()
+    await userEvent.click(screen.getByRole("button", { name: "Continue" }))
+    expect(await screen.findByText("When and where can you meet?")).toBeInTheDocument()
+    await userEvent.click(screen.getByLabelText("Evenings"))
+    await userEvent.click(screen.getByRole("button", { name: "Continue" }))
+    await userEvent.click(await screen.findByRole("button", { name: "Finish" }))
+
+    expect(mockMutateAsync).toHaveBeenCalledWith(
+      expect.objectContaining({ cityId: null, latitude: 49.19, longitude: 16.6, radiusKm: 30 }),
+    )
   })
 
   it("supports going back to earlier steps", async () => {

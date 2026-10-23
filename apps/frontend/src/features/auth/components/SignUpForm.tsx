@@ -8,6 +8,7 @@ import { Trans, useTranslation } from "react-i18next"
 import { z } from "zod"
 
 import { ROUTES } from "@/app/routes"
+import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -21,8 +22,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-
-import { GazeBlobatar } from "@/features/auth/components/GazeBlobatar"
 
 const PASSWORD_MIN_LENGTH = 8
 

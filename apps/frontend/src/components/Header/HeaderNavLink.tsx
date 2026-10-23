@@ -11,6 +11,7 @@ type HeaderNavLinkProps = LinkProps & {
 export function HeaderNavLink({ children, className, ...props }: HeaderNavLinkProps) {
   return (
     <Link
+      activeOptions={{ exact: true }}
       {...props}
       // Active styling uses the router's data-status attribute rather than
       // `activeProps`: those classes would collide with the base ones and

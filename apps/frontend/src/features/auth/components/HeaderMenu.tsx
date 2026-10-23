@@ -3,6 +3,7 @@ import { ChevronDown, LogOut } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
+import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Blobatar } from "@/components/ui/blobatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -14,7 +15,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { GazeBlobatar } from "@/features/auth/components/GazeBlobatar"
 import { useSession } from "@/features/auth/hooks/useSession"
 import { useSignOut } from "@/features/auth/hooks/useSignOut"
 

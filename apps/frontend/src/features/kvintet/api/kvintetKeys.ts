@@ -6,5 +6,6 @@ export const kvintetKeys = {
       ? ([...kvintetKeys.all, "feed", category] as const)
       : ([...kvintetKeys.all, "feed"] as const),
   membership: () => [...kvintetKeys.all, "membership"] as const,
+  mine: () => [...kvintetKeys.all, "mine"] as const,
   reference: () => [...kvintetKeys.all, "reference"] as const,
 }

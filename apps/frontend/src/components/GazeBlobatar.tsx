@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils"
 
 type GazeBlobatarProps = {
   name: string
+  /** Accessible label; leave out when the name is written next to the avatar. */
+  title?: string
   className?: string
   /** "always" idles continuously (one big avatar); "hover" only while hovered (nav bar). */
   animate?: "always" | "hover"
@@ -19,6 +21,7 @@ type GazeBlobatarProps = {
 /** Animated avatar whose eyes follow the cursor. Static `Blobatar` stays the default for lists. */
 export function GazeBlobatar({
   name,
+  title,
   className,
   animate = "always",
   travel = 3,
@@ -32,7 +35,7 @@ export function GazeBlobatar({
       name={name}
       size={size}
       className={cn("overflow-visible", className)}
-      blobatar={{ animate, ref }}
+      blobatar={{ animate, ref, title }}
     />
   )
 }
