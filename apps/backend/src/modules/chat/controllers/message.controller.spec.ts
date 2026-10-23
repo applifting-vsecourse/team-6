@@ -1,4 +1,5 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
+import { ListMessagesQueryDto } from '@/modules/chat/controllers/dto/list-messages-query.dto';
 import { SendMessageDto } from '@/modules/chat/controllers/dto/send-message.dto';
 import { MessageController } from '@/modules/chat/controllers/message.controller';
 import { ChatMessage } from '@/modules/chat/domain/message';
@@ -104,5 +105,28 @@ describe('MessageController', () => {
     expect((blank as ValidationFailedException).errors).toEqual([
       { field: 'body', code: 'isNotEmpty' },
     ]);
+  });
+
+  it('rejects a cursor outside the id range with a 400, not a database error', async () => {
+    const pipe = createValidationPipe();
+    const meta = { type: 'query', metatype: ListMessagesQueryDto } as const;
+
+    const tooBig = await pipe
+      .transform({ after: '2147483648' }, meta)
+      .catch((e) => e);
+    expect((tooBig as ValidationFailedException).errors).toEqual([
+      { field: 'after', code: 'max' },
+    ]);
+
+    const negative = await pipe
+      .transform({ before: '-1' }, meta)
+      .catch((e) => e);
+    expect((negative as ValidationFailedException).errors).toEqual([
+      { field: 'before', code: 'min' },
+    ]);
+
+    await expect(
+      pipe.transform({ after: '2147483647' }, meta),
+    ).resolves.toMatchObject({ after: 2147483647 });
   });
 });
