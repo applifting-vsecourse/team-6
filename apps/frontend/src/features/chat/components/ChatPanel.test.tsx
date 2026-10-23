@@ -141,6 +141,21 @@ describe("ChatPanel", () => {
     expect(box).toHaveValue("Hello")
   })
 
+  it("keeps what was typed while a send is still in flight", async () => {
+    apiGet.mockResolvedValue([])
+    renderPanel()
+    const box = await screen.findByRole("textbox", { name: "Message" })
+
+    let finishSend: (sent: ChatMessage) => void = () => undefined
+    apiPost.mockReturnValue(new Promise((resolve) => (finishSend = resolve)))
+    await userEvent.type(box, "Hello{Enter}")
+    await userEvent.type(box, " there")
+    finishSend(message(1, { authorId: "u1", body: "Hello" }))
+
+    await waitFor(() => expect(screen.getByRole("button", { name: "Send" })).toBeEnabled())
+    expect(box).toHaveValue("Hello there")
+  })
+
   it("adds a line break on Shift+Enter instead of sending", async () => {
     apiGet.mockResolvedValue([])
     renderPanel()

@@ -46,7 +46,7 @@ export function MessageItem({ message, isOwn }: MessageItemProps) {
         {/* Plain text only: React escapes it, whitespace-pre-wrap keeps the author's line breaks. */}
         <p
           className={cn(
-            "rounded-lg border border-border px-3 py-2.5 text-base break-words whitespace-pre-wrap text-foreground",
+            "rounded-lg px-3 py-2.5 text-base break-words whitespace-pre-wrap text-foreground",
             isOwn ? "bg-primary/10" : "bg-secondary",
           )}
         >

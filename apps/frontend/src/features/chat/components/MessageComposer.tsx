@@ -26,8 +26,10 @@ export function MessageComposer({ onSend, isSending, error }: MessageComposerPro
   const submit = async () => {
     if (isSending || !text.trim()) return
     try {
-      await onSend(text)
-      setText("")
+      const sent = text
+      await onSend(sent)
+      // Clear only what was sent: the box stays editable while the send and refresh run.
+      setText((current) => (current === sent ? "" : current))
     } catch {
       // The error is shown from `error`; the text stays so nothing typed is lost.
     }
