@@ -359,6 +359,12 @@
       "description": "We found proposals that match your profile. Pick by topic – you'll see names once the group forms.",
       "title": "Pick a proposal"
     },
+    "nextStepMember": {
+      "badge": "YOUR KVINTET",
+      "button": "Go to my kvintet",
+      "description": "See who's in your group and what happens next.",
+      "title": "Head to your kvintet"
+    },
     "profileCard": {
       "badge": "YOUR PROFILE",
       "daysWeekdays": "weekdays",
@@ -376,6 +382,7 @@
       "timeMornings": "mornings"
     },
     "subtitle": "You're not in any kvintet yet. Start by picking a proposal.",
+    "subtitleMember": "You're in a kvintet. Check on your group.",
     "title": "Overview"
   },
   "roles": {
