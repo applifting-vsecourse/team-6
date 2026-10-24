@@ -44,62 +44,100 @@ export const seedDatabase = async (
 
   console.log('Creating example users');
 
-  const duck = await createUser(prisma, auth, {
-    email: 'caffeinatedduck@example.com',
-    password: 'password1',
-    name: 'Caffeinated Duck',
-    username: 'CaffeinatedDuck',
+  const jan = await createUser(prisma, auth, {
+    email: 'jan.novak@example.com',
+    password: 'passwordos',
+    name: 'Jan Novák',
+    username: 'JanNovak',
   });
 
-  const thinker = await createUser(prisma, auth, {
-    email: 'deepduckthoughts@example.com',
-    password: 'password2',
-    name: 'Deep Duck Thoughts',
-    username: 'DeepDuckThoughts',
+  const petra = await createUser(prisma, auth, {
+    email: 'petra.svobodova@example.com',
+    password: 'passwordos',
+    name: 'Petra Svobodová',
+    username: 'PetraSvobodova',
   });
 
-  const critic = await createUser(prisma, auth, {
-    email: 'breadcritic@example.com',
-    password: 'password3',
-    name: 'The Bread Critic',
-    username: 'BreadCritic',
+  const tomas = await createUser(prisma, auth, {
+    email: 'tomas.dvorak@example.com',
+    password: 'passwordos',
+    name: 'Tomáš Dvořák',
+    username: 'TomasDvorak',
   });
 
-  const season = await createUser(prisma, auth, {
-    email: 'migrationseason@example.com',
-    password: 'password4',
-    name: 'Migration Season',
-    username: 'MigrationSeason',
+  const eva = await createUser(prisma, auth, {
+    email: 'eva.cerna@example.com',
+    password: 'passwordos',
+    name: 'Eva Černá',
+    username: 'EvaCerna',
   });
 
   // One more kvintet owner per category, so the feed's category filter has something to show.
-  const linguist = await createUser(prisma, auth, {
-    email: 'quackinglinguist@example.com',
-    password: 'password6',
-    name: 'Quacking Linguist',
-    username: 'QuackingLinguist',
+  const lucie = await createUser(prisma, auth, {
+    email: 'lucie.prochazkova@example.com',
+    password: 'passwordos',
+    name: 'Lucie Procházková',
+    username: 'LucieProchazkova',
   });
 
-  const founder = await createUser(prisma, auth, {
-    email: 'pondfounder@example.com',
-    password: 'password7',
-    name: 'Pond Founder',
-    username: 'PondFounder',
+  const martin = await createUser(prisma, auth, {
+    email: 'martin.kucera@example.com',
+    password: 'passwordos',
+    name: 'Martin Kučera',
+    username: 'MartinKucera',
   });
 
-  const cook = await createUser(prisma, auth, {
-    email: 'weekendcook@example.com',
-    password: 'password8',
-    name: 'Weekend Cook',
-    username: 'WeekendCook',
+  const katerina = await createUser(prisma, auth, {
+    email: 'katerina.vesela@example.com',
+    password: 'passwordos',
+    name: 'Kateřina Veselá',
+    username: 'KaterinaVesela',
   });
 
-  // Has no profile and no kvintet, so this account sees the full feed.
-  await createUser(prisma, auth, {
-    email: 'pondadmin@example.com',
-    password: 'password5',
-    name: 'Pond Admin',
-    username: 'PondAdmin',
+  // The fourth member of the AI kvintet, so it can already be voted to start.
+  const ondrej = await createUser(prisma, auth, {
+    email: 'ondrej.marek@example.com',
+    password: 'passwordos',
+    name: 'Ondřej Marek',
+    username: 'OndrejMarek',
+  });
+
+  // Five members of an already running kvintet: sign in as any of them.
+  const [anna, jakub, david, dana, filip] = await Promise.all(
+    [
+      ['Anna Horáková', 'AnnaHorakova', 'anna.horakova@example.com'],
+      ['Jakub Beneš', 'JakubBenes', 'jakub.benes@example.com'],
+      ['David Král', 'DavidKral', 'david.kral@example.com'],
+      ['Dana Pokorná', 'DanaPokorna', 'dana.pokorna@example.com'],
+      ['Filip Němec', 'FilipNemec', 'filip.nemec@example.com'],
+    ].map(([name, username, email]) =>
+      createUser(prisma, auth, {
+        email,
+        password: 'passwordos',
+        name,
+        username,
+      }),
+    ),
+  );
+
+  // Onboarded but in no kvintet, so these accounts see the full feed.
+  const feedUsers = await Promise.all(
+    [
+      ['Lenka Malá', 'LenkaMala', 'lenka.mala@example.com'],
+      ['Nathan Němec', 'NathanNemec', 'nathan.nemec@example.com'],
+      ['Martin Bambas', 'MartinBambas', 'martin.bambas@example.com'],
+      ['Dominik Šimon', 'DominikSimon', 'dominik.simon@example.com'],
+      ['Petr Mráček', 'PetrMracek', 'petr.mracek@example.com'],
+      ['David Vokurka', 'DavidVokurka', 'david.vokurka@example.com'],
+    ].map(([name, username, email]) =>
+      createUser(prisma, auth, { email, password: 'passwordos', name, username }),
+    ),
+  );
+  await prisma.profile.createMany({
+    data: feedUsers.map((user) => ({
+      userId: user.id,
+      onboardingCompletedAt: new Date(),
+    })),
   });
 
   console.log('Creating demo kvintets');
@@ -110,7 +148,7 @@ export const seedDatabase = async (
       category: 'technology',
       members: [
         {
-          userId: duck.id,
+          userId: jan.id,
           position: 'Backend developer',
           meetingFrequency: 'BIWEEKLY',
           teach: ['python', 'sql'],
@@ -118,7 +156,7 @@ export const seedDatabase = async (
           interests: ['startups'],
         },
         {
-          userId: thinker.id,
+          userId: petra.id,
           position: 'Data analyst',
           meetingFrequency: 'BIWEEKLY',
           teach: ['statistics'],
@@ -126,21 +164,31 @@ export const seedDatabase = async (
           interests: ['running'],
         },
         {
-          userId: critic.id,
+          userId: tomas.id,
           position: 'Product manager',
           meetingFrequency: 'BIWEEKLY',
           teach: ['roadmapping'],
           learn: ['negotiation'],
           interests: ['board-games'],
         },
+        {
+          userId: ondrej.id,
+          position: 'BI consultant',
+          meetingFrequency: 'BIWEEKLY',
+          teach: ['sql'],
+          learn: ['python'],
+          interests: ['cycling'],
+        },
       ],
+      // Two of four have agreed, so the vote progress is visible.
+      votes: 2,
     },
     {
       title: 'From Excel to Python',
       category: 'technology',
       members: [
         {
-          userId: season.id,
+          userId: eva.id,
           position: 'Accountant',
           meetingFrequency: 'WEEKLY',
           teach: ['excel'],
@@ -154,7 +202,7 @@ export const seedDatabase = async (
       category: 'languages',
       members: [
         {
-          userId: linguist.id,
+          userId: lucie.id,
           position: 'Translator',
           meetingFrequency: 'WEEKLY',
           teach: ['copywriting'],
@@ -168,7 +216,7 @@ export const seedDatabase = async (
       category: 'business',
       members: [
         {
-          userId: founder.id,
+          userId: martin.id,
           position: 'Startup founder',
           meetingFrequency: 'BIWEEKLY',
           teach: ['startups'],
@@ -182,12 +230,60 @@ export const seedDatabase = async (
       category: 'leisure',
       members: [
         {
-          userId: cook.id,
+          userId: katerina.id,
           position: 'Graphic designer',
           meetingFrequency: 'MONTHLY',
           teach: ['cooking'],
           learn: ['music'],
           interests: ['board-games'],
+        },
+      ],
+    },
+    {
+      title: 'Frontend craft circle',
+      category: 'technology',
+      active: true,
+      votes: 5,
+      members: [
+        {
+          userId: anna.id,
+          position: 'Frontend developer',
+          meetingFrequency: 'WEEKLY',
+          teach: ['react'],
+          learn: ['ux-design'],
+          interests: ['coffee'],
+        },
+        {
+          userId: jakub.id,
+          position: 'Full-stack developer',
+          meetingFrequency: 'WEEKLY',
+          teach: ['typescript'],
+          learn: ['docker'],
+          interests: ['cycling'],
+        },
+        {
+          userId: david.id,
+          position: 'Tech lead',
+          meetingFrequency: 'WEEKLY',
+          teach: ['git'],
+          learn: ['public-speaking'],
+          interests: ['reading'],
+        },
+        {
+          userId: dana.id,
+          position: 'UI designer',
+          meetingFrequency: 'WEEKLY',
+          teach: ['figma'],
+          learn: ['html-css'],
+          interests: ['photography'],
+        },
+        {
+          userId: filip.id,
+          position: 'DevOps engineer',
+          meetingFrequency: 'WEEKLY',
+          teach: ['docker'],
+          learn: ['react'],
+          interests: ['running'],
         },
       ],
     },

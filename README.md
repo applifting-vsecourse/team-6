@@ -33,14 +33,17 @@ The ports are deliberately odd — 3050, 4050, and Postgres on 5433 rather than 
 
 ### Seeded users
 
-| Email                          | Password        |
-| ------------------------------ | --------------- |
-| `caffeinatedduck@example.com`  | `password1`     |
-| `deepduckthoughts@example.com` | `password2`     |
-| `breadcritic@example.com`      | `password3`     |
-| `migrationseason@example.com`  | `password4`     |
-| `pondadmin@example.com`        | `password5`     |
-| `admin@example.com`            | `adminpassword` |
+The full list is in `apps/backend/src/scripts/seed/seed/seed-database.ts`. `lenka.mala`, `nathan.nemec`, `martin.bambas`, `dominik.simon`, `petr.mracek` and `david.vokurka` are onboarded and in no kvintet, so they see every proposal; all share the password `passwordos`; `anna.horakova` is in an active kvintet of five.
+
+| Email                         | Password        |
+| ----------------------------- | --------------- |
+| `jan.novak@example.com`       | `passwordos`    |
+| `petra.svobodova@example.com` | `passwordos`    |
+| `tomas.dvorak@example.com`    | `passwordos`    |
+| `eva.cerna@example.com`       | `passwordos`    |
+| `lenka.mala@example.com`      | `passwordos`    |
+| `anna.horakova@example.com`   | `passwordos`    |
+| `admin@example.com`           | `adminpassword` |
 
 Verification/reset emails are printed to the backend terminal (console mailer) unless you configure Resend or SMTP in `apps/backend/.env`.
 
