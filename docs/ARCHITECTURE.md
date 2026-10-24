@@ -148,15 +148,15 @@ Member-only routes use `mine` instead of `:id`, so a client cannot address someo
 
 Routes (TanStack Router, file-based). Guards are pathless layout routes (`_Authenticated`, `_Onboarded`, `_Admin`) whose loader checks the session and redirects. `_Onboarded` sends users without a finished profile to `/onboarding`; `_Admin` shows the 404 page to non-admins.
 
-| Route                                        | Access                   |
-| -------------------------------------------- | ------------------------ |
-| `/`, `/login`, `/signup`, `/code-of-conduct` | public                   |
-| `/onboarding`                                | signed in, not onboarded |
-| `/overview`, `/profile`                      | signed in + onboarded    |
-| `/board`, `/board/new`                       | signed in + onboarded    |
-| `/kvintet/feed`, `/kvintet`                  | signed in + onboarded    |
+| Route                                            | Access                   |
+| ------------------------------------------------ | ------------------------ |
+| `/`, `/login`, `/signup`, `/code-of-conduct`     | public                   |
+| `/onboarding`                                    | signed in, not onboarded |
+| `/overview`, `/profile`                          | signed in + onboarded    |
+| `/board`, `/board/new`                           | signed in + onboarded    |
+| `/kvintet/feed`, `/kvintet`, `/kvintet/messages` | signed in + onboarded    |
 
-The chat is not a route of its own: an `ACTIVE` kvintet's `/kvintet` page has an Overview and a Messages tab (`/kvintet?tab=messages`), and the chat is mounted, and polled, only while that tab is open. Features may not import each other, so the `kvintet` feature takes the chat as a render prop that the route supplies.
+The chat has its own page, `/kvintet/messages`, linked from the "Open messages" button on an `ACTIVE` kvintet's `/kvintet` page; it shows the kvintet title, a back link and the member names, and sends anyone whose kvintet is missing or not `ACTIVE` back to `/kvintet`. Features may not import each other, so the `kvintet` feature renders that page and takes the chat as a render prop that the route supplies.
 | `/admin` | admin |
 
 - Features live in `src/features/{account,profile,board,kvintet,chat,admin,legal}`. Business decisions stay in hooks and on the server, not in components.

@@ -1,17 +1,25 @@
+import type { ReactNode } from "react"
 import { render, screen } from "@testing-library/react"
-import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 
 import type { KvintetDetails } from "@/features/kvintet/api/kvintetApi"
 
 import { ActiveKvintetView } from "./ActiveKvintetView"
 
+vi.mock("@tanstack/react-router", () => ({
+  Link: ({ children, to, className }: { children?: ReactNode; to: string; className?: string }) => (
+    <a
+      href={to}
+      className={className}
+    >
+      {children}
+    </a>
+  ),
+}))
+
 vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
 
 describe("ActiveKvintetView", () => {
-  // The chat belongs to another feature; the route hands it in.
-  const renderChat = (currentUserId: string | undefined) => <div>chat for {currentUserId}</div>
-
   const mockActiveKvintet: KvintetDetails = {
     id: "k1",
     title: "AI v práci – co opravdu funguje",
@@ -100,9 +108,6 @@ describe("ActiveKvintetView", () => {
     render(
       <ActiveKvintetView
         kvintet={mockActiveKvintet}
-        tab="overview"
-        onTabChange={vi.fn()}
-        renderChat={renderChat}
         onLeave={handleLeave}
         isLeaving={false}
       />,
@@ -130,46 +135,14 @@ describe("ActiveKvintetView", () => {
     expect(screen.getByText("Produktový manažer")).toBeInTheDocument()
     expect(screen.getByText("UX designérka")).toBeInTheDocument()
 
-    // The chat is a tab, closed by default
-    expect(screen.getByRole("tab", { name: "Overview" })).toHaveAttribute("aria-selected", "true")
-    expect(screen.getByRole("tab", { name: "Messages" })).toBeInTheDocument()
-    expect(screen.queryByText(/chat for/)).not.toBeInTheDocument()
+    // Group chat block
+    expect(screen.getByText("Group chat")).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: "Open messages" })).toHaveAttribute(
+      "href",
+      "/kvintet/messages",
+    )
 
     // Leave kvintet
     expect(screen.getByRole("button", { name: "Leave kvintet" })).toBeInTheDocument()
-  })
-
-  it("asks to open the messages tab when it is clicked", async () => {
-    const handleTabChange = vi.fn()
-
-    render(
-      <ActiveKvintetView
-        kvintet={mockActiveKvintet}
-        tab="overview"
-        onTabChange={handleTabChange}
-        renderChat={renderChat}
-        onLeave={vi.fn()}
-        isLeaving={false}
-      />,
-    )
-    await userEvent.click(screen.getByRole("tab", { name: "Messages" }))
-
-    expect(handleTabChange).toHaveBeenCalledWith("messages")
-  })
-
-  it("shows the chat of the current member on the messages tab", () => {
-    render(
-      <ActiveKvintetView
-        kvintet={mockActiveKvintet}
-        tab="messages"
-        onTabChange={vi.fn()}
-        renderChat={renderChat}
-        onLeave={vi.fn()}
-        isLeaving={false}
-      />,
-    )
-
-    expect(screen.getByText("chat for u1")).toBeInTheDocument()
-    expect(screen.queryByText("Backend vývojář")).not.toBeInTheDocument()
   })
 })

@@ -50,8 +50,10 @@
     "empty": "Zatím žádné zprávy. Pozdravte svůj kvintet.",
     "error": "Zprávy se nepodařilo načíst.",
     "newMessages": "Nové zprávy",
+    "pageTitle": "Zprávy",
     "retry": "Zkusit znovu",
     "showEarlier": "Zobrazit starší zprávy",
+    "subtitle": "{{names}} · zprávy čtou jen členové",
     "you": "Vy"
   },
   "codeOfConduct": {
@@ -131,6 +133,11 @@
     "activeSubtitle": "VZNIKL {{date}} · {{count}} ČLENŮ",
     "activeSubtitleWithPreferences": "VZNIKL {{date}} · {{count}} ČLENŮ · VŠEM VYHOVUJE: {{preferences}}",
     "alreadyMember": "V návrhu už jste.",
+    "chat": {
+      "description": "Domluvte si první setkání ve skupinovém chatu.",
+      "heading": "Skupinový chat",
+      "openMessages": "Otevřít zprávy"
+    },
     "count_few": "{{formatted}} návrhy",
     "count_many": "{{formatted}} návrhu",
     "count_one": "{{formatted}} návrh",
@@ -227,10 +234,6 @@
     "table": {
       "description": "Domluvte si první setkání ve skupinovém chatu. Kvintet si řídíte sami – bez facilitátora a bez hodnocení.",
       "title": "Pět lidí, <em className=\"italic\">jeden stůl.</em>"
-    },
-    "tabs": {
-      "messages": "Zprávy",
-      "overview": "Přehled"
     },
     "teaches": "Učí: {{tags}}",
     "title": "Návrhy pro vás",

@@ -48,8 +48,10 @@
     "empty": "No messages yet. Say hello to your kvintet.",
     "error": "We couldn't load the messages.",
     "newMessages": "New messages",
+    "pageTitle": "Messages",
     "retry": "Try again",
     "showEarlier": "Show earlier messages",
+    "subtitle": "{{names}} · only members can read the messages",
     "you": "You"
   },
   "codeOfConduct": {
@@ -129,6 +131,11 @@
     "activeSubtitle": "FORMED ON {{date}} · {{count}} MEMBERS",
     "activeSubtitleWithPreferences": "FORMED ON {{date}} · {{count}} MEMBERS · SUITS EVERYONE: {{preferences}}",
     "alreadyMember": "You are already in a proposal.",
+    "chat": {
+      "description": "Arrange your first meeting in the group chat.",
+      "heading": "Group chat",
+      "openMessages": "Open messages"
+    },
     "count_one": "{{formatted}} proposal",
     "count_other": "{{formatted}} proposals",
     "diagram": {
@@ -223,10 +230,6 @@
     "table": {
       "description": "Arrange your first meeting in the group chat. You run the kvintet yourselves – no facilitator, no ratings.",
       "title": "Five people, <em className=\"italic\">one table.</em>"
-    },
-    "tabs": {
-      "messages": "Messages",
-      "overview": "Overview"
     },
     "teaches": "Teaches: {{tags}}",
     "title": "Proposals for you",
