@@ -90,6 +90,7 @@ model User {
 
   profile         Profile?
   kvintetMember   KvintetMember?
+  messages        Message[]
 
   @@unique([email])
   @@unique([username])
@@ -211,6 +212,7 @@ model Kvintet {
   activatedAt DateTime?
   members     KvintetMember[]
   votes       KvintetVote[]
+  messages    Message[]
 
   @@index([status, createdAt])
   @@map("kvintet")
@@ -237,4 +239,26 @@ model KvintetVote {
 
   @@id([kvintetId, userId])
   @@map("kvintet_vote")
+}
+
+enum MessageKind {
+  USER
+  SYSTEM
+
+  @@map("message_kind")
+}
+
+// authorId is NULL for SYSTEM lines and for messages whose author deleted their account.
+model Message {
+  id        Int         @id @default(autoincrement())
+  kvintetId String      @db.Uuid
+  kvintet   Kvintet     @relation(fields: [kvintetId], references: [id], onDelete: Cascade)
+  authorId  String?
+  author    User?       @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  kind      MessageKind @default(USER)
+  body      String      @db.Text
+  createdAt DateTime    @default(now())
+
+  @@index([kvintetId, id])
+  @@map("message")
 }

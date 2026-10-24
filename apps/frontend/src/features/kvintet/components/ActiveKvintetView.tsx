@@ -1,6 +1,8 @@
 import { useState } from "react"
+import { Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
+import { ROUTES } from "@/app/routes"
 import { Button } from "@/components/ui/button"
 import { SUPPORT_EMAIL } from "@/config/support"
 import { formatDate } from "@/lib/date"
@@ -75,14 +77,12 @@ export function ActiveKvintetView({ kvintet, onLeave, isLeaving }: ActiveKvintet
             <h3 className="text-subheading">{t("kvintet.chat.heading")}</h3>
             <p className="text-sm text-muted-foreground">{t("kvintet.chat.description")}</p>
             <Button
+              asChild
               variant="default"
               className="mt-1 w-full"
-              disabled
-              aria-disabled="true"
             >
-              {t("kvintet.chat.openMessages")}
+              <Link to={ROUTES.kvintetMessages}>{t("kvintet.chat.openMessages")}</Link>
             </Button>
-            <p className="text-xs text-muted-foreground">{t("kvintet.chat.comingSoon")}</p>
           </div>
 
           {/* Report issue */}

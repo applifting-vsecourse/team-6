@@ -1,6 +1,7 @@
 import { ConfigModule } from '@applifting-io/nestjs-decorated-config';
 import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
+import { ChatModule } from './modules/chat/chat.module';
 import { KvintetModule } from './modules/kvintet/kvintet.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { ReferenceModule } from './modules/reference/reference.module';
@@ -16,6 +17,7 @@ const imports = [
   ReferenceModule,
   ProfileModule,
   KvintetModule,
+  ChatModule,
 ];
 
 @Module({

@@ -1,4 +1,6 @@
 import type { ComponentType, ReactNode } from "react"
+import type * as ReactQuery from "@tanstack/react-query"
+import type * as ReactRouter from "@tanstack/react-router"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 
@@ -8,12 +10,12 @@ vi.mock("@/features/auth/hooks/useSession", () => ({
   useSession: () => ({ user: { id: "u1", name: "Jana Nováková" } }),
 }))
 vi.mock("@tanstack/react-query", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@tanstack/react-query")>()),
+  ...(await importOriginal<typeof ReactQuery>()),
   useQuery: () => ({ data: undefined }),
 }))
 // The page only needs links to render; a real router is beside the point here.
 vi.mock("@tanstack/react-router", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@tanstack/react-router")>()),
+  ...(await importOriginal<typeof ReactRouter>()),
   Link: ({ children, to }: { children?: ReactNode; to: string }) => <a href={to}>{children}</a>,
 }))
 
