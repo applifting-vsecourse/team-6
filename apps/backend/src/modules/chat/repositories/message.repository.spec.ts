@@ -72,7 +72,7 @@ describe('MessageRepository (Postgres)', () => {
   };
 
   /** What Leave does to chat: lock the kvintet, then delete the membership. */
-  const leave = (kvintetId: string, userId: string) =>
+  const leave = (kvintetId: string, userId: string): Promise<void> =>
     prisma.$transaction(async (tx) => {
       await tx.$queryRaw`SELECT "id" FROM "kvintet" WHERE "id" = ${kvintetId}::uuid FOR UPDATE`;
       await tx.kvintetMember.delete({ where: { userId } });

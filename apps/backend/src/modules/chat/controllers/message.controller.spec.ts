@@ -17,7 +17,7 @@ import { mock } from 'jest-mock-extended';
 
 // See kvintet.controller.spec.ts: the real provider pulls in ESM-only packages.
 jest.mock('@/shared/auth/providers/better-auth.provider', () => ({
-  InjectBetterAuth: () => undefined,
+  InjectBetterAuth: (): undefined => undefined,
 }));
 jest.mock('@/shared/auth/utils/get-session-from-request', () => ({
   getSessionFromRequest: jest.fn(),
@@ -43,7 +43,7 @@ describe('MessageController', () => {
     const guard = new MemberGuard({} as BetterAuth, prisma);
     const context = {
       switchToHttp: () => ({
-        getRequest: () => ({
+        getRequest: (): unknown => ({
           session: { user: { id: 'admin-1', role: 'admin' } },
         }),
       }),

@@ -3,7 +3,7 @@ import { MessageRepository } from '@/modules/chat/repositories/message.repositor
 import { MessageService } from '@/modules/chat/services/message.service';
 import { ValidationFailedException } from '@/shared/errors/validation.pipe';
 import { ConflictException, ForbiddenException } from '@nestjs/common';
-import { mock } from 'jest-mock-extended';
+import { mock, type MockProxy } from 'jest-mock-extended';
 
 const message: ChatMessage = {
   id: 1,
@@ -16,7 +16,10 @@ const message: ChatMessage = {
 };
 
 describe('MessageService', () => {
-  const setup = () => {
+  const setup = (): {
+    repository: MockProxy<MessageRepository>;
+    service: MessageService;
+  } => {
     const repository = mock<MessageRepository>();
     return { repository, service: new MessageService(repository) };
   };
