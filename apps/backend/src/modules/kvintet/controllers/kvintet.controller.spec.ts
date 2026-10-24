@@ -13,7 +13,7 @@ import { mock } from 'jest-mock-extended';
 // The real guard pulls in the better-auth provider (.tsx email templates, ESM-only
 // packages) which this Jest setup does not load; its behaviour has its own spec.
 jest.mock('@/shared/auth/providers/better-auth.provider', () => ({
-  InjectBetterAuth: () => undefined,
+  InjectBetterAuth: (): undefined => undefined,
 }));
 jest.mock('@/shared/auth/utils/get-session-from-request', () => ({
   getSessionFromRequest: jest.fn(),
@@ -38,7 +38,7 @@ describe('KvintetController', () => {
     const guard = new OnboardedGuard({} as BetterAuth, prisma);
     const context = {
       switchToHttp: () => ({
-        getRequest: () => ({
+        getRequest: (): { session: { user: { id: string } } } => ({
           session: { user: { id: 'u1' } },
         }),
       }),

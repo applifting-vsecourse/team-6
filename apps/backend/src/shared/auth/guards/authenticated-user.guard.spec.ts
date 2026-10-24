@@ -7,18 +7,24 @@ import { AuthenticatedUserGuard } from './authenticated-user.guard';
 // ESM-only better-auth/node, which this Jest setup does not load. The guard
 // only needs the decorator and the session lookup result.
 jest.mock('@/shared/auth/providers/better-auth.provider', () => ({
-  InjectBetterAuth: () => undefined,
+  InjectBetterAuth: (): undefined => undefined,
 }));
 jest.mock('@/shared/auth/utils/get-session-from-request', () => ({
   getSessionFromRequest: jest.fn(),
 }));
 
-const setup = (session: unknown) => {
+const setup = (
+  session: unknown,
+): {
+  guard: AuthenticatedUserGuard;
+  context: ExecutionContext;
+  request: { session?: unknown };
+} => {
   jest.mocked(getSessionFromRequest).mockResolvedValue(session);
   const guard = new AuthenticatedUserGuard({} as BetterAuth);
   const request: { session?: unknown } = {};
   const context = {
-    switchToHttp: () => ({ getRequest: () => request }),
+    switchToHttp: () => ({ getRequest: (): typeof request => request }),
   } as unknown as ExecutionContext;
   return { guard, context, request };
 };

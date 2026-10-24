@@ -34,7 +34,7 @@ const setup = (
   );
   const request: { session?: unknown; kvintetMember?: unknown } = {};
   const context = {
-    switchToHttp: () => ({ getRequest: () => request }),
+    switchToHttp: () => ({ getRequest: (): typeof request => request }),
   } as unknown as ExecutionContext;
   return { guard, context, request, prismaMock };
 };

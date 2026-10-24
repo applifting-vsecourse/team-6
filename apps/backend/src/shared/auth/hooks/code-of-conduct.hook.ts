@@ -9,7 +9,7 @@ import { BetterAuthOptions } from 'better-auth/types';
 export const codeOfConductDatabaseHooks = {
   user: {
     create: {
-      before: (user, ctx) => {
+      before: (user, ctx): Promise<{ data: object }> => {
         const consented = withCodeOfConductConsent(user, ctx?.body);
         if (!consented) {
           throw APIError.from('BAD_REQUEST', {
