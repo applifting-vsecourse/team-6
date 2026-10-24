@@ -8,7 +8,8 @@ import type { ChatMessage } from "@/features/chat/api/chatApi"
 import { ChatPanel } from "./ChatPanel"
 
 // The gaze driver needs browser APIs jsdom lacks (matchMedia, ResizeObserver).
-vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
+const { useGaze } = vi.hoisted(() => ({ useGaze: vi.fn(() => ({ ref: vi.fn() })) }))
+vi.mock("@blobatar/react/gaze", () => ({ useGaze }))
 
 type Params = Record<string, number>
 const apiGet = vi.fn<(path: string, options: { searchParams: Params }) => Promise<ChatMessage[]>>()
@@ -51,6 +52,7 @@ describe("ChatPanel", () => {
   beforeEach(() => {
     apiGet.mockReset()
     apiPost.mockReset()
+    useGaze.mockClear()
   })
 
   it("shows messages oldest to newest with author, time and a separator per day", async () => {
@@ -77,6 +79,26 @@ describe("ChatPanel", () => {
     expect(screen.getByText("Eva left")).toBeInTheDocument()
     expect(screen.getAllByText(/\d{1,2}:\d{2}/).length).toBeGreaterThanOrEqual(3)
     expect(apiGet).toHaveBeenCalledWith("kvintets/mine/messages", { searchParams: {} })
+  })
+
+  it("animates only the avatar under the mouse", async () => {
+    apiGet.mockResolvedValue([message(1), message(2)])
+    renderPanel()
+    await screen.findByText("Message 1")
+    // Static avatars do not even set up the gaze driver.
+    expect(useGaze).not.toHaveBeenCalled()
+
+    // The avatar itself is swapped on hover, so keep hold of its stable wrapper.
+    const [first, second] = [...document.querySelectorAll('[data-slot="avatar"]')].map(
+      (avatar) => avatar.parentElement!,
+    )
+    await userEvent.hover(first!)
+    expect(useGaze).toHaveBeenCalledTimes(1)
+
+    await userEvent.unhover(first!)
+    useGaze.mockClear()
+    await userEvent.hover(second!)
+    expect(useGaze).toHaveBeenCalledTimes(1)
   })
 
   it("renders a message body as text, never as HTML", async () => {
