@@ -12,7 +12,7 @@ import { useMyKvintet } from "@/features/kvintet/hooks/useMyKvintet"
 
 type KvintetMessagesPageProps = {
   /** The chat belongs to another feature, and features may not import each other: the route supplies it. */
-  renderChat: (currentUserId: string | undefined) => ReactNode
+  renderChat: (chat: { kvintetId: string; currentUserId: string | undefined }) => ReactNode
 }
 
 export function KvintetMessagesPage({ renderChat }: KvintetMessagesPageProps) {
@@ -70,7 +70,10 @@ export function KvintetMessagesPage({ renderChat }: KvintetMessagesPageProps) {
                 })}
               </p>
             </header>
-            {renderChat(kvintet.members.find((member) => member.isCurrentUser)?.userId)}
+            {renderChat({
+              kvintetId: kvintet.id,
+              currentUserId: kvintet.members.find((member) => member.isCurrentUser)?.userId,
+            })}
           </>
         )}
       </div>

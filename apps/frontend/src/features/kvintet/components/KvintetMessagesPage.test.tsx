@@ -72,7 +72,15 @@ describe("KvintetMessagesPage", () => {
   it("shows the kvintet title, a way back, its members and the chat", () => {
     state({ data: kvintet("ACTIVE") })
 
-    render(<KvintetMessagesPage renderChat={(id) => <p>chat for {id}</p>} />)
+    render(
+      <KvintetMessagesPage
+        renderChat={({ kvintetId, currentUserId }) => (
+          <p>
+            chat {kvintetId} for {currentUserId}
+          </p>
+        )}
+      />,
+    )
 
     expect(
       screen.getByRole("heading", { name: "AI v práci – co opravdu funguje" }),
@@ -81,7 +89,7 @@ describe("KvintetMessagesPage", () => {
     expect(
       screen.getByText("Jana Nováková, Petr Svoboda · only members can read the messages"),
     ).toBeInTheDocument()
-    expect(screen.getByText("chat for u1")).toBeInTheDocument()
+    expect(screen.getByText("chat k1 for u1")).toBeInTheDocument()
   })
 
   it.each([

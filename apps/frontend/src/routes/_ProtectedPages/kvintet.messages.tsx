@@ -10,7 +10,13 @@ export const Route = createFileRoute("/_ProtectedPages/kvintet/messages")({
 function KvintetMessagesRoute() {
   return (
     <KvintetMessagesPage
-      renderChat={(currentUserId) => <ChatPanel currentUserId={currentUserId} />}
+      renderChat={({ kvintetId, currentUserId }) => (
+        <ChatPanel
+          key={kvintetId}
+          kvintetId={kvintetId}
+          currentUserId={currentUserId}
+        />
+      )}
     />
   )
 }

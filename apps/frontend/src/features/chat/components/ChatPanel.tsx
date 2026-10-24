@@ -13,15 +13,16 @@ import { MessageComposer } from "./MessageComposer"
 import { MessageItem } from "./MessageItem"
 
 type ChatPanelProps = {
+  kvintetId: string
   currentUserId: string | undefined
 }
 
 const dayOf = (iso: string) => new Date(iso).toDateString()
 
-export function ChatPanel({ currentUserId }: ChatPanelProps) {
+export function ChatPanel({ kvintetId, currentUserId }: ChatPanelProps) {
   const { t } = useTranslation()
-  const chat = useMessages()
-  const send = useSendMessage()
+  const chat = useMessages(kvintetId)
+  const send = useSendMessage(kvintetId)
   const { messages } = chat
   const scrollerRef = useRef<HTMLDivElement>(null)
   const scroll = useStickToBottom(scrollerRef, messages?.at(-1)?.id)

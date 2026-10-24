@@ -35,7 +35,8 @@ describe("messagesQueryOptions", () => {
   })
 
   // staleTime 0 makes the second fetch run the queryFn again, like a poll does.
-  const poll = () => queryClient.fetchQuery({ ...messagesQueryOptions(), staleTime: 0 })
+  const poll = (kvintetId = "k1") =>
+    queryClient.fetchQuery({ ...messagesQueryOptions(kvintetId), staleTime: 0 })
 
   it("remembers whether older messages may exist from the first page only", async () => {
     apiGet.mockReturnValueOnce(range(1, 50))
@@ -43,6 +44,18 @@ describe("messagesQueryOptions", () => {
 
     apiGet.mockReturnValueOnce([])
     expect((await poll()).hasEarlier).toBe(true)
+  })
+
+  it("never continues from the cached messages of another kvintet", async () => {
+    apiGet.mockReturnValueOnce([message(1), message(2)])
+    await poll("kvintet-a")
+
+    apiGet.mockReturnValueOnce([message(7)])
+    const { messages } = await poll("kvintet-b")
+
+    // A fresh kvintet loads its latest page; it does not ask "after 2" and glue A's history on.
+    expect(apiGet).toHaveBeenLastCalledWith("kvintets/mine/messages", { searchParams: {} })
+    expect(messages.map((m) => m.id)).toEqual([7])
   })
 
   it("catches up over several pages until one is shorter than the limit", async () => {

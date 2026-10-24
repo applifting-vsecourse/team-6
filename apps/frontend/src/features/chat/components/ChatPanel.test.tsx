@@ -43,7 +43,10 @@ const renderPanel = () => {
   })
   return render(
     <QueryClientProvider client={queryClient}>
-      <ChatPanel currentUserId="u1" />
+      <ChatPanel
+        kvintetId="k1"
+        currentUserId="u1"
+      />
     </QueryClientProvider>,
   )
 }

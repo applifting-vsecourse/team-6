@@ -46,9 +46,9 @@ export type MessagesData = {
  * what came after the newest message we hold and appends it, repeating until a page comes back
  * shorter than the limit so `after=0` style catch-ups never stop halfway.
  */
-export const messagesQueryOptions = () =>
+export const messagesQueryOptions = (kvintetId: string) =>
   queryOptions({
-    queryKey: chatKeys.messages(),
+    queryKey: chatKeys.messages(kvintetId),
     queryFn: async ({ client, queryKey }): Promise<MessagesData> => {
       const previous = client.getQueryData<MessagesData>(queryKey)
       if (!previous) {

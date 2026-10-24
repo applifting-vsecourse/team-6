@@ -11,8 +11,8 @@ import {
 import { chatKeys } from "@/features/chat/api/chatKeys"
 
 /** The polled messages plus the older pages the reader asked for, oldest to newest. */
-export function useMessages() {
-  const query = useQuery(messagesQueryOptions())
+export function useMessages(kvintetId: string) {
+  const query = useQuery(messagesQueryOptions(kvintetId))
   const [earlier, setEarlier] = useState<ChatMessage[]>([])
   const [isExhausted, setIsExhausted] = useState(false)
 
@@ -41,7 +41,7 @@ export function useMessages() {
   }
 }
 
-export function useSendMessage() {
+export function useSendMessage(kvintetId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -49,6 +49,6 @@ export function useSendMessage() {
     // Poll right away instead of appending the reply: another member's message with a lower id
     // may be newer than our cache, and appending ours would make the next poll skip it. The
     // mutation stays pending until the refresh lands, so the message is on screen when it clears.
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: chatKeys.messages() }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: chatKeys.messages(kvintetId) }),
   })
 }
