@@ -130,7 +130,12 @@ export const seedDatabase = async (
       ['Petr Mráček', 'PetrMracek', 'petr.mracek@example.com'],
       ['David Vokurka', 'DavidVokurka', 'david.vokurka@example.com'],
     ].map(([name, username, email]) =>
-      createUser(prisma, auth, { email, password: 'passwordos', name, username }),
+      createUser(prisma, auth, {
+        email,
+        password: 'passwordos',
+        name,
+        username,
+      }),
     ),
   );
   await prisma.profile.createMany({
