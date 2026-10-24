@@ -1,9 +1,11 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
 import { MeetingFrequency } from '@/generated/prisma/client';
 
-type DemoMember = {
+export type DemoMember = {
   userId: string;
   position: string;
+  // Role names from the onboarding picker.
+  roles?: string[];
   meetingFrequency: MeetingFrequency;
   teach: string[];
   learn: string[];
@@ -26,9 +28,9 @@ const minutesAgo = (minutes: number): Date =>
 // Local demo data only: the feed is empty until someone has a profile and a kvintet.
 // shortcut: writes profiles and tags directly because nothing else does yet; once the
 // onboarding story (#7) saves them, create demo profiles through its code instead.
-export async function createDemoKvintets(
+export async function createDemoProfiles(
   prisma: PrismaService,
-  kvintets: DemoKvintet[],
+  members: DemoMember[],
 ): Promise<void> {
   const tags = new Map(
     (await prisma.tag.findMany()).map((tag) => [tag.slug, tag.id]),
@@ -39,38 +41,48 @@ export async function createDemoKvintets(
     return id;
   };
 
+  for (const member of members) {
+    await prisma.profile.create({
+      data: {
+        userId: member.userId,
+        // Without it the guards send a demo user back to onboarding.
+        onboardingCompletedAt: new Date(),
+        position: member.position,
+        roles: member.roles ?? [],
+        meetingFrequency: member.meetingFrequency,
+        weekdays: true,
+        evenings: true,
+        tags: {
+          create: [
+            ...member.teach.map((slug) => ({
+              tagId: tagId(slug),
+              kind: 'TEACH' as const,
+            })),
+            ...member.learn.map((slug) => ({
+              tagId: tagId(slug),
+              kind: 'LEARN' as const,
+            })),
+            ...member.interests.map((slug) => ({
+              tagId: tagId(slug),
+              kind: 'INTEREST' as const,
+            })),
+          ],
+        },
+      },
+    });
+  }
+}
+
+export async function createDemoKvintets(
+  prisma: PrismaService,
+  kvintets: DemoKvintet[],
+): Promise<void> {
   for (const kvintet of kvintets) {
     const category = await prisma.category.findUniqueOrThrow({
       where: { slug: kvintet.category },
     });
 
-    for (const member of kvintet.members) {
-      await prisma.profile.create({
-        data: {
-          userId: member.userId,
-          // Without it the guards send a demo user back to onboarding.
-          onboardingCompletedAt: new Date(),
-          position: member.position,
-          meetingFrequency: member.meetingFrequency,
-          tags: {
-            create: [
-              ...member.teach.map((slug) => ({
-                tagId: tagId(slug),
-                kind: 'TEACH' as const,
-              })),
-              ...member.learn.map((slug) => ({
-                tagId: tagId(slug),
-                kind: 'LEARN' as const,
-              })),
-              ...member.interests.map((slug) => ({
-                tagId: tagId(slug),
-                kind: 'INTEREST' as const,
-              })),
-            ],
-          },
-        },
-      });
-    }
+    await createDemoProfiles(prisma, kvintet.members);
 
     const created = await prisma.kvintet.create({
       data: {

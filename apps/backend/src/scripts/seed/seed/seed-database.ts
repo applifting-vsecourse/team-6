@@ -1,7 +1,11 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
 import { BetterAuth } from '@/shared/auth/providers/better-auth.provider';
 import { Config } from '@/shared/config/config.service';
-import { createDemoKvintets } from './create-demo-kvintets';
+import {
+  createDemoKvintets,
+  createDemoProfiles,
+  type DemoMember,
+} from './create-demo-kvintets';
 import { createUser } from './create-user';
 
 export const seedDatabase = async (
@@ -121,29 +125,92 @@ export const seedDatabase = async (
   );
 
   // Onboarded but in no kvintet, so these accounts see the full feed.
-  const feedUsers = await Promise.all(
-    [
-      ['Lenka Malá', 'LenkaMala', 'lenka.mala@example.com'],
-      ['Nathan Němec', 'NathanNemec', 'nathan.nemec@example.com'],
-      ['Martin Bambas', 'MartinBambas', 'martin.bambas@example.com'],
-      ['Dominik Šimon', 'DominikSimon', 'dominik.simon@example.com'],
-      ['Petr Mráček', 'PetrMracek', 'petr.mracek@example.com'],
-      ['David Vokurka', 'DavidVokurka', 'david.vokurka@example.com'],
-    ].map(([name, username, email]) =>
-      createUser(prisma, auth, {
-        email,
-        password: 'passwordos',
-        name,
-        username,
+  const feedUsers: (Omit<DemoMember, 'userId'> & {
+    name: string;
+    username: string;
+    email: string;
+  })[] = [
+    {
+      name: 'Lenka Malá',
+      username: 'LenkaMala',
+      email: 'lenka.mala@example.com',
+      position: 'Project manager',
+      roles: ['Project Manager'],
+      meetingFrequency: 'WEEKLY',
+      teach: ['agile', 'leadership'],
+      learn: ['python'],
+      interests: ['yoga'],
+    },
+    {
+      name: 'Nathan Němec',
+      username: 'NathanNemec',
+      email: 'nathan.nemec@example.com',
+      position: 'Data engineer',
+      roles: ['Data Engineer'],
+      meetingFrequency: 'BIWEEKLY',
+      teach: ['postgresql', 'python'],
+      learn: ['kubernetes'],
+      interests: ['gaming'],
+    },
+    {
+      name: 'Martin Bambas',
+      username: 'MartinBambas',
+      email: 'martin.bambas@example.com',
+      position: 'Backend developer',
+      roles: ['Backend Developer'],
+      meetingFrequency: 'WEEKLY',
+      teach: ['nestjs', 'typescript'],
+      learn: ['terraform'],
+      interests: ['cycling'],
+    },
+    {
+      name: 'Dominik Šimon',
+      username: 'DominikSimon',
+      email: 'dominik.simon@example.com',
+      position: 'UX/UI designer',
+      roles: ['UX/UI Designer'],
+      meetingFrequency: 'BIWEEKLY',
+      teach: ['figma', 'ux-design'],
+      learn: ['react'],
+      interests: ['photography'],
+    },
+    {
+      name: 'Petr Mráček',
+      username: 'PetrMracek',
+      email: 'petr.mracek@example.com',
+      position: 'Security engineer',
+      roles: ['Security Engineer'],
+      meetingFrequency: 'MONTHLY',
+      teach: ['cybersecurity', 'linux'],
+      learn: ['public-speaking'],
+      interests: ['bouldering'],
+    },
+    {
+      name: 'David Vokurka',
+      username: 'DavidVokurka',
+      email: 'david.vokurka@example.com',
+      position: 'Product manager',
+      roles: ['Product Manager'],
+      meetingFrequency: 'WEEKLY',
+      teach: ['product-strategy', 'roadmapping'],
+      learn: ['sql'],
+      interests: ['coffee'],
+    },
+  ];
+  await createDemoProfiles(
+    prisma,
+    await Promise.all(
+      feedUsers.map(async ({ name, username, email, ...profile }) => {
+        const user = await createUser(prisma, auth, {
+          email,
+          password: 'passwordos',
+          name,
+          username,
+        });
+        return { ...profile, userId: user.id };
       }),
     ),
   );
-  await prisma.profile.createMany({
-    data: feedUsers.map((user) => ({
-      userId: user.id,
-      onboardingCompletedAt: new Date(),
-    })),
-  });
 
   console.log('Creating demo kvintets');
 

@@ -33,17 +33,30 @@ The ports are deliberately odd — 3050, 4050, and Postgres on 5433 rather than 
 
 ### Seeded users
 
-The full list is in `apps/backend/src/scripts/seed/seed/seed-database.ts`. `lenka.mala`, `nathan.nemec`, `martin.bambas`, `dominik.simon`, `petr.mracek` and `david.vokurka` are onboarded and in no kvintet, so they see every proposal; all share the password `passwordos`; `anna.horakova` is in an active kvintet of five.
+The seed ([`seed-database.ts`](apps/backend/src/scripts/seed/seed/seed-database.ts)) only runs into an empty database. Every seeded user has finished onboarding.
 
-| Email                         | Password        |
-| ----------------------------- | --------------- |
-| `jan.novak@example.com`       | `passwordos`    |
-| `petra.svobodova@example.com` | `passwordos`    |
-| `tomas.dvorak@example.com`    | `passwordos`    |
-| `eva.cerna@example.com`       | `passwordos`    |
-| `lenka.mala@example.com`      | `passwordos`    |
-| `anna.horakova@example.com`   | `passwordos`    |
-| `admin@example.com`           | `adminpassword` |
+| Email                           | Name              | Password        | State                                                    |
+| ------------------------------- | ----------------- | --------------- | -------------------------------------------------------- |
+| `jan.novak@example.com`         | Jan Novák         | `passwordos`    | Proposal "Using AI at work" (4 of 5), has voted to start |
+| `petra.svobodova@example.com`   | Petra Svobodová   | `passwordos`    | Same proposal, has voted to start                        |
+| `tomas.dvorak@example.com`      | Tomáš Dvořák      | `passwordos`    | Same proposal, has not voted yet                         |
+| `ondrej.marek@example.com`      | Ondřej Marek      | `passwordos`    | Same proposal, has not voted yet                         |
+| `eva.cerna@example.com`         | Eva Černá         | `passwordos`    | Proposal "From Excel to Python" (1 of 5)                 |
+| `lucie.prochazkova@example.com` | Lucie Procházková | `passwordos`    | Proposal "Spanish conversation over lunch" (1 of 5)      |
+| `martin.kucera@example.com`     | Martin Kučera     | `passwordos`    | Proposal "Negotiating your first client deal" (1 of 5)   |
+| `katerina.vesela@example.com`   | Kateřina Veselá   | `passwordos`    | Proposal "Cooking together on Sundays" (1 of 5)          |
+| `anna.horakova@example.com`     | Anna Horáková     | `passwordos`    | Member of the active kvintet "Frontend craft circle"     |
+| `jakub.benes@example.com`       | Jakub Beneš       | `passwordos`    | Same active kvintet                                      |
+| `david.kral@example.com`        | David Král        | `passwordos`    | Same active kvintet                                      |
+| `dana.pokorna@example.com`      | Dana Pokorná      | `passwordos`    | Same active kvintet                                      |
+| `filip.nemec@example.com`       | Filip Němec       | `passwordos`    | Same active kvintet                                      |
+| `lenka.mala@example.com`        | Lenka Malá        | `passwordos`    | Onboarded, in no kvintet: sees every proposal            |
+| `nathan.nemec@example.com`      | Nathan Němec      | `passwordos`    | Onboarded, in no kvintet: sees every proposal            |
+| `martin.bambas@example.com`     | Martin Bambas     | `passwordos`    | Onboarded, in no kvintet: sees every proposal            |
+| `dominik.simon@example.com`     | Dominik Šimon     | `passwordos`    | Onboarded, in no kvintet: sees every proposal            |
+| `petr.mracek@example.com`       | Petr Mráček       | `passwordos`    | Onboarded, in no kvintet: sees every proposal            |
+| `david.vokurka@example.com`     | David Vokurka     | `passwordos`    | Onboarded, in no kvintet: sees every proposal            |
+| `admin@example.com`             | Admin             | `adminpassword` | Superadmin (from the config; delete in production)       |
 
 Verification/reset emails are printed to the backend terminal (console mailer) unless you configure Resend or SMTP in `apps/backend/.env`.
 
