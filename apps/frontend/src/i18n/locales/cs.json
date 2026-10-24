@@ -380,6 +380,12 @@
       "description": "Našli jsme návrhy, které odpovídají vašemu profilu. Vyberte podle tématu – jména uvidíte, až skupina vznikne.",
       "title": "Vyberte si návrh"
     },
+    "nextStepMember": {
+      "badge": "VÁŠ KVINTET",
+      "button": "Přejít na můj kvintet",
+      "description": "Podívejte se, kdo je ve vaší skupině a co bude dál.",
+      "title": "Jděte do svého kvintetu"
+    },
     "profileCard": {
       "badge": "VÁŠ PROFIL",
       "daysWeekdays": "všední dny",
@@ -397,6 +403,7 @@
       "timeMornings": "dopoledne"
     },
     "subtitle": "Zatím nejste v žádném kvintetu. Začněte výběrem návrhu.",
+    "subtitleMember": "Jste v kvintetu. Podívejte se, jak se vaší skupině daří.",
     "title": "Přehled"
   },
   "roles": {
