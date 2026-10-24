@@ -40,6 +40,7 @@ describe("OverviewPage", () => {
     )
   })
 
+  // TEMPORARY: covers the stopgap member variant; revisit with the overview redesign.
   it("sends a kvintet member to their kvintet instead of the proposals", () => {
     membership.isMember = true
     render(<OverviewPage />)

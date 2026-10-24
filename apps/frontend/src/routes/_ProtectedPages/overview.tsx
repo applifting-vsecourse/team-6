@@ -34,6 +34,9 @@ function OverviewPage() {
   const profile = profileQuery.data
   const { isMember } = useKvintetMembership()
 
+  // TEMPORARY: the member variant of this page (copy, button to /kvintet, hidden
+  // how-it-works) is a stopgap. What the overview shows once a user has a kvintet,
+  // or whether it exists at all, is still to be decided with the client.
   const nextStep = isMember
     ? {
         badge: t("overview.nextStepMember.badge"),
