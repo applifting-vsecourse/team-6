@@ -39,6 +39,23 @@
     "personal-development": "Osobní rozvoj",
     "technology": "Technologie"
   },
+  "chat": {
+    "composer": {
+      "label": "Zpráva",
+      "placeholder": "Napište zprávu…",
+      "send": "Odeslat",
+      "sending": "Odesílám…"
+    },
+    "deletedMember": "Smazaný člen",
+    "empty": "Zatím žádné zprávy. Pozdravte svůj kvintet.",
+    "error": "Zprávy se nepodařilo načíst.",
+    "newMessages": "Nové zprávy",
+    "pageTitle": "Zprávy",
+    "retry": "Zkusit znovu",
+    "showEarlier": "Zobrazit starší zprávy",
+    "subtitle": "{{names}} · zprávy čtou jen členové",
+    "you": "Vy"
+  },
   "codeOfConduct": {
     "intro": "Kvintet je místo pro lidi, kteří se chtějí potkávat a učit se od sebe navzájem. Aby se tu všichni cítili dobře, držíme se několika jednoduchých pravidel.",
     "reportIntro": "Porušení pravidel nebo problém s konkrétním člověkem nahlaste na <email>{{email}}</email>.",
@@ -95,6 +112,7 @@
     "conflict": "Tohle je v rozporu s existujícími daty.",
     "forbidden": "Nemáte k tomu přístup.",
     "internal_error": "Na naší straně se něco pokazilo. Zkuste to prosím znovu.",
+    "kvintet_not_active": "Chat se otevře, jakmile bude kvintet aktivní.",
     "kvintet_not_open": "Tento návrh je plný nebo už není otevřený.",
     "not_found": "Nepodařilo se najít, co hledáte.",
     "pageNotFound": "Stránka nenalezena",
@@ -119,7 +137,6 @@
     "activeSubtitleWithPreferences": "VZNIKL {{date}} · {{count}} ČLENŮ · VŠEM VYHOVUJE: {{preferences}}",
     "alreadyMember": "V návrhu už jste.",
     "chat": {
-      "comingSoon": "Skupinový chat bude dostupný již brzy.",
       "description": "Domluvte si první setkání ve skupinovém chatu.",
       "heading": "Skupinový chat",
       "openMessages": "Otevřít zprávy"

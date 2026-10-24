@@ -11,7 +11,7 @@ import type { Response } from 'express';
 import { ProfileController } from './profile.controller';
 
 jest.mock('@/shared/auth/providers/better-auth.provider', () => ({
-  InjectBetterAuth: () => undefined,
+  InjectBetterAuth: (): undefined => undefined,
 }));
 jest.mock('@/shared/auth/utils/get-session-from-request', () => ({
   getSessionFromRequest: jest.fn(),
@@ -31,7 +31,7 @@ describe('ProfileController', () => {
     role: 'user',
   };
 
-  const createMockResponse = () => {
+  const createMockResponse = (): Response => {
     const res: Partial<Response> = {};
     res.status = jest.fn().mockReturnValue(res);
     res.json = jest.fn().mockReturnValue(res);

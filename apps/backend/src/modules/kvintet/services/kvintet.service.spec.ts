@@ -7,7 +7,7 @@ import {
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
-import { mock } from 'jest-mock-extended';
+import { mock, type MockProxy } from 'jest-mock-extended';
 
 const member = (
   meetingFrequency: OpenKvintet['members'][number]['meetingFrequency'],
@@ -26,7 +26,10 @@ const kvintet = (members: OpenKvintet['members']): OpenKvintet => ({
   members,
 });
 
-const setup = () => {
+const setup = (): {
+  repository: MockProxy<KvintetRepository>;
+  service: KvintetService;
+} => {
   const repository = mock<KvintetRepository>();
   return { repository, service: new KvintetService(repository) };
 };

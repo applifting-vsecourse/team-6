@@ -37,6 +37,23 @@
     "personal-development": "Personal development",
     "technology": "Technology"
   },
+  "chat": {
+    "composer": {
+      "label": "Message",
+      "placeholder": "Write a message…",
+      "send": "Send",
+      "sending": "Sending…"
+    },
+    "deletedMember": "Deleted member",
+    "empty": "No messages yet. Say hello to your kvintet.",
+    "error": "We couldn't load the messages.",
+    "newMessages": "New messages",
+    "pageTitle": "Messages",
+    "retry": "Try again",
+    "showEarlier": "Show earlier messages",
+    "subtitle": "{{names}} · only members can read the messages",
+    "you": "You"
+  },
   "codeOfConduct": {
     "intro": "Kvintet is a place for people who want to meet and learn from each other. To keep it pleasant for everyone, we follow a few simple rules.",
     "reportIntro": "Report a broken rule or a problem with a specific person to <email>{{email}}</email>.",
@@ -93,6 +110,7 @@
     "conflict": "This conflicts with existing data.",
     "forbidden": "You don't have access to this.",
     "internal_error": "Something went wrong on our side. Please try again.",
+    "kvintet_not_active": "This kvintet's chat opens once the kvintet is active.",
     "kvintet_not_open": "This proposal is full or no longer open.",
     "not_found": "We couldn't find what you were looking for.",
     "pageNotFound": "Page not found",
@@ -117,7 +135,6 @@
     "activeSubtitleWithPreferences": "FORMED ON {{date}} · {{count}} MEMBERS · SUITS EVERYONE: {{preferences}}",
     "alreadyMember": "You are already in a proposal.",
     "chat": {
-      "comingSoon": "Group chat will be available soon.",
       "description": "Arrange your first meeting in the group chat.",
       "heading": "Group chat",
       "openMessages": "Open messages"
