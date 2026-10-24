@@ -26,7 +26,7 @@ export function OnboardingProgress({
         return (
           <div
             key={step}
-            className={cn("h-1 flex-1 transition-colors", isActive ? "bg-primary" : "bg-[#E9E1D2]")}
+            className={cn("h-1 flex-1 transition-colors", isActive ? "bg-primary" : "bg-track")}
           />
         )
       })}

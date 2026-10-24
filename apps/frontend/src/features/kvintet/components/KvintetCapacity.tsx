@@ -1,7 +1,10 @@
 import { useTranslation } from "react-i18next"
 
+import seatFilledDark from "@/assets/seat-filled-dark.svg"
 import seatFilled from "@/assets/seat-filled.svg"
+import seatFreeDark from "@/assets/seat-free-dark.svg"
 import seatFree from "@/assets/seat-free.svg"
+import { ThemedImage } from "@/components/ThemedImage"
 import { formatNumber } from "@/lib/date"
 
 // Five seats drawn as the Kvintet flower (px from the Figma frame). Filled = member,
@@ -29,10 +32,10 @@ export function KvintetCapacity({ filled, total }: KvintetCapacityProps) {
         className="relative size-14"
       >
         {SEATS.map((seat, index) => (
-          <img
+          <ThemedImage
             key={index}
-            src={index < filled ? seatFilled : seatFree}
-            alt=""
+            light={index < filled ? seatFilled : seatFree}
+            dark={index < filled ? seatFilledDark : seatFreeDark}
             width={28}
             height={28}
             className="absolute size-7"
