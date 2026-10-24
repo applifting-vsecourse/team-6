@@ -6,7 +6,8 @@ import { memoryAdapter } from 'better-auth/adapters/memory';
 
 // Real BetterAuth with the app's core config and the consent hook, over an
 // in-memory store, so sign-up goes through the same path as in production.
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- the type is BetterAuth's generic Auth<...>, inferred from the options below
+// The return type is BetterAuth's inferred generic over the options below; writing it out would only restate it.
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function createTestAuth() {
   const db: Record<string, unknown[]> = {
     user: [],
@@ -40,7 +41,7 @@ const credentials = {
 const signUp = (
   auth: ReturnType<typeof createTestAuth>['auth'],
   extra: Record<string, unknown> = {},
-): ReturnType<typeof auth.api.signUpEmail> => {
+): Promise<unknown> => {
   const body = { ...credentials, ...extra };
   return auth.api.signUpEmail({ body });
 };

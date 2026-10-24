@@ -1,9 +1,21 @@
+import type { ReactNode } from "react"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 
 import type { KvintetDetails } from "@/features/kvintet/api/kvintetApi"
 
 import { ActiveKvintetView } from "./ActiveKvintetView"
+
+vi.mock("@tanstack/react-router", () => ({
+  Link: ({ children, to, className }: { children?: ReactNode; to: string; className?: string }) => (
+    <a
+      href={to}
+      className={className}
+    >
+      {children}
+    </a>
+  ),
+}))
 
 vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
 
@@ -125,10 +137,10 @@ describe("ActiveKvintetView", () => {
 
     // Group chat block
     expect(screen.getByText("Group chat")).toBeInTheDocument()
-    const openMessagesButton = screen.getByRole("button", { name: "Open messages" })
-    expect(openMessagesButton).toBeInTheDocument()
-    expect(openMessagesButton).toBeDisabled()
-    expect(screen.getByText("Group chat will be available soon.")).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: "Open messages" })).toHaveAttribute(
+      "href",
+      "/kvintet/messages",
+    )
 
     // Leave kvintet
     expect(screen.getByRole("button", { name: "Leave kvintet" })).toBeInTheDocument()

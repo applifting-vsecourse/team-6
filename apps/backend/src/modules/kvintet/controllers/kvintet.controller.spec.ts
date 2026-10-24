@@ -38,7 +38,7 @@ describe('KvintetController', () => {
     const guard = new OnboardedGuard({} as BetterAuth, prisma);
     const context = {
       switchToHttp: () => ({
-        getRequest: (): { session: { user: { id: string } } } => ({
+        getRequest: (): unknown => ({
           session: { user: { id: 'u1' } },
         }),
       }),

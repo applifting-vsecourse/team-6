@@ -5,7 +5,7 @@ import {
   Logger,
   NotFoundException,
   UnauthorizedException,
-  ValidationPipe,
+  type ValidationPipe,
 } from '@nestjs/common';
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { AllExceptionsFilter } from './all-exceptions.filter';
@@ -25,9 +25,7 @@ function run(exception: unknown): { status: number; body: unknown } {
   const json = jest.fn();
   const status = jest.fn().mockReturnValue({ json });
   const host = {
-    switchToHttp: () => ({
-      getResponse: (): { status: jest.Mock } => ({ status }),
-    }),
+    switchToHttp: () => ({ getResponse: (): unknown => ({ status }) }),
   } as never;
   jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
   new AllExceptionsFilter().catch(exception, host);

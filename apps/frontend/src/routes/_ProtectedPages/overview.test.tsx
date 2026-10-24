@@ -1,6 +1,6 @@
 import type { ComponentType, ReactNode } from "react"
 import type * as ReactQuery from "@tanstack/react-query"
-import type * as Router from "@tanstack/react-router"
+import type * as ReactRouter from "@tanstack/react-router"
 import { render, screen } from "@testing-library/react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -20,7 +20,7 @@ vi.mock("@tanstack/react-query", async (importOriginal) => ({
 }))
 // The page only needs links to render; a real router is beside the point here.
 vi.mock("@tanstack/react-router", async (importOriginal) => ({
-  ...(await importOriginal<typeof Router>()),
+  ...(await importOriginal<typeof ReactRouter>()),
   Link: ({ children, to }: { children?: ReactNode; to: string }) => <a href={to}>{children}</a>,
 }))
 

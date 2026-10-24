@@ -38,7 +38,7 @@ const setup = (
   );
   const request: { session?: unknown } = {};
   const context = {
-    switchToHttp: () => ({ getRequest: (): typeof request => request }),
+    switchToHttp: () => ({ getRequest: (): unknown => request }),
   } as unknown as ExecutionContext;
   return { guard, context, request, prismaMock };
 };

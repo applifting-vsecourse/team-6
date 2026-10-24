@@ -7,7 +7,7 @@ import {
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
-import { mock, MockProxy } from 'jest-mock-extended';
+import { mock, type MockProxy } from 'jest-mock-extended';
 
 const member = (
   meetingFrequency: OpenKvintet['members'][number]['meetingFrequency'],
