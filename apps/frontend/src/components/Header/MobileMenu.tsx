@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next"
 import { DisabledNavItem } from "@/components/Header/DisabledNavItem"
 import { LanguageSwitcher } from "@/components/Header/LanguageSwitcher"
 import { NAV_ITEMS, type NavDisabled } from "@/components/Header/nav"
+import { ThemeSwitcher } from "@/components/Header/ThemeSwitcher"
 import { LogoMark } from "@/components/LogoMark"
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 
@@ -79,9 +80,15 @@ export function MobileMenu({ hasNav = false, navDisabled, account }: MobileMenuP
             })}
           </nav>
         ) : null}
-        <div className="mx-4 flex items-center justify-between border-b border-border py-4">
-          <span className="text-body">{t("common.language")}</span>
-          <LanguageSwitcher variant="pills" />
+        <div className="mx-4 flex flex-col gap-3.5 border-b border-border py-4">
+          <div className="flex items-center justify-between">
+            <span className="text-body">{t("common.language")}</span>
+            <LanguageSwitcher variant="pills" />
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-body">{t("common.theme")}</span>
+            <ThemeSwitcher variant="pills" />
+          </div>
         </div>
         {account ? <div className="px-4 py-4">{account}</div> : null}
       </SheetContent>

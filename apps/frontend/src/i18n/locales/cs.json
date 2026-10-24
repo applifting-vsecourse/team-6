@@ -63,7 +63,10 @@
     "goHome": "Na úvodní stránku",
     "language": "Jazyk",
     "reload": "Načíst znovu",
-    "saving": "Ukládání…"
+    "saving": "Ukládání…",
+    "theme": "Motiv",
+    "themeDark": "Tmavý",
+    "themeLight": "Světlý"
   },
   "errors": {
     "CITY_NOT_FOUND": "Vybrané město nebylo nalezeno.",
@@ -260,7 +263,9 @@
     "contactSupport": "Kontaktovat podporu",
     "mainNavigation": "Hlavní navigace",
     "menu": "Menu",
-    "openMenu": "Otevřít menu"
+    "openMenu": "Otevřít menu",
+    "switchToDark": "Přepnout na tmavý motiv",
+    "switchToLight": "Přepnout na světlý motiv"
   },
   "meetingFrequency": {
     "BIWEEKLY": "jednou za 14 dní",

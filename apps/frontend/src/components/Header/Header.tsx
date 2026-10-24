@@ -5,6 +5,7 @@ import { HeaderNav } from "@/components/Header/HeaderNav"
 import { LanguageSwitcher } from "@/components/Header/LanguageSwitcher"
 import { MobileMenu } from "@/components/Header/MobileMenu"
 import type { NavDisabled } from "@/components/Header/nav"
+import { ThemeSwitcher } from "@/components/Header/ThemeSwitcher"
 
 type HeaderProps = {
   // Navigation is for signed-in users only; signed out there is nothing to list yet.
@@ -30,6 +31,7 @@ export function Header({ hasNav = false, navDisabled, userMenu, mobileAccount }:
         ) : null}
         <div className="ml-auto flex items-center gap-5">
           <LanguageSwitcher className="hidden md:flex" />
+          <ThemeSwitcher className="hidden md:inline-flex" />
           {userMenu}
           <MobileMenu
             hasNav={hasNav}

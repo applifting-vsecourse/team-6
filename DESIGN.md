@@ -8,7 +8,7 @@ These are rules, not suggestions. When a rule and a "nicer looking" idea disagre
 
 **Tokens live in `apps/frontend/src/styles/global.css`.** That file is the only source of truth for colour, type, radius and shadows, and mirrors the Figma file's variables (`Design_MVP`). This file says how to _use_ them.
 
-The app has **one theme: light.** There is no dark mode and no theme switcher.
+The app has **two themes: light and dark**, switched in the header (`ThemeSwitcher`, state in `lib/theme.ts`). Both are defined by the same token names: `:root` holds light, `.dark` holds dark, and the Figma `[Tmavý]` frames are the reference. **Never write `dark:` colour overrides in feature code**: a semantic class (`bg-card`, `text-muted-foreground`) already follows the theme. The only exception is assets with baked-in colours (SVGs), which use `ThemedImage` with a `-dark` file.
 
 ## Colour
 
