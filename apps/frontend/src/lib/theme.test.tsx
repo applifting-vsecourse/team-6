@@ -3,8 +3,10 @@ import { act, renderHook } from "@testing-library/react"
 import { setTheme, useTheme } from "./theme"
 
 afterEach(() => {
+  vi.restoreAllMocks()
   localStorage.clear()
   document.documentElement.classList.remove("dark")
+  document.head.querySelector('meta[name="theme-color"]')?.remove()
 })
 
 describe("theme", () => {
@@ -38,7 +40,18 @@ describe("theme", () => {
 
     expect(() => setTheme("dark")).not.toThrow()
     expect(document.documentElement).toHaveClass("dark")
+  })
 
-    vi.restoreAllMocks()
+  it("tints the browser chrome with the theme's background", () => {
+    const meta = document.createElement("meta")
+    meta.name = "theme-color"
+    meta.content = "#fbf8f2"
+    document.head.append(meta)
+
+    setTheme("dark")
+    expect(meta.content).toBe("#141f36")
+
+    setTheme("light")
+    expect(meta.content).toBe("#fbf8f2")
   })
 })
