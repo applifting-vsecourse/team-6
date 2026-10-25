@@ -47,4 +47,49 @@ describe("KvintetMemberList", () => {
 
     expect(screen.getByText("Graphic designer")).toBeInTheDocument()
   })
+
+  it("translates the role slugs in the proposal heading", () => {
+    render(
+      <KvintetMemberList
+        members={[member]}
+        isActive={false}
+      />,
+    )
+
+    expect(screen.getByText("QA / Test Engineer, Backend Developer")).toBeInTheDocument()
+  })
+
+  it.each([null, ""])(
+    "falls back to the name, then to an open seat, when the role is %j",
+    (role) => {
+      render(
+        <KvintetMemberList
+          members={[
+            {
+              ...member,
+              role,
+              name: "Eva Nováková",
+              teachTags: [],
+              learnTags: [],
+              interestTags: [],
+            },
+            {
+              ...member,
+              userId: "u2",
+              role,
+              name: null,
+              teachTags: [],
+              learnTags: [],
+              interestTags: [],
+            },
+          ]}
+          totalSeats={2}
+          isActive={false}
+        />,
+      )
+
+      expect(screen.getByText("Eva Nováková")).toBeInTheDocument()
+      expect(screen.getAllByText("Open seat")).toHaveLength(1)
+    },
+  )
 })

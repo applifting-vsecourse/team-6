@@ -1,8 +1,9 @@
 import { useTranslation } from "react-i18next"
 
+import { formatList } from "@/lib/date"
+
 import type { KvintetMember } from "@/features/kvintet/api/kvintetApi"
 import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
-import { formatList } from "@/lib/date"
 
 type KvintetMemberListProps = {
   members: KvintetMember[]
@@ -26,12 +27,18 @@ export function KvintetMemberList({ members, isActive, totalSeats = 5 }: Kvintet
   // The label stays in foreground ink so teaching and learning read apart from the muted tags.
   const memberTags = (member: KvintetMember) =>
     [
-      member.teachTags.length > 0 && { label: t("kvintet.members.teaches"), tags: member.teachTags },
+      member.teachTags.length > 0 && {
+        label: t("kvintet.members.teaches"),
+        tags: member.teachTags,
+      },
       member.learnTags.length > 0 && {
         label: t("kvintet.members.wantsToLearn"),
         tags: member.learnTags,
       },
-      member.interestTags.length > 0 && { label: t("kvintet.members.interests"), tags: member.interestTags },
+      member.interestTags.length > 0 && {
+        label: t("kvintet.members.interests"),
+        tags: member.interestTags,
+      },
     ].filter((part) => part !== false)
 
   return (
@@ -71,7 +78,9 @@ export function KvintetMemberList({ members, isActive, totalSeats = 5 }: Kvintet
                 // Proposal view: shows role (with (vy) indicator for current user)
                 <div className="flex items-center gap-2">
                   <span className="text-base font-semibold text-foreground">
-                    {(member.role && roleLabel(member.role)) ?? member.name ?? t("kvintet.members.openSeat")}
+                    {(member.role ? roleLabel(member.role) : null) ??
+                      member.name ??
+                      t("kvintet.members.openSeat")}
                     {member.isCurrentUser ? ` ${String(t("kvintet.members.you"))}` : ""}
                   </span>
                 </div>
