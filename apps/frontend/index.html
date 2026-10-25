@@ -4,6 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#fbf8f2" />
+    <script>
+      // Sets the theme before first paint so there is no flash. Keep in sync with src/lib/theme.ts.
+      try {
+        var stored = localStorage.getItem("theme")
+        var dark = stored ? stored === "dark" : matchMedia("(prefers-color-scheme: dark)").matches
+        if (dark) {
+          document.documentElement.classList.add("dark")
+          document.querySelector('meta[name="theme-color"]').content = "#141f36"
+        }
+      } catch (e) {}
+    </script>
     <meta name="description" content="Kvintet — groups of up to five students." />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Kvintet</title>

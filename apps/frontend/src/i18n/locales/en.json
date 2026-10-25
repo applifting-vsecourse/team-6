@@ -78,7 +78,10 @@
     "goHome": "Go home",
     "language": "Language",
     "reload": "Reload",
-    "saving": "Saving…"
+    "saving": "Saving…",
+    "theme": "Theme",
+    "themeDark": "Dark",
+    "themeLight": "Light"
   },
   "errors": {
     "CITY_NOT_FOUND": "Selected city was not found.",
@@ -273,7 +276,9 @@
     "contactSupport": "Contact support",
     "mainNavigation": "Main navigation",
     "menu": "Menu",
-    "openMenu": "Open menu"
+    "openMenu": "Open menu",
+    "switchToDark": "Switch to dark theme",
+    "switchToLight": "Switch to light theme"
   },
   "meetingFrequency": {
     "BIWEEKLY": "every 14 days",

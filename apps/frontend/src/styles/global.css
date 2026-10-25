@@ -5,6 +5,9 @@
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
 
+/* Dark theme is a `.dark` class on <html> (see lib/theme.ts), not the OS media query. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -26,6 +29,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-track: var(--track);
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
@@ -61,8 +65,9 @@
   --tracking-meta: 0.06em;
 }
 
-/* Kvintet palette (Figma Design_MVP variables). Light theme only. */
+/* Kvintet palette (Figma Design_MVP variables). Light here, dark in `.dark` below. */
 :root {
+  color-scheme: light;
   --font-sans: "Source Sans 3 Variable", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Newsreader Variable", Georgia, serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -105,6 +110,45 @@
   --shadow-lg: 0px 2px 10px 0px hsl(0 0% 0% / 0.1), 0px 4px 6px -1px hsl(0 0% 0% / 0.1);
   --shadow-xl: 0px 2px 10px 0px hsl(0 0% 0% / 0.1), 0px 8px 10px -1px hsl(0 0% 0% / 0.1);
   --shadow-2xl: 0px 2px 10px 0px hsl(0 0% 0% / 0.25);
+  /* paper-200: empty progress track */
+  --track: #e9e1d2;
+}
+
+/* Dark palette (Figma `[Tmavý]` frames). Only colours change; type, radius and shadows are shared. */
+.dark {
+  color-scheme: dark;
+
+  /* paper-50 */
+  --background: #141f36;
+  /* ink-900 */
+  --foreground: #f4eee3;
+  /* ink-700: body copy */
+  --body: #dcd4c5;
+  /* paper-100 */
+  --card: #1c2b4a;
+  --card-foreground: #f4eee3;
+  --popover: #1c2b4a;
+  --popover-foreground: #f4eee3;
+  --primary: #f4eee3;
+  /* on-ink */
+  --primary-foreground: #141f36;
+  --secondary: #1c2b4a;
+  --secondary-foreground: #f4eee3;
+  --muted: #1c2b4a;
+  /* ink-500 */
+  --muted-foreground: #a9b5cc;
+  /* paper-200 */
+  --accent: #26375a;
+  --accent-foreground: #f4eee3;
+  /* danger */
+  --destructive: #e88484;
+  --destructive-foreground: #141f36;
+  /* line */
+  --border: #33456b;
+  /* line-strong */
+  --input: #7385a8;
+  --ring: #f4eee3;
+  --track: #26375a;
 }
 
 @layer base {

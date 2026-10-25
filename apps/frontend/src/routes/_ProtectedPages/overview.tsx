@@ -3,8 +3,10 @@ import { createFileRoute, Link, redirect } from "@tanstack/react-router"
 import { Trans, useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
+import watermarkDark from "@/assets/logo-watermark-dark.svg"
 import watermark from "@/assets/logo-watermark.svg"
 import { Seo } from "@/components/Seo"
+import { ThemedImage } from "@/components/ThemedImage"
 import { Button } from "@/components/ui/button"
 import { formatLongDate } from "@/lib/date"
 
@@ -99,9 +101,9 @@ function OverviewPage() {
     <>
       <Seo title={t("overview.title")} />
       <div className="relative mx-auto w-full max-w-4xl px-4 pt-16 pb-24">
-        <img
-          src={watermark}
-          alt=""
+        <ThemedImage
+          light={watermark}
+          dark={watermarkDark}
           width={182}
           height={182}
           className="pointer-events-none absolute top-2 right-4 hidden size-45.5 md:block"
