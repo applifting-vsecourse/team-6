@@ -193,14 +193,15 @@
     "members": {
       "capacity": "{{count}} of 5",
       "heading": "Members",
+      "interests": "Interests",
       "namesHiddenHint": "You will see names once the kvintet is formed.",
       "notVoted": "Not voted",
       "openSeat": "Open seat",
-      "teaches": "Teaches {{tags}}",
+      "teaches": "Teaches",
       "votedYes": "For",
       "waitingForFifth": "Waiting for the fifth member.",
       "waitingForMember": "Waiting for another member.",
-      "wantsToLearn": "wants to learn {{tags}}",
+      "wantsToLearn": "Wants to learn",
       "you": "(you)"
     },
     "myKvintetTitle": "My kvintet",

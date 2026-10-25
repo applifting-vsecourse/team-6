@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next"
 
 import type { KvintetMember } from "@/features/kvintet/api/kvintetApi"
+import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
+import { formatList } from "@/lib/date"
 
 type KvintetMemberListProps = {
   members: KvintetMember[]
@@ -10,39 +12,33 @@ type KvintetMemberListProps = {
 
 export function KvintetMemberList({ members, isActive, totalSeats = 5 }: KvintetMemberListProps) {
   const { t } = useTranslation()
+  const label = useSlugLabel()
   const openSeatsCount = Math.max(0, totalSeats - members.length)
 
-  const formatMemberTags = (member: KvintetMember): string => {
-    const parts: string[] = []
+  const tags = (slugs: string[]) => formatList(slugs.map((slug) => label("tags", slug)))
+  // The role is the profile's role slugs joined by ", ", or a free-text position; unknown text shows as itself.
+  const roleLabel = (role: string) =>
+    role
+      .split(", ")
+      .map((slug) => label("roles", slug))
+      .join(", ")
 
-    if (member.teachTags.length > 0) {
-      parts.push(
-        t("kvintet.members.teaches", {
-          tags: member.teachTags.join(", "),
-        }),
-      )
-    }
-
-    if (member.learnTags.length > 0) {
-      parts.push(
-        t("kvintet.members.wantsToLearn", {
-          tags: member.learnTags.join(", "),
-        }),
-      )
-    }
-
-    if (member.interestTags.length > 0) {
-      parts.push(member.interestTags.join(", "))
-    }
-
-    return parts.join(" · ")
-  }
+  // The label stays in foreground ink so teaching and learning read apart from the muted tags.
+  const memberTags = (member: KvintetMember) =>
+    [
+      member.teachTags.length > 0 && { label: t("kvintet.members.teaches"), tags: member.teachTags },
+      member.learnTags.length > 0 && {
+        label: t("kvintet.members.wantsToLearn"),
+        tags: member.learnTags,
+      },
+      member.interestTags.length > 0 && { label: t("kvintet.members.interests"), tags: member.interestTags },
+    ].filter((part) => part !== false)
 
   return (
     <ul className="divide-y divide-border">
       {/* Existing members */}
       {members.map((member) => {
-        const tagsString = formatMemberTags(member)
+        const tagParts = memberTags(member)
 
         return (
           <li
@@ -58,20 +54,38 @@ export function KvintetMemberList({ members, isActive, totalSeats = 5 }: Kvintet
                     {member.isCurrentUser ? ` ${String(t("kvintet.members.you"))}` : ""}
                   </span>
                   {member.role && (
-                    <span className="text-sm text-muted-foreground">{member.role}</span>
+                    <>
+                      <span
+                        aria-hidden
+                        className="text-sm text-muted-foreground"
+                      >
+                        -
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        {roleLabel(member.role)}
+                      </span>
+                    </>
                   )}
                 </div>
               ) : (
                 // Proposal view: shows role (with (vy) indicator for current user)
                 <div className="flex items-center gap-2">
                   <span className="text-base font-semibold text-foreground">
-                    {member.role ?? member.name ?? t("kvintet.members.openSeat")}
+                    {(member.role && roleLabel(member.role)) ?? member.name ?? t("kvintet.members.openSeat")}
                     {member.isCurrentUser ? ` ${String(t("kvintet.members.you"))}` : ""}
                   </span>
                 </div>
               )}
 
-              {tagsString && <p className="text-sm text-muted-foreground">{tagsString}</p>}
+              {tagParts.map(({ label: prefix, tags: slugs }) => (
+                <p
+                  key={prefix}
+                  className="text-sm text-muted-foreground"
+                >
+                  <span className="font-medium text-foreground">{prefix} </span>
+                  {tags(slugs)}
+                </p>
+              ))}
             </div>
 
             {/* In proposal view: show vote status badge */}
