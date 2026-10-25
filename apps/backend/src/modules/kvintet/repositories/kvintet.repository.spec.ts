@@ -154,6 +154,35 @@ describe('KvintetRepository (Postgres)', () => {
     ).resolves.toEqual({ result: 'unknown_category' });
   });
 
+  it('lists only the kvintets of the requested category', async () => {
+    const [user] = await createUsers(1, 'filtered');
+    const kvintetId = await createKvintet([user]);
+    const { slug } = await prisma.category.findUniqueOrThrow({
+      where: { id: categoryId },
+    });
+    const other = await prisma.category.findFirstOrThrow({
+      where: { id: { not: categoryId } },
+    });
+
+    const inCategory = await repository.findOpenKvintets(slug);
+    const inOther = await repository.findOpenKvintets(other.slug);
+
+    expect(inCategory.map((p) => p.id)).toContain(kvintetId);
+    expect(inCategory.every((p) => p.category === slug)).toBe(true);
+    expect(inOther.map((p) => p.id)).not.toContain(kvintetId);
+  });
+
+  it('knows which category slugs exist', async () => {
+    const { slug } = await prisma.category.findUniqueOrThrow({
+      where: { id: categoryId },
+    });
+
+    await expect(repository.categoryExists(slug)).resolves.toBe(true);
+    await expect(repository.categoryExists('does-not-exist')).resolves.toBe(
+      false,
+    );
+  });
+
   it('lists open kvintets by role and tags only', async () => {
     const [user] = await createUsers(1, 'listed');
     await prisma.profile.create({

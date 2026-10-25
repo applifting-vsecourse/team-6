@@ -39,6 +39,23 @@
     "personal-development": "Osobní rozvoj",
     "technology": "Technologie"
   },
+  "chat": {
+    "composer": {
+      "label": "Zpráva",
+      "placeholder": "Napište zprávu…",
+      "send": "Odeslat",
+      "sending": "Odesílám…"
+    },
+    "deletedMember": "Smazaný člen",
+    "empty": "Zatím žádné zprávy. Pozdravte svůj kvintet.",
+    "error": "Zprávy se nepodařilo načíst.",
+    "newMessages": "Nové zprávy",
+    "pageTitle": "Zprávy",
+    "retry": "Zkusit znovu",
+    "showEarlier": "Zobrazit starší zprávy",
+    "subtitle": "{{names}} · zprávy čtou jen členové",
+    "you": "Vy"
+  },
   "codeOfConduct": {
     "intro": "Kvintet je místo pro lidi, kteří se chtějí potkávat a učit se od sebe navzájem. Aby se tu všichni cítili dobře, držíme se několika jednoduchých pravidel.",
     "reportIntro": "Porušení pravidel nebo problém s konkrétním člověkem nahlaste na <email>{{email}}</email>.",
@@ -63,7 +80,10 @@
     "goHome": "Na úvodní stránku",
     "language": "Jazyk",
     "reload": "Načíst znovu",
-    "saving": "Ukládání…"
+    "saving": "Ukládání…",
+    "theme": "Motiv",
+    "themeDark": "Tmavý",
+    "themeLight": "Světlý"
   },
   "errors": {
     "CITY_NOT_FOUND": "Vybrané město nebylo nalezeno.",
@@ -92,6 +112,7 @@
     "conflict": "Tohle je v rozporu s existujícími daty.",
     "forbidden": "Nemáte k tomu přístup.",
     "internal_error": "Na naší straně se něco pokazilo. Zkuste to prosím znovu.",
+    "kvintet_not_active": "Chat se otevře, jakmile bude kvintet aktivní.",
     "kvintet_not_open": "Tento návrh je plný nebo už není otevřený.",
     "not_found": "Nepodařilo se najít, co hledáte.",
     "pageNotFound": "Stránka nenalezena",
@@ -116,7 +137,6 @@
     "activeSubtitleWithPreferences": "VZNIKL {{date}} · {{count}} ČLENŮ · VŠEM VYHOVUJE: {{preferences}}",
     "alreadyMember": "V návrhu už jste.",
     "chat": {
-      "comingSoon": "Skupinový chat bude dostupný již brzy.",
       "description": "Domluvte si první setkání ve skupinovém chatu.",
       "heading": "Skupinový chat",
       "openMessages": "Otevřít zprávy"
@@ -149,6 +169,11 @@
       "text": "Tady se objeví návrhy, které odpovídají vašemu profilu.",
       "title": "Zatím pro vás nemáme žádný návrh"
     },
+    "emptyFiltered": {
+      "showAll": "Zrušit filtr",
+      "text": "Zkuste jinou kategorii, nebo založte vlastní návrh v této kategorii.",
+      "title": "V kategorii {{category}} zatím není žádný návrh"
+    },
     "emptyState": {
       "description": "Vaše skupina se tu objeví, až se přidáte k návrhu.",
       "title": "Zatím nejste v žádném kvintetu",
@@ -158,6 +183,10 @@
       "retry": "Zkusit znovu",
       "text": "Na naší straně se něco pokazilo. Zkuste to prosím znovu.",
       "title": "Návrhy se nepodařilo načíst"
+    },
+    "filter": {
+      "all": "Vše",
+      "label": "Kategorie"
     },
     "interests": "Zájmy: {{tags}}",
     "join": "Přidat se k návrhu",
@@ -251,7 +280,9 @@
     "contactSupport": "Kontaktovat podporu",
     "mainNavigation": "Hlavní navigace",
     "menu": "Menu",
-    "openMenu": "Otevřít menu"
+    "openMenu": "Otevřít menu",
+    "switchToDark": "Přepnout na tmavý motiv",
+    "switchToLight": "Přepnout na světlý motiv"
   },
   "meetingFrequency": {
     "BIWEEKLY": "jednou za 14 dní",
@@ -354,6 +385,12 @@
       "description": "Našli jsme návrhy, které odpovídají vašemu profilu. Vyberte podle tématu – jména uvidíte, až skupina vznikne.",
       "title": "Vyberte si návrh"
     },
+    "nextStepMember": {
+      "badge": "VÁŠ KVINTET",
+      "button": "Přejít na můj kvintet",
+      "description": "Podívejte se, kdo je ve vaší skupině a co bude dál.",
+      "title": "Jděte do svého kvintetu"
+    },
     "profileCard": {
       "badge": "VÁŠ PROFIL",
       "daysWeekdays": "všední dny",
@@ -371,6 +408,7 @@
       "timeMornings": "dopoledne"
     },
     "subtitle": "Zatím nejste v žádném kvintetu. Začněte výběrem návrhu.",
+    "subtitleMember": "Jste v kvintetu. Podívejte se, jak se vaší skupině daří.",
     "title": "Přehled"
   },
   "roles": {

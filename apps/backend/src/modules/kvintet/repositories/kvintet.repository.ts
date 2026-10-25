@@ -38,11 +38,20 @@ export class KvintetRepository {
     return member !== null;
   }
 
-  async findOpenKvintets(): Promise<OpenKvintet[]> {
+  async categoryExists(slug: string): Promise<boolean> {
+    const category = await this.prisma.category.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+    return category !== null;
+  }
+
+  async findOpenKvintets(categorySlug?: string): Promise<OpenKvintet[]> {
     const kvintets = await this.prisma.kvintet.findMany({
       where: {
         status: 'FORMING',
         members: { some: {} },
+        ...(categorySlug ? { category: { slug: categorySlug } } : {}),
       },
       orderBy: { createdAt: 'desc' },
       // Select only what the feed shows: never the user's name, e-mail or id.

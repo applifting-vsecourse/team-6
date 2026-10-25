@@ -16,6 +16,13 @@ export function formatLongDate(date: string | number | Date) {
   )
 }
 
+// "6:02 PM" / "18:02"
+export function formatTime(date: string | number | Date) {
+  return new Intl.DateTimeFormat(i18n.resolvedLanguage, { timeStyle: "short" }).format(
+    new Date(date),
+  )
+}
+
 // "Python, SQL and Excel" / "Python, SQL a Excel"
 export function formatList(items: string[]) {
   return new Intl.ListFormat(i18n.resolvedLanguage, { style: "long", type: "conjunction" }).format(

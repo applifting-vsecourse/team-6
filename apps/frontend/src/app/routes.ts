@@ -6,5 +6,6 @@ export const ROUTES = {
   overview: "/overview",
   kvintetFeed: "/kvintet/feed",
   myKvintet: "/kvintet",
+  kvintetMessages: "/kvintet/messages",
   onboarding: "/onboarding",
 } as const

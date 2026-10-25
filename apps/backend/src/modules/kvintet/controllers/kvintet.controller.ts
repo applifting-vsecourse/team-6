@@ -14,6 +14,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -25,6 +26,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { FeedItemDto } from './dto/feed-item.dto';
+import { FeedQueryDto } from './dto/feed-query.dto';
 import { KvintetDetailsDto } from './dto/kvintet-details.dto';
 import { MembershipDto } from './dto/membership.dto';
 import { StartedKvintetDto, StartKvintetDto } from './dto/start-kvintet.dto';
@@ -50,10 +52,13 @@ export class KvintetController {
   @ApiOperation({
     summary: 'Open kvintets',
     description:
-      'Kvintets that still have a free seat, newest first. Members appear by role and interests only. 409 if the caller is already in a kvintet.',
+      'Kvintets that still have a free seat, newest first, optionally only one category. Members appear by role and interests only. 400 for an unknown category, 409 if the caller is already in a kvintet.',
   })
-  feed(@User() user: Identity): Promise<FeedItemDto[]> {
-    return this.service.feed(user.id);
+  feed(
+    @User() user: Identity,
+    @Query() query: FeedQueryDto,
+  ): Promise<FeedItemDto[]> {
+    return this.service.feed(user.id, query.category);
   }
 
   @Post()

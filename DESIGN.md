@@ -8,7 +8,7 @@ These are rules, not suggestions. When a rule and a "nicer looking" idea disagre
 
 **Tokens live in `apps/frontend/src/styles/global.css`.** That file is the only source of truth for colour, type, radius and shadows, and mirrors the Figma file's variables (`Design_MVP`). This file says how to _use_ them.
 
-The app has **one theme: light.** There is no dark mode and no theme switcher.
+The app has **two themes: light and dark**, switched in the header (`ThemeSwitcher`, state in `lib/theme.ts`). Both are defined by the same token names: `:root` holds light, `.dark` holds dark, and the Figma `[Tmavý]` frames are the reference. **Never write `dark:` colour overrides in feature code**: a semantic class (`bg-card`, `text-muted-foreground`) already follows the theme. The only exception is assets with baked-in colours (SVGs), which use `ThemedImage` with a `-dark` file.
 
 ## Colour
 
@@ -57,8 +57,8 @@ Use the scale only: `1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 14, 16, 22, 24` (Tai
 Kvintet shows no photos, so every person is represented by a generated avatar from [blobatar](https://blobatar.dev): the same string always renders the same creature, with nothing stored or uploaded. Use `Blobatar` from `@/components/ui/blobatar` wherever a person appears (chat messages, member lists, kvintet cards) — never initials, stock icons or a hand-rolled avatar.
 
 - **Seed:** the user's `username`, falling back to `id` when there is none. Use the same seed everywhere, or one person turns into two faces. Never seed from the e-mail (it is private).
-- **Static by default.** A static blobatar is one `<img>`; an animated one is ~12 SVG nodes. Lists and chat (many avatars, small) stay static.
-- **Animation is opt-in, through `GazeBlobatar`** (`components/`): its eyes follow the cursor. One large avatar (sign-up preview, profile header) uses `animate="always"`; the single nav-bar avatar uses `animate="hover"` with a larger `travel`. Never animate avatars in a list or chat. It switches itself off for `prefers-reduced-motion` and on touch.
+- **Static by default.** A static blobatar is one `<img>`; an animated one is ~12 SVG nodes. Lists and chat (many avatars, small) stay static; the chat swaps in the animated one only for the avatar under the mouse.
+- **Animation is opt-in, through `GazeBlobatar`** (`components/`): its eyes follow the cursor. One large avatar (sign-up preview, profile header) uses `animate="always"`; the single nav-bar avatar uses `animate="hover"` with a larger `travel`. Never animate avatars in a list. The one exception is the chat: a message avatar is a static `Blobatar` and becomes `GazeBlobatar` with `animate="hover"` only while the mouse is over it, so at most one animated avatar exists at a time; never `"always"` there. It switches itself off for `prefers-reduced-motion` and on touch.
 - **Decorative by default** (no alt text) because the name is written next to it. If an avatar stands alone, pass `blobatar={{ title: name }}`.
 - **Tests:** jsdom lacks `matchMedia`/`ResizeObserver`, so a test that renders `GazeBlobatar` mocks `@blobatar/react/gaze` (see `SignUpForm.test.tsx`).
 

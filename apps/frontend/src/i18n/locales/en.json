@@ -37,6 +37,23 @@
     "personal-development": "Personal development",
     "technology": "Technology"
   },
+  "chat": {
+    "composer": {
+      "label": "Message",
+      "placeholder": "Write a message…",
+      "send": "Send",
+      "sending": "Sending…"
+    },
+    "deletedMember": "Deleted member",
+    "empty": "No messages yet. Say hello to your kvintet.",
+    "error": "We couldn't load the messages.",
+    "newMessages": "New messages",
+    "pageTitle": "Messages",
+    "retry": "Try again",
+    "showEarlier": "Show earlier messages",
+    "subtitle": "{{names}} · only members can read the messages",
+    "you": "You"
+  },
   "codeOfConduct": {
     "intro": "Kvintet is a place for people who want to meet and learn from each other. To keep it pleasant for everyone, we follow a few simple rules.",
     "reportIntro": "Report a broken rule or a problem with a specific person to <email>{{email}}</email>.",
@@ -61,7 +78,10 @@
     "goHome": "Go home",
     "language": "Language",
     "reload": "Reload",
-    "saving": "Saving…"
+    "saving": "Saving…",
+    "theme": "Theme",
+    "themeDark": "Dark",
+    "themeLight": "Light"
   },
   "errors": {
     "CITY_NOT_FOUND": "Selected city was not found.",
@@ -90,6 +110,7 @@
     "conflict": "This conflicts with existing data.",
     "forbidden": "You don't have access to this.",
     "internal_error": "Something went wrong on our side. Please try again.",
+    "kvintet_not_active": "This kvintet's chat opens once the kvintet is active.",
     "kvintet_not_open": "This proposal is full or no longer open.",
     "not_found": "We couldn't find what you were looking for.",
     "pageNotFound": "Page not found",
@@ -114,7 +135,6 @@
     "activeSubtitleWithPreferences": "FORMED ON {{date}} · {{count}} MEMBERS · SUITS EVERYONE: {{preferences}}",
     "alreadyMember": "You are already in a proposal.",
     "chat": {
-      "comingSoon": "Group chat will be available soon.",
       "description": "Arrange your first meeting in the group chat.",
       "heading": "Group chat",
       "openMessages": "Open messages"
@@ -145,6 +165,11 @@
       "text": "Proposals that fit your profile will show up here.",
       "title": "No proposals for you yet"
     },
+    "emptyFiltered": {
+      "showAll": "Clear filter",
+      "text": "Try another category, or start your own proposal in this one.",
+      "title": "No proposals in {{category}} yet"
+    },
     "emptyState": {
       "description": "Your group will appear here once you join a proposal.",
       "title": "You are not in any kvintet yet",
@@ -154,6 +179,10 @@
       "retry": "Try again",
       "text": "Something went wrong on our side. Please try again.",
       "title": "Couldn't load proposals"
+    },
+    "filter": {
+      "all": "All",
+      "label": "Category"
     },
     "interests": "Interests: {{tags}}",
     "join": "Join this proposal",
@@ -247,7 +276,9 @@
     "contactSupport": "Contact support",
     "mainNavigation": "Main navigation",
     "menu": "Menu",
-    "openMenu": "Open menu"
+    "openMenu": "Open menu",
+    "switchToDark": "Switch to dark theme",
+    "switchToLight": "Switch to light theme"
   },
   "meetingFrequency": {
     "BIWEEKLY": "every 14 days",
@@ -350,6 +381,12 @@
       "description": "We found proposals that match your profile. Pick by topic – you'll see names once the group forms.",
       "title": "Pick a proposal"
     },
+    "nextStepMember": {
+      "badge": "YOUR KVINTET",
+      "button": "Go to my kvintet",
+      "description": "See who's in your group and what happens next.",
+      "title": "Head to your kvintet"
+    },
     "profileCard": {
       "badge": "YOUR PROFILE",
       "daysWeekdays": "weekdays",
@@ -367,6 +404,7 @@
       "timeMornings": "mornings"
     },
     "subtitle": "You're not in any kvintet yet. Start by picking a proposal.",
+    "subtitleMember": "You're in a kvintet. Check on your group.",
     "title": "Overview"
   },
   "roles": {

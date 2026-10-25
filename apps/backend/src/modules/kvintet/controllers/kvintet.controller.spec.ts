@@ -13,7 +13,7 @@ import { mock } from 'jest-mock-extended';
 // The real guard pulls in the better-auth provider (.tsx email templates, ESM-only
 // packages) which this Jest setup does not load; its behaviour has its own spec.
 jest.mock('@/shared/auth/providers/better-auth.provider', () => ({
-  InjectBetterAuth: () => undefined,
+  InjectBetterAuth: (): undefined => undefined,
 }));
 jest.mock('@/shared/auth/utils/get-session-from-request', () => ({
   getSessionFromRequest: jest.fn(),
@@ -38,7 +38,7 @@ describe('KvintetController', () => {
     const guard = new OnboardedGuard({} as BetterAuth, prisma);
     const context = {
       switchToHttp: () => ({
-        getRequest: () => ({
+        getRequest: (): unknown => ({
           session: { user: { id: 'u1' } },
         }),
       }),
@@ -47,6 +47,21 @@ describe('KvintetController', () => {
     await expect(guard.canActivate(context)).rejects.toThrow(
       ForbiddenException,
     );
+  });
+
+  it('passes the category query on to the feed', async () => {
+    const repository = mock<KvintetRepository>();
+    repository.isMember.mockResolvedValue(false);
+    repository.categoryExists.mockResolvedValue(true);
+    repository.findOpenKvintets.mockResolvedValue([]);
+    const controller = new KvintetController(new KvintetService(repository));
+
+    await controller.feed(
+      { id: 'u1', email: 'a@b.c', name: 'A', role: 'user' },
+      { category: 'languages' },
+    );
+
+    expect(repository.findOpenKvintets).toHaveBeenCalledWith('languages');
   });
 
   it('answers the feed with an allow-list of fields and nothing else', async () => {
@@ -70,12 +85,10 @@ describe('KvintetController', () => {
     ]);
     const controller = new KvintetController(new KvintetService(repository));
 
-    const [item] = await controller.feed({
-      id: 'u1',
-      email: 'a@b.c',
-      name: 'A',
-      role: 'user',
-    });
+    const [item] = await controller.feed(
+      { id: 'u1', email: 'a@b.c', name: 'A', role: 'user' },
+      {},
+    );
 
     // A new field on the feed must be added here on purpose: names, e-mails and
     // user ids must never reach this response.
