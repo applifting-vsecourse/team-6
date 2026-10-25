@@ -197,14 +197,15 @@
     "members": {
       "capacity": "{{count}} z 5",
       "heading": "Členové",
+      "interests": "Zájmy",
       "namesHiddenHint": "Jména uvidíte, až kvintet vznikne.",
       "notVoted": "Nehlasováno",
       "openSeat": "Volné místo",
-      "teaches": "Učí {{tags}}",
+      "teaches": "Učí",
       "votedYes": "Pro",
       "waitingForFifth": "Čeká se na pátého člena.",
       "waitingForMember": "Čeká se na dalšího člena.",
-      "wantsToLearn": "chce se naučit {{tags}}",
+      "wantsToLearn": "Chce se naučit",
       "you": "(vy)"
     },
     "myKvintetTitle": "Můj kvintet",
