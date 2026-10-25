@@ -10,6 +10,7 @@ import { formatLongDate } from "@/lib/date"
 
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
 import { useSession } from "@/features/auth/hooks/useSession"
+import { useKvintetMembership } from "@/features/kvintet/hooks/useKvintetMembership"
 import { profileQueryOptions, type Tag } from "@/features/profile/api/profileApi"
 import { TagBadge } from "@/features/profile/components/TagBadge"
 
@@ -31,6 +32,26 @@ function OverviewPage() {
   const { user } = useSession()
   const profileQuery = useQuery(profileQueryOptions(user?.id))
   const profile = profileQuery.data
+  const { isMember } = useKvintetMembership()
+
+  // TEMPORARY: the member variant of this page (copy, button to /kvintet, hidden
+  // how-it-works) is a stopgap. What the overview shows once a user has a kvintet,
+  // or whether it exists at all, is still to be decided with the client.
+  const nextStep = isMember
+    ? {
+        badge: t("overview.nextStepMember.badge"),
+        title: t("overview.nextStepMember.title"),
+        description: t("overview.nextStepMember.description"),
+        button: t("overview.nextStepMember.button"),
+        to: ROUTES.myKvintet,
+      }
+    : {
+        badge: t("overview.nextStep.badge"),
+        title: t("overview.nextStep.title"),
+        description: t("overview.nextStep.description"),
+        button: t("overview.nextStep.button"),
+        to: ROUTES.kvintetFeed,
+      }
 
   const firstName = user?.name.split(" ")[0]
 
@@ -100,29 +121,31 @@ function OverviewPage() {
               t("overview.greetingAnonymous")
             )}
           </h1>
-          <p className="text-lg text-foreground/80">{t("overview.subtitle")}</p>
+          <p className="text-lg text-foreground/80">
+            {isMember ? t("overview.subtitleMember") : t("overview.subtitle")}
+          </p>
         </div>
 
         <div className="mt-8 grid grid-cols-1 items-start gap-8 md:grid-cols-3">
           {/* Next step block */}
           <div className="flex flex-col gap-4 rounded-lg border border-primary/20 bg-background p-8 md:col-span-2">
             <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
-              {t("overview.nextStep.badge")}
+              {nextStep.badge}
             </p>
-            <h2 className="font-serif text-2xl font-semibold text-foreground">
-              {t("overview.nextStep.title")}
-            </h2>
-            <p className="text-base text-foreground/80">{t("overview.nextStep.description")}</p>
+            <h2 className="font-serif text-2xl font-semibold text-foreground">{nextStep.title}</h2>
+            <p className="text-base text-foreground/80">{nextStep.description}</p>
             <div className="pt-1">
               <Button asChild>
-                <Link to={ROUTES.kvintetFeed}>{t("overview.nextStep.button")}</Link>
+                <Link to={nextStep.to}>{nextStep.button}</Link>
               </Button>
             </div>
-            <div className="mt-2 flex flex-col gap-2 border-t border-border pt-5">
-              <p className="text-sm text-foreground/80">{t("overview.howItWorks.p1")}</p>
-              <p className="text-sm text-foreground/80">{t("overview.howItWorks.p2")}</p>
-              <p className="text-sm text-foreground/80">{t("overview.howItWorks.p3")}</p>
-            </div>
+            {!isMember && (
+              <div className="mt-2 flex flex-col gap-2 border-t border-border pt-5">
+                <p className="text-sm text-foreground/80">{t("overview.howItWorks.p1")}</p>
+                <p className="text-sm text-foreground/80">{t("overview.howItWorks.p2")}</p>
+                <p className="text-sm text-foreground/80">{t("overview.howItWorks.p3")}</p>
+              </div>
+            )}
           </div>
 
           {/* Profile side card */}
