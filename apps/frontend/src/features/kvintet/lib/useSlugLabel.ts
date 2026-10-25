@@ -10,6 +10,6 @@ type Translate = (key: string, options: { defaultValue: string }) => string
 export function useSlugLabel() {
   const { t } = useTranslation()
   // The key is built from server data, so it can't go through the typed `t`.
-  return (group: "categories" | "tags", slug: string) =>
+  return (group: "categories" | "tags" | "roles", slug: string) =>
     (t as unknown as Translate)(`${group}.${slug}`, { defaultValue: slug })
 }
