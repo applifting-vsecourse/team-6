@@ -6,7 +6,7 @@ Closes #
 
 ## How to verify
 
-<!-- Steps for the reviewer, or "covered by tests". -->
+<!-- Steps for the reviewer, or "covered by tests". UI changes are reviewed by running the branch locally (`pnpm dev`), so no screenshots needed. -->
 
 ## Checklist
 
@@ -17,7 +17,3 @@ Closes #
 - [ ] UI follows `DESIGN.md`; controls come from `src/components/ui/`; all texts use `t()` keys present in every locale file
 - [ ] Migration is additive; no new env vars or secrets; no names, e-mails or message bodies in logs
 - [ ] `docs/ARCHITECTURE.md` updated if a decision changed
-
-## Screenshots
-
-<!-- UI changes only: light and dark theme, mobile and desktop. -->
