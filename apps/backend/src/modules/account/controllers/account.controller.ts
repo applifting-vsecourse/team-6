@@ -29,7 +29,7 @@ export class AccountController {
   @ApiOperation({
     summary: 'Delete current user account',
     description:
-      'Leaves any current kvintet, deletes profile and user data by cascade, and anonymises sent chat messages',
+      'Atomically leaves any current kvintet, deletes the user account, and cascades related records',
   })
   @ApiOkResponse({
     schema: {

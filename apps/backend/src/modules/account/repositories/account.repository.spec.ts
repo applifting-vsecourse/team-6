@@ -1,7 +1,6 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
 import { AccountRepository } from '@/modules/account/repositories/account.repository';
 import { AccountService } from '@/modules/account/services/account.service';
-import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
 import { NotFoundException } from '@nestjs/common';
 import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
@@ -18,11 +17,7 @@ describe('Account integration against Postgres', () => {
   const prefix = `it-acc-${randomUUID().slice(0, 8)}`;
   const prisma = new PrismaService();
   const accountRepository = new AccountRepository(prisma);
-  const kvintetRepository = new KvintetRepository(prisma);
-  const accountService = new AccountService(
-    accountRepository,
-    kvintetRepository,
-  );
+  const accountService = new AccountService(accountRepository);
   let categoryId: number;
   let tagId: number;
 
@@ -225,7 +220,7 @@ describe('Account integration against Postgres', () => {
 
   it('throws NotFoundException when attempting to delete non-existent user', async () => {
     await expect(
-      accountRepository.deleteUser('non-existent-user-id'),
+      accountRepository.deleteAccount('non-existent-user-id'),
     ).rejects.toThrow(NotFoundException);
   });
 });
