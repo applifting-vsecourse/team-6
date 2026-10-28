@@ -1,4 +1,15 @@
 {
+  "account": {
+    "deleteAccount": "Delete account",
+    "deleteDialog": {
+      "cancel": "Cancel",
+      "confirm": "Delete account",
+      "deleting": "Deleting...",
+      "description": "Are you sure you want to delete your account? Your profile, questionnaire answers, and spot in a kvintet will be permanently deleted. This action cannot be undone.",
+      "title": "Delete account"
+    },
+    "deleteSuccess": "Your account has been deleted successfully."
+  },
   "auth": {
     "acceptCodeOfConduct": "I have read and accept the <coc>code of conduct</coc>",
     "confirmPassword": "Confirm password",

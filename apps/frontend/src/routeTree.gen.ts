@@ -16,6 +16,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ProtectedPagesOnboardingRouteImport } from './routes/_ProtectedPages/onboarding'
 import { Route as ProtectedPagesOverviewRouteImport } from './routes/_ProtectedPages/overview'
+import { Route as ProtectedPagesProfileRouteImport } from './routes/_ProtectedPages/profile'
 import { Route as ProtectedPagesKvintetIndexRouteImport } from './routes/_ProtectedPages/kvintet.index'
 import { Route as ProtectedPagesKvintetFeedRouteImport } from './routes/_ProtectedPages/kvintet.feed'
 import { Route as ProtectedPagesKvintetMessagesRouteImport } from './routes/_ProtectedPages/kvintet.messages'
@@ -55,6 +56,11 @@ const ProtectedPagesOverviewRoute = ProtectedPagesOverviewRouteImport.update({
   path: '/overview',
   getParentRoute: () => ProtectedPagesRoute,
 } as any)
+const ProtectedPagesProfileRoute = ProtectedPagesProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => ProtectedPagesRoute,
+} as any)
 const ProtectedPagesKvintetIndexRoute =
   ProtectedPagesKvintetIndexRouteImport.update({
     id: '/kvintet/',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/onboarding': typeof ProtectedPagesOnboardingRoute
   '/overview': typeof ProtectedPagesOverviewRoute
+  '/profile': typeof ProtectedPagesProfileRoute
   '/kvintet/feed': typeof ProtectedPagesKvintetFeedRoute
   '/kvintet/messages': typeof ProtectedPagesKvintetMessagesRoute
   '/kvintet/': typeof ProtectedPagesKvintetIndexRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/onboarding': typeof ProtectedPagesOnboardingRoute
   '/overview': typeof ProtectedPagesOverviewRoute
+  '/profile': typeof ProtectedPagesProfileRoute
   '/kvintet/feed': typeof ProtectedPagesKvintetFeedRoute
   '/kvintet/messages': typeof ProtectedPagesKvintetMessagesRoute
   '/kvintet': typeof ProtectedPagesKvintetIndexRoute
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_ProtectedPages/onboarding': typeof ProtectedPagesOnboardingRoute
   '/_ProtectedPages/overview': typeof ProtectedPagesOverviewRoute
+  '/_ProtectedPages/profile': typeof ProtectedPagesProfileRoute
   '/_ProtectedPages/kvintet/feed': typeof ProtectedPagesKvintetFeedRoute
   '/_ProtectedPages/kvintet/messages': typeof ProtectedPagesKvintetMessagesRoute
   '/_ProtectedPages/kvintet/': typeof ProtectedPagesKvintetIndexRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/onboarding'
     | '/overview'
+    | '/profile'
     | '/kvintet/feed'
     | '/kvintet/messages'
     | '/kvintet/'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/onboarding'
     | '/overview'
+    | '/profile'
     | '/kvintet/feed'
     | '/kvintet/messages'
     | '/kvintet'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_ProtectedPages/onboarding'
     | '/_ProtectedPages/overview'
+    | '/_ProtectedPages/profile'
     | '/_ProtectedPages/kvintet/feed'
     | '/_ProtectedPages/kvintet/messages'
     | '/_ProtectedPages/kvintet/'
@@ -205,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedPagesOverviewRouteImport
       parentRoute: typeof ProtectedPagesRoute
     }
+    '/_ProtectedPages/profile': {
+      id: '/_ProtectedPages/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProtectedPagesProfileRouteImport
+      parentRoute: typeof ProtectedPagesRoute
+    }
     '/_ProtectedPages/kvintet/': {
       id: '/_ProtectedPages/kvintet/'
       path: '/kvintet'
@@ -232,6 +251,7 @@ declare module '@tanstack/react-router' {
 interface ProtectedPagesRouteChildren {
   ProtectedPagesOnboardingRoute: typeof ProtectedPagesOnboardingRoute
   ProtectedPagesOverviewRoute: typeof ProtectedPagesOverviewRoute
+  ProtectedPagesProfileRoute: typeof ProtectedPagesProfileRoute
   ProtectedPagesKvintetFeedRoute: typeof ProtectedPagesKvintetFeedRoute
   ProtectedPagesKvintetMessagesRoute: typeof ProtectedPagesKvintetMessagesRoute
   ProtectedPagesKvintetIndexRoute: typeof ProtectedPagesKvintetIndexRoute
@@ -240,6 +260,7 @@ interface ProtectedPagesRouteChildren {
 const ProtectedPagesRouteChildren: ProtectedPagesRouteChildren = {
   ProtectedPagesOnboardingRoute: ProtectedPagesOnboardingRoute,
   ProtectedPagesOverviewRoute: ProtectedPagesOverviewRoute,
+  ProtectedPagesProfileRoute: ProtectedPagesProfileRoute,
   ProtectedPagesKvintetFeedRoute: ProtectedPagesKvintetFeedRoute,
   ProtectedPagesKvintetMessagesRoute: ProtectedPagesKvintetMessagesRoute,
   ProtectedPagesKvintetIndexRoute: ProtectedPagesKvintetIndexRoute,
