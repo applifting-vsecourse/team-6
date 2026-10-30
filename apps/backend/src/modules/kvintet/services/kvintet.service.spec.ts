@@ -3,6 +3,8 @@ import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.reposi
 import { KvintetService } from '@/modules/kvintet/services/kvintet.service';
 import {
   emptyMatchProfile,
+  MATCH_THRESHOLD,
+  scoreKvintet,
   type MatchProfile,
   type MatchTag,
 } from '@/modules/matching/matching';
@@ -202,6 +204,31 @@ describe('KvintetService.feed', () => {
       expect(feed.items.map((item) => item.id)).toEqual(['strong']);
       expect(feed.items[0].reasons).toHaveLength(3);
       expect(repository.findMatchProfile).toHaveBeenCalledWith('u1');
+    });
+
+    it('keeps a kvintet scoring exactly the threshold', async () => {
+      const { repository, service } = setup();
+      repository.isMember.mockResolvedValue(false);
+      // One TEACH tag in the topic (a quarter of the topic weight) on top of all-neutral criteria.
+      const teacherOfPython = matchProfile({ tags: [tag('python', 'TEACH')] });
+      repository.findMatchProfile.mockResolvedValue(teacherOfPython);
+      const boundary = kvintet([member(null, neutral)], 'boundary', [
+        'data-ai',
+      ]);
+      const below = kvintet([member(null, neutral)], 'below', ['leisure']);
+      repository.findOpenKvintets.mockResolvedValue([boundary, below]);
+      // Guard the fixture: it must land on the threshold itself, not near it.
+      expect(
+        scoreKvintet(teacherOfPython, {
+          categories: boundary.categories,
+          members: [neutral],
+        }).score,
+      ).toBe(MATCH_THRESHOLD);
+
+      const feed = await service.feed('u1');
+
+      expect(feed.fallback).toBe(false);
+      expect(feed.items.map((item) => item.id)).toEqual(['boundary']);
     });
 
     it('lists every kvintet, flagged as fallback, when none reaches the threshold', async () => {
