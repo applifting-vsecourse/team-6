@@ -72,3 +72,14 @@ WHERE "categoryId" = (SELECT "id" FROM "category" WHERE "slug" = 'technology');
 
 -- Its tag_category rows go with it (ON DELETE CASCADE). 3d-printing stays in leisure.
 DELETE FROM "category" WHERE "slug" = 'technology';
+
+-- Guard: fail (and roll back) rather than leave a tag that no category can match.
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM "tag" t
+        WHERE NOT EXISTS (SELECT 1 FROM "tag_category" tc WHERE tc."tagId" = t."id")
+    ) THEN
+        RAISE EXCEPTION 'split_technology_category: a tag was left without a category';
+    END IF;
+END $$;
