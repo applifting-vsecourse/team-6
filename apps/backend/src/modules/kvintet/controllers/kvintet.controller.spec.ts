@@ -71,7 +71,7 @@ describe('KvintetController', () => {
       {
         id: 'kvintet-1',
         title: 'Using AI at work',
-        categories: ['technology'],
+        categories: ['software-development'],
         members: [
           {
             position: 'Backend developer',

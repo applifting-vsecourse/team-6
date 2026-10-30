@@ -17,13 +17,13 @@ vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.f
 vi.mock("@/lib/api-client", () => ({ api: { get: vi.fn(), post: vi.fn() } }))
 
 const reference = {
-  categories: [{ slug: "technology" }, { slug: "business" }, { slug: "languages" }, { slug: "leisure" }],
+  categories: [{ slug: "software-development" }, { slug: "business" }, { slug: "languages" }, { slug: "leisure" }],
 }
 
 const kvintet = (id: string, title: string): FeedKvintet => ({
   id,
   title,
-  categories: ["technology"],
+  categories: ["software-development"],
   capacity: 5,
   memberCount: 1,
   meetingFrequency: null,
@@ -145,7 +145,7 @@ describe("category filter", () => {
     renderPage()
 
     expect(await screen.findByRole("radio", { name: "All" })).toHaveAttribute("data-state", "on")
-    expect(screen.getByRole("radio", { name: "Technology" })).toHaveAttribute("data-state", "off")
+    expect(screen.getByRole("radio", { name: "Software development" })).toHaveAttribute("data-state", "off")
     expect(screen.getByRole("radio", { name: "Languages" })).toHaveAttribute("data-state", "off")
   })
 
@@ -162,8 +162,8 @@ describe("category filter", () => {
     serve(() => Promise.resolve([kvintet("k1", "Spanish")]))
     renderPage("languages")
 
-    await userEvent.click(await screen.findByRole("radio", { name: "Technology" }))
-    expect(onCategoryChange).toHaveBeenLastCalledWith("technology")
+    await userEvent.click(await screen.findByRole("radio", { name: "Software development" }))
+    expect(onCategoryChange).toHaveBeenLastCalledWith("software-development")
 
     await userEvent.click(screen.getByRole("radio", { name: "All" }))
     expect(onCategoryChange).toHaveBeenLastCalledWith(undefined)
@@ -237,12 +237,12 @@ describe("starting a proposal", () => {
     await openDialog()
     const group = screen.getByRole("group", { name: "Categories" })
 
-    for (const name of ["Technology", "Business", "Languages"]) {
+    for (const name of ["Software development", "Business", "Languages"]) {
       await userEvent.click(within(group).getByRole("button", { name }))
     }
 
     expect(within(group).getByRole("button", { name: "Leisure" })).toBeDisabled()
-    expect(within(group).getByRole("button", { name: "Technology" })).toBeEnabled()
+    expect(within(group).getByRole("button", { name: "Software development" })).toBeEnabled()
   })
 
   it("creates the proposal and leaves for My kvintet", async () => {
@@ -253,7 +253,7 @@ describe("starting a proposal", () => {
       "  How to use AI in a small firm ",
     )
     const group = screen.getByRole("group", { name: "Categories" })
-    await userEvent.click(within(group).getByRole("button", { name: "Technology" }))
+    await userEvent.click(within(group).getByRole("button", { name: "Software development" }))
     await userEvent.click(within(group).getByRole("button", { name: "Business" }))
     await userEvent.click(screen.getByRole("button", { name: "Start proposal" }))
 
@@ -261,7 +261,7 @@ describe("starting a proposal", () => {
       expect(api.post).toHaveBeenCalledWith("kvintets", {
         json: {
           title: "How to use AI in a small firm",
-          categorySlugs: ["technology", "business"],
+          categorySlugs: ["software-development", "business"],
         },
       }),
     )
@@ -276,7 +276,7 @@ describe("starting a proposal", () => {
     await userEvent.type(screen.getByLabelText("Topic or problem"), "Topic")
     await userEvent.click(
       within(screen.getByRole("group", { name: "Categories" })).getByRole("button", {
-        name: "Technology",
+        name: "Software development",
       }),
     )
     await userEvent.click(screen.getByRole("button", { name: "Start proposal" }))

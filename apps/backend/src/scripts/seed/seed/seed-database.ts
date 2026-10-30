@@ -217,7 +217,7 @@ export const seedDatabase = async (
   await createDemoKvintets(prisma, [
     {
       title: 'Using AI at work – what really works',
-      categories: ['technology'],
+      categories: ['data-ai'],
       members: [
         {
           userId: jan.id,
@@ -257,7 +257,7 @@ export const seedDatabase = async (
     },
     {
       title: 'From Excel to Python',
-      categories: ['technology', 'business'],
+      categories: ['data-ai', 'software-development', 'business'],
       members: [
         {
           userId: eva.id,
@@ -313,7 +313,7 @@ export const seedDatabase = async (
     },
     {
       title: 'Frontend craft circle',
-      categories: ['technology'],
+      categories: ['software-development'],
       active: true,
       votes: 5,
       members: [

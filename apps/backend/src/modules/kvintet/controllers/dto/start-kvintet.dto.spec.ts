@@ -6,7 +6,7 @@ const errorsFor = (categorySlugs: unknown): Promise<unknown[]> =>
   validate(plainToInstance(StartKvintetDto, { title: 'Topic', categorySlugs }));
 
 describe('StartKvintetDto', () => {
-  it.each([[['languages']], [['technology', 'business', 'leisure']]])(
+  it.each([[['languages']], [['software-development', 'business', 'leisure']]])(
     'accepts %j',
     async (categorySlugs) => {
       await expect(errorsFor(categorySlugs)).resolves.toHaveLength(0);
@@ -17,7 +17,7 @@ describe('StartKvintetDto', () => {
     ['missing', undefined],
     ['a single string', 'languages'],
     ['empty', []],
-    ['more than three', ['technology', 'business', 'leisure', 'languages']],
+    ['more than three', ['software-development', 'business', 'leisure', 'languages']],
     ['repeated', ['languages', 'languages']],
     ['an empty slug', ['']],
   ])('rejects categories that are %s', async (_label, categorySlugs) => {

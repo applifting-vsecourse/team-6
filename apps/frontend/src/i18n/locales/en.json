@@ -32,10 +32,13 @@
   },
   "categories": {
     "business": "Business",
+    "cloud-security": "Cloud & security",
+    "data-ai": "Data & AI",
+    "design-product": "Design & product",
     "languages": "Languages",
     "leisure": "Leisure",
     "personal-development": "Personal development",
-    "technology": "Technology"
+    "software-development": "Software development"
   },
   "chat": {
     "composer": {

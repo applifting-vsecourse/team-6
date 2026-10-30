@@ -34,10 +34,13 @@
   },
   "categories": {
     "business": "Podnikání",
+    "cloud-security": "Cloud a bezpečnost",
+    "data-ai": "Data a AI",
+    "design-product": "Design a produkt",
     "languages": "Jazyky",
     "leisure": "Volný čas",
     "personal-development": "Osobní rozvoj",
-    "technology": "Technologie"
+    "software-development": "Vývoj softwaru"
   },
   "chat": {
     "composer": {

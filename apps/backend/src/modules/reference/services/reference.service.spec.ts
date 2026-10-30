@@ -27,7 +27,7 @@ describe('ReferenceService', () => {
   it('returns cities, tags, and categories from repository', async (): Promise<void> => {
     const mockCities = [new CityEntity('c1', 'Praha', 50.07, 14.43)];
     const mockTags = [new TagEntity('t1', 'excel')];
-    const mockCategories = [{ slug: 'technology' }];
+    const mockCategories = [{ slug: 'software-development' }];
 
     repository.findAllCities.mockResolvedValue(mockCities);
     repository.findAllTags.mockResolvedValue(mockTags);

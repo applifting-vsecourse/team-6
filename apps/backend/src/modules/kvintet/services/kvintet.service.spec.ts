@@ -22,7 +22,7 @@ const member = (
 const kvintet = (members: OpenKvintet['members']): OpenKvintet => ({
   id: 'kvintet-1',
   title: 'Using AI at work',
-  categories: ['technology'],
+  categories: ['software-development'],
   members,
 });
 
@@ -128,7 +128,7 @@ describe('KvintetService.feed', () => {
     expect(item).toEqual({
       id: 'kvintet-1',
       title: 'Using AI at work',
-      categories: ['technology'],
+      categories: ['software-development'],
       capacity: 5,
       memberCount: 1,
       meetingFrequency: 'WEEKLY',
