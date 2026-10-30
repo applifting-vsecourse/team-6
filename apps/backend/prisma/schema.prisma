@@ -152,7 +152,7 @@ model Tag {
   @@map("tag")
 }
 
-// Reference data: which categories a tag counts towards. Used to match a user's tags to a kvintet's one category.
+// Reference data: which categories a tag counts towards. Used to match a user's tags to a kvintet's categories.
 model TagCategory {
   tagId      Int
   tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
