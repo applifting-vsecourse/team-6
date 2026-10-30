@@ -1,5 +1,6 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
+import { emptyMatchProfile } from '@/modules/matching/matching';
 import { BadRequestException, ConflictException } from '@nestjs/common';
 import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
@@ -241,6 +242,60 @@ describe('KvintetRepository (Postgres)', () => {
         },
       ],
     });
+  });
+
+  it('loads what matching needs, for the caller and for feed members', async () => {
+    const [user, bare] = await createUsers(2, 'matched');
+    await prisma.profile.create({
+      data: {
+        userId: user,
+        roles: ['developer'],
+        weekdays: true,
+        evenings: true,
+        latitude: 50.08,
+        longitude: 14.44,
+        radiusKm: 25,
+        meetingFrequency: 'BIWEEKLY',
+        expectations: JSON.stringify(['learn_new']),
+        tags: {
+          create: [{ kind: 'LEARN', tag: { connect: { slug: 'python' } } }],
+        },
+      },
+    });
+    const kvintetId = await createKvintet([user]);
+
+    const expected = {
+      roles: ['developer'],
+      weekdays: true,
+      weekends: false,
+      evenings: true,
+      latitude: 50.08,
+      longitude: 14.44,
+      radiusKm: 25,
+      meetingFrequency: 'BIWEEKLY',
+      expectations: ['learn_new'],
+      tags: [
+        {
+          slug: 'python',
+          kind: 'LEARN',
+          categories: expect.arrayContaining([
+            'software-development',
+            'data-ai',
+          ]) as unknown,
+        },
+      ],
+    };
+    await expect(repository.findMatchProfile(user)).resolves.toMatchObject(
+      expected,
+    );
+    const open = await repository.findOpenKvintets();
+    expect(
+      open.find((p) => p.id === kvintetId)?.members[0].match,
+    ).toMatchObject(expected);
+    // No profile row at all: every field empty, so matching treats it as neutral.
+    await expect(repository.findMatchProfile(bare)).resolves.toEqual(
+      emptyMatchProfile(),
+    );
   });
 
   it('retrieves kvintet details, votes, and leaves', async () => {

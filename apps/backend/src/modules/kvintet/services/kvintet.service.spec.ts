@@ -1,6 +1,13 @@
 import { KvintetDetails, OpenKvintet } from '@/modules/kvintet/domain/kvintet';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
 import { KvintetService } from '@/modules/kvintet/services/kvintet.service';
+import {
+  emptyMatchProfile,
+  MATCH_THRESHOLD,
+  scoreKvintet,
+  type MatchProfile,
+  type MatchTag,
+} from '@/modules/matching/matching';
 import { ValidationFailedException } from '@/shared/errors/validation.pipe';
 import {
   ConflictException,
@@ -9,20 +16,31 @@ import {
 } from '@nestjs/common';
 import { mock, type MockProxy } from 'jest-mock-extended';
 
+const matchProfile = (overrides: Partial<MatchProfile> = {}): MatchProfile => ({
+  ...emptyMatchProfile(),
+  ...overrides,
+});
+
 const member = (
   meetingFrequency: OpenKvintet['members'][number]['meetingFrequency'],
+  match: MatchProfile = matchProfile(),
 ): OpenKvintet['members'][number] => ({
   position: 'Backend developer',
   meetingFrequency,
   teach: ['python'],
   learn: ['ux-design'],
   interests: ['startups'],
+  match,
 });
 
-const kvintet = (members: OpenKvintet['members']): OpenKvintet => ({
-  id: 'kvintet-1',
+const kvintet = (
+  members: OpenKvintet['members'],
+  id = 'kvintet-1',
+  categories = ['software-development'],
+): OpenKvintet => ({
+  id,
   title: 'Using AI at work',
-  categories: ['software-development'],
+  categories,
   members,
 });
 
@@ -31,6 +49,7 @@ const setup = (): {
   service: KvintetService;
 } => {
   const repository = mock<KvintetRepository>();
+  repository.findMatchProfile.mockResolvedValue(matchProfile());
   return { repository, service: new KvintetService(repository) };
 };
 
@@ -68,7 +87,10 @@ describe('KvintetService.feed', () => {
     repository.categoryExists.mockResolvedValue(true);
     repository.findOpenKvintets.mockResolvedValue([]);
 
-    await expect(service.feed('u1', 'languages')).resolves.toEqual([]);
+    await expect(service.feed('u1', 'languages')).resolves.toEqual({
+      items: [],
+      fallback: false,
+    });
 
     expect(repository.categoryExists).toHaveBeenCalledWith('languages');
     expect(repository.findOpenKvintets).toHaveBeenCalledWith('languages');
@@ -108,7 +130,7 @@ describe('KvintetService.feed', () => {
 
     const feed = await service.feed('u1');
 
-    expect(feed.map((item) => item.meetingFrequency)).toEqual([
+    expect(feed.items.map((item) => item.meetingFrequency)).toEqual([
       'BIWEEKLY',
       null,
       null,
@@ -123,8 +145,11 @@ describe('KvintetService.feed', () => {
     const leaky = { ...member('WEEKLY'), name: 'Jana', userId: 'u2' };
     repository.findOpenKvintets.mockResolvedValue([kvintet([leaky])]);
 
-    const [item] = await service.feed('u1');
+    const {
+      items: [item],
+    } = await service.feed('u1');
 
+    // No `match` data and no score: only what the card shows.
     expect(item).toEqual({
       id: 'kvintet-1',
       title: 'Using AI at work',
@@ -140,6 +165,93 @@ describe('KvintetService.feed', () => {
           interests: ['startups'],
         },
       ],
+      reasons: [],
+    });
+  });
+
+  describe('ranking', () => {
+    const tag = (slug: string, kind: MatchTag['kind']): MatchTag => ({
+      slug,
+      kind,
+      categories: ['data-ai'],
+    });
+    // Wants to learn three tags; the strong kvintet teaches all of them.
+    const me = matchProfile({
+      tags: [tag('python', 'LEARN'), tag('sql', 'LEARN'), tag('nlp', 'LEARN')],
+      weekdays: true,
+      evenings: true,
+    });
+    const teacher = matchProfile({
+      tags: [tag('python', 'TEACH'), tag('sql', 'TEACH'), tag('nlp', 'TEACH')],
+      weekdays: true,
+      evenings: true,
+    });
+    const neutral = matchProfile();
+
+    it('ranks by score, hides kvintets below the threshold and caps reasons at three', async () => {
+      const { repository, service } = setup();
+      repository.isMember.mockResolvedValue(false);
+      repository.findMatchProfile.mockResolvedValue(me);
+      // Newest first, as the repository lists them.
+      repository.findOpenKvintets.mockResolvedValue([
+        kvintet([member(null, neutral)], 'unrelated', ['leisure']),
+        kvintet([member(null, teacher)], 'strong', ['data-ai']),
+      ]);
+
+      const feed = await service.feed('u1');
+
+      expect(feed.fallback).toBe(false);
+      expect(feed.items.map((item) => item.id)).toEqual(['strong']);
+      expect(feed.items[0].reasons).toHaveLength(3);
+      expect(repository.findMatchProfile).toHaveBeenCalledWith('u1');
+    });
+
+    it('keeps a kvintet scoring exactly the threshold', async () => {
+      const { repository, service } = setup();
+      repository.isMember.mockResolvedValue(false);
+      // One TEACH tag in the topic (a quarter of the topic weight) on top of all-neutral criteria.
+      const teacherOfPython = matchProfile({ tags: [tag('python', 'TEACH')] });
+      repository.findMatchProfile.mockResolvedValue(teacherOfPython);
+      const boundary = kvintet([member(null, neutral)], 'boundary', [
+        'data-ai',
+      ]);
+      const below = kvintet([member(null, neutral)], 'below', ['leisure']);
+      repository.findOpenKvintets.mockResolvedValue([boundary, below]);
+      // Guard the fixture: it must land on the threshold itself, not near it.
+      expect(
+        scoreKvintet(teacherOfPython, {
+          categories: boundary.categories,
+          members: [neutral],
+        }).score,
+      ).toBe(MATCH_THRESHOLD);
+
+      const feed = await service.feed('u1');
+
+      expect(feed.fallback).toBe(false);
+      expect(feed.items.map((item) => item.id)).toEqual(['boundary']);
+    });
+
+    it('lists every kvintet, flagged as fallback, when none reaches the threshold', async () => {
+      const { repository, service } = setup();
+      repository.isMember.mockResolvedValue(false);
+      repository.findMatchProfile.mockResolvedValue(me);
+      // Same days only: better than neutral, still below the threshold.
+      const timeOnly = matchProfile({ weekdays: true });
+      repository.findOpenKvintets.mockResolvedValue([
+        kvintet([member(null, neutral)], 'newer', ['leisure']),
+        kvintet([member(null, neutral)], 'older', ['leisure']),
+        kvintet([member(null, timeOnly)], 'same-time', ['leisure']),
+      ]);
+
+      const feed = await service.feed('u1');
+
+      expect(feed.fallback).toBe(true);
+      // Best first; equal scores keep the repository's newest-first order.
+      expect(feed.items.map((item) => item.id)).toEqual([
+        'same-time',
+        'newer',
+        'older',
+      ]);
     });
   });
 });

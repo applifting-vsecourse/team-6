@@ -182,6 +182,7 @@
       "text": "Something went wrong on our side. Please try again.",
       "title": "Couldn't load proposals"
     },
+    "fallback": "Nothing fits your profile closely yet, so here are all open proposals, closest first.",
     "filter": {
       "all": "All",
       "label": "Category"
@@ -222,6 +223,16 @@
       "weekends": "Weekends"
     },
     "proposalSubtitle": "SUITS EVERYONE: {{preferences}}",
+    "reasons": {
+      "availability": "Same time options",
+      "frequency": "Same meeting frequency",
+      "interest": "Shared interest: {{tag}}",
+      "label": "Why it suits you:",
+      "learn": "Someone here teaches {{tag}}",
+      "roleMix": "Roles different from yours",
+      "teach": "Someone here wants to learn {{tag}}",
+      "topic": "Your topic: {{category}}"
+    },
     "seats": "{{filled}} of {{total}}",
     "startOwn": {
       "button": "Start a new proposal",
