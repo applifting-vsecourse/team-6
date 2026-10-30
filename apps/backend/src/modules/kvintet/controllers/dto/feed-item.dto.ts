@@ -10,7 +10,7 @@ export class FeedMemberDto {
 
 /** Why a kvintet suits the caller. The frontend translates the code; there is no score. */
 export class FeedReasonDto {
-  /** learn | teach | interest | topic | availability | nearby | frequency | roleMix */
+  /** learn | teach | interest | topic | availability | frequency | roleMix */
   code!: string;
   /** Tag slug, for learn, teach and interest. */
   tag?: string;

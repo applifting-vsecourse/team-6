@@ -183,15 +183,20 @@ describe('scoreKvintet', () => {
       expect(score(me, [brno]) - NEUTRAL_SCORE).toBeCloseTo(
         -MATCH_WEIGHTS.distance * 0.5,
       );
-      expect(
-        scoreKvintet(me, { categories: [], members: [here] }).reasons,
-      ).toEqual([{ code: 'nearby' }]);
-      expect(
-        scoreKvintet(me, { categories: [], members: [brno] }).reasons,
-      ).toEqual([]);
     });
 
-    it('leaves members without a location out of the mean and withholds the nearby reason', () => {
+    it('never turns distance into a reason, so a member cannot be located by moving my own point', () => {
+      for (const member of [
+        profile({ ...PRAHA, radiusKm: 50 }),
+        profile({ ...BRNO, radiusKm: 300 }),
+      ]) {
+        expect(
+          scoreKvintet(me, { categories: [], members: [member] }).reasons,
+        ).toEqual([]);
+      }
+    });
+
+    it('leaves members without a location out of the mean', () => {
       const here = profile({ ...PRAHA, radiusKm: 50 });
       const result = scoreKvintet(me, {
         categories: [],
@@ -321,12 +326,11 @@ describe('scoreKvintet', () => {
     expect(local.score).toBeGreaterThan(far.score);
     expect(ai.score).toBeGreaterThanOrEqual(MATCH_THRESHOLD);
     expect(far.score).toBeLessThan(MATCH_THRESHOLD);
-    // Strongest first: topic and availability (15 points each, topic listed first), then nearby,
+    // Strongest first: topic and availability (15 points each, topic listed first), then
     // the learnable tag, frequency and the role mix.
     expect(ai.reasons).toEqual([
       { code: 'topic', category: 'data-ai' },
       { code: 'availability' },
-      { code: 'nearby' },
       { code: 'learn', tag: 'python' },
       { code: 'frequency' },
       { code: 'roleMix' },

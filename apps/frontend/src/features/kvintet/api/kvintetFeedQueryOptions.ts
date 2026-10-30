@@ -27,7 +27,7 @@ const feedKvintetSchema = z.object({
     z.union([
       z.object({ code: z.enum(["learn", "teach", "interest"]), tag: z.string() }),
       z.object({ code: z.literal("topic"), category: z.string() }),
-      z.object({ code: z.enum(["availability", "nearby", "frequency", "roleMix"]) }),
+      z.object({ code: z.enum(["availability", "frequency", "roleMix"]) }),
     ]),
   ),
 })

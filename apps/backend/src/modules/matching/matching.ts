@@ -52,7 +52,8 @@ export type MatchKvintet = {
 export type MatchReason =
   | { code: 'learn' | 'teach' | 'interest'; tag: string }
   | { code: 'topic'; category: string }
-  | { code: 'availability' | 'nearby' | 'frequency' | 'roleMix' };
+  // No distance reason: a yes/no "nearby" lets a caller locate a member by moving their own point.
+  | { code: 'availability' | 'frequency' | 'roleMix' };
 
 export type MatchResult = { score: number; reasons: MatchReason[] };
 
@@ -242,7 +243,7 @@ export function scoreKvintet(
   const distances = members
     .map((m) => distance(me, m))
     .filter((d): d is number => d !== null);
-  const nearby = mean(distances);
+  const closeness = mean(distances);
   const frequencies = members.map((m) => frequency(me, m));
   const roleMix = roles(me, members);
 
@@ -250,7 +251,7 @@ export function scoreKvintet(
     MATCH_WEIGHTS.topic * fit.value +
     MATCH_WEIGHTS.complementarity * pairs.value +
     MATCH_WEIGHTS.availability * timeFit +
-    MATCH_WEIGHTS.distance * nearby +
+    MATCH_WEIGHTS.distance * closeness +
     MATCH_WEIGHTS.frequency * mean(frequencies) +
     MATCH_WEIGHTS.expectations * mean(members.map((m) => expectations(me, m))) +
     MATCH_WEIGHTS.roles * roleMix;
@@ -281,17 +282,6 @@ export function scoreKvintet(
     weighted.push({
       points: MATCH_WEIGHTS.availability,
       reason: { code: 'availability' },
-    });
-  }
-  // Only when every member's distance is known and inside the shared radius.
-  if (
-    distances.length === members.length &&
-    members.length > 0 &&
-    distances.every((d) => d > 0)
-  ) {
-    weighted.push({
-      points: MATCH_WEIGHTS.distance * nearby,
-      reason: { code: 'nearby' },
     });
   }
   if (frequencies.length > 0 && frequencies.every((f) => f === 1)) {

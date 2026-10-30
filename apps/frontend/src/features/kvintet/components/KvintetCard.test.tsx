@@ -24,7 +24,7 @@ const kvintet: FeedKvintet = {
   reasons: [
     { code: "learn", tag: "python" },
     { code: "topic", category: "data-ai" },
-    { code: "nearby" },
+    { code: "frequency" },
   ],
 }
 
@@ -55,7 +55,7 @@ describe("KvintetCard", () => {
 
     expect(screen.getByText("Someone here teaches Python")).toBeInTheDocument()
     expect(screen.getByText("Your topic: Data & AI")).toBeInTheDocument()
-    expect(screen.getByText("Nearby")).toBeInTheDocument()
+    expect(screen.getByText("Same meeting frequency")).toBeInTheDocument()
   })
 
   it("shows no reasons when there are none", () => {
