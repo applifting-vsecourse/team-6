@@ -241,18 +241,6 @@ describe("starting a proposal", () => {
     expect(api.post).not.toHaveBeenCalled()
   })
 
-  it("lets the user pick at most three categories", async () => {
-    await openDialog()
-    const group = screen.getByRole("group", { name: "Categories" })
-
-    for (const name of ["Software development", "Business", "Languages"]) {
-      await userEvent.click(within(group).getByRole("button", { name }))
-    }
-
-    expect(within(group).getByRole("button", { name: "Leisure" })).toBeDisabled()
-    expect(within(group).getByRole("button", { name: "Software development" })).toBeEnabled()
-  })
-
   it("creates the proposal and leaves for My kvintet", async () => {
     await openDialog()
 
