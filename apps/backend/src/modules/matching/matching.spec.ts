@@ -251,6 +251,27 @@ describe('scoreKvintet', () => {
         }).reasons,
       ).toEqual([{ code: 'roleMix' }]);
     });
+
+    it('treats members without roles as unknown, not as a different role', () => {
+      const me = profile({ roles: ['developer'] });
+
+      // Nobody picked a role: neutral and no reason, not a perfect mix.
+      const unknown = scoreKvintet(me, {
+        categories: [],
+        members: [profile(), profile()],
+      });
+      expect(unknown.score).toBeCloseTo(NEUTRAL_SCORE);
+      expect(unknown.reasons).toEqual([]);
+      // Only members with roles are compared: one designer, one unknown is a full mix.
+      const mixed = scoreKvintet(me, {
+        categories: [],
+        members: [profile({ roles: ['designer'] }), profile()],
+      });
+      expect(mixed.score - NEUTRAL_SCORE).toBeCloseTo(
+        MATCH_WEIGHTS.roles * 0.5,
+      );
+      expect(mixed.reasons).toEqual([{ code: 'roleMix' }]);
+    });
   });
 
   it('ranks a topic and logistics match above a logistics-only one above an unrelated one', () => {

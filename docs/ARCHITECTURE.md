@@ -122,7 +122,7 @@ Criteria, each 0–1 and weighted (sum 100):
 | Distance (10)        | Per member, haversine distance within the smaller of the two radii: `1 − d / (2 · radius)`, 0 beyond it; members without a location are left out of the mean                        |
 | Frequency (8)        | Per member: same 1, neighbouring 0.5, weekly against monthly 0                                                                                                                      |
 | Expectations (6)     | Per member, overlap of the questionnaire's expectations                                                                                                                             |
-| Role mix (6)         | Share of members who have none of the caller's roles: a mix is the point                                                                                                            |
+| Role mix (6)         | Among members who picked roles, the share who have none of the caller's roles: a mix is the point; with no roles on either side it is neutral                                       |
 
 Data one side has not filled in scores a neutral 0.5, so it neither helps nor hurts. Distance, availability and the other soft criteria never hide a kvintet on their own; only the total score does.
 

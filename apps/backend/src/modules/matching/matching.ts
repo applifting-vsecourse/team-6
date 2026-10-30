@@ -218,13 +218,17 @@ function expectations(me: MatchProfile, member: MatchProfile): number {
   return shared / new Set([...me.expectations, ...member.expectations]).size;
 }
 
-/** A mix of roles is the point: members who share none of the caller's roles count. */
+/**
+ * A mix of roles is the point: members who share none of the caller's roles count.
+ * Only members who picked roles are compared; with none on either side it is neutral.
+ */
 function roles(me: MatchProfile, members: MatchProfile[]): number {
-  if (me.roles.length === 0 || members.length === 0) return NEUTRAL;
-  const sharing = members.filter((m) =>
+  const known = members.filter((m) => m.roles.length > 0);
+  if (me.roles.length === 0 || known.length === 0) return NEUTRAL;
+  const sharing = known.filter((m) =>
     m.roles.some((role) => me.roles.includes(role)),
   ).length;
-  return 1 - sharing / members.length;
+  return 1 - sharing / known.length;
 }
 
 export function scoreKvintet(
