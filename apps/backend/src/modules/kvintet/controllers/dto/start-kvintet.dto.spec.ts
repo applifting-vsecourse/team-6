@@ -17,7 +17,10 @@ describe('StartKvintetDto', () => {
     ['missing', undefined],
     ['a single string', 'languages'],
     ['empty', []],
-    ['more than three', ['software-development', 'business', 'leisure', 'languages']],
+    [
+      'more than three',
+      ['software-development', 'business', 'leisure', 'languages'],
+    ],
     ['repeated', ['languages', 'languages']],
     ['an empty slug', ['']],
   ])('rejects categories that are %s', async (_label, categorySlugs) => {

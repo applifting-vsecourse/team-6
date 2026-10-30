@@ -17,7 +17,12 @@ vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.f
 vi.mock("@/lib/api-client", () => ({ api: { get: vi.fn(), post: vi.fn() } }))
 
 const reference = {
-  categories: [{ slug: "software-development" }, { slug: "business" }, { slug: "languages" }, { slug: "leisure" }],
+  categories: [
+    { slug: "software-development" },
+    { slug: "business" },
+    { slug: "languages" },
+    { slug: "leisure" },
+  ],
 }
 
 const kvintet = (id: string, title: string): FeedKvintet => ({
@@ -145,7 +150,10 @@ describe("category filter", () => {
     renderPage()
 
     expect(await screen.findByRole("radio", { name: "All" })).toHaveAttribute("data-state", "on")
-    expect(screen.getByRole("radio", { name: "Software development" })).toHaveAttribute("data-state", "off")
+    expect(screen.getByRole("radio", { name: "Software development" })).toHaveAttribute(
+      "data-state",
+      "off",
+    )
     expect(screen.getByRole("radio", { name: "Languages" })).toHaveAttribute("data-state", "off")
   })
 

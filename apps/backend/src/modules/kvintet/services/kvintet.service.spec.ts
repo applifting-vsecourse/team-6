@@ -145,7 +145,11 @@ describe('KvintetService.feed', () => {
 });
 
 describe('KvintetService.start', () => {
-  const input = { title: 'Topic', categorySlugs: ['leisure'], description: null };
+  const input = {
+    title: 'Topic',
+    categorySlugs: ['leisure'],
+    description: null,
+  };
 
   it('returns the new kvintet id', async () => {
     const { repository, service } = setup();
