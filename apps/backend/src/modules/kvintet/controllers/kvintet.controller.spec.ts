@@ -3,12 +3,22 @@ import { KvintetController } from '@/modules/kvintet/controllers/kvintet.control
 import { KvintetDetails } from '@/modules/kvintet/domain/kvintet';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
 import { KvintetService } from '@/modules/kvintet/services/kvintet.service';
+import {
+  emptyMatchProfile,
+  type MatchProfile,
+  type MatchTag,
+} from '@/modules/matching/matching';
 import { AuthenticatedUserGuard } from '@/shared/auth/guards/authenticated-user.guard';
 import { MemberGuard } from '@/shared/auth/guards/member.guard';
 import { OnboardedGuard } from '@/shared/auth/guards/onboarded.guard';
 import type { BetterAuth } from '@/shared/auth/providers/better-auth.provider';
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { mock } from 'jest-mock-extended';
+
+const matchProfile = (overrides: Partial<MatchProfile> = {}): MatchProfile => ({
+  ...emptyMatchProfile(),
+  ...overrides,
+});
 
 // The real guard pulls in the better-auth provider (.tsx email templates, ESM-only
 // packages) which this Jest setup does not load; its behaviour has its own spec.
@@ -53,6 +63,7 @@ describe('KvintetController', () => {
     const repository = mock<KvintetRepository>();
     repository.isMember.mockResolvedValue(false);
     repository.categoryExists.mockResolvedValue(true);
+    repository.findMatchProfile.mockResolvedValue(matchProfile());
     repository.findOpenKvintets.mockResolvedValue([]);
     const controller = new KvintetController(new KvintetService(repository));
 
@@ -67,6 +78,14 @@ describe('KvintetController', () => {
   it('answers the feed with an allow-list of fields and nothing else', async () => {
     const repository = mock<KvintetRepository>();
     repository.isMember.mockResolvedValue(false);
+    const python = (kind: 'TEACH' | 'LEARN'): MatchTag => ({
+      slug: 'python',
+      kind,
+      categories: ['software-development'],
+    });
+    repository.findMatchProfile.mockResolvedValue(
+      matchProfile({ tags: [python('LEARN')] }),
+    );
     repository.findOpenKvintets.mockResolvedValue([
       {
         id: 'kvintet-1',
@@ -79,19 +98,28 @@ describe('KvintetController', () => {
             teach: ['python'],
             learn: [],
             interests: [],
+            // Location and the rest of the profile are for ranking only.
+            match: matchProfile({
+              tags: [python('TEACH')],
+              latitude: 50.08,
+              longitude: 14.44,
+              radiusKm: 20,
+            }),
           },
         ],
       },
     ]);
     const controller = new KvintetController(new KvintetService(repository));
 
-    const [item] = await controller.feed(
+    const feed = await controller.feed(
       { id: 'u1', email: 'a@b.c', name: 'A', role: 'user' },
       {},
     );
+    const [item] = feed.items;
 
-    // A new field on the feed must be added here on purpose: names, e-mails and
-    // user ids must never reach this response.
+    // A new field on the feed must be added here on purpose: names, e-mails,
+    // user ids, locations and scores must never reach this response.
+    expect(Object.keys(feed).sort()).toEqual(['fallback', 'items']);
     expect(Object.keys(item).sort()).toEqual([
       'capacity',
       'categories',
@@ -99,6 +127,7 @@ describe('KvintetController', () => {
       'meetingFrequency',
       'memberCount',
       'members',
+      'reasons',
       'title',
     ]);
     expect(Object.keys(item.members[0]).sort()).toEqual([
@@ -107,6 +136,12 @@ describe('KvintetController', () => {
       'position',
       'teach',
     ]);
+    expect(item.reasons).toContainEqual({ code: 'learn', tag: 'python' });
+    for (const reason of item.reasons) {
+      expect(['category', 'code', 'tag']).toEqual(
+        expect.arrayContaining(Object.keys(reason)),
+      );
+    }
   });
 
   describe('member endpoints', () => {

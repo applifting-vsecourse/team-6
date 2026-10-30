@@ -39,6 +39,7 @@ export function KvintetFeedPage({ category, onCategoryChange }: KvintetFeedPageP
     ...kvintetFeedQueryOptions(activeCategory),
     enabled: !category || !reference.isPending,
   })
+  const items = kvintets.data?.items
   const join = useJoinKvintet()
 
   // The feed answers 409 to someone who is already in a kvintet.
@@ -51,7 +52,7 @@ export function KvintetFeedPage({ category, onCategoryChange }: KvintetFeedPageP
 
   const openStart = () => setIsStartOpen(true)
   // The empty state already offers to start a proposal, so the "nothing fits?" box would repeat it.
-  const isFilteredEmpty = activeCategory !== undefined && kvintets.data?.length === 0
+  const isFilteredEmpty = activeCategory !== undefined && items?.length === 0
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 pt-16 pb-24">
@@ -107,7 +108,7 @@ export function KvintetFeedPage({ category, onCategoryChange }: KvintetFeedPageP
           </Alert>
         ) : null}
 
-        {kvintets.data?.length === 0 ? (
+        {items?.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-lg border border-border px-6 py-12 text-center">
             <LogoMark className="size-12" />
             <h2 className="text-subheading font-semibold">
@@ -137,16 +138,19 @@ export function KvintetFeedPage({ category, onCategoryChange }: KvintetFeedPageP
           </div>
         ) : null}
 
-        {kvintets.data?.length ? (
+        {items?.length ? (
           <>
             <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
               {t("kvintet.count", {
-                count: kvintets.data.length,
-                formatted: formatNumber(kvintets.data.length),
+                count: items.length,
+                formatted: formatNumber(items.length),
               })}
             </p>
+            {kvintets.data?.fallback ? (
+              <p className="text-sm text-body">{t("kvintet.fallback")}</p>
+            ) : null}
             <ul className="flex flex-col gap-6">
-              {kvintets.data.map((kvintet) => (
+              {items.map((kvintet) => (
                 <li key={kvintet.id}>
                   <KvintetCard
                     kvintet={kvintet}

@@ -8,6 +8,16 @@ export class FeedMemberDto {
   interests!: string[];
 }
 
+/** Why a kvintet suits the caller. The frontend translates the code; there is no score. */
+export class FeedReasonDto {
+  /** learn | teach | interest | topic | availability | nearby | frequency | roleMix */
+  code!: string;
+  /** Tag slug, for learn, teach and interest. */
+  tag?: string;
+  /** Category slug, for topic. */
+  category?: string;
+}
+
 export class FeedItemDto {
   id!: string;
   title!: string;
@@ -18,4 +28,13 @@ export class FeedItemDto {
   /** Set only when every member picked the same meeting frequency. */
   meetingFrequency!: MeetingFrequency | null;
   members!: FeedMemberDto[];
+  /** Up to three, strongest first. */
+  reasons!: FeedReasonDto[];
+}
+
+export class FeedDto {
+  /** Best match first. */
+  items!: FeedItemDto[];
+  /** True when no kvintet reached the match threshold, so every open one is listed. */
+  fallback!: boolean;
 }

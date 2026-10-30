@@ -33,6 +33,7 @@ const kvintet = (id: string, title: string): FeedKvintet => ({
   memberCount: 1,
   meetingFrequency: null,
   members: [{ position: "Accountant", teach: ["excel"], learn: [], interests: [] }],
+  reasons: [],
 })
 
 const apiError = (status: number, code: string) =>
@@ -43,14 +44,17 @@ const apiError = (status: number, code: string) =>
     },
   )
 
-// `api.get(path).json()` for the feed and the reference list.
-const serve = (feed: () => Promise<unknown>) =>
-  vi
-    .mocked(api.get)
-    .mockImplementation(
-      (path: unknown) =>
-        ({ json: () => (path === "reference" ? Promise.resolve(reference) : feed()) }) as never,
-    )
+// `api.get(path).json()` for the feed and the reference list; `feed` resolves to the items.
+const serve = (feed: () => Promise<unknown>, isFallback = false) =>
+  vi.mocked(api.get).mockImplementation(
+    (path: unknown) =>
+      ({
+        json: () =>
+          path === "reference"
+            ? Promise.resolve(reference)
+            : feed().then((items) => ({ items, fallback: isFallback })),
+      }) as never,
+  )
 
 const onCategoryChange = vi.fn()
 
@@ -86,6 +90,19 @@ describe("KvintetFeedPage", () => {
     expect(await screen.findByRole("heading", { name: "From Excel to Python" })).toBeInTheDocument()
     expect(screen.getByRole("heading", { name: "Spanish" })).toBeInTheDocument()
     expect(screen.getByText("2 proposals")).toBeInTheDocument()
+    expect(screen.queryByText(/Nothing fits your profile closely/)).not.toBeInTheDocument()
+  })
+
+  it("says so when nothing fits closely and it lists every open proposal instead", async () => {
+    serve(() => Promise.resolve([kvintet("k1", "From Excel to Python")]), true)
+    renderPage()
+
+    expect(
+      await screen.findByText(
+        "Nothing fits your profile closely yet, so here are all open proposals, closest first.",
+      ),
+    ).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "From Excel to Python" })).toBeInTheDocument()
   })
 
   it("shows an empty state that offers to start a proposal", async () => {
