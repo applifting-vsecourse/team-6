@@ -8,7 +8,7 @@ import { KvintetCard } from "@/features/kvintet/components/KvintetCard"
 const kvintet: FeedKvintet = {
   id: "k1",
   title: "Using AI at work",
-  category: "technology",
+  categories: ["technology", "business"],
   capacity: 5,
   memberCount: 2,
   meetingFrequency: "BIWEEKLY",
@@ -36,11 +36,12 @@ const renderCard = (overrides: Partial<FeedKvintet> = {}, onJoin = vi.fn()) => {
 }
 
 describe("KvintetCard", () => {
-  it("shows the topic, category and seats", () => {
+  it("shows the topic, every category and seats", () => {
     renderCard()
 
     expect(screen.getByRole("heading", { name: "Using AI at work" })).toBeInTheDocument()
     expect(screen.getByText("Technology")).toBeInTheDocument()
+    expect(screen.getByText("Business")).toBeInTheDocument()
     expect(screen.getByText("2 of 5")).toBeInTheDocument()
   })
 

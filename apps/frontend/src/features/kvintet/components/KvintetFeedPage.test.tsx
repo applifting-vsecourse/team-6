@@ -16,12 +16,14 @@ vi.mock("@tanstack/react-router", () => ({ useNavigate: () => navigate }))
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }))
 vi.mock("@/lib/api-client", () => ({ api: { get: vi.fn(), post: vi.fn() } }))
 
-const reference = { categories: [{ slug: "technology" }, { slug: "languages" }] }
+const reference = {
+  categories: [{ slug: "technology" }, { slug: "business" }, { slug: "languages" }, { slug: "leisure" }],
+}
 
 const kvintet = (id: string, title: string): FeedKvintet => ({
   id,
   title,
-  category: "technology",
+  categories: ["technology"],
   capacity: 5,
   memberCount: 1,
   meetingFrequency: null,
@@ -205,7 +207,11 @@ describe("category filter", () => {
     await userEvent.click(screen.getByRole("button", { name: "Start a new proposal" }))
 
     const dialog = await screen.findByRole("dialog")
-    expect(within(dialog).getByRole("combobox")).toHaveTextContent("Languages")
+    const group = within(dialog).getByRole("group", { name: "Categories" })
+    expect(within(group).getByRole("button", { name: "Languages" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    )
   })
 })
 
@@ -223,9 +229,20 @@ describe("starting a proposal", () => {
     await userEvent.click(screen.getByRole("button", { name: "Start proposal" }))
 
     expect(await screen.findByText("Enter a topic")).toBeInTheDocument()
-    // The placeholder and the validation message share the text.
-    expect(screen.getAllByText("Choose a category")).toHaveLength(2)
+    expect(screen.getByText("Choose a category")).toBeInTheDocument()
     expect(api.post).not.toHaveBeenCalled()
+  })
+
+  it("lets the user pick at most three categories", async () => {
+    await openDialog()
+    const group = screen.getByRole("group", { name: "Categories" })
+
+    for (const name of ["Technology", "Business", "Languages"]) {
+      await userEvent.click(within(group).getByRole("button", { name }))
+    }
+
+    expect(within(group).getByRole("button", { name: "Leisure" })).toBeDisabled()
+    expect(within(group).getByRole("button", { name: "Technology" })).toBeEnabled()
   })
 
   it("creates the proposal and leaves for My kvintet", async () => {
@@ -235,13 +252,17 @@ describe("starting a proposal", () => {
       screen.getByLabelText("Topic or problem"),
       "  How to use AI in a small firm ",
     )
-    await userEvent.click(screen.getByRole("combobox", { name: "Category" }))
-    await userEvent.click(await screen.findByRole("option", { name: "Technology" }))
+    const group = screen.getByRole("group", { name: "Categories" })
+    await userEvent.click(within(group).getByRole("button", { name: "Technology" }))
+    await userEvent.click(within(group).getByRole("button", { name: "Business" }))
     await userEvent.click(screen.getByRole("button", { name: "Start proposal" }))
 
     await waitFor(() =>
       expect(api.post).toHaveBeenCalledWith("kvintets", {
-        json: { title: "How to use AI in a small firm", categorySlug: "technology" },
+        json: {
+          title: "How to use AI in a small firm",
+          categorySlugs: ["technology", "business"],
+        },
       }),
     )
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/kvintet" }))
@@ -253,8 +274,11 @@ describe("starting a proposal", () => {
     vi.mocked(api.post).mockRejectedValue(apiError(409, "already_in_kvintet"))
 
     await userEvent.type(screen.getByLabelText("Topic or problem"), "Topic")
-    await userEvent.click(screen.getByRole("combobox", { name: "Category" }))
-    await userEvent.click(await screen.findByRole("option", { name: "Technology" }))
+    await userEvent.click(
+      within(screen.getByRole("group", { name: "Categories" })).getByRole("button", {
+        name: "Technology",
+      }),
+    )
     await userEvent.click(screen.getByRole("button", { name: "Start proposal" }))
 
     expect(

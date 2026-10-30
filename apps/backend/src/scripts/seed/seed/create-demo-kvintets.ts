@@ -14,7 +14,7 @@ export type DemoMember = {
 
 type DemoKvintet = {
   title: string;
-  category: string;
+  categories: string[];
   members: DemoMember[];
   // Full and agreed on.
   active?: boolean;
@@ -78,16 +78,22 @@ export async function createDemoKvintets(
   kvintets: DemoKvintet[],
 ): Promise<void> {
   for (const kvintet of kvintets) {
-    const category = await prisma.category.findUniqueOrThrow({
-      where: { slug: kvintet.category },
-    });
+    const categoryIds = await Promise.all(
+      kvintet.categories.map(
+        async (slug) =>
+          (await prisma.category.findUniqueOrThrow({ where: { slug } })).id,
+      ),
+    );
 
     await createDemoProfiles(prisma, kvintet.members);
 
     const created = await prisma.kvintet.create({
       data: {
         title: kvintet.title,
-        categoryId: category.id,
+        categoryId: categoryIds[0],
+        categories: {
+          create: categoryIds.map((categoryId) => ({ categoryId })),
+        },
         status: kvintet.active ? 'ACTIVE' : 'FORMING',
         activatedAt: kvintet.active ? minutesAgo(2 * 24 * 60) : null,
         members: {

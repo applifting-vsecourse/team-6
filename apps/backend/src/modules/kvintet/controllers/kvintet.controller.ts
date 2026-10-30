@@ -52,7 +52,7 @@ export class KvintetController {
   @ApiOperation({
     summary: 'Open kvintets',
     description:
-      'Kvintets that still have a free seat, newest first, optionally only one category. Members appear by role and interests only. 400 for an unknown category, 409 if the caller is already in a kvintet.',
+      'Kvintets that still have a free seat, newest first, optionally only those in one category. Members appear by role and interests only. 400 for an unknown category, 409 if the caller is already in a kvintet.',
   })
   feed(
     @User() user: Identity,
@@ -72,7 +72,7 @@ export class KvintetController {
   ): Promise<StartedKvintetDto> {
     return this.service.start(user.id, {
       title: dto.title,
-      categorySlug: dto.categorySlug,
+      categorySlugs: dto.categorySlugs,
       description: dto.description || null,
     });
   }

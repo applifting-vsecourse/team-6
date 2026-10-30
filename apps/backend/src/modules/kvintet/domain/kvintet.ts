@@ -14,7 +14,7 @@ export type MemberProfile = {
 export type OpenKvintet = {
   id: string;
   title: string;
-  category: string;
+  categories: string[];
   members: MemberProfile[];
 };
 
@@ -22,7 +22,7 @@ export type OpenKvintet = {
 export type FeedItem = {
   id: string;
   title: string;
-  category: string;
+  categories: string[];
   capacity: number;
   memberCount: number;
   /** Set only when every member picked the same meeting frequency. */
@@ -32,7 +32,7 @@ export type FeedItem = {
 
 export type NewKvintet = {
   title: string;
-  categorySlug: string;
+  categorySlugs: string[];
   description: string | null;
 };
 

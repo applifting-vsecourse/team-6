@@ -146,9 +146,8 @@
     },
     "dialog": {
       "cancel": "Cancel",
-      "category": "Category",
-      "categoryHint": "Others find the proposal by category in the filter.",
-      "categoryPlaceholder": "Choose a category",
+      "category": "Categories",
+      "categoryHint": "Pick up to {{max}}. Others find the proposal by category in the filter.",
       "confirmLeave": "Leave",
       "description": "You will be its first member. Others will see the topic, your role and tags – not your name.",
       "details": "Short description (optional)",
@@ -241,6 +240,7 @@
     "vacancyHint": "It could be you.",
     "validation": {
       "categoryRequired": "Choose a category",
+      "categoryTooMany": "Choose at most {{max}} categories",
       "descriptionTooLong": "The description can be at most {{max}} characters",
       "titleRequired": "Enter a topic",
       "titleTooLong": "The topic can be at most {{max}} characters"
