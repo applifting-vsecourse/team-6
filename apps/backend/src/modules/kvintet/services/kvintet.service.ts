@@ -46,7 +46,7 @@ export class KvintetService {
       return {
         id: kvintet.id,
         title: kvintet.title,
-        category: kvintet.category,
+        categories: kvintet.categories,
         capacity: KVINTET_CAPACITY,
         memberCount: kvintet.members.length,
         // Only when every member agrees; null otherwise.
@@ -65,7 +65,7 @@ export class KvintetService {
     const outcome = await this.repository.start(userId, kvintet);
     if (outcome.result === 'unknown_category') {
       throw new ValidationFailedException([
-        { field: 'categorySlug', code: 'isIn' },
+        { field: 'categorySlugs', code: 'isIn' },
       ]);
     }
     if (outcome.result === 'already_member') throw alreadyInKvintet();

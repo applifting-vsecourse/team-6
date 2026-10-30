@@ -11,8 +11,8 @@ export class FeedMemberDto {
 export class FeedItemDto {
   id!: string;
   title!: string;
-  /** Category slug. */
-  category!: string;
+  /** Category slugs, 1–3, in reference order. */
+  categories!: string[];
   capacity!: number;
   memberCount!: number;
   /** Set only when every member picked the same meeting frequency. */

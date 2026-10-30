@@ -34,10 +34,13 @@
   },
   "categories": {
     "business": "Podnikání",
+    "cloud-security": "Cloud a bezpečnost",
+    "data-ai": "Data a AI",
+    "design-product": "Design a produkt",
     "languages": "Jazyky",
     "leisure": "Volný čas",
     "personal-development": "Osobní rozvoj",
-    "technology": "Technologie"
+    "software-development": "Vývoj softwaru"
   },
   "chat": {
     "composer": {
@@ -151,8 +154,7 @@
     "dialog": {
       "cancel": "Zrušit",
       "category": "Kategorie",
-      "categoryHint": "Podle kategorie návrh najdou ostatní ve filtru.",
-      "categoryPlaceholder": "Vyberte kategorii",
+      "categoryHint": "Vyberte nejvýše {{max}}. Podle kategorie návrh najdou ostatní ve filtru.",
       "confirmLeave": "Opustit",
       "description": "Budete jeho prvním členem. Ostatní uvidí téma, vaši roli a štítky – ne vaše jméno.",
       "details": "Krátký popis (nepovinné)",
@@ -245,6 +247,7 @@
     "vacancyHint": "Můžete to být vy.",
     "validation": {
       "categoryRequired": "Vyberte kategorii",
+      "categoryTooMany": "Vyberte nejvýše {{max}} kategorie",
       "descriptionTooLong": "Popis může mít nejvýše {{max}} znaků",
       "titleRequired": "Zadejte téma",
       "titleTooLong": "Téma může mít nejvýše {{max}} znaků"

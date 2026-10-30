@@ -22,7 +22,7 @@ const member = (
 const kvintet = (members: OpenKvintet['members']): OpenKvintet => ({
   id: 'kvintet-1',
   title: 'Using AI at work',
-  category: 'technology',
+  categories: ['software-development'],
   members,
 });
 
@@ -128,7 +128,7 @@ describe('KvintetService.feed', () => {
     expect(item).toEqual({
       id: 'kvintet-1',
       title: 'Using AI at work',
-      category: 'technology',
+      categories: ['software-development'],
       capacity: 5,
       memberCount: 1,
       meetingFrequency: 'WEEKLY',
@@ -145,7 +145,11 @@ describe('KvintetService.feed', () => {
 });
 
 describe('KvintetService.start', () => {
-  const input = { title: 'Topic', categorySlug: 'leisure', description: null };
+  const input = {
+    title: 'Topic',
+    categorySlugs: ['leisure'],
+    description: null,
+  };
 
   it('returns the new kvintet id', async () => {
     const { repository, service } = setup();
@@ -154,14 +158,14 @@ describe('KvintetService.start', () => {
     await expect(service.start('u1', input)).resolves.toEqual({ id: 'k1' });
   });
 
-  it('rejects an unknown category as a validation error on categorySlug', async () => {
+  it('rejects an unknown category as a validation error on categorySlugs', async () => {
     const { repository, service } = setup();
     repository.start.mockResolvedValue({ result: 'unknown_category' });
 
     const error = await service.start('u1', input).catch((e) => e);
 
     expect(error).toBeInstanceOf(ValidationFailedException);
-    expect(error.errors).toEqual([{ field: 'categorySlug', code: 'isIn' }]);
+    expect(error.errors).toEqual([{ field: 'categorySlugs', code: 'isIn' }]);
   });
 
   it('answers 409 already_in_kvintet when the caller already has a kvintet', async () => {

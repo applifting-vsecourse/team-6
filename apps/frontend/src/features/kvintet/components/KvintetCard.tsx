@@ -46,9 +46,16 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
       aria-labelledby={titleId}
       className="gap-4 rounded-lg bg-secondary px-7 py-6"
     >
-      <span className="inline-flex self-start rounded-full border border-input px-2.5 py-0.5 font-mono text-xs tracking-meta text-body uppercase">
-        {label("categories", kvintet.category)}
-      </span>
+      <div className="flex flex-wrap gap-2">
+        {kvintet.categories.map((slug) => (
+          <span
+            key={slug}
+            className="inline-flex rounded-full border border-input px-2.5 py-0.5 font-mono text-xs tracking-meta text-body uppercase"
+          >
+            {label("categories", slug)}
+          </span>
+        ))}
+      </div>
 
       <div className="flex items-center justify-between gap-4">
         <h2

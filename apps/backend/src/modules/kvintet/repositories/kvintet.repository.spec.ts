@@ -51,6 +51,7 @@ describe('KvintetRepository (Postgres)', () => {
       data: {
         title: `${prefix} kvintet`,
         categoryId,
+        categories: { create: { categoryId } },
         members: { create: memberIds.map((userId) => ({ userId })) },
       },
     });
@@ -116,9 +117,13 @@ describe('KvintetRepository (Postgres)', () => {
     await expect(
       repository.start(owner, {
         title: `${prefix} second`,
-        categorySlug: (
-          await prisma.category.findUniqueOrThrow({ where: { id: categoryId } })
-        ).slug,
+        categorySlugs: [
+          (
+            await prisma.category.findUniqueOrThrow({
+              where: { id: categoryId },
+            })
+          ).slug,
+        ],
         description: null,
       }),
     ).resolves.toEqual({ result: 'already_member' });
@@ -132,26 +137,43 @@ describe('KvintetRepository (Postgres)', () => {
     );
   });
 
-  it('starts a kvintet with the caller as its only member', async () => {
+  it('starts a kvintet with the caller as its only member and every chosen category', async () => {
     const [user] = await createUsers(1, 'starter');
-    const category = await prisma.category.findUniqueOrThrow({
-      where: { id: categoryId },
+    const categories = await prisma.category.findMany({
+      orderBy: { sortOrder: 'asc' },
+      take: 2,
     });
 
     const outcome = await repository.start(user, {
       title: `${prefix} started`,
-      categorySlug: category.slug,
+      // Reverse order: the feed still lists them in reference order.
+      categorySlugs: [categories[1].slug, categories[0].slug],
       description: 'Short description',
     });
 
     expect(outcome.result).toBe('started');
+    const id = outcome.result === 'started' ? outcome.id : '';
+    const open = await repository.findOpenKvintets(categories[1].slug);
+    expect(open.find((p) => p.id === id)?.categories).toEqual([
+      categories[0].slug,
+      categories[1].slug,
+    ]);
+  });
+
+  it('refuses to start a kvintet when any category is unknown', async () => {
+    const [user] = await createUsers(1, 'unknown');
+    const { slug } = await prisma.category.findUniqueOrThrow({
+      where: { id: categoryId },
+    });
+
     await expect(
       repository.start(user, {
         title: `${prefix} nope`,
-        categorySlug: 'does-not-exist',
+        categorySlugs: [slug, 'does-not-exist'],
         description: null,
       }),
     ).resolves.toEqual({ result: 'unknown_category' });
+    await expect(repository.isMember(user)).resolves.toBe(false);
   });
 
   it('lists only the kvintets of the requested category', async () => {
@@ -168,7 +190,7 @@ describe('KvintetRepository (Postgres)', () => {
     const inOther = await repository.findOpenKvintets(other.slug);
 
     expect(inCategory.map((p) => p.id)).toContain(kvintetId);
-    expect(inCategory.every((p) => p.category === slug)).toBe(true);
+    expect(inCategory.every((p) => p.categories.includes(slug))).toBe(true);
     expect(inOther.map((p) => p.id)).not.toContain(kvintetId);
   });
 
@@ -208,7 +230,7 @@ describe('KvintetRepository (Postgres)', () => {
     const open = await repository.findOpenKvintets();
 
     expect(open.find((p) => p.id === kvintetId)).toMatchObject({
-      category: category.slug,
+      categories: [category.slug],
       members: [
         {
           position: 'Accountant',

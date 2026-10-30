@@ -217,7 +217,7 @@ export const seedDatabase = async (
   await createDemoKvintets(prisma, [
     {
       title: 'Using AI at work – what really works',
-      category: 'technology',
+      categories: ['data-ai'],
       members: [
         {
           userId: jan.id,
@@ -257,7 +257,7 @@ export const seedDatabase = async (
     },
     {
       title: 'From Excel to Python',
-      category: 'technology',
+      categories: ['data-ai', 'software-development', 'business'],
       members: [
         {
           userId: eva.id,
@@ -271,7 +271,7 @@ export const seedDatabase = async (
     },
     {
       title: 'Spanish conversation over lunch',
-      category: 'languages',
+      categories: ['languages'],
       members: [
         {
           userId: lucie.id,
@@ -285,7 +285,7 @@ export const seedDatabase = async (
     },
     {
       title: 'Negotiating your first client deal',
-      category: 'business',
+      categories: ['business'],
       members: [
         {
           userId: martin.id,
@@ -299,7 +299,7 @@ export const seedDatabase = async (
     },
     {
       title: 'Cooking together on Sundays',
-      category: 'leisure',
+      categories: ['leisure'],
       members: [
         {
           userId: katerina.id,
@@ -313,7 +313,7 @@ export const seedDatabase = async (
     },
     {
       title: 'Frontend craft circle',
-      category: 'technology',
+      categories: ['software-development'],
       active: true,
       votes: 5,
       members: [

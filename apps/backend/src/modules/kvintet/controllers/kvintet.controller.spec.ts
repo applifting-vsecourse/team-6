@@ -71,7 +71,7 @@ describe('KvintetController', () => {
       {
         id: 'kvintet-1',
         title: 'Using AI at work',
-        category: 'technology',
+        categories: ['software-development'],
         members: [
           {
             position: 'Backend developer',
@@ -94,7 +94,7 @@ describe('KvintetController', () => {
     // user ids must never reach this response.
     expect(Object.keys(item).sort()).toEqual([
       'capacity',
-      'category',
+      'categories',
       'id',
       'meetingFrequency',
       'memberCount',

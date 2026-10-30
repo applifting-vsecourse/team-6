@@ -51,14 +51,19 @@ export class KvintetRepository {
       where: {
         status: 'FORMING',
         members: { some: {} },
-        ...(categorySlug ? { category: { slug: categorySlug } } : {}),
+        ...(categorySlug
+          ? { categories: { some: { category: { slug: categorySlug } } } }
+          : {}),
       },
       orderBy: { createdAt: 'desc' },
       // Select only what the feed shows: never the user's name, e-mail or id.
       select: {
         id: true,
         title: true,
-        category: { select: { slug: true } },
+        categories: {
+          orderBy: { category: { sortOrder: 'asc' } },
+          select: { category: { select: { slug: true } } },
+        },
         members: {
           orderBy: { joinedAt: 'asc' },
           select: {
@@ -83,7 +88,7 @@ export class KvintetRepository {
     return kvintets.map((kvintet) => ({
       id: kvintet.id,
       title: kvintet.title,
-      category: kvintet.category.slug,
+      categories: kvintet.categories.map(({ category }) => category.slug),
       members: kvintet.members.map(({ user: { profile } }) => {
         const slugsOf = (kind: ProfileTagKind): string[] =>
           (profile?.tags ?? [])
@@ -102,11 +107,16 @@ export class KvintetRepository {
 
   /** Starts a new kvintet (status FORMING) with the caller as its first member. */
   async start(userId: string, input: NewKvintet): Promise<StartOutcome> {
-    const category = await this.prisma.category.findUnique({
-      where: { slug: input.categorySlug },
-      select: { id: true },
+    const categories = await this.prisma.category.findMany({
+      where: { slug: { in: input.categorySlugs } },
+      select: { id: true, slug: true },
     });
-    if (!category) return { result: 'unknown_category' };
+    if (categories.length !== input.categorySlugs.length) {
+      return { result: 'unknown_category' };
+    }
+    const categoryIds = input.categorySlugs.map(
+      (slug) => categories.find((category) => category.slug === slug)!.id,
+    );
 
     try {
       // A nested create is one transaction; the unique userId rejects a second kvintet.
@@ -114,7 +124,11 @@ export class KvintetRepository {
         data: {
           title: input.title,
           description: input.description,
-          categoryId: category.id,
+          // Deprecated column, kept until it is dropped: the first chosen category.
+          categoryId: categoryIds[0],
+          categories: {
+            create: categoryIds.map((categoryId) => ({ categoryId })),
+          },
           members: { create: { userId } },
         },
         select: { id: true },
