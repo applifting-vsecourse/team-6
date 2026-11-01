@@ -15,9 +15,9 @@ Owner: Valeriia (QA).
 
 - [ ] **X-1** Open the screen at 375 px width → Nothing overflows horizontally, all buttons reachable, text readable
 - [ ] **X-2** Look for hardcoded / English text in the Czech UI → All texts are Czech and come from translation keys (no raw keys like `auth.signIn.title` visible)
-- [ ] **X-3** Look for photos, avatars, faces → None anywhere (#3)
+- [ ] **X-3** Look for photos and photo upload → No photos and no photo upload anywhere; every person is shown as a blobatar (DESIGN.md → People are blobatars)
 - [ ] **X-4** Look for stars, scores, public statistics about people → None (#7, #13, #16)
-- [ ] **X-5** Dusty-rose accent → At most one accent element per screen (#3)
+- [ ] **X-5** Count the `primary` buttons → At most one `primary` action per screen; everything else is outline, ghost or a plain link (DESIGN.md)
 - [ ] **X-6** Loading / empty / error states → Every list has all three (throttle network in dev tools to see loading; stop the backend to see the error)
 - [ ] **X-7** Compare with Figma → Layout and texts match the wireframe/design linked in the issue
 - [ ] **X-8** Switch to dark theme and back → Every text and control stays readable; the choice survives a reload
