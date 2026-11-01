@@ -96,7 +96,7 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
           >
             <span
               aria-hidden="true"
-              className="size-10 shrink-0 rounded-full border-2 border-dashed border-border"
+              className="size-10 shrink-0 rounded-full border border-dashed border-border"
             />
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
               <p className="text-base font-semibold sm:w-56 sm:shrink-0">{t("kvintet.vacancy")}</p>
