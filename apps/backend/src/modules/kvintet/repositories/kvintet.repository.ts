@@ -1,4 +1,7 @@
-import { PrismaService } from '@/core/prisma/prisma.service';
+import {
+  PrismaService,
+  type TransactionClient,
+} from '@/core/prisma/prisma.service';
 import {
   Prisma,
   type KvintetStatus,
@@ -25,6 +28,10 @@ import {
 const isUniqueViolation = (error: unknown): boolean =>
   error instanceof Prisma.PrismaClientKnownRequestError &&
   error.code === 'P2002';
+
+export interface LeaveOptions {
+  silentIfNotMember?: boolean;
+}
 
 @Injectable()
 export class KvintetRepository {
@@ -415,66 +422,85 @@ export class KvintetRepository {
     });
   }
 
-  async leave(kvintetId: string, userId: string): Promise<void> {
-    await this.prisma.$transaction(async (tx) => {
-      const locked = await tx.$queryRaw<Array<{ id: string }>>`
-        SELECT id FROM "kvintet" WHERE id = ${kvintetId}::uuid FOR UPDATE
-      `;
+  async leaveInTransaction(
+    tx: TransactionClient,
+    kvintetId: string,
+    userId: string,
+    options: LeaveOptions = {},
+  ): Promise<void> {
+    const locked = await tx.$queryRaw<Array<{ id: string }>>`
+      SELECT id FROM "kvintet" WHERE id = ${kvintetId}::uuid FOR UPDATE
+    `;
 
-      if (!locked || locked.length === 0) {
-        throw new NotFoundException({
-          statusCode: 404,
-          code: 'not_found',
-          message: 'Kvintet not found',
-        });
-      }
-
-      const kvintet = await tx.kvintet.findUnique({
-        where: { id: kvintetId },
-        include: {
-          members: true,
-          votes: true,
-        },
+    if (!locked || locked.length === 0) {
+      if (options.silentIfNotMember) return;
+      throw new NotFoundException({
+        statusCode: 404,
+        code: 'not_found',
+        message: 'Kvintet not found',
       });
+    }
 
-      if (!kvintet) {
-        throw new NotFoundException({
-          statusCode: 404,
-          code: 'not_found',
-          message: 'Kvintet not found',
-        });
-      }
-
-      const isMember = kvintet.members.some((m) => m.userId === userId);
-      if (!isMember) {
-        throw new BadRequestException({
-          statusCode: 400,
-          code: 'bad_request',
-          message: 'Caller is not a member of this kvintet',
-        });
-      }
-
-      await tx.kvintetMember.delete({
-        where: {
-          kvintetId_userId: {
-            kvintetId,
-            userId,
-          },
-        },
-      });
-
-      const remainingMembers = kvintet.members.filter(
-        (m) => m.userId !== userId,
-      );
-
-      if (remainingMembers.length === 0) {
-        await tx.kvintet.delete({
-          where: { id: kvintetId },
-        });
-      } else if (kvintet.status === 'FORMING') {
-        // Votes agreed to the old roster; the rest must vote again.
-        await tx.kvintetVote.deleteMany({ where: { kvintetId } });
-      }
+    const kvintet = await tx.kvintet.findUnique({
+      where: { id: kvintetId },
+      include: {
+        members: true,
+        votes: true,
+      },
     });
+
+    if (!kvintet) {
+      if (options.silentIfNotMember) return;
+      throw new NotFoundException({
+        statusCode: 404,
+        code: 'not_found',
+        message: 'Kvintet not found',
+      });
+    }
+
+    const isMember = kvintet.members.some((m) => m.userId === userId);
+    if (!isMember) {
+      if (options.silentIfNotMember) return;
+      throw new BadRequestException({
+        statusCode: 400,
+        code: 'bad_request',
+        message: 'Caller is not a member of this kvintet',
+      });
+    }
+
+    await tx.kvintetMember.delete({
+      where: {
+        kvintetId_userId: {
+          kvintetId,
+          userId,
+        },
+      },
+    });
+
+    const remainingMembers = kvintet.members.filter((m) => m.userId !== userId);
+
+    if (remainingMembers.length === 0) {
+      await tx.kvintet.delete({
+        where: { id: kvintetId },
+      });
+    } else if (kvintet.status === 'FORMING') {
+      // Votes agreed to the old roster; the rest must vote again.
+      await tx.kvintetVote.deleteMany({ where: { kvintetId } });
+    }
+  }
+
+  async leave(
+    kvintetId: string,
+    userId: string,
+    tx?: TransactionClient,
+    options?: LeaveOptions,
+  ): Promise<void> {
+    if (tx) {
+      await this.leaveInTransaction(tx, kvintetId, userId, options);
+    } else {
+      await this.prisma.$transaction((innerTx) =>
+        this.leaveInTransaction(innerTx, kvintetId, userId, options),
+      );
+    }
   }
 }

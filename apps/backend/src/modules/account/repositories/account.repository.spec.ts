@@ -1,6 +1,7 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
 import { AccountRepository } from '@/modules/account/repositories/account.repository';
 import { AccountService } from '@/modules/account/services/account.service';
+import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
 import { NotFoundException } from '@nestjs/common';
 import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
@@ -16,7 +17,8 @@ if (!['localhost', '127.0.0.1'].includes(databaseHost)) {
 describe('Account integration against Postgres', () => {
   const prefix = `it-acc-${randomUUID().slice(0, 8)}`;
   const prisma = new PrismaService();
-  const accountRepository = new AccountRepository(prisma);
+  const kvintetRepository = new KvintetRepository(prisma);
+  const accountRepository = new AccountRepository(prisma, kvintetRepository);
   const accountService = new AccountService(accountRepository);
   let categoryId: number;
   let tagId: number;
