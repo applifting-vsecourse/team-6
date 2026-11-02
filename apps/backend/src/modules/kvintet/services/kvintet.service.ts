@@ -1,10 +1,12 @@
 import {
-  FeedItem,
+  Feed,
+  FEED_REASONS,
   KVINTET_CAPACITY,
   KvintetDetails,
   NewKvintet,
 } from '@/modules/kvintet/domain/kvintet';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
+import { MATCH_THRESHOLD, scoreKvintet } from '@/modules/matching/matching';
 import { ValidationFailedException } from '@/shared/errors/validation.pipe';
 import {
   ConflictException,
@@ -27,7 +29,7 @@ export class KvintetService {
     return { isMember: await this.repository.isMember(userId) };
   }
 
-  async feed(userId: string, categorySlug?: string): Promise<FeedItem[]> {
+  async feed(userId: string, categorySlug?: string): Promise<Feed> {
     // The feed never lists the caller's own kvintet; the client sends them elsewhere.
     if (await this.repository.isMember(userId)) throw alreadyInKvintet();
 
@@ -38,27 +40,50 @@ export class KvintetService {
       ]);
     }
 
-    const kvintets = await this.repository.findOpenKvintets(categorySlug);
-    return kvintets.map((kvintet) => {
-      const frequencies = new Set(
-        kvintet.members.map((member) => member.meetingFrequency),
-      );
-      return {
-        id: kvintet.id,
-        title: kvintet.title,
-        categories: kvintet.categories,
-        capacity: KVINTET_CAPACITY,
-        memberCount: kvintet.members.length,
-        // Only when every member agrees; null otherwise.
-        meetingFrequency: frequencies.size === 1 ? [...frequencies][0] : null,
-        members: kvintet.members.map((member) => ({
-          position: member.position,
-          teach: member.teach,
-          learn: member.learn,
-          interests: member.interests,
-        })),
-      };
-    });
+    const [me, kvintets] = await Promise.all([
+      this.repository.findMatchProfile(userId),
+      this.repository.findOpenKvintets(categorySlug),
+    ]);
+
+    // Computed on every read: profile changes show on the next load. The repository lists
+    // newest first and the sort is stable, so equal scores stay newest first.
+    const ranked = kvintets
+      .map((kvintet) => ({
+        kvintet,
+        ...scoreKvintet(me, {
+          categories: kvintet.categories,
+          members: kvintet.members.map((member) => member.match),
+        }),
+      }))
+      .sort((a, b) => b.score - a.score);
+    const matching = ranked.filter((item) => item.score >= MATCH_THRESHOLD);
+    // A small pilot must never get an empty feed just because nothing fits well.
+    const fallback = matching.length === 0 && ranked.length > 0;
+
+    return {
+      fallback,
+      items: (fallback ? ranked : matching).map(({ kvintet, reasons }) => {
+        const frequencies = new Set(
+          kvintet.members.map((member) => member.meetingFrequency),
+        );
+        return {
+          id: kvintet.id,
+          title: kvintet.title,
+          categories: kvintet.categories,
+          capacity: KVINTET_CAPACITY,
+          memberCount: kvintet.members.length,
+          // Only when every member agrees; null otherwise.
+          meetingFrequency: frequencies.size === 1 ? [...frequencies][0] : null,
+          members: kvintet.members.map((member) => ({
+            position: member.position,
+            teach: member.teach,
+            learn: member.learn,
+            interests: member.interests,
+          })),
+          reasons: reasons.slice(0, FEED_REASONS),
+        };
+      }),
+    };
   }
 
   async start(userId: string, kvintet: NewKvintet): Promise<{ id: string }> {

@@ -186,6 +186,7 @@
       "text": "Na naší straně se něco pokazilo. Zkuste to prosím znovu.",
       "title": "Návrhy se nepodařilo načíst"
     },
+    "fallback": "Vašemu profilu zatím žádný návrh přesně neodpovídá, proto ukazujeme všechny otevřené, nejbližší první.",
     "filter": {
       "all": "Vše",
       "label": "Kategorie"
@@ -226,6 +227,16 @@
       "weekends": "Víkendy"
     },
     "proposalSubtitle": "VŠEM VYHOVUJE: {{preferences}}",
+    "reasons": {
+      "availability": "Stejné časové možnosti",
+      "frequency": "Stejná frekvence setkávání",
+      "interest": "Společný zájem: {{tag}}",
+      "label": "Proč vám sedí:",
+      "learn": "Někdo tu učí {{tag}}",
+      "roleMix": "Jiné role než vaše",
+      "teach": "Někdo se tu chce naučit {{tag}}",
+      "topic": "Vaše téma: {{category}}"
+    },
     "seats": "{{filled}} z {{total}}",
     "startOwn": {
       "button": "Založit nový návrh",

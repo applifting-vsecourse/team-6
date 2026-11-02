@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { formatList } from "@/lib/date"
 
-import type { FeedKvintet } from "@/features/kvintet/api/kvintetFeedQueryOptions"
+import type { FeedKvintet, FeedReason } from "@/features/kvintet/api/kvintetFeedQueryOptions"
 import { KvintetCapacity } from "@/features/kvintet/components/KvintetCapacity"
 import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
 
@@ -33,6 +33,23 @@ function describeMember(
   ]
     .filter(Boolean)
     .join(" · ")
+}
+
+function describeReason(
+  reason: FeedReason,
+  t: TFunction,
+  label: ReturnType<typeof useSlugLabel>,
+): string {
+  switch (reason.code) {
+    case "learn":
+    case "teach":
+    case "interest":
+      return t(`kvintet.reasons.${reason.code}`, { tag: label("tags", reason.tag) })
+    case "topic":
+      return t("kvintet.reasons.topic", { category: label("categories", reason.category) })
+    default:
+      return t(`kvintet.reasons.${reason.code}`)
+  }
 }
 
 export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetCardProps) {
@@ -69,6 +86,21 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
           total={kvintet.capacity}
         />
       </div>
+
+      {kvintet.reasons.length ? (
+        // Plain text, not a list: the card's list is its members.
+        <p className="flex flex-wrap gap-2">
+          <span className="sr-only">{t("kvintet.reasons.label")}</span>
+          {kvintet.reasons.map((reason) => (
+            <span
+              key={`${reason.code}-${"tag" in reason ? reason.tag : ""}`}
+              className="rounded-full border border-border px-2.5 py-0.5 text-sm text-body"
+            >
+              {describeReason(reason, t, label)}
+            </span>
+          ))}
+        </p>
+      ) : null}
 
       {kvintet.meetingFrequency ? (
         <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">

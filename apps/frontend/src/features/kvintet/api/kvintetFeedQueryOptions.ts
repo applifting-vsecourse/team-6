@@ -22,19 +22,33 @@ const feedKvintetSchema = z.object({
       interests: z.array(z.string()),
     }),
   ),
+  // Why it suits the caller, strongest first. The server never sends a score.
+  reasons: z.array(
+    z.union([
+      z.object({ code: z.enum(["learn", "teach", "interest"]), tag: z.string() }),
+      z.object({ code: z.literal("topic"), category: z.string() }),
+      z.object({ code: z.enum(["availability", "frequency", "roleMix"]) }),
+    ]),
+  ),
 })
 
 export type FeedKvintet = z.infer<typeof feedKvintetSchema>
+export type FeedReason = FeedKvintet["reasons"][number]
+
+const feedSchema = z.object({
+  // Best match first.
+  items: z.array(feedKvintetSchema),
+  // Nothing reached the match threshold, so every open proposal is listed.
+  fallback: z.boolean(),
+})
 
 export const kvintetFeedQueryOptions = (category?: string) =>
   queryOptions({
     queryKey: kvintetKeys.feed(category),
     queryFn: async () =>
-      z
-        .array(feedKvintetSchema)
-        .parse(
-          await api
-            .get("kvintets/feed", { searchParams: category ? { category } : undefined })
-            .json(),
-        ),
+      feedSchema.parse(
+        await api
+          .get("kvintets/feed", { searchParams: category ? { category } : undefined })
+          .json(),
+      ),
   })

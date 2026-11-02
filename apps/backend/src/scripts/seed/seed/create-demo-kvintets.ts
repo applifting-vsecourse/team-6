@@ -10,6 +10,22 @@ export type DemoMember = {
   teach: string[];
   learn: string[];
   interests: string[];
+  // Where and when they can meet, so the feed ranking differs between accounts.
+  // Defaults: Praha, 25 km, weekday evenings, wants to learn something new.
+  place?: keyof typeof PLACES;
+  radiusKm?: number;
+  availability?: Partial<
+    Record<
+      'weekdays' | 'weekends' | 'mornings' | 'afternoons' | 'evenings',
+      boolean
+    >
+  >;
+  expectations?: string[];
+};
+
+const PLACES = {
+  praha: { latitude: 50.0755, longitude: 14.4378 },
+  brno: { latitude: 49.1951, longitude: 16.6068 },
 };
 
 type DemoKvintet = {
@@ -50,8 +66,10 @@ export async function createDemoProfiles(
         position: member.position,
         roles: member.roles ?? [],
         meetingFrequency: member.meetingFrequency,
-        weekdays: true,
-        evenings: true,
+        ...PLACES[member.place ?? 'praha'],
+        radiusKm: member.radiusKm ?? 25,
+        ...(member.availability ?? { weekdays: true, evenings: true }),
+        expectations: JSON.stringify(member.expectations ?? ['learn_new']),
         tags: {
           create: [
             ...member.teach.map((slug) => ({
