@@ -36,6 +36,21 @@ describe("DeleteAccountDialog", () => {
     expect(handleOpenChange).toHaveBeenCalledWith(false)
   })
 
+  it("calls onOpenChange(false) when close icon is clicked", async () => {
+    const handleOpenChange = vi.fn()
+    render(
+      <DeleteAccountDialog
+        isOpen={true}
+        onOpenChange={handleOpenChange}
+        onConfirm={vi.fn()}
+        isDeleting={false}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole("button", { name: "Close" }))
+    expect(handleOpenChange).toHaveBeenCalledWith(false)
+  })
+
   it("calls onConfirm when confirm button is clicked", async () => {
     const handleConfirm = vi.fn()
     render(
@@ -63,5 +78,26 @@ describe("DeleteAccountDialog", () => {
 
     expect(screen.getByRole("button", { name: "Cancel" })).toBeDisabled()
     expect(screen.getByRole("button", { name: "Deleting..." })).toBeDisabled()
+  })
+
+  it("ignores close requests while deleting", async () => {
+    const handleOpenChange = vi.fn()
+    render(
+      <DeleteAccountDialog
+        isOpen={true}
+        onOpenChange={handleOpenChange}
+        onConfirm={vi.fn()}
+        isDeleting={true}
+      />,
+    )
+
+    const closeButton = screen.queryByRole("button", { name: "Close" })
+    if (closeButton) {
+      await userEvent.click(closeButton)
+    }
+
+    await userEvent.keyboard("{Escape}")
+
+    expect(handleOpenChange).not.toHaveBeenCalled()
   })
 })

@@ -25,10 +25,16 @@ export function DeleteAccountDialog({
 }: DeleteAccountDialogProps) {
   const { t } = useTranslation()
 
+  const handleOpenChange = (isNextOpen: boolean) => {
+    if (!isDeleting) {
+      onOpenChange(isNextOpen)
+    }
+  }
+
   return (
     <Dialog
       open={isOpen}
-      onOpenChange={onOpenChange}
+      onOpenChange={handleOpenChange}
     >
       <DialogContent>
         <DialogHeader>
@@ -38,7 +44,7 @@ export function DeleteAccountDialog({
         <DialogFooter className="mt-4 gap-2 sm:gap-0">
           <Button
             variant="outline"
-            onClick={() => onOpenChange(false)}
+            onClick={() => handleOpenChange(false)}
             disabled={isDeleting}
           >
             {t("account.deleteDialog.cancel")}
