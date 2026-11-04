@@ -2,6 +2,7 @@ import type { TFunction } from "i18next"
 import { Loader2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
+import { Blobatar } from "@/components/ui/blobatar"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { formatList } from "@/lib/date"
@@ -112,21 +113,34 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
         {kvintet.members.map((member, index) => (
           <li
             key={index}
-            className="flex flex-col gap-1 border-t border-border py-2.5 sm:flex-row sm:items-center sm:gap-4"
+            className="flex items-center gap-3 border-t border-border py-2.5"
           >
-            <p className="text-base font-semibold text-foreground sm:w-56 sm:shrink-0">
-              {member.position ?? t("kvintet.member")}
-            </p>
-            <p className="text-sm text-body">{describeMember(member, t, label)}</p>
+            {/* The feed never carries a name, so the face is seeded by the seat, not the person. */}
+            <Blobatar
+              name={`${kvintet.id}-seat-${index}`}
+              className="size-10 shrink-0"
+            />
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
+              <p className="text-base font-semibold text-foreground sm:w-56 sm:shrink-0">
+                {member.position ?? t("kvintet.member")}
+              </p>
+              <p className="text-sm text-body">{describeMember(member, t, label)}</p>
+            </div>
           </li>
         ))}
         {Array.from({ length: freeSeats }, (_, index) => (
           <li
             key={`free-${index}`}
-            className="flex flex-col gap-1 border-t border-border py-2.5 text-muted-foreground sm:flex-row sm:items-center sm:gap-4"
+            className="flex items-center gap-3 border-t border-border py-2.5 text-muted-foreground"
           >
-            <p className="text-base font-semibold sm:w-56 sm:shrink-0">{t("kvintet.vacancy")}</p>
-            <p className="text-sm">{t("kvintet.vacancyHint")}</p>
+            <span
+              aria-hidden="true"
+              className="size-10 shrink-0 rounded-full border border-dashed border-border"
+            />
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
+              <p className="text-base font-semibold sm:w-56 sm:shrink-0">{t("kvintet.vacancy")}</p>
+              <p className="text-sm">{t("kvintet.vacancyHint")}</p>
+            </div>
           </li>
         ))}
       </ul>

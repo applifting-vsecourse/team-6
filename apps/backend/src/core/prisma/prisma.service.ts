@@ -2,6 +2,10 @@ import { PrismaClient } from '@/generated/prisma/client';
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
 
+export type TransactionClient = Parameters<
+  Parameters<PrismaClient['$transaction']>[0]
+>[0];
+
 // Prisma 7 connects through a driver adapter rather than a `url` in the schema,
 // so the connection string is read here. CLI commands (migrate, studio) read it
 // from prisma.config.ts instead.

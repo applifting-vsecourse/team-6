@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link, redirect } from "@tanstack/react-router"
 import { Trans, useTranslation } from "react-i18next"
@@ -10,6 +11,8 @@ import { ThemedImage } from "@/components/ThemedImage"
 import { Button } from "@/components/ui/button"
 import { formatLongDate } from "@/lib/date"
 
+import { DeleteAccountDialog } from "@/features/account/components/DeleteAccountDialog"
+import { useDeleteAccount } from "@/features/account/hooks/useDeleteAccount"
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
 import { useSession } from "@/features/auth/hooks/useSession"
 import { useKvintetMembership } from "@/features/kvintet/hooks/useKvintetMembership"
@@ -35,6 +38,8 @@ function OverviewPage() {
   const profileQuery = useQuery(profileQueryOptions(user?.id))
   const profile = profileQuery.data
   const { isMember } = useKvintetMembership()
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const deleteAccount = useDeleteAccount()
 
   // TEMPORARY: the member variant of this page (copy, button to /kvintet, hidden
   // how-it-works) is a stopgap. What the overview shows once a user has a kvintet,
@@ -235,17 +240,33 @@ function OverviewPage() {
 
             {summaryLine && <p className="pt-2 text-sm text-muted-foreground">{summaryLine}</p>}
 
-            <div className="pt-1">
+            <div className="flex flex-col gap-2 pt-1">
               <Link
                 to={ROUTES.onboarding}
                 className="text-label font-semibold text-foreground underline underline-offset-4 hover:text-primary"
               >
                 {t("overview.profileCard.edit")}
               </Link>
+              <div className="mt-1 border-t border-border pt-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto self-start p-0 text-sm text-destructive underline underline-offset-4 hover:bg-transparent hover:text-destructive/80"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                >
+                  {t("account.deleteAccount")}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      <DeleteAccountDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={() => deleteAccount.mutate()}
+        isDeleting={deleteAccount.isPending}
+      />
     </>
   )
 }
