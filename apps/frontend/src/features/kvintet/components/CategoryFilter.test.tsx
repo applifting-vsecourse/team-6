@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest"
 
 import { CategoryFilter } from "@/features/kvintet/components/CategoryFilter"
 
-const categories = [{ slug: "technology" }, { slug: "leisure" }]
+const categories = [{ slug: "software-development" }, { slug: "leisure" }]
 
 describe("CategoryFilter", () => {
   it("lists All first, then the categories in the given order", () => {
@@ -18,7 +18,7 @@ describe("CategoryFilter", () => {
 
     expect(screen.getAllByRole("radio").map((chip) => chip.textContent)).toEqual([
       "All",
-      "Technology",
+      "Software development",
       "Leisure",
     ])
     expect(screen.getByLabelText("Category")).toBeInTheDocument()
@@ -47,8 +47,8 @@ describe("CategoryFilter", () => {
       />,
     )
 
-    await userEvent.click(screen.getByRole("radio", { name: "Technology" }))
-    expect(onChange).toHaveBeenLastCalledWith("technology")
+    await userEvent.click(screen.getByRole("radio", { name: "Software development" }))
+    expect(onChange).toHaveBeenLastCalledWith("software-development")
 
     await userEvent.click(screen.getByRole("radio", { name: "All" }))
     expect(onChange).toHaveBeenLastCalledWith(undefined)

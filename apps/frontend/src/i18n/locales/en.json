@@ -43,10 +43,13 @@
   },
   "categories": {
     "business": "Business",
+    "cloud-security": "Cloud & security",
+    "data-ai": "Data & AI",
+    "design-product": "Design & product",
     "languages": "Languages",
     "leisure": "Leisure",
     "personal-development": "Personal development",
-    "technology": "Technology"
+    "software-development": "Software development"
   },
   "chat": {
     "composer": {
@@ -157,9 +160,8 @@
     },
     "dialog": {
       "cancel": "Cancel",
-      "category": "Category",
-      "categoryHint": "Others find the proposal by category in the filter.",
-      "categoryPlaceholder": "Choose a category",
+      "category": "Categories",
+      "categoryHint": "Pick up to {{max}}. Others find the proposal by category in the filter.",
       "confirmLeave": "Leave",
       "description": "You will be its first member. Others will see the topic, your role and tags – not your name.",
       "details": "Short description (optional)",
@@ -191,6 +193,7 @@
       "text": "Something went wrong on our side. Please try again.",
       "title": "Couldn't load proposals"
     },
+    "fallback": "Nothing fits your profile closely yet, so here are all open proposals, closest first.",
     "filter": {
       "all": "All",
       "label": "Category"
@@ -231,6 +234,16 @@
       "weekends": "Weekends"
     },
     "proposalSubtitle": "SUITS EVERYONE: {{preferences}}",
+    "reasons": {
+      "availability": "Same time options",
+      "frequency": "Same meeting frequency",
+      "interest": "Shared interest: {{tag}}",
+      "label": "Why it suits you:",
+      "learn": "Someone here teaches {{tag}}",
+      "roleMix": "Roles different from yours",
+      "teach": "Someone here wants to learn {{tag}}",
+      "topic": "Your topic: {{category}}"
+    },
     "seats": "{{filled}} of {{total}}",
     "startOwn": {
       "button": "Start a new proposal",
@@ -252,6 +265,7 @@
     "vacancyHint": "It could be you.",
     "validation": {
       "categoryRequired": "Choose a category",
+      "categoryTooMany": "Choose at most {{max}} categories",
       "descriptionTooLong": "The description can be at most {{max}} characters",
       "titleRequired": "Enter a topic",
       "titleTooLong": "The topic can be at most {{max}} characters"
