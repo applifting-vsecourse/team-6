@@ -223,7 +223,7 @@ describe("category filter", () => {
     expect(onCategoryChange).toHaveBeenCalledWith(undefined)
   })
 
-  it("starts a proposal in the filtered category from the empty state", async () => {
+  it("starts a proposal without preselecting the filtered category", async () => {
     serve(() => Promise.resolve([]))
     renderPage("languages")
 
@@ -233,9 +233,9 @@ describe("category filter", () => {
 
     const dialog = await screen.findByRole("dialog")
     const group = within(dialog).getByRole("group", { name: "Categories" })
-    expect(within(group).getByRole("button", { name: "Languages" })).toHaveAttribute(
+    expect(await within(group).findByRole("button", { name: "Languages" })).toHaveAttribute(
       "aria-pressed",
-      "true",
+      "false",
     )
   })
 })

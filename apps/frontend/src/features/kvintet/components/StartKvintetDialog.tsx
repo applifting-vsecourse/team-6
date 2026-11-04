@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react"
+import { useMemo } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useQuery } from "@tanstack/react-query"
 import type { TFunction } from "i18next"
@@ -63,25 +63,15 @@ const defaultValues: FormValues = { title: "", categorySlugs: [], description: "
 type StartKvintetDialogProps = {
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
-  /** Category preselected each time the dialog opens, e.g. the one the feed is filtered by. */
-  defaultCategory?: string
 }
 
-export function StartKvintetDialog({
-  isOpen,
-  onOpenChange,
-  defaultCategory,
-}: StartKvintetDialogProps) {
+export function StartKvintetDialog({ isOpen, onOpenChange }: StartKvintetDialogProps) {
   const { t } = useTranslation()
   const label = useSlugLabel()
   const schema = useMemo(() => createSchema(t), [t])
   const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues })
   const { data: reference } = useQuery(referenceQueryOptions())
   const start = useStartKvintet()
-
-  useEffect(() => {
-    if (isOpen) form.setValue("categorySlugs", defaultCategory ? [defaultCategory] : [])
-  }, [isOpen, defaultCategory, form])
 
   const handleOpenChange = (isNextOpen: boolean) => {
     if (!isNextOpen) {

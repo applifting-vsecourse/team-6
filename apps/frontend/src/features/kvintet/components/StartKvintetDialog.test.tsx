@@ -20,16 +20,12 @@ const reference = {
   ],
 }
 
-const renderDialog = (defaultCategory?: string) =>
+const renderDialog = () =>
   render(
     <QueryClientProvider
       client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
     >
-      <StartKvintetDialog
-        isOpen
-        onOpenChange={vi.fn()}
-        defaultCategory={defaultCategory}
-      />
+      <StartKvintetDialog isOpen onOpenChange={vi.fn()} />
     </QueryClientProvider>,
   )
 
@@ -63,12 +59,5 @@ describe("StartKvintetDialog", () => {
         json: { title: "Topic", categorySlugs: ["software-development", "languages", "leisure"] },
       }),
     )
-  })
-
-  it("preselects the category it was opened with", async () => {
-    renderDialog("languages")
-
-    expect(await category("Languages")).toHaveAttribute("aria-pressed", "true")
-    expect(await category("Business")).toHaveAttribute("aria-pressed", "false")
   })
 })
