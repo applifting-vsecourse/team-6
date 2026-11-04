@@ -19,11 +19,17 @@ export const isOnboarded = (profile?: { onboardingCompletedAt?: string | Date | 
 const isSameOriginPath = (target: string) =>
   target.startsWith("/") && new URL(target, "http://app.invalid").origin === "http://app.invalid"
 
-// Where to go after signing in: onboarding first, then the page the user was sent away from, else Overview.
+// Where to go after signing in: Overview by default (which handles all user states including incomplete profile),
+// or the page the user was sent away from (sending to onboarding only when a deep-linked page requires it).
 export const postSignInPath = (from?: string, hasOnboarded = isOnboarded()) => {
-  if (!hasOnboarded) return ROUTES.onboarding
   const target = from ? decodeRedirectUri(from) : undefined
-  return target && isSameOriginPath(target) ? target : ROUTES.overview
+  if (target && isSameOriginPath(target)) {
+    if (!hasOnboarded && target !== ROUTES.overview && target !== ROUTES.onboarding) {
+      return ROUTES.onboarding
+    }
+    return target
+  }
+  return ROUTES.overview
 }
 
 // The router's `to` takes a pathname only, so a target like "/profile?tab=2" is split into `to`, `search` and `hash`.

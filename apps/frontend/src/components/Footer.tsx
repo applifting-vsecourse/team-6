@@ -12,6 +12,12 @@ export function Footer() {
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-2.5 md:h-16 md:flex-row md:items-center md:gap-6">
         <div className="flex gap-5 text-sm text-body md:gap-6">
           <Link
+            to={ROUTES.howItWorks}
+            className="hover:underline"
+          >
+            {t("layout.howItWorks")}
+          </Link>
+          <Link
             to={ROUTES.codeOfConduct}
             className="hover:underline"
           >

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { beforeEach, describe, expect, it, vi } from "vitest"
@@ -6,6 +7,17 @@ import { HeaderMenu, MobileAccount } from "@/features/auth/components/HeaderMenu
 
 // The gaze driver needs browser APIs jsdom lacks (matchMedia, ResizeObserver).
 vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
+
+vi.mock("@tanstack/react-router", () => ({
+  Link: ({ children, to, className }: { children?: ReactNode; to: string; className?: string }) => (
+    <a
+      href={to}
+      className={className}
+    >
+      {children}
+    </a>
+  ),
+}))
 
 const useSession = vi.fn<() => { user: { id: string; name: string; username: string } | null }>()
 const signOut = vi.fn()
@@ -28,11 +40,15 @@ describe("MobileAccount", () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it("shows the user and signs out on click", async () => {
+  it("shows the user, links to edit profile, and signs out on click", async () => {
     useSession.mockReturnValue({ user: { id: "u1", name: "Jana Nováková", username: "jana" } })
     render(<MobileAccount />)
 
     expect(screen.getByText("Jana Nováková")).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: "Edit profile" })).toHaveAttribute(
+      "href",
+      "/onboarding",
+    )
     await userEvent.click(screen.getByRole("button", { name: "Sign out" }))
 
     expect(signOut).toHaveBeenCalledOnce()

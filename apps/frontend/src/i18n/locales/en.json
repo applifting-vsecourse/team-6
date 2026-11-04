@@ -2,6 +2,7 @@
   "auth": {
     "acceptCodeOfConduct": "I have read and accept the <coc>code of conduct</coc>",
     "confirmPassword": "Confirm password",
+    "editProfile": "Edit profile",
     "email": "Email",
     "emailPlaceholder": "e.g. john@doe.com",
     "haveAccount": "Already have an account?",
@@ -78,6 +79,7 @@
     "goHome": "Go home",
     "language": "Language",
     "reload": "Reload",
+    "retry": "Retry",
     "saving": "Saving…",
     "theme": "Theme",
     "themeDark": "Dark",
@@ -121,6 +123,18 @@
     "unauthorized": "You need to sign in first.",
     "unexpected": "An unexpected error occurred.",
     "validation_failed": "Some of the entered values are not valid."
+  },
+  "howItWorks": {
+    "intro": "Kvintet connects people in small groups of up to five to share knowledge and learn from each other.",
+    "principlesTitle": "Key principles",
+    "seoTitle": "How Kvintet works",
+    "step1Text": "Your role, what you can teach and what you want to learn. Tags, no photos.",
+    "step1Title": "Tell us about yourself",
+    "step2Text": "You see every group that fits you – roles and interests, names stay hidden until the group forms.",
+    "step2Title": "Pick a proposal",
+    "step3Text": "With five members it forms on its own. With three or four, when everyone votes yes. Then the group chat opens.",
+    "step3Title": "Form your kvintet",
+    "title": "How Kvintet works"
   },
   "kvintet": {
     "actions": {
@@ -275,6 +289,7 @@
   "layout": {
     "closeMenu": "Close menu",
     "contactSupport": "Contact support",
+    "howItWorks": "How Kvintet works",
     "mainNavigation": "Main navigation",
     "menu": "Menu",
     "openMenu": "Open menu",
@@ -369,8 +384,54 @@
     "title": "Onboarding"
   },
   "overview": {
-    "greeting": "Welcome, <em>{{name}}</em>",
-    "greetingAnonymous": "Welcome",
+    "active": {
+      "beforeMeeting": "BEFORE THE NEXT MEETING",
+      "chatDescription": "Plan your next meeting together.",
+      "chatHeading": "Group chat",
+      "heading": "Your kvintet",
+      "icebreaker": {
+        "another": "Another question",
+        "label": "Icebreaker question",
+        "q1": "What new thing did you learn at work this month?",
+        "q2": "What's a project or hobby you're currently excited about?",
+        "q3": "What was your biggest professional 'aha' moment recently?",
+        "q4": "If you could automate one tedious part of your work, what would it be?",
+        "send": "Send to chat"
+      },
+      "leaveHint": "The others carry on without you.",
+      "nextMeeting": {
+        "body": "No date yet. Suggest one in the chat.",
+        "label": "Next meeting"
+      },
+      "noMessages": "No messages yet. Say hello!",
+      "openChat": "Open chat",
+      "subtitle": "{{title}} · {{count}} people · since {{date}}",
+      "tip": {
+        "body": "Everyone shares one goal for the next 3 months.",
+        "label": "Tip for the group"
+      }
+    },
+    "forming": {
+      "canVoteDescription": "Start with four now, or wait for one more. It starts when all four agree.",
+      "canVoteTitle": "Start now or wait for a fifth?",
+      "heading": "Your kvintet is forming",
+      "leaveKvintet": "Leave kvintet",
+      "seatsStatus": "{{seats}} OF {{capacity}} SEATS · {{voted}} OF {{total}} WANT TO START",
+      "teachesWants": "teaches {{offers}} · wants {{seeks}}",
+      "teachesWantsFallback": "teaches {{role}}",
+      "voteButton": "Start now",
+      "voteHint": "Others will only see that you voted.",
+      "votedDescription": "You voted to start. Waiting for the others.",
+      "votedStatus": "You voted to start. Waiting for the others.",
+      "votedTitle": "Waiting for others to vote",
+      "waitingDescription": "At three you can vote to start. We'll let you know.",
+      "waitingSeatsStatus": "{{seats}} OF {{capacity}} SEATS · WAITING FOR MORE",
+      "waitingTitle": "Waiting for more people",
+      "whoSubtitle": "Names appear once you start.",
+      "whoTitle": "Who's here"
+    },
+    "greeting": "Hi, {{name}}",
+    "greetingAnonymous": "Hi",
     "howItWorks": {
       "p1": "— A kvintet forms automatically when five people join.",
       "p2": "— With three or four members it forms when everyone votes yes.",
@@ -388,6 +449,19 @@
       "description": "See who's in your group and what happens next.",
       "title": "Head to your kvintet"
     },
+    "noKvintet": {
+      "empty": "No proposals available right now.",
+      "join": "Join",
+      "joining": "Joining…",
+      "lead": "Pick a kvintet – these fit you best.",
+      "leadAfterLeave": "Pick a new kvintet – these fit you best.",
+      "leftNotice": "You left “{{title}}”",
+      "leftNoticeHint": "You can join another kvintet any time.",
+      "nothingFits": "Nothing fits?",
+      "seeAll": "See all",
+      "startOwn": "Start your own",
+      "startYourOwnHint": "Start your own – others will join."
+    },
     "profileCard": {
       "badge": "YOUR PROFILE",
       "daysWeekdays": "weekdays",
@@ -404,8 +478,15 @@
       "timeEvenings": "evenings",
       "timeMornings": "mornings"
     },
-    "subtitle": "You're not in any kvintet yet. Start by picking a proposal.",
-    "subtitleMember": "You're in a kvintet. Check on your group.",
+    "profileNotFinished": {
+      "button": "Finish profile",
+      "description": "Two short steps left – about 2 minutes.",
+      "lead": "Almost there!",
+      "stepBadge": "STEP 1 OF 3 DONE",
+      "title": "Finish your profile"
+    },
+    "subtitle": "You are not in a kvintet yet. Start by picking a proposal.",
+    "subtitleMember": "You are in a kvintet. See how your group is doing.",
     "title": "Overview"
   },
   "roles": {

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router"
-import { ChevronDown, LogOut } from "lucide-react"
+import { ChevronDown, LogOut, User } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
@@ -63,6 +63,12 @@ export function HeaderMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to={ROUTES.onboarding}>
+            <User className="size-4" />
+            {t("auth.editProfile")}
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem
           onSelect={() => signOut.mutate()}
           disabled={signOut.isPending}
@@ -92,14 +98,22 @@ export function MobileAccount() {
         />
         <p className="font-semibold text-foreground">{user.name}</p>
       </div>
-      <Button
-        variant="link"
-        onClick={() => signOut.mutate()}
-        disabled={signOut.isPending}
-        className="h-auto self-start p-0 text-body underline"
-      >
-        {t("auth.signOut")}
-      </Button>
+      <div className="flex items-center gap-4 pt-1">
+        <Link
+          to={ROUTES.onboarding}
+          className="text-sm font-medium text-body underline"
+        >
+          {t("auth.editProfile")}
+        </Link>
+        <Button
+          variant="link"
+          onClick={() => signOut.mutate()}
+          disabled={signOut.isPending}
+          className="h-auto p-0 text-body underline"
+        >
+          {t("auth.signOut")}
+        </Button>
+      </div>
     </div>
   )
 }

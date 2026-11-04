@@ -57,6 +57,10 @@ describe("postSignInPath", () => {
     expect(postSignInPath(encoded("/profile"), false)).toBe("/onboarding")
   })
 
+  it("sends users who have not finished onboarding to Overview when there is no deep link", () => {
+    expect(postSignInPath(undefined, false)).toBe("/overview")
+  })
+
   it("ignores redirect targets that leave the app", () => {
     expect(postSignInPath(encoded("https://evil.example"))).toBe("/overview")
     expect(postSignInPath(encoded("//evil.example"))).toBe("/overview")
