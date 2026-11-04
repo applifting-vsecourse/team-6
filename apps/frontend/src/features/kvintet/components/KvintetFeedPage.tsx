@@ -165,7 +165,10 @@ export function KvintetFeedPage({ category, onCategoryChange }: KvintetFeedPageP
         ) : null}
       </div>
 
-      <StartKvintetDialog isOpen={isStartOpen} onOpenChange={setIsStartOpen} />
+      <StartKvintetDialog
+        isOpen={isStartOpen}
+        onOpenChange={setIsStartOpen}
+      />
     </div>
   )
 }

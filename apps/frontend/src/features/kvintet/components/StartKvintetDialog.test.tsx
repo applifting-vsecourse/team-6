@@ -25,7 +25,10 @@ const renderDialog = () =>
     <QueryClientProvider
       client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
     >
-      <StartKvintetDialog isOpen onOpenChange={vi.fn()} />
+      <StartKvintetDialog
+        isOpen
+        onOpenChange={vi.fn()}
+      />
     </QueryClientProvider>,
   )
 
