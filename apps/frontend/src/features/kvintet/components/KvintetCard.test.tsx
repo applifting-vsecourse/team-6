@@ -8,7 +8,7 @@ import { KvintetCard } from "@/features/kvintet/components/KvintetCard"
 const kvintet: FeedKvintet = {
   id: "k1",
   title: "Using AI at work",
-  category: "technology",
+  categories: ["software-development", "business"],
   capacity: 5,
   memberCount: 2,
   meetingFrequency: "BIWEEKLY",
@@ -20,6 +20,11 @@ const kvintet: FeedKvintet = {
       interests: ["startups"],
     },
     { position: null, teach: [], learn: [], interests: [] },
+  ],
+  reasons: [
+    { code: "learn", tag: "python" },
+    { code: "topic", category: "data-ai" },
+    { code: "frequency" },
   ],
 }
 
@@ -36,12 +41,27 @@ const renderCard = (overrides: Partial<FeedKvintet> = {}, onJoin = vi.fn()) => {
 }
 
 describe("KvintetCard", () => {
-  it("shows the topic, category and seats", () => {
+  it("shows the topic, every category and seats", () => {
     renderCard()
 
     expect(screen.getByRole("heading", { name: "Using AI at work" })).toBeInTheDocument()
-    expect(screen.getByText("Technology")).toBeInTheDocument()
+    expect(screen.getByText("Software development")).toBeInTheDocument()
+    expect(screen.getByText("Business")).toBeInTheDocument()
     expect(screen.getByText("2 of 5")).toBeInTheDocument()
+  })
+
+  it("says why the proposal suits the user, with translated tags and categories", () => {
+    renderCard()
+
+    expect(screen.getByText("Someone here teaches Python")).toBeInTheDocument()
+    expect(screen.getByText("Your topic: Data & AI")).toBeInTheDocument()
+    expect(screen.getByText("Same meeting frequency")).toBeInTheDocument()
+  })
+
+  it("shows no reasons when there are none", () => {
+    renderCard({ reasons: [] })
+
+    expect(screen.queryByText("Why it suits you:")).not.toBeInTheDocument()
   })
 
   it("describes each member by role and tags and marks the free seats", () => {

@@ -1,4 +1,5 @@
 import type { MeetingFrequency } from '@/generated/prisma/client';
+import type { MatchProfile, MatchReason } from '@/modules/matching/matching';
 
 export const KVINTET_CAPACITY = 5;
 
@@ -14,25 +15,37 @@ export type MemberProfile = {
 export type OpenKvintet = {
   id: string;
   title: string;
-  category: string;
-  members: MemberProfile[];
+  categories: string[];
+  /** `match` is for ranking only and never leaves the server. */
+  members: (MemberProfile & { match: MatchProfile })[];
 };
 
 /** One kvintet as the feed lists it, ready for the response. */
 export type FeedItem = {
   id: string;
   title: string;
-  category: string;
+  categories: string[];
   capacity: number;
   memberCount: number;
   /** Set only when every member picked the same meeting frequency. */
   meetingFrequency: MeetingFrequency | null;
   members: Pick<MemberProfile, 'position' | 'teach' | 'learn' | 'interests'>[];
+  /** Up to three reasons it suits the caller, strongest first. The score itself is never sent. */
+  reasons: MatchReason[];
 };
+
+export type Feed = {
+  items: FeedItem[];
+  /** No kvintet reached the match threshold, so every open one is listed, best first. */
+  fallback: boolean;
+};
+
+/** How many reasons a feed item shows. */
+export const FEED_REASONS = 3;
 
 export type NewKvintet = {
   title: string;
-  categorySlug: string;
+  categorySlugs: string[];
   description: string | null;
 };
 

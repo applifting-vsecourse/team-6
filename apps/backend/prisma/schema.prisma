@@ -71,16 +71,16 @@ model Verification {
 }
 
 model User {
-  id              String    @id
-  name            String
-  email           String
-  emailVerified   Boolean
-  image           String?   @db.Text
-  createdAt       DateTime
-  updatedAt       DateTime
-  sessions        Session[]
-  accounts        Account[]
-  role            UserRole  @default(user)
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean
+  image         String?   @db.Text
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+  role          UserRole  @default(user)
 
   codeOfConductAcceptedAt DateTime?
   codeOfConductVersion    String?
@@ -88,9 +88,9 @@ model User {
   username        String? @db.VarChar(50)
   displayUsername String? @db.VarChar(50)
 
-  profile         Profile?
-  kvintetMember   KvintetMember?
-  messages        Message[]
+  profile       Profile?
+  kvintetMember KvintetMember?
+  messages      Message[]
 
   @@unique([email])
   @@unique([username])
@@ -132,11 +132,12 @@ model City {
 
 // Reference data: inserted by migrations, never by the seed script.
 model Category {
-  id        Int           @id @default(autoincrement())
-  slug      String        @unique
-  sortOrder Int
-  kvintets  Kvintet[]
-  tags      TagCategory[]
+  id                Int               @id @default(autoincrement())
+  slug              String            @unique
+  sortOrder         Int
+  kvintets          Kvintet[]
+  tags              TagCategory[]
+  kvintetCategories KvintetCategory[]
 
   @@map("category")
 }
@@ -151,7 +152,7 @@ model Tag {
   @@map("tag")
 }
 
-// Reference data: which categories a tag counts towards. Used to match a user's tags to a kvintet's one category.
+// Reference data: which categories a tag counts towards. Used to match a user's tags to a kvintet's categories.
 model TagCategory {
   tagId      Int
   tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
@@ -202,13 +203,15 @@ model Profile {
 
 // FORMING kvintets are open to new members and listed in the feed. "group" is an SQL reserved word.
 model Kvintet {
-  id          String          @id @default(uuid()) @db.Uuid
-  status      KvintetStatus   @default(FORMING)
+  id          String            @id @default(uuid()) @db.Uuid
+  status      KvintetStatus     @default(FORMING)
   title       String
   description String?
+  // Deprecated: holds the first of `categories`. Kept until a later deploy drops it (additive migrations only).
   categoryId  Int
-  category    Category        @relation(fields: [categoryId], references: [id])
-  createdAt   DateTime        @default(now())
+  category    Category          @relation(fields: [categoryId], references: [id])
+  categories  KvintetCategory[]
+  createdAt   DateTime          @default(now())
   activatedAt DateTime?
   members     KvintetMember[]
   votes       KvintetVote[]
@@ -216,6 +219,18 @@ model Kvintet {
 
   @@index([status, createdAt])
   @@map("kvintet")
+}
+
+// A kvintet's 1–3 topics, chosen when it is started.
+model KvintetCategory {
+  kvintetId  String   @db.Uuid
+  kvintet    Kvintet  @relation(fields: [kvintetId], references: [id], onDelete: Cascade)
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([kvintetId, categoryId])
+  @@index([categoryId])
+  @@map("kvintet_category")
 }
 
 model KvintetMember {
