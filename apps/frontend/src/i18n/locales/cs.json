@@ -1,4 +1,15 @@
 {
+  "account": {
+    "deleteAccount": "Smazat účet",
+    "deleteDialog": {
+      "cancel": "Zrušit",
+      "confirm": "Smazat účet",
+      "deleting": "Mazání...",
+      "description": "Opravdu chcete smazat svůj účet? Váš profil, dotazník i místo ve skupině budou trvale smazány. Tuto akci nelze vzít zpět.",
+      "title": "Smazat účet"
+    },
+    "deleteSuccess": "Váš účet byl úspěšně smazán."
+  },
   "auth": {
     "acceptCodeOfConduct": "Přečetl/a jsem si <coc>kodex chování</coc> a souhlasím s ním",
     "confirmPassword": "Potvrzení hesla",
