@@ -57,11 +57,11 @@ Use the scale only: `1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 14, 16, 22, 24` (Tai
 Kvintet shows no photos, so every person is represented by a generated avatar from [blobatar](https://blobatar.dev): the same string always renders the same creature, with nothing stored or uploaded. Use `Blobatar` from `@/components/ui/blobatar` wherever a person appears (chat messages, member lists, kvintet cards) — never initials, stock icons or a hand-rolled avatar.
 
 - **Seed:** the user's `username`, falling back to `id` when there is none. Use the same seed everywhere, or one person turns into two faces. Never seed from the e-mail (it is private). The exception is a person who is not in your group yet: their face is seeded by an opaque seat or membership value, so it never reveals who they are.
-- **Three states, one meaning each** (components in `components/KvintetSeats.tsx`):
-  - **Grey** (`AnonymousBlobatar`) — not met yet. Anyone outside your group: feed, proposals, "who's here" before the kvintet starts.
+- **Three states, one meaning each**:
+  - **Grey** — not met yet. Anyone outside your group: feed, proposals, "who's here" before the kvintet starts.
   - **Colour** (`Blobatar`) — you, and your group once it has started.
-  - **Dashed circle** (`FreeSeat`) — a seat nobody has taken. Never a "+" or an empty avatar.
-- **A kvintet is a group of five seats, never a number.** `KvintetSeats` draws one: `layout="row"` is the compact form for cards, `layout="ring"` is the table of the home page and "kvintet begins" (seats scale with the container). Members first, free seats after, always five in total.
+  - **Dashed circle** — a seat nobody has taken. Never a "+" or an empty avatar.
+- **A kvintet is a group of five seats, never a number.** One shared component draws it, as a compact row (cards) or as a ring (the table of the home page and "kvintet begins"; seats scale with the container). Members first, free seats after, always five in total.
 - **Sizes** come from the Figma, so pick the one for the job rather than a new value:
 
   | Use                                               | Size   | Class     |
@@ -75,10 +75,12 @@ Kvintet shows no photos, so every person is represented by a generated avatar fr
   | Home "finish your profile"                        | 112 px | `size-28` |
   | Sign-up preview                                   | 160 px | `size-40` |
 
-  The ring on home is 76–80 px per seat; let `KvintetSeats` size it from its container.
+  The ring on home is 76–80 px per seat; size it from the container, not per seat.
 
-- **Static by default.** A static blobatar is one `<img>`; an animated one is ~12 SVG nodes. Lists and chat (many avatars, small) stay static; the chat swaps in the animated one only for the avatar under the mouse.
-- **Animation is opt-in, through `GazeBlobatar`** (`components/`): its eyes follow the cursor. One large avatar (sign-up preview, profile header) uses `animate="always"`; the single nav-bar avatar uses `animate="hover"` with a larger `travel`. Never animate avatars in a list. The one exception is the chat: a message avatar is a static `Blobatar` and becomes `GazeBlobatar` with `animate="hover"` only while the mouse is over it, so at most one animated avatar exists at a time; never `"always"` there. It switches itself off for `prefers-reduced-motion` and on touch.
+- **Animate wherever it is affordable, and follow the mouse.** A blobatar that looks back at you is the point of the app, so give every avatar the eyes-follow-the-cursor motion unless the cost below rules it out. A static blobatar is one `<img>`; an animated one is ~12 SVG nodes, and every animated avatar runs its own gaze driver (its own `pointermove`, `scroll` and `resize` listeners and a frame loop). That is cheap for a handful and wasteful for dozens, so there are exactly two modes:
+  - **`always`** (`GazeBlobatar`, `animate="always"`) for one large avatar or one group of five: sign-up preview, profile header, the ring on home and "kvintet begins", the nav-bar avatar (`animate="hover"` with a larger `travel`). Keep it to about ten on screen at once.
+  - **`hover`** for everything that comes in a list: chat messages, feed and "who's here" rows, proposal cards. It is a static `Blobatar` that becomes animated only while the mouse is over it, so a list of any length costs one driver at a time. Never `always` in a list.
+  - Both switch themselves off for `prefers-reduced-motion` and on touch. The ~10 and "a list" thresholds are judgement, not measurements: if a profile of a real screen shows jank, move that screen from `always` to `hover`, and write the screen here.
 - **Decorative by default** (no alt text) because the name is written next to it. If an avatar stands alone, pass `blobatar={{ title: name }}`.
 - **Tests:** jsdom lacks `matchMedia`/`ResizeObserver`, so a test that renders `GazeBlobatar` mocks `@blobatar/react/gaze` (see `SignUpForm.test.tsx`).
 
