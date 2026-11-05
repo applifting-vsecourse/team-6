@@ -101,11 +101,11 @@ export function KvintetMemberList({ members, isActive, totalSeats = 5 }: Kvintet
             {!isActive && (
               <div className="shrink-0">
                 {member.hasVoted ? (
-                  <span className="inline-flex rounded-full bg-primary/10 px-2.5 py-0.5 font-mono text-xs tracking-meta text-primary uppercase">
+                  <span className="inline-flex rounded-full bg-primary/10 px-2.5 py-0.5 font-mono text-meta tracking-meta text-primary uppercase">
                     {t("kvintet.members.votedYes")}
                   </span>
                 ) : (
-                  <span className="inline-flex rounded-full bg-secondary px-2.5 py-0.5 font-mono text-xs tracking-meta text-muted-foreground uppercase">
+                  <span className="inline-flex rounded-full bg-secondary px-2.5 py-0.5 font-mono text-meta tracking-meta text-muted-foreground uppercase">
                     {t("kvintet.members.notVoted")}
                   </span>
                 )}

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#fbf8f2" />
+    <meta name="theme-color" content="#f5f6fa" />
     <script>
       // Sets the theme before first paint so there is no flash. Keep in sync with src/lib/theme.ts.
       try {
@@ -11,7 +11,7 @@
         var dark = stored ? stored === "dark" : matchMedia("(prefers-color-scheme: dark)").matches
         if (dark) {
           document.documentElement.classList.add("dark")
-          document.querySelector('meta[name="theme-color"]').content = "#141f36"
+          document.querySelector('meta[name="theme-color"]').content = "#0d1220"
         }
       } catch (e) {}
     </script>

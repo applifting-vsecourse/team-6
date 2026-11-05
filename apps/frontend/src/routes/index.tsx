@@ -76,7 +76,7 @@ function LandingPage() {
                   key={step.title}
                   className="flex flex-col gap-1 md:gap-2"
                 >
-                  <span className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
+                  <span className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <h3 className="text-subheading">{t(step.title)}</h3>

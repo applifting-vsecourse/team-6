@@ -24,7 +24,7 @@ export function HeaderNav({ className, disabledItems }: HeaderNavProps) {
           <DisabledNavItem
             key={item.to}
             reason={reason}
-            className="rounded-md px-3 py-1.5 text-label font-semibold"
+            className="rounded-sm px-3 py-2 text-label font-medium"
           >
             {t(item.labelKey)}
           </DisabledNavItem>

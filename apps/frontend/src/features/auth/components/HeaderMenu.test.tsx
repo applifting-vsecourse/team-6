@@ -86,7 +86,7 @@ describe("HeaderMenu dropdown", () => {
     useSession.mockReturnValue({ user: { id: "u1", name: "Jana Nováková", username: "jana" } })
     render(<HeaderMenu />)
 
-    await userEvent.click(screen.getByRole("button", { name: /Jana Nováková/ }))
+    await userEvent.click(screen.getByRole("button", { name: /^Jana/ }))
 
     const menu = await screen.findByRole("menu")
     expect(within(menu).getByText("@jana")).toBeInTheDocument()

@@ -38,7 +38,7 @@ export function ProposalKvintetView({
       {/* Header section */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <span className="inline-flex rounded-full bg-secondary px-3 py-1 font-mono text-xs tracking-meta text-muted-foreground uppercase">
+          <span className="inline-flex rounded-full bg-secondary px-3 py-1 font-mono text-meta tracking-meta text-muted-foreground uppercase">
             {t("kvintet.statusProposal", { count: kvintet.members.length })}
           </span>
         </div>
@@ -46,7 +46,7 @@ export function ProposalKvintetView({
         <h1 className="text-title">{kvintet.title}</h1>
 
         {formattedPreferences && (
-          <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
+          <p className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
             {t("kvintet.proposalSubtitle", {
               preferences: formattedPreferences,
             })}
@@ -58,7 +58,7 @@ export function ProposalKvintetView({
       {canShowVoteBox ? (
         <div className="flex flex-col items-start justify-between gap-4 rounded-lg border border-primary/30 bg-card p-6 sm:flex-row sm:items-center">
           <div className="flex flex-col gap-1.5">
-            <span className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
+            <span className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
               {t("kvintet.vote.title")}
             </span>
             <p className="text-base font-semibold text-foreground">
@@ -95,7 +95,7 @@ export function ProposalKvintetView({
         </div>
       ) : (
         <div className="flex flex-col gap-1.5 rounded-lg border border-border bg-card/60 p-6">
-          <span className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
+          <span className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
             {t("kvintet.vote.notStartedTitle")}
           </span>
           <p className="text-sm text-muted-foreground">

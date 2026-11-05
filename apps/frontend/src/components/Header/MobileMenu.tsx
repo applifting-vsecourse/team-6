@@ -30,7 +30,7 @@ type MobileMenuProps = {
 const ROW =
   "group flex min-h-12 items-center gap-3 rounded-lg px-4 py-3 text-base font-medium text-foreground"
 const DOT = "size-2 shrink-0 rounded-full bg-input"
-const META_LABEL = "px-4 font-mono text-xs tracking-meta text-muted-foreground uppercase"
+const META_LABEL = "px-4 font-mono text-meta tracking-meta text-muted-foreground uppercase"
 
 /** One row of a menu list: a dot, the label, an optional badge and a chevron. Closes the menu. */
 function MenuLink({
@@ -76,7 +76,7 @@ export function MobileMenu({
     <Sheet>
       <SheetTrigger
         aria-label={t("layout.openMenu")}
-        className="p-1 md:hidden"
+        className="p-0.75 md:hidden"
       >
         <Menu className="size-5.5" />
       </SheetTrigger>
@@ -88,7 +88,7 @@ export function MobileMenu({
       >
         <SheetTitle className="sr-only">{t("layout.menu")}</SheetTitle>
         <div className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4">
-          <div className="flex items-center gap-2.5 font-serif text-subheading font-medium text-foreground">
+          <div className="flex items-center gap-2.5 text-logo font-semibold text-foreground">
             <LogoMark />
             Kvintet
           </div>

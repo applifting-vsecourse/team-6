@@ -47,14 +47,14 @@ export function LanguageSwitcher({ className, variant = "text" }: LanguageSwitch
     <div
       role="group"
       aria-label={t("common.language")}
-      className={cn("flex items-center gap-1.5", className)}
+      className={cn("flex items-center gap-1", className)}
     >
       {locales.map((locale, index) => (
         <Fragment key={locale.code}>
           {index > 0 ? (
             <span
               aria-hidden
-              className="font-mono text-xs text-input"
+              className="font-mono text-meta text-input"
             >
               /
             </span>
@@ -65,7 +65,7 @@ export function LanguageSwitcher({ className, variant = "text" }: LanguageSwitch
             aria-label={locale.nativeName}
             aria-pressed={i18n.resolvedLanguage === locale.code}
             onClick={() => void i18n.changeLanguage(locale.code)}
-            className="h-auto p-0 font-mono text-xs tracking-meta text-muted-foreground uppercase hover:bg-transparent aria-pressed:text-foreground"
+            className="h-auto p-0 font-mono text-meta tracking-meta text-muted-foreground uppercase hover:bg-transparent aria-pressed:text-foreground"
           >
             {locale.code}
           </Button>

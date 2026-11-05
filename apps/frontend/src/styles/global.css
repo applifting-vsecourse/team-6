@@ -1,6 +1,4 @@
-@import "@fontsource-variable/newsreader/wght.css";
-@import "@fontsource-variable/newsreader/wght-italic.css";
-@import "@fontsource-variable/source-sans-3/wght.css";
+@import "@fontsource-variable/inter/wght.css";
 @import "@fontsource/ibm-plex-mono/500.css";
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
@@ -35,7 +33,6 @@
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
-  --font-serif: var(--font-serif);
 
   --shadow-2xs: var(--shadow-2xs);
   --shadow-xs: var(--shadow-xs);
@@ -46,8 +43,8 @@
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
 
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: calc(var(--radius) + 4px);
+  --radius-md: var(--radius);
   --radius-sm: calc(var(--radius) - 2px);
 }
 
@@ -62,17 +59,23 @@
   --text-heading--line-height: 2.125rem;
   --text-subheading: 1.3125rem;
   --text-subheading--line-height: 1.75rem;
-  --text-label: 0.9375rem;
-  --text-label--line-height: 1.25rem;
-  --tracking-meta: 0.06em;
+  --text-label: 0.875rem;
+  --text-label--line-height: 1.4;
+  /* Figma C/small, C/mono and the wordmark. */
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.45;
+  --text-meta: 0.6875rem;
+  --text-meta--line-height: 1.4;
+  --text-logo: 1.1875rem;
+  --text-logo--line-height: 1.35;
+  --tracking-meta: 0.08em;
 }
 
 /* Kvintet palette (Figma Design_MVP variables: bg, surface, surface-2, line, line-strong, primary,
    muted, accent, danger). Light here, dark in `.dark` below. */
 :root {
   color-scheme: light;
-  --font-sans: "Source Sans 3 Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Newsreader Variable", Georgia, serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* bg: the paper of every page */
@@ -108,7 +111,8 @@
   /* line-strong */
   --input: #b8c0d3;
   --ring: #10172a;
-  --radius: 4px;
+  /* Figma: buttons and inputs 8px (md), cards 12px (lg), nav items and checkbox ~6px (sm). */
+  --radius: 8px;
   --shadow-2xs: 0px 2px 10px 0px hsl(0 0% 0% / 0.05);
   --shadow-xs: 0px 2px 10px 0px hsl(0 0% 0% / 0.05);
   --shadow-sm: 0px 2px 10px 0px hsl(0 0% 0% / 0.1), 0px 1px 2px -1px hsl(0 0% 0% / 0.1);
@@ -168,10 +172,8 @@
     @apply bg-background text-body antialiased;
   }
   h1,
-  h2 {
-    @apply font-serif font-medium text-foreground;
-  }
+  h2,
   h3 {
-    @apply font-serif font-semibold text-foreground;
+    @apply font-semibold text-foreground;
   }
 }

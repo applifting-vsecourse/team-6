@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import { sleepy } from "blobatar/expression"
-import { ChevronDown, LogOut } from "lucide-react"
+import { LogOut } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
@@ -37,7 +37,7 @@ export function HeaderMenu() {
       <>
         <Link
           to={ROUTES.login}
-          className="text-label font-semibold text-foreground"
+          className="text-label font-medium text-foreground md:px-4.5 md:py-2.75"
         >
           {t("auth.signIn")}
         </Link>
@@ -62,17 +62,21 @@ export function HeaderMenu() {
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            size="sm"
-            className="hidden text-sm font-normal text-body md:inline-flex"
+            className="hidden h-auto gap-2.5 p-0 text-label font-medium text-foreground hover:bg-transparent md:inline-flex"
           >
             <GazeBlobatar
               name={seedOf(user)}
               animate="hover"
               travel={7}
-              className="size-8"
+              className="size-7.5"
             />
-            {user.name}
-            <ChevronDown aria-hidden />
+            {user.name.split(" ")[0]}
+            <span
+              aria-hidden
+              className="text-small font-normal text-muted-foreground"
+            >
+              ▾
+            </span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
@@ -145,7 +149,7 @@ export function MobileAccount() {
             />
           ))}
         </div>
-        <p className="font-serif text-subheading font-medium text-foreground">
+        <p className="text-subheading font-semibold text-foreground">
           {t("layout.findYourKvintet")}
         </p>
         <div className="flex w-full flex-col gap-2.5">

@@ -68,7 +68,7 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
         {kvintet.categories.map((slug) => (
           <span
             key={slug}
-            className="inline-flex rounded-full border border-input px-2.5 py-0.5 font-mono text-xs tracking-meta text-body uppercase"
+            className="inline-flex rounded-full border border-input px-2.5 py-0.5 font-mono text-meta tracking-meta text-body uppercase"
           >
             {label("categories", slug)}
           </span>
@@ -104,7 +104,7 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
       ) : null}
 
       {kvintet.meetingFrequency ? (
-        <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
+        <p className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
           {t("kvintet.suitsAll", { value: t(`meetingFrequency.${kvintet.meetingFrequency}`) })}
         </p>
       ) : null}

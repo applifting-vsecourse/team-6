@@ -20,7 +20,7 @@ export function CodeOfConductPage() {
             key={rule}
             className="flex gap-3 border-t border-border py-3 first:border-t-0 md:gap-5"
           >
-            <span className="font-mono text-xs leading-6 tracking-meta text-muted-foreground">
+            <span className="font-mono text-meta leading-6 tracking-meta text-muted-foreground">
               {String(index + 1).padStart(2, "0")}
             </span>
             <span className="flex-1 text-foreground">{t(`codeOfConduct.${rule}`)}</span>

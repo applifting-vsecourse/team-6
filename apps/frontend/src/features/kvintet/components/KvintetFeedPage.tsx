@@ -140,7 +140,7 @@ export function KvintetFeedPage({ category, onCategoryChange }: KvintetFeedPageP
 
         {items?.length ? (
           <>
-            <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
+            <p className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
               {t("kvintet.count", {
                 count: items.length,
                 formatted: formatNumber(items.length),

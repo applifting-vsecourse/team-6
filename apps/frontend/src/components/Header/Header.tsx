@@ -40,11 +40,11 @@ export function Header({
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background px-4">
-      <div className="mx-auto flex h-14 w-full max-w-4xl items-center gap-4 md:h-16 md:gap-10">
+      <div className="mx-auto flex h-14 w-full max-w-4xl items-center gap-3 md:h-16 md:gap-7">
         <div className="flex items-center gap-3">
           <HeaderLogo />
           {step ? (
-            <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
+            <p className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
               <span className="hidden md:inline">
                 {t("onboarding.stepProgress", { current: step.current, total: step.total })}
               </span>
@@ -60,7 +60,7 @@ export function Header({
             disabledItems={navDisabled}
           />
         ) : null}
-        <div className="ml-auto flex items-center gap-5">
+        <div className="ml-auto flex items-center gap-3 md:gap-4.5">
           <LanguageSwitcher className="hidden md:flex" />
           <ThemeSwitcher className="hidden md:inline-flex" />
           {userMenu}
