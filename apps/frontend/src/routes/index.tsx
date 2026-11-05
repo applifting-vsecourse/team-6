@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { Trans, useTranslation } from "react-i18next"
 
-import { ROUTES } from "@/app/routes"
+import { HOW_IT_WORKS_ANCHOR, ROUTES } from "@/app/routes"
 import { LogoMark } from "@/components/LogoMark"
 import { PageLayout } from "@/components/PageLayout"
 import { Seo } from "@/components/Seo"
@@ -65,7 +65,10 @@ function LandingPage() {
             <LogoMark className="hidden size-75 shrink-0 md:block" />
           </section>
 
-          <section className="flex flex-col gap-6 border-t border-border pt-10">
+          <section
+            id={HOW_IT_WORKS_ANCHOR}
+            className="flex scroll-mt-22 flex-col gap-6 border-t border-border pt-10"
+          >
             <h2 className="text-heading">{t("landing.howItWorks")}</h2>
             <ol className="grid gap-5 md:grid-cols-3 md:gap-10">
               {STEPS.map((step, index) => (

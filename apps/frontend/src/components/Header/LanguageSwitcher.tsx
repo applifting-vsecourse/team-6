@@ -1,7 +1,9 @@
 import { Fragment } from "react"
 import { useTranslation } from "react-i18next"
 
+import { SEGMENT_GROUP_CLASS, SEGMENT_ITEM_CLASS } from "@/components/Header/segmented"
 import { Button } from "@/components/ui/button"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { locales } from "@/i18n"
 import { cn } from "@/lib/utils"
 
@@ -17,28 +19,27 @@ export function LanguageSwitcher({ className, variant = "text" }: LanguageSwitch
 
   if (variant === "pills") {
     return (
-      <div
-        role="group"
+      <ToggleGroup
+        type="single"
+        spacing={1}
+        value={i18n.resolvedLanguage}
+        // Radix reports "" when the selected item is clicked again; a language is always chosen.
+        onValueChange={(code) => code && void i18n.changeLanguage(code)}
         aria-label={t("common.language")}
-        className={cn("flex items-center gap-2", className)}
+        className={cn(SEGMENT_GROUP_CLASS, className)}
       >
-        {locales.map((locale) => {
-          const isActive = i18n.resolvedLanguage === locale.code
-          return (
-            <Button
-              key={locale.code}
-              size="sm"
-              variant={isActive ? "default" : "outline"}
-              lang={locale.code}
-              aria-pressed={isActive}
-              onClick={() => void i18n.changeLanguage(locale.code)}
-              className="h-8 rounded-full px-3.5 text-sm font-normal"
-            >
-              {locale.nativeName}
-            </Button>
-          )
-        })}
-      </div>
+        {locales.map((locale) => (
+          <ToggleGroupItem
+            key={locale.code}
+            value={locale.code}
+            lang={locale.code}
+            aria-label={locale.nativeName}
+            className={cn(SEGMENT_ITEM_CLASS, "uppercase")}
+          >
+            {locale.code}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
     )
   }
 

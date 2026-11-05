@@ -1,7 +1,9 @@
 import { Moon, Sun } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
+import { SEGMENT_GROUP_CLASS, SEGMENT_ITEM_CLASS } from "@/components/Header/segmented"
 import { Button } from "@/components/ui/button"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { useTheme, type Theme } from "@/lib/theme"
 import { cn } from "@/lib/utils"
 
@@ -22,27 +24,25 @@ export function ThemeSwitcher({ className, variant = "icon" }: ThemeSwitcherProp
 
   if (variant === "pills") {
     return (
-      <div
-        role="group"
+      <ToggleGroup
+        type="single"
+        spacing={1}
+        value={theme}
+        // Radix reports "" when the selected item is clicked again; a theme is always chosen.
+        onValueChange={(value) => value && setTheme(value as Theme)}
         aria-label={t("common.theme")}
-        className={cn("flex items-center gap-2", className)}
+        className={cn(SEGMENT_GROUP_CLASS, className)}
       >
-        {THEMES.map(({ value, labelKey }) => {
-          const isActive = theme === value
-          return (
-            <Button
-              key={value}
-              size="sm"
-              variant={isActive ? "default" : "outline"}
-              aria-pressed={isActive}
-              onClick={() => setTheme(value)}
-              className="h-8 rounded-full px-3.5 text-sm font-normal"
-            >
-              {t(labelKey)}
-            </Button>
-          )
-        })}
-      </div>
+        {THEMES.map(({ value, labelKey }) => (
+          <ToggleGroupItem
+            key={value}
+            value={value}
+            className={SEGMENT_ITEM_CLASS}
+          >
+            {t(labelKey)}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
     )
   }
 

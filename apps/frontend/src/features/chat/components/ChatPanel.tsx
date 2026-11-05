@@ -7,6 +7,7 @@ import { getErrorMessage } from "@/lib/errorMessage"
 
 import { useMessages, useSendMessage } from "@/features/chat/hooks/useMessages"
 import { useStickToBottom } from "@/features/chat/hooks/useStickToBottom"
+import { useMarkMessagesRead } from "@/features/chat/hooks/useUnread"
 
 import { DaySeparator } from "./DaySeparator"
 import { MessageComposer } from "./MessageComposer"
@@ -26,6 +27,7 @@ export function ChatPanel({ kvintetId, currentUserId }: ChatPanelProps) {
   const { messages } = chat
   const scrollerRef = useRef<HTMLDivElement>(null)
   const scroll = useStickToBottom(scrollerRef, messages?.at(-1)?.id)
+  useMarkMessagesRead(messages?.at(-1)?.id)
 
   const sendAndFollow = (body: string) => {
     // Mark the list as "at the bottom" first, so the refreshed list scrolls to our own message.
