@@ -209,39 +209,36 @@ export function LocationMapPicker({
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-0.5">
-        <div className="flex items-center justify-between">
-          <Label className="text-label font-semibold text-foreground">
-            {t("onboarding.step2.mapTitle")}
-          </Label>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleUseCurrentLocation}
-            disabled={isLocating}
-            className="h-8 gap-1.5 text-xs font-medium text-primary hover:text-primary/90"
-          >
-            <LocateFixed className="h-3.5 w-3.5" />
-            {isLocating ? t("onboarding.step2.locating") : t("onboarding.step2.useCurrentLocation")}
-          </Button>
+    <div className="flex flex-col gap-3.5">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-0.5">
+          <h2 className="text-h3">{t("onboarding.step2.whereTitle")}</h2>
+          <p className="text-small text-muted-foreground">{t("onboarding.step2.mapHint")}</p>
         </div>
-        <p className="text-sm text-muted-foreground">{t("onboarding.step2.mapHint")}</p>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleUseCurrentLocation}
+          disabled={isLocating}
+          className="h-auto shrink-0 px-3 py-2 text-small font-normal text-highlight"
+        >
+          <LocateFixed className="size-3.5" />
+          {isLocating ? t("onboarding.step2.locating") : t("onboarding.step2.useCurrentLocation")}
+        </Button>
       </div>
 
-      {locationNote && <p className="text-xs text-muted-foreground">{locationNote}</p>}
+      {locationNote && <p className="text-small text-muted-foreground">{locationNote}</p>}
 
       <div
         ref={mapContainerRef}
         data-testid="location-map-container"
-        className="relative h-72 w-full overflow-hidden rounded-lg border border-border bg-muted/40 sm:h-80"
+        className="relative h-65 w-full overflow-hidden rounded-lg border border-border bg-secondary"
         style={{ zIndex: 0 }}
       />
 
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1 font-mono">
-          <MapPin className="h-3.5 w-3.5 text-primary" />
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <span className="flex items-center gap-1 font-mono text-meta tracking-meta text-muted-foreground uppercase">
+          <MapPin className="size-3 text-destructive" />
           {formatNumber(currentLat, {
             minimumFractionDigits: 4,
             maximumFractionDigits: 4,
@@ -253,20 +250,20 @@ export function LocationMapPicker({
           })}
           °
         </span>
-        <span className="font-medium text-foreground">
+        <span className="text-small text-foreground">
           {t("onboarding.step2.selectedRadius", { count: formatNumber(currentRadius) })}
         </span>
       </div>
 
-      <div className="flex flex-col gap-2 pt-1">
-        <div className="flex items-center justify-between text-sm">
+      <div className="flex flex-col gap-2.5">
+        <div className="flex items-start justify-between">
           <Label
             htmlFor="radius-slider"
-            className="text-label font-semibold text-foreground"
+            className="text-compact font-medium text-foreground"
           >
             {t("onboarding.step2.radiusSliderLabel")}
           </Label>
-          <span className="font-mono font-semibold text-primary">
+          <span className="font-mono text-meta tracking-meta text-highlight uppercase">
             {t("onboarding.step2.radiusOption", { count: formatNumber(currentRadius) })}
           </span>
         </div>
@@ -281,7 +278,7 @@ export function LocationMapPicker({
           aria-label={t("onboarding.step2.radiusSliderLabel")}
         />
 
-        <div className="flex flex-wrap gap-1.5 pt-1">
+        <div className="flex flex-wrap gap-1.5">
           {presetRadii.map((rad) => (
             <Button
               key={rad}
@@ -289,7 +286,7 @@ export function LocationMapPicker({
               variant={currentRadius === rad ? "default" : "outline"}
               size="sm"
               onClick={() => handleRadiusChange(rad)}
-              className="h-7 px-2.5 py-1 text-xs font-medium"
+              className="h-auto rounded-full px-2.5 py-1 text-small font-normal"
             >
               {t("onboarding.step2.radiusOption", { count: formatNumber(rad) })}
             </Button>

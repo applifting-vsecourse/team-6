@@ -27,9 +27,11 @@ function OnboardingPage() {
   return (
     <>
       <Seo title={t("onboarding.title")} />
-      <div className="mx-auto w-full max-w-[672px] px-4 py-8 md:py-16">
+      <div className="mx-auto w-full max-w-160 px-4 pt-7 pb-10 md:pt-12 md:pb-22">
         <OnboardingWizard
           userId={user?.id}
+          // Same seed as the header: username, id when there is none. Never the e-mail.
+          avatarSeed={user ? user.username || user.id : undefined}
           step={step}
           onStepChange={(next) => void navigate({ search: { step: next } })}
         />

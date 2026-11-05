@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next"
 import { Input } from "@/components/ui/input"
 
 import type { Tag } from "@/features/profile/api/profileApi"
+import { OnboardingCard } from "@/features/profile/components/OnboardingCard"
 import { TagBadge } from "@/features/profile/components/TagBadge"
 
 type TagSelectorProps = {
@@ -65,14 +66,12 @@ export function TagSelector({
   }, [allTags, defaultSuggestedSlugs, getTagLabel, search, selectedTagIds])
 
   return (
-    <div className="flex flex-col gap-3 border-t border-border pt-6">
-      <div className="flex flex-col gap-0.5">
-        <h3 className="text-subheading font-semibold text-foreground">{title}</h3>
-        {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
-      </div>
-
+    <OnboardingCard
+      title={title}
+      hint={hint}
+    >
       {selectedTags.length > 0 && (
-        <div className="flex flex-wrap gap-2 pt-1">
+        <div className="flex flex-wrap gap-2">
           {selectedTags.map((tag) => (
             <TagBadge
               key={tag.id}
@@ -85,40 +84,32 @@ export function TagSelector({
         </div>
       )}
 
-      <div>
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") e.preventDefault()
-          }}
-          placeholder={t("onboarding.step1.searchTagsPlaceholder")}
-          aria-label={t("onboarding.step1.searchTagsAria", { section: title })}
-          className="h-10 text-sm"
-        />
-      </div>
-
       {suggestedTags.length > 0 && (
-        <div className="flex flex-col gap-2 pt-1">
-          <p className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
-            {t("onboarding.step1.recommended")}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {suggestedTags.map((tag) => (
-              <TagBadge
-                key={tag.id}
-                label={getTagLabel(tag)}
-                variant="suggested"
-                onAction={() => {
-                  onSelectTag(tag.id)
-                  setSearch("")
-                }}
-                actionAriaLabel={t("onboarding.step1.addTag", { name: getTagLabel(tag) })}
-              />
-            ))}
-          </div>
+        <div className="flex flex-wrap gap-2">
+          {suggestedTags.map((tag) => (
+            <TagBadge
+              key={tag.id}
+              label={getTagLabel(tag)}
+              variant="suggested"
+              onAction={() => {
+                onSelectTag(tag.id)
+                setSearch("")
+              }}
+              actionAriaLabel={t("onboarding.step1.addTag", { name: getTagLabel(tag) })}
+            />
+          ))}
         </div>
       )}
-    </div>
+
+      <Input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") e.preventDefault()
+        }}
+        placeholder={t("onboarding.step1.searchTagsPlaceholder")}
+        aria-label={t("onboarding.step1.searchTagsAria", { section: title })}
+      />
+    </OnboardingCard>
   )
 }

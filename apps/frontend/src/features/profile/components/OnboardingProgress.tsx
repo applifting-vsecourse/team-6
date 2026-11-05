@@ -19,14 +19,17 @@ export function OnboardingProgress({
       aria-valuenow={currentStep}
       aria-valuemin={1}
       aria-valuemax={totalSteps}
-      className={cn("flex w-full items-center gap-2", className)}
+      className={cn("flex w-full items-center gap-1.5", className)}
     >
       {steps.map((step) => {
         const isActive = step <= currentStep
         return (
           <div
             key={step}
-            className={cn("h-1 flex-1 transition-colors", isActive ? "bg-primary" : "bg-track")}
+            className={cn(
+              "h-1 flex-1 rounded-xs transition-colors",
+              isActive ? "bg-highlight" : "bg-secondary",
+            )}
           />
         )
       })}

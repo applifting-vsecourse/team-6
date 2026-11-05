@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next"
 import { Button } from "@/components/ui/button"
 
 import type { Tag } from "@/features/profile/api/profileApi"
+import { OnboardingTitle } from "@/features/profile/components/OnboardingTitle"
 import { RoleSelector } from "@/features/profile/components/RoleSelector"
 import { TagSelector } from "@/features/profile/components/TagSelector"
 
@@ -55,12 +56,12 @@ export function Step1Profile({ initialData, allTags, onContinue }: Step1ProfileP
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-7"
+      className="flex flex-col gap-5 md:gap-6"
     >
-      <div className="flex flex-col gap-2">
-        <h1 className="text-title text-foreground">{t("onboarding.step1.title")}</h1>
-        <p className="text-lg text-foreground/80">{t("onboarding.step1.description")}</p>
-      </div>
+      <OnboardingTitle
+        title={t("onboarding.step1.title")}
+        description={t("onboarding.step1.description")}
+      />
 
       <div ref={roleSectionRef}>
         <RoleSelector
@@ -100,7 +101,6 @@ export function Step1Profile({ initialData, allTags, onContinue }: Step1ProfileP
 
       <TagSelector
         title={t("onboarding.step1.learnTitle")}
-        hint={t("onboarding.step1.teachHint")}
         selectedTagIds={learnTagIds}
         allTags={allTags}
         defaultSuggestedSlugs={[
@@ -121,7 +121,6 @@ export function Step1Profile({ initialData, allTags, onContinue }: Step1ProfileP
 
       <TagSelector
         title={t("onboarding.step1.interestsTitle")}
-        hint={t("onboarding.step1.teachHint")}
         selectedTagIds={interestTagIds}
         allTags={allTags}
         defaultSuggestedSlugs={[
@@ -142,15 +141,12 @@ export function Step1Profile({ initialData, allTags, onContinue }: Step1ProfileP
         onRemoveTag={(id) => setInterestTagIds((prev) => prev.filter((tId) => tId !== id))}
       />
 
-      <div className="flex flex-col-reverse items-start justify-between gap-4 pt-2 sm:flex-row sm:items-center">
-        <p className="text-sm text-muted-foreground">{t("onboarding.step1.changeLaterNote")}</p>
-        <Button
-          type="submit"
-          className="w-full sm:w-auto"
-        >
-          {t("common.continue")}
-        </Button>
-      </div>
+      <Button
+        type="submit"
+        className="w-full md:w-fit"
+      >
+        {t("common.continue")}
+      </Button>
     </form>
   )
 }
