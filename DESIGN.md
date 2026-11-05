@@ -56,7 +56,27 @@ Use the scale only: `1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 14, 16, 22, 24` (Tai
 
 Kvintet shows no photos, so every person is represented by a generated avatar from [blobatar](https://blobatar.dev): the same string always renders the same creature, with nothing stored or uploaded. Use `Blobatar` from `@/components/ui/blobatar` wherever a person appears (chat messages, member lists, kvintet cards) — never initials, stock icons or a hand-rolled avatar.
 
-- **Seed:** the user's `username`, falling back to `id` when there is none. Use the same seed everywhere, or one person turns into two faces. Never seed from the e-mail (it is private).
+- **Seed:** the user's `username`, falling back to `id` when there is none. Use the same seed everywhere, or one person turns into two faces. Never seed from the e-mail (it is private). The exception is a person who is not in your group yet: their face is seeded by an opaque seat or membership value, so it never reveals who they are.
+- **Three states, one meaning each** (components in `components/KvintetSeats.tsx`):
+  - **Grey** (`AnonymousBlobatar`) — not met yet. Anyone outside your group: feed, proposals, "who's here" before the kvintet starts.
+  - **Colour** (`Blobatar`) — you, and your group once it has started.
+  - **Dashed circle** (`FreeSeat`) — a seat nobody has taken. Never a "+" or an empty avatar.
+- **A kvintet is a group of five seats, never a number.** `KvintetSeats` draws one: `layout="row"` is the compact form for cards, `layout="ring"` is the table of the home page and "kvintet begins" (seats scale with the container). Members first, free seats after, always five in total.
+- **Sizes** come from the Figma, so pick the one for the job rather than a new value:
+
+  | Use                                               | Size   | Class     |
+  | ------------------------------------------------- | ------ | --------- |
+  | Inline, in a chip or tile                         | 24 px  | `size-6`  |
+  | Compact list ("who's here"), last message on home | 32 px  | `size-8`  |
+  | Chat message, seats in a proposal card on home    | 36 px  | `size-9`  |
+  | Member row in the feed, nav bar, mobile menu      | 48 px  | `size-12` |
+  | Page title accent (onboarding), empty-state group | 56 px  | `size-14` |
+  | "Kvintet begins", profile header                  | 96 px  | `size-24` |
+  | Home "finish your profile"                        | 112 px | `size-28` |
+  | Sign-up preview                                   | 160 px | `size-40` |
+
+  The ring on home is 76–80 px per seat; let `KvintetSeats` size it from its container.
+
 - **Static by default.** A static blobatar is one `<img>`; an animated one is ~12 SVG nodes. Lists and chat (many avatars, small) stay static; the chat swaps in the animated one only for the avatar under the mouse.
 - **Animation is opt-in, through `GazeBlobatar`** (`components/`): its eyes follow the cursor. One large avatar (sign-up preview, profile header) uses `animate="always"`; the single nav-bar avatar uses `animate="hover"` with a larger `travel`. Never animate avatars in a list. The one exception is the chat: a message avatar is a static `Blobatar` and becomes `GazeBlobatar` with `animate="hover"` only while the mouse is over it, so at most one animated avatar exists at a time; never `"always"` there. It switches itself off for `prefers-reduced-motion` and on touch.
 - **Decorative by default** (no alt text) because the name is written next to it. If an avatar stands alone, pass `blobatar={{ title: name }}`.

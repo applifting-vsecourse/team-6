@@ -2,7 +2,7 @@ import type { TFunction } from "i18next"
 import { Loader2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
-import { Blobatar } from "@/components/ui/blobatar"
+import { AnonymousBlobatar, FreeSeat } from "@/components/KvintetSeats"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { formatList } from "@/lib/date"
@@ -116,9 +116,9 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
             className="flex items-center gap-3 border-t border-border py-2.5"
           >
             {/* The feed never carries a name, so the face is seeded by the seat, not the person. */}
-            <Blobatar
-              name={`${kvintet.id}-seat-${index}`}
-              className="size-10 shrink-0"
+            <AnonymousBlobatar
+              seed={`${kvintet.id}-seat-${index}`}
+              className="size-12 shrink-0"
             />
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
               <p className="text-base font-semibold text-foreground sm:w-56 sm:shrink-0">
@@ -133,10 +133,7 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
             key={`free-${index}`}
             className="flex items-center gap-3 border-t border-border py-2.5 text-muted-foreground"
           >
-            <span
-              aria-hidden="true"
-              className="size-10 shrink-0 rounded-full border border-dashed border-border"
-            />
+            <FreeSeat className="size-12" />
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
               <p className="text-base font-semibold sm:w-56 sm:shrink-0">{t("kvintet.vacancy")}</p>
               <p className="text-sm">{t("kvintet.vacancyHint")}</p>
