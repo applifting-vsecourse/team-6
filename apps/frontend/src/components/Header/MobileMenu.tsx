@@ -49,7 +49,7 @@ function MenuLink({
       >
         <span
           aria-hidden
-          className={cn(DOT, isNav && "group-data-[status=active]:bg-primary")}
+          className={cn(DOT, isNav && "group-data-[status=active]:bg-highlight")}
         />
         <span className="flex-1">{children}</span>
         {badge}
@@ -139,8 +139,7 @@ export function MobileMenu({
                   isNav
                   badge={
                     chat.unreadCount > 0 ? (
-                      // `primary` here follows the design's blue badge, not an action.
-                      <span className="grid h-6 min-w-6 place-items-center rounded-full bg-primary px-1.5 text-sm font-medium text-primary-foreground">
+                      <span className="grid h-6 min-w-6 place-items-center rounded-full bg-highlight px-1.5 text-sm font-medium text-highlight-foreground">
                         <span className="sr-only">
                           {t("layout.unreadMessages", { count: chat.unreadCount })}
                         </span>

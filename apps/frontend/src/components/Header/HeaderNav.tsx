@@ -16,7 +16,7 @@ export function HeaderNav({ className, disabledItems }: HeaderNavProps) {
   return (
     <nav
       aria-label={t("layout.mainNavigation")}
-      className={cn("items-center gap-8", className)}
+      className={cn("items-center gap-1", className)}
     >
       {NAV_ITEMS.map((item) => {
         const reason = disabledItems?.[item.to]
@@ -24,7 +24,7 @@ export function HeaderNav({ className, disabledItems }: HeaderNavProps) {
           <DisabledNavItem
             key={item.to}
             reason={reason}
-            className="border-b-2 border-transparent py-1 text-label font-semibold"
+            className="rounded-md px-3 py-1.5 text-label font-semibold"
           >
             {t(item.labelKey)}
           </DisabledNavItem>
