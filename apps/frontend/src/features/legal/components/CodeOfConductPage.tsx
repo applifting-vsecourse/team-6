@@ -26,7 +26,9 @@ export function CodeOfConductPage() {
               <span className="font-mono text-meta tracking-meta text-highlight uppercase">
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <span className="flex-1 text-compact text-foreground">{t(`codeOfConduct.${rule}`)}</span>
+              <span className="flex-1 text-compact text-foreground">
+                {t(`codeOfConduct.${rule}`)}
+              </span>
             </li>
           ))}
         </ol>
