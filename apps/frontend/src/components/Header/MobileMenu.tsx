@@ -8,8 +8,8 @@ import { DisabledNavItem } from "@/components/Header/DisabledNavItem"
 import { LanguageSwitcher } from "@/components/Header/LanguageSwitcher"
 import { NAV_ITEMS, type NavDisabled } from "@/components/Header/nav"
 import { ThemeSwitcher } from "@/components/Header/ThemeSwitcher"
-import { LogoMark } from "@/components/LogoMark"
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Wordmark } from "@/components/Wordmark"
 import { SUPPORT_EMAIL } from "@/config/support"
 import { formatNumber } from "@/lib/date"
 import { cn } from "@/lib/utils"
@@ -28,9 +28,9 @@ type MobileMenuProps = {
 }
 
 const ROW =
-  "group flex min-h-12 items-center gap-3 rounded-lg px-4 py-3 text-base font-medium text-foreground"
+  "group flex items-center gap-3 rounded-lg p-3.5 text-compact font-medium text-foreground"
 const DOT = "size-2 shrink-0 rounded-full bg-input"
-const META_LABEL = "px-4 font-mono text-meta tracking-meta text-muted-foreground uppercase"
+const META_LABEL = "font-mono text-meta tracking-meta text-muted-foreground uppercase"
 
 /** One row of a menu list: a dot, the label, an optional badge and a chevron. Closes the menu. */
 function MenuLink({
@@ -88,10 +88,7 @@ export function MobileMenu({
       >
         <SheetTitle className="sr-only">{t("layout.menu")}</SheetTitle>
         <div className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4">
-          <div className="flex items-center gap-2.5 text-logo font-semibold text-foreground">
-            <LogoMark />
-            Kvintet
-          </div>
+          <Wordmark />
           <SheetClose
             aria-label={t("layout.closeMenu")}
             className="p-1"
@@ -100,7 +97,7 @@ export function MobileMenu({
           </SheetClose>
         </div>
 
-        <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 py-4">
+        <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 pt-4 pb-6">
           {top}
 
           {hasNav ? (
@@ -170,15 +167,15 @@ export function MobileMenu({
             </nav>
           ) : null}
 
-          <section className="flex flex-col gap-2">
+          <section className="flex flex-col gap-1.5">
             <p className={META_LABEL}>{t("layout.settings")}</p>
-            <div className="flex flex-col divide-y divide-border rounded-lg border border-border bg-card">
-              <div className="flex items-center justify-between px-4 py-2.5">
-                <span className="text-base text-foreground">{t("common.language")}</span>
+            <div className="flex flex-col divide-y divide-border rounded-lg border border-border">
+              <div className="flex items-center justify-between px-3.5 py-2.5">
+                <span className="text-compact text-foreground">{t("common.language")}</span>
                 <LanguageSwitcher variant="pills" />
               </div>
-              <div className="flex items-center justify-between px-4 py-2.5">
-                <span className="text-base text-foreground">{t("common.theme")}</span>
+              <div className="flex items-center justify-between px-3.5 py-2.5">
+                <span className="text-compact text-foreground">{t("common.theme")}</span>
                 <ThemeSwitcher variant="pills" />
               </div>
             </div>

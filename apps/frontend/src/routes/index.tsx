@@ -28,7 +28,7 @@ function LandingPage() {
     <>
       <Seo />
       <PageLayout header={<AppHeader />}>
-        <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 pt-8 pb-12 md:pt-22 md:pb-24">
+        <div className="mx-auto flex w-full max-w-300 flex-col gap-8 px-4 pt-8 pb-12 md:pt-22 md:pb-24">
           <section className="flex flex-col items-start gap-6 md:flex-row md:items-center md:gap-16">
             <LogoMark className="size-40 md:hidden" />
             <div className="flex flex-col items-start gap-5 md:flex-1">

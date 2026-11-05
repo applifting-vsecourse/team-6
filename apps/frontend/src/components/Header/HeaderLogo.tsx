@@ -1,16 +1,15 @@
 import { Link } from "@tanstack/react-router"
 
 import { ROUTES } from "@/app/routes"
-import { LogoMark } from "@/components/LogoMark"
+import { Wordmark } from "@/components/Wordmark"
 
 export function HeaderLogo() {
   return (
     <Link
       to={ROUTES.home}
-      className="flex items-center gap-2.5 text-logo font-semibold text-foreground"
+      className="flex items-center"
     >
-      <LogoMark />
-      Kvintet
+      <Wordmark />
     </Link>
   )
 }

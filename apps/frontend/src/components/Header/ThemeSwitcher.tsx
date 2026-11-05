@@ -55,7 +55,7 @@ export function ThemeSwitcher({ className, variant = "icon" }: ThemeSwitcherProp
       aria-label={t(next === "dark" ? "layout.switchToDark" : "layout.switchToLight")}
       onClick={() => setTheme(next)}
       className={cn(
-        "size-6 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground",
+        "size-6 p-0 text-muted-foreground hover:bg-transparent hover:text-foreground has-[>svg]:px-0",
         className,
       )}
     >
