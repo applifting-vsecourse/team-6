@@ -210,7 +210,7 @@ export function LocationMapPicker({
 
   return (
     <div className="flex flex-col gap-3.5">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col items-start gap-3 md:flex-row md:justify-between md:gap-4">
         <div className="flex flex-col gap-0.5">
           <h2 className="text-h3">{t("onboarding.step2.whereTitle")}</h2>
           <p className="text-small text-muted-foreground">{t("onboarding.step2.mapHint")}</p>

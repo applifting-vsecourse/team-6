@@ -175,22 +175,23 @@ export function Step3Questionnaire({
         />
       </OnboardingCard>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex items-center gap-3">
         <Button
           type="button"
           variant="outline"
+          className="flex-1 bg-card md:flex-none"
           onClick={onBack}
           disabled={isSubmitting}
         >
           {t("common.back")}
         </Button>
-        <p className="order-last w-full text-small text-muted-foreground md:order-none md:w-auto md:flex-1">
+        <p className="hidden text-small text-muted-foreground md:block md:flex-1">
           {t("onboarding.step3.finishHint")}
         </p>
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="ml-auto md:ml-0"
+          className="flex-1 md:flex-none"
         >
           {isSubmitting ? t("common.saving") : t("common.finish")}
         </Button>

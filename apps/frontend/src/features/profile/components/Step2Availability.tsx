@@ -127,7 +127,7 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
         title={t("onboarding.step2.daysTitle")}
         isInvalid={Boolean(daysError)}
       >
-        <div className="flex flex-wrap gap-x-7 gap-y-3">
+        <div className="flex flex-col gap-3 md:flex-row md:gap-7">
           {option(hasWeekdays, t("onboarding.step2.weekdays"), (isChecked) => {
             setHasWeekdays(isChecked)
             if (isChecked || hasWeekends) setDaysError(null)
@@ -152,7 +152,7 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
         title={t("onboarding.step2.timeOfDayTitle")}
         isInvalid={Boolean(timeOfDayError)}
       >
-        <div className="flex flex-wrap gap-x-7 gap-y-3">
+        <div className="flex flex-col gap-3 md:flex-row md:gap-7">
           {option(hasMornings, t("onboarding.step2.mornings"), (isChecked) => {
             setHasMornings(isChecked)
             if (isChecked || hasAfternoons || hasEvenings) setTimeOfDayError(null)
@@ -202,15 +202,21 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
         )}
       </OnboardingCard>
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center gap-3 md:justify-between">
         <Button
           type="button"
           variant="outline"
+          className="flex-1 bg-card md:flex-none"
           onClick={onBack}
         >
           {t("common.back")}
         </Button>
-        <Button type="submit">{t("common.continue")}</Button>
+        <Button
+          type="submit"
+          className="flex-1 md:flex-none"
+        >
+          {t("common.continue")}
+        </Button>
       </div>
     </form>
   )

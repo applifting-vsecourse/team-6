@@ -145,7 +145,7 @@ export function RoleSelector({
             aria-pressed={item.id === fieldId}
             onClick={() => setFieldId(item.id)}
             className={cn(
-              "inline-flex cursor-pointer items-center gap-2 rounded-lg border py-2 pr-3 pl-2 text-label font-medium transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+              "inline-flex cursor-pointer items-center gap-2 rounded-md border py-2 pr-3 pl-2 text-label font-medium transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
               item.id === fieldId
                 ? "border-primary bg-primary text-primary-foreground"
                 : "border-input bg-card text-foreground hover:bg-secondary",
