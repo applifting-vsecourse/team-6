@@ -52,9 +52,10 @@ function SignUpPage() {
       await navigate({ to: ROUTES.onboarding })
     } catch (error) {
       const message = getErrorMessage(error, "errors.signUpFailed")
-      const code = (error as { code?: string }).code
+      // Same read as getErrorMessage: a thrown null or primitive has no code.
+      const code = (error as { code?: unknown } | null)?.code
       // A taken e-mail belongs under the e-mail field (Figma A2b), anything else in the alert.
-      if (code && EMAIL_TAKEN_CODES.includes(code)) setEmailError(message)
+      if (typeof code === "string" && EMAIL_TAKEN_CODES.includes(code)) setEmailError(message)
       else setErrorMessage(message)
     }
   }

@@ -66,4 +66,12 @@ describe("SignUpPage server errors", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("Sign up failed")
     expect(screen.getByLabelText("Email")).not.toHaveAttribute("aria-invalid", "true")
   })
+
+  it("survives a rejection that is not an Error", async () => {
+    signUp.mutateAsync.mockRejectedValue(undefined)
+
+    await submitForm()
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Sign up failed")
+  })
 })
