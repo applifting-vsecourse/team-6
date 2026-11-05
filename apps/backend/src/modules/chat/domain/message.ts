@@ -17,7 +17,13 @@ export type ChatMessage = {
   createdAt: Date;
 };
 
+// message.id is a Postgres SERIAL: anything above would fail in the database as a 500.
+export const MAX_MESSAGE_ID = 2_147_483_647;
+
 export type ChatCursor = { after?: number; before?: number };
+
+/** `active` is false while the kvintet is still forming: there is no chat to have unread messages in. */
+export type UnreadState = { active: boolean; count: number };
 
 /** Where the caller's kvintet stands; NULL means the caller is in none. */
 export type ChatAccess = { kvintetId: string; active: boolean } | null;

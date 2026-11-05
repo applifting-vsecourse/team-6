@@ -239,6 +239,8 @@ model KvintetMember {
   userId    String       @unique
   user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   joinedAt  DateTime     @default(now())
+  // Newest chat message this member has seen; everything after it from others counts as unread.
+  lastReadMessageId Int  @default(0)
   vote      KvintetVote?
 
   @@id([kvintetId, userId])
