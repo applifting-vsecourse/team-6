@@ -29,7 +29,7 @@ The app has **two themes: light and dark**, switched in the header (`ThemeSwitch
 
 ## Spacing
 
-Use the scale only: `1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 14, 16, 22, 24` (Tailwind units — 4px…96px; the half steps and 5, 10, 22 come from the Figma). No arbitrary values like `p-[13px]`. Related things get `gap-2`/`gap-3`; fields in a form get `gap-5`; separate blocks get `gap-6`/`gap-8`.
+Use the scale only: `1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 9, 10, 12, 14, 16, 22, 24, 28, 40` (Tailwind units — 4px…96px; the half steps and 5, 9, 10, 22, 28, 40 come from the Figma). No arbitrary values like `p-[13px]`. Related things get `gap-2`/`gap-3`; fields in a form get `gap-5`; separate blocks get `gap-6`/`gap-8`.
 
 ## Type
 
