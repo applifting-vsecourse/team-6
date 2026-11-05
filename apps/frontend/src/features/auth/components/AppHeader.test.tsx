@@ -140,10 +140,11 @@ describe("AppHeader", () => {
     expect(screen.getByRole("link", { name: "Sign in" })).toBeInTheDocument()
   })
 
-  it("leaves the account link out when hasAccount is false", () => {
+  it("offers Sign up instead of Sign in when hasAccount is false", () => {
     useSession.mockReturnValue({ user: null })
     render(<AppHeader hasAccount={false} />)
 
     expect(screen.queryByRole("link", { name: "Sign in" })).not.toBeInTheDocument()
+    expect(screen.getByRole("link", { name: "Sign up" })).toHaveAttribute("href", "/signup")
   })
 })

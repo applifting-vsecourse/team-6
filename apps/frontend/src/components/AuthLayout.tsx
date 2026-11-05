@@ -18,13 +18,19 @@ type AuthLayoutProps = {
 export function AuthLayout({ title, description, children, footer, header }: AuthLayoutProps) {
   return (
     <PageLayout header={header}>
-      <section className="mx-auto w-full max-w-lg px-4 pt-16 pb-24">
-        <h1 className="text-title">{title}</h1>
-        <p className="mt-2 text-lg text-body">{description}</p>
+      <section className="px-4 pt-7 pb-10 md:pt-14 md:pb-22">
+        <div className="mx-auto w-full max-w-105">
+          <div className="flex flex-col gap-5 md:gap-2">
+            <h1 className="text-h1-mobile md:text-h1">{title}</h1>
+            <p className="text-copy text-muted-foreground md:text-lead">{description}</p>
+          </div>
 
-        <div className="mt-5">{children}</div>
+          <div className="mt-5 md:mt-4.5">{children}</div>
 
-        <p className="mt-5 text-sm text-body">{footer}</p>
+          <p className="mt-5 flex flex-wrap gap-x-1.5 text-small text-muted-foreground md:mt-4.5">
+            {footer}
+          </p>
+        </div>
       </section>
     </PageLayout>
   )
