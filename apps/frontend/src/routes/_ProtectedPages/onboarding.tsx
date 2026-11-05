@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
-import { z } from "zod"
 
 import { Seo } from "@/components/Seo"
 
@@ -8,15 +7,7 @@ import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOpt
 import { useSession } from "@/features/auth/hooks/useSession"
 import { profileQueryOptions } from "@/features/profile/api/profileApi"
 import { OnboardingWizard } from "@/features/profile/components/OnboardingWizard"
-
-// The step lives in the URL so the app header can show it and a reload keeps it.
-// Anything that is not 1-3 starts at the first step.
-const onboardingSearchSchema = z.object({
-  step: z
-    .union([z.literal(1), z.literal(2), z.literal(3)])
-    .default(1)
-    .catch(1),
-})
+import { onboardingSearchSchema } from "@/features/profile/lib/onboardingSearch"
 
 export const Route = createFileRoute("/_ProtectedPages/onboarding")({
   validateSearch: onboardingSearchSchema,
