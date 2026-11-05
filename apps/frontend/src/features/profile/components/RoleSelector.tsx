@@ -3,6 +3,7 @@ import { Check } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { Blobatar } from "@/components/ui/blobatar"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
@@ -139,24 +140,20 @@ export function RoleSelector({
     >
       <div className="flex flex-wrap gap-2">
         {ROLE_FIELDS.map((item) => (
-          <button
+          <Button
             key={item.id}
             type="button"
+            variant={item.id === fieldId ? "default" : "outline"}
             aria-pressed={item.id === fieldId}
             onClick={() => setFieldId(item.id)}
-            className={cn(
-              "inline-flex cursor-pointer items-center gap-2 rounded-md border py-2 pr-3 pl-2 text-label font-medium transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
-              item.id === fieldId
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-input bg-card text-foreground hover:bg-secondary",
-            )}
+            className={cn("h-auto py-2 pr-3 pl-2", item.id !== fieldId && "bg-card")}
           >
             <Blobatar
               name={item.id}
               className="size-6"
             />
             {t(item.labelKey)}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -172,9 +169,10 @@ export function RoleSelector({
                   const label = getRoleLabel(slug)
                   const isSelected = activeRoles.includes(slug)
                   return (
-                    <button
+                    <Button
                       key={slug}
                       type="button"
+                      variant="outline"
                       aria-pressed={isSelected}
                       aria-label={
                         isSelected
@@ -186,15 +184,15 @@ export function RoleSelector({
                         else onSelectRole(slug)
                       }}
                       className={cn(
-                        "inline-flex cursor-pointer items-center gap-1 rounded-full border px-3 py-1.5 text-small transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        "h-auto gap-1 rounded-full px-3 py-1.5 text-small font-normal",
                         isSelected
-                          ? "border-highlight bg-highlight-soft text-highlight"
-                          : "border-input bg-card text-foreground hover:bg-secondary",
+                          ? "border-highlight bg-highlight-soft text-highlight hover:bg-highlight-soft hover:text-highlight"
+                          : "bg-card",
                       )}
                     >
                       {isSelected ? <Check className="size-3 stroke-[2.5]" /> : null}
                       {label}
-                    </button>
+                    </Button>
                   )
                 })}
               </div>
@@ -249,13 +247,14 @@ export function RoleSelector({
       )}
 
       {!isSearching && (
-        <button
+        <Button
           type="button"
+          variant="link"
           onClick={() => setIsSearching(true)}
-          className="w-fit cursor-pointer text-small text-highlight underline underline-offset-2 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="h-auto w-fit p-0 text-small font-normal text-highlight underline"
         >
           {t("onboarding.step1.searchAllRoles")}
-        </button>
+        </Button>
       )}
 
       {error && (
