@@ -1,4 +1,6 @@
 @import "@fontsource-variable/inter/wght.css";
+@import "@fontsource-variable/inter/wght-italic.css";
+@import "@fontsource-variable/bricolage-grotesque/opsz.css";
 @import "@fontsource/ibm-plex-mono/500.css";
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
@@ -34,6 +36,7 @@
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
+  --font-brand: var(--font-brand);
 
   --shadow-2xs: var(--shadow-2xs);
   --shadow-xs: var(--shadow-xs);
@@ -62,8 +65,8 @@
   --text-subheading--line-height: 1.75rem;
   --text-label: 0.875rem;
   --text-label--line-height: 1.4;
-  /* Figma C/h1 (page title of forms and reading pages), C/h1m on a phone, C/lead, C/body, C/h3.
-     `copy`, not `body`: `text-body` is already the body colour. */
+  /* Figma C/h1 (page title of forms and reading pages), C/h1m on a phone, C/lead and C/h3.
+     The 15px C/body is `compact` below. */
   --text-h1: 2rem;
   --text-h1--line-height: 1.2;
   --text-h1--letter-spacing: -0.01em;
@@ -72,16 +75,16 @@
   --text-h1-mobile--letter-spacing: -0.01em;
   --text-lead: 1.0625rem;
   --text-lead--line-height: 1.5;
-  --text-copy: 0.9375rem;
-  --text-copy--line-height: 1.5;
   --text-h3: 1.0625rem;
   --text-h3--line-height: 1.35;
   /* Figma C/small, C/mono and the wordmark. */
+  --text-compact: 0.9375rem;
+  --text-compact--line-height: 1.5;
   --text-small: 0.8125rem;
   --text-small--line-height: 1.45;
   --text-meta: 0.6875rem;
   --text-meta--line-height: 1.4;
-  --text-logo: 1.1875rem;
+  --text-logo: 1.375rem;
   --text-logo--line-height: 1.35;
   --tracking-meta: 0.08em;
 }
@@ -91,10 +94,13 @@
 :root {
   color-scheme: light;
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  /* Wordmark only (Figma logo variant C). */
+  --font-brand:
+    "Bricolage Grotesque Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* bg: the paper of every page */
-  --background: #f5f6fa;
+  --background: #eef0fa;
   /* text */
   --foreground: #10172a;
   /* body copy; between text and muted (Figma has no separate style) */

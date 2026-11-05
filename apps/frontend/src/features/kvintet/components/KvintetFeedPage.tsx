@@ -55,7 +55,7 @@ export function KvintetFeedPage({ category, onCategoryChange }: KvintetFeedPageP
   const isFilteredEmpty = activeCategory !== undefined && items?.length === 0
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 pt-16 pb-24">
+    <div className="mx-auto w-full max-w-300 px-4 pt-16 pb-24">
       <div className="flex flex-col gap-6">
         <header className="flex flex-col gap-2">
           <h1 className="text-title">{t("kvintet.title")}</h1>

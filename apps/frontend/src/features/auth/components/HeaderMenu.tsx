@@ -24,8 +24,8 @@ import { useSignOut } from "@/features/auth/hooks/useSignOut"
 // An empty username falls back to the id, hence `||` and not `??`.
 const seedOf = (user: { id: string; username: string }) => user.username || user.id
 
-// Decorative faces for the signed-out menu. Not people, so the seeds are arbitrary.
-const GUEST_SEEDS = ["guest-one", "guest-two", "guest-three"] as const
+// Decorative faces for the signed-out menu: the three shapes and colours the Figma shows.
+const GUEST_SEEDS = ["jana", "petr", "eva"] as const
 
 export function HeaderMenu() {
   const { t } = useTranslation()
@@ -62,7 +62,7 @@ export function HeaderMenu() {
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="hidden h-auto gap-2.5 p-0 text-label font-medium text-foreground hover:bg-transparent md:inline-flex"
+            className="hidden h-auto gap-2.5 p-0 text-label font-medium text-foreground hover:bg-transparent has-[>svg]:px-0 md:inline-flex"
           >
             <GazeBlobatar
               name={seedOf(user)}
@@ -135,23 +135,21 @@ export function MobileAccount() {
 
   if (!user) {
     return (
-      <div className="flex flex-col items-center gap-4 rounded-lg border border-border bg-card p-4">
+      <div className="flex flex-col items-center gap-3 rounded-lg border border-border bg-card p-4.5">
         <div
           aria-hidden
-          className="flex items-center gap-1"
+          className="flex items-center"
         >
           {GUEST_SEEDS.map((seed) => (
             <Blobatar
               key={seed}
               name={seed}
-              className="size-12"
+              className="-mr-2 size-10 last:mr-0"
               blobatar={{ expression: sleepy }}
             />
           ))}
         </div>
-        <p className="text-subheading font-semibold text-foreground">
-          {t("layout.findYourKvintet")}
-        </p>
+        <p className="text-lg font-semibold text-foreground">{t("layout.findYourKvintet")}</p>
         <div className="flex w-full flex-col gap-2.5">
           <SheetClose asChild>
             <Button asChild>

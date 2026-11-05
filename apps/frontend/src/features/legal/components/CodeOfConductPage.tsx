@@ -12,7 +12,7 @@ export function CodeOfConductPage() {
       <article className="mx-auto flex w-full max-w-180 flex-col gap-5 md:gap-6">
         <header className="flex flex-col gap-5 md:gap-2">
           <h1 className="text-h1-mobile md:text-h1">{t("codeOfConduct.title")}</h1>
-          <p className="text-copy text-muted-foreground md:text-lead">
+          <p className="text-compact text-muted-foreground md:text-lead">
             {t("codeOfConduct.subtitle")}
           </p>
         </header>
@@ -26,14 +26,14 @@ export function CodeOfConductPage() {
               <span className="font-mono text-meta tracking-meta text-highlight uppercase">
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <span className="flex-1 text-copy text-foreground">{t(`codeOfConduct.${rule}`)}</span>
+              <span className="flex-1 text-compact text-foreground">{t(`codeOfConduct.${rule}`)}</span>
             </li>
           ))}
         </ol>
 
         <section className="flex flex-col gap-5 md:gap-2">
           <h2 className="text-h3">{t("codeOfConduct.reportTitle")}</h2>
-          <p className="text-copy text-muted-foreground">
+          <p className="text-compact text-muted-foreground">
             <Trans
               i18nKey="codeOfConduct.reportIntro"
               values={{ email: SUPPORT_EMAIL }}

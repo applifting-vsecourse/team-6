@@ -22,7 +22,7 @@ export function AuthLayout({ title, description, children, footer, header }: Aut
         <div className="mx-auto w-full max-w-105">
           <div className="flex flex-col gap-5 md:gap-2">
             <h1 className="text-h1-mobile md:text-h1">{title}</h1>
-            <p className="text-copy text-muted-foreground md:text-lead">{description}</p>
+            <p className="text-compact text-muted-foreground md:text-lead">{description}</p>
           </div>
 
           <div className="mt-5 md:mt-4.5">{children}</div>

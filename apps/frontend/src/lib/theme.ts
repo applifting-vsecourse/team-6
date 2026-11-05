@@ -4,7 +4,7 @@ export type Theme = "light" | "dark"
 
 const STORAGE_KEY = "theme"
 // Same values as the `background` token in each theme; tints the mobile browser chrome.
-const THEME_COLOR: Record<Theme, string> = { light: "#f5f6fa", dark: "#0d1220" }
+const THEME_COLOR: Record<Theme, string> = { light: "#eef0fa", dark: "#0d1220" }
 
 const listeners = new Set<() => void>()
 

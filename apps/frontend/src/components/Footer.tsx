@@ -9,7 +9,7 @@ export function Footer() {
 
   return (
     <footer className="border-t border-border bg-background px-4 py-6 md:py-0">
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-2.5 md:h-16 md:flex-row md:items-center md:gap-6">
+      <div className="mx-auto flex w-full max-w-300 flex-col gap-2.5 md:h-16 md:flex-row md:items-center md:gap-6">
         <div className="flex flex-wrap gap-x-5 gap-y-1 text-small text-muted-foreground md:gap-6">
           <Link
             to={ROUTES.home}

@@ -45,13 +45,13 @@ describe("theme", () => {
   it("tints the browser chrome with the theme's background", () => {
     const meta = document.createElement("meta")
     meta.name = "theme-color"
-    meta.content = "#f5f6fa"
+    meta.content = "#eef0fa"
     document.head.append(meta)
 
     setTheme("dark")
     expect(meta.content).toBe("#0d1220")
 
     setTheme("light")
-    expect(meta.content).toBe("#f5f6fa")
+    expect(meta.content).toBe("#eef0fa")
   })
 })

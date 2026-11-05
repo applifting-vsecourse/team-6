@@ -40,7 +40,7 @@ export function Header({
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background px-4">
-      <div className="mx-auto flex h-14 w-full max-w-4xl items-center gap-3 md:h-16 md:gap-7">
+      <div className="mx-auto flex h-14 w-full max-w-300 items-center gap-3 md:h-16 md:gap-7">
         <div className="flex items-center gap-3">
           <HeaderLogo />
           {step ? (

@@ -9,6 +9,6 @@ describe("cn", () => {
 
   it("lets a later font size win over an earlier one", () => {
     expect(cn("text-base text-small")).toBe("text-small")
-    expect(cn("text-label", "text-copy")).toBe("text-copy")
+    expect(cn("text-label", "text-compact")).toBe("text-compact")
   })
 })

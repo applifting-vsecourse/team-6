@@ -105,7 +105,7 @@ function OverviewPage() {
   return (
     <>
       <Seo title={t("overview.title")} />
-      <div className="relative mx-auto w-full max-w-4xl px-4 pt-16 pb-24">
+      <div className="relative mx-auto w-full max-w-300 px-4 pt-16 pb-24">
         <ThemedImage
           light={watermark}
           dark={watermarkDark}
