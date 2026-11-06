@@ -13,8 +13,8 @@
   "auth": {
     "acceptCodeOfConduct": "I have read and accept the <coc>code of conduct</coc>",
     "confirmPassword": "Confirm password",
-    "editProfile": "Edit profile",
     "createAccount": "Create account",
+    "editProfile": "Edit profile",
     "email": "Email",
     "emailPlaceholder": "e.g. jana@company.com",
     "haveAccount": "Already have an account?",

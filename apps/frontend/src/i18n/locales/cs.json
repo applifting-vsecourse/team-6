@@ -13,8 +13,8 @@
   "auth": {
     "acceptCodeOfConduct": "Přečetl/a jsem si <coc>kodex chování</coc> a souhlasím s ním",
     "confirmPassword": "Potvrzení hesla",
-    "editProfile": "Upravit profil",
     "createAccount": "Vytvořit účet",
+    "editProfile": "Upravit profil",
     "email": "E-mail",
     "emailPlaceholder": "např. jana@firma.cz",
     "haveAccount": "Už máte účet?",
