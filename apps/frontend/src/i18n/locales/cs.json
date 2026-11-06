@@ -337,7 +337,7 @@
     "step1": {
       "addRole": "Vybrat roli {{name}}",
       "addTag": "Přidat štítek {{name}}",
-      "description": "Ostatní uvidí vaši roli a štítky. Vaše jméno až po startu kvintetu.",
+      "description": "Podle profilu vám navrhneme skupiny. Ostatní uvidí vaši roli a štítky – nikdy fotku.",
       "fields": {
         "data": "Data a AI",
         "design": "Design",
@@ -347,8 +347,8 @@
         "product": "Produkt a management",
         "tech": "Technologie a vývoj"
       },
-      "interestsTitle": "Zajímá mě",
-      "learnTitle": "Chci se naučit",
+      "interestsTitle": "Zájmy",
+      "learnTitle": "Co se chci naučit",
       "removeRole": "Odebrat roli {{name}}",
       "removeTag": "Odebrat štítek {{name}}",
       "role": "Čemu se věnujete?",
@@ -360,9 +360,9 @@
       "searchRolePlaceholder": "Hledat roli…",
       "searchTagsAria": "Hledat štítky v sekci {{section}}",
       "searchTagsPlaceholder": "Hledat štítky…",
-      "teachHint": "Vyberte libovolný počet.",
-      "teachTitle": "Umím naučit",
-      "title": "Řekněte nám o sobě"
+      "teachHint": "Vyberte libovolný počet štítků.",
+      "teachTitle": "Co umím naučit",
+      "title": "Řekněte nám něco o sobě"
     },
     "step2": {
       "afternoons": "Odpoledne",

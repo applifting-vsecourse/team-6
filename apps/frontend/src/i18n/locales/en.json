@@ -331,7 +331,7 @@
     "step1": {
       "addRole": "Select role {{name}}",
       "addTag": "Add tag {{name}}",
-      "description": "Others see your role and tags. Your name only once the kvintet starts.",
+      "description": "We'll suggest groups based on your profile. Others will see your role and tags – never a photo.",
       "fields": {
         "data": "Data & AI",
         "design": "Design",
@@ -341,8 +341,8 @@
         "product": "Product & management",
         "tech": "Tech & dev"
       },
-      "interestsTitle": "I'm interested in",
-      "learnTitle": "I want to learn",
+      "interestsTitle": "Interests",
+      "learnTitle": "What I want to learn",
       "removeRole": "Remove role {{name}}",
       "removeTag": "Remove tag {{name}}",
       "role": "What do you do?",
@@ -354,9 +354,9 @@
       "searchRolePlaceholder": "Search role…",
       "searchTagsAria": "Search tags in {{section}}",
       "searchTagsPlaceholder": "Search tags…",
-      "teachHint": "Pick as many as you like.",
-      "teachTitle": "I can teach",
-      "title": "Tell us about you"
+      "teachHint": "Pick any number of tags.",
+      "teachTitle": "What I can teach",
+      "title": "Tell us about yourself"
     },
     "step2": {
       "afternoons": "Afternoons",

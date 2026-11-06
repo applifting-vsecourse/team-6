@@ -93,7 +93,7 @@ describe("OnboardingWizard", () => {
     render(<Wizard />, { wrapper: createWrapper() })
 
     // Step 1
-    expect(await screen.findByText("Tell us about you")).toBeInTheDocument()
+    expect(await screen.findByText("Tell us about yourself")).toBeInTheDocument()
     await userEvent.click(await screen.findByRole("button", { name: "Tech & dev" }))
     await userEvent.click(screen.getByRole("button", { name: "Select role Software Engineer" }))
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
@@ -143,7 +143,7 @@ describe("OnboardingWizard", () => {
     })
     render(<Wizard />, { wrapper: createWrapper() })
 
-    expect(await screen.findByText("Tell us about you")).toBeInTheDocument()
+    expect(await screen.findByText("Tell us about yourself")).toBeInTheDocument()
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
     expect(await screen.findByText("When and where can you meet?")).toBeInTheDocument()
     await userEvent.click(screen.getByLabelText("Evenings"))
@@ -158,7 +158,7 @@ describe("OnboardingWizard", () => {
   it("supports going back to earlier steps", async () => {
     render(<Wizard />, { wrapper: createWrapper() })
 
-    expect(await screen.findByText("Tell us about you")).toBeInTheDocument()
+    expect(await screen.findByText("Tell us about yourself")).toBeInTheDocument()
     await userEvent.click(await screen.findByRole("button", { name: "Design" }))
     await userEvent.click(screen.getByRole("button", { name: "Select role UX/UI Designer" }))
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
@@ -166,7 +166,7 @@ describe("OnboardingWizard", () => {
     expect(await screen.findByText("When and where can you meet?")).toBeInTheDocument()
     await userEvent.click(screen.getByRole("button", { name: "Back" }))
 
-    expect(await screen.findByText("Tell us about you")).toBeInTheDocument()
+    expect(await screen.findByText("Tell us about yourself")).toBeInTheDocument()
     expect(screen.getByText("UX/UI Designer")).toBeInTheDocument()
   })
 
@@ -180,7 +180,7 @@ describe("OnboardingWizard", () => {
     )
 
     expect(await screen.findByText("When and where can you meet?")).toBeInTheDocument()
-    expect(screen.queryByText("Tell us about you")).not.toBeInTheDocument()
+    expect(screen.queryByText("Tell us about yourself")).not.toBeInTheDocument()
   })
 
   it("asks the route to change the step instead of keeping one of its own", async () => {
@@ -200,7 +200,7 @@ describe("OnboardingWizard", () => {
 
     expect(onStepChange).toHaveBeenCalledWith(2)
     // Still step 1 until the route updates the URL and passes the new step back.
-    expect(screen.getByText("Tell us about you")).toBeInTheDocument()
+    expect(screen.getByText("Tell us about yourself")).toBeInTheDocument()
   })
 
   it("renders error alert when profile query fails", async () => {
