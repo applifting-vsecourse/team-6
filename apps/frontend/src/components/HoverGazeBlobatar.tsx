@@ -1,5 +1,6 @@
 import { useState } from "react"
 import type { Palette } from "blobatar"
+import type { Expression } from "blobatar/expression"
 
 import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Blobatar } from "@/components/ui/blobatar"
@@ -9,6 +10,8 @@ type HoverGazeBlobatarProps = {
   name: string
   className?: string
   palette?: Palette
+  /** A pose to hold, static and animated alike. */
+  expression?: Expression
   /** Eye excursion; keep it larger on small avatars. */
   travel?: number
 }
@@ -21,6 +24,7 @@ export function HoverGazeBlobatar({
   name,
   className = "size-8",
   palette,
+  expression,
   travel = 6,
 }: HoverGazeBlobatarProps) {
   const [isHovered, setIsHovered] = useState(false)
@@ -37,13 +41,14 @@ export function HoverGazeBlobatar({
           animate="hover"
           travel={travel}
           palette={palette}
+          expression={expression}
           className="size-full"
         />
       ) : (
         <Blobatar
           name={name}
           className="size-full"
-          blobatar={palette ? { palette } : undefined}
+          blobatar={palette || expression ? { palette, expression } : undefined}
         />
       )}
     </span>
