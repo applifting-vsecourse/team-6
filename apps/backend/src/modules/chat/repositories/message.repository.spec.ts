@@ -257,6 +257,110 @@ describe('MessageRepository (Postgres)', () => {
     ]);
   });
 
+  describe('unread messages', () => {
+    const readMark = async (userId: string): Promise<number> =>
+      (
+        await prisma.kvintetMember.findUniqueOrThrow({
+          where: { userId },
+          select: { lastReadMessageId: true },
+        })
+      ).lastReadMessageId;
+
+    it("counts others' messages, not the caller's own or SYSTEM lines", async () => {
+      const [me, other] = await Promise.all([
+        createUser('unread-me'),
+        createUser('unread-other'),
+      ]);
+      const kvintetId = await createKvintet([me, other]);
+      await seedMessages(kvintetId, other, 2);
+      await seedMessages(kvintetId, me, 3);
+      await prisma.message.create({
+        data: { kvintetId, kind: 'SYSTEM', body: 'someone left' },
+      });
+
+      await expect(repository.countUnread(me, kvintetId)).resolves.toBe(2);
+      await expect(repository.countUnread(other, kvintetId)).resolves.toBe(3);
+    });
+
+    it('still counts messages whose author deleted their account', async () => {
+      const [me, gone] = await Promise.all([
+        createUser('unread-keep'),
+        createUser('unread-gone'),
+      ]);
+      const kvintetId = await createKvintet([me, gone]);
+      await seedMessages(kvintetId, gone, 2);
+      await prisma.user.delete({ where: { id: gone } });
+
+      await expect(repository.countUnread(me, kvintetId)).resolves.toBe(2);
+    });
+
+    it('moves the read mark forward only and never past the newest message', async () => {
+      const [me, other] = await Promise.all([
+        createUser('mark-me'),
+        createUser('mark-other'),
+      ]);
+      const kvintetId = await createKvintet([me, other]);
+      const ids = await seedMessages(kvintetId, other, 4);
+
+      await repository.markRead(me, kvintetId, ids[1]);
+      expect(await readMark(me)).toBe(ids[1]);
+      await expect(repository.countUnread(me, kvintetId)).resolves.toBe(2);
+
+      await repository.markRead(me, kvintetId, ids[0]);
+      expect(await readMark(me)).toBe(ids[1]);
+
+      await repository.markRead(me, kvintetId, 2_147_483_647);
+      expect(await readMark(me)).toBe(ids[3]);
+      await expect(repository.countUnread(me, kvintetId)).resolves.toBe(0);
+
+      // A message that arrives later is unread again; the made-up id did not hide it.
+      await seedMessages(kvintetId, other, 1);
+      await expect(repository.countUnread(me, kvintetId)).resolves.toBe(1);
+    });
+
+    it("keeps each member's mark to themselves", async () => {
+      const [me, other] = await Promise.all([
+        createUser('own-mark-me'),
+        createUser('own-mark-other'),
+      ]);
+      const kvintetId = await createKvintet([me, other]);
+      const ids = await seedMessages(kvintetId, other, 2);
+
+      await repository.markRead(me, kvintetId, ids[1]);
+
+      expect(await readMark(other)).toBe(0);
+    });
+
+    it('does nothing for someone who is no longer a member', async () => {
+      const [stayer, leaver] = await Promise.all([
+        createUser('mark-stayer'),
+        createUser('mark-leaver'),
+      ]);
+      const kvintetId = await createKvintet([stayer, leaver]);
+      const ids = await seedMessages(kvintetId, stayer, 1);
+      await leave(kvintetId, leaver);
+
+      await expect(
+        repository.markRead(leaver, kvintetId, ids[0]),
+      ).resolves.toBeUndefined();
+      await expect(repository.countUnread(leaver, kvintetId)).resolves.toBe(0);
+    });
+
+    it("ignores a mark for a kvintet the caller isn't in", async () => {
+      const [me, outsider] = await Promise.all([
+        createUser('foreign-me'),
+        createUser('foreign-out'),
+      ]);
+      await createKvintet([me]);
+      const theirs = await createKvintet([outsider]);
+      const ids = await seedMessages(theirs, outsider, 2);
+
+      await repository.markRead(me, theirs, ids[1]);
+
+      expect(await readMark(me)).toBe(0);
+    });
+  });
+
   it('deletes the messages together with their kvintet', async () => {
     const author = await createUser('cascade');
     const kvintetId = await createKvintet([author]);

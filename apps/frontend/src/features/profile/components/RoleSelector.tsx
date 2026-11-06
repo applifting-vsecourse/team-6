@@ -165,7 +165,7 @@ export function RoleSelector({
 
       {suggestedRoles.length > 0 && (
         <div className="flex flex-col gap-2 pt-1">
-          <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
+          <p className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
             {t("onboarding.step1.recommendedRoles")}
           </p>
           <div className="flex flex-wrap gap-2">

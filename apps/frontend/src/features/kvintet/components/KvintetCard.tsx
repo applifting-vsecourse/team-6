@@ -2,12 +2,12 @@ import type { TFunction } from "i18next"
 import { Loader2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
-import { Blobatar } from "@/components/ui/blobatar"
+import { AnonymousBlobatar, FreeSeat } from "@/components/AnonymousBlobatar"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { formatList } from "@/lib/date"
 
-import type { FeedKvintet } from "@/features/kvintet/api/kvintetFeedQueryOptions"
+import type { FeedKvintet, FeedReason } from "@/features/kvintet/api/kvintetFeedQueryOptions"
 import { KvintetCapacity } from "@/features/kvintet/components/KvintetCapacity"
 import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
 
@@ -36,6 +36,23 @@ function describeMember(
     .join(" · ")
 }
 
+function describeReason(
+  reason: FeedReason,
+  t: TFunction,
+  label: ReturnType<typeof useSlugLabel>,
+): string {
+  switch (reason.code) {
+    case "learn":
+    case "teach":
+    case "interest":
+      return t(`kvintet.reasons.${reason.code}`, { tag: label("tags", reason.tag) })
+    case "topic":
+      return t("kvintet.reasons.topic", { category: label("categories", reason.category) })
+    default:
+      return t(`kvintet.reasons.${reason.code}`)
+  }
+}
+
 export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetCardProps) {
   const { t } = useTranslation()
   const label = useSlugLabel()
@@ -47,9 +64,16 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
       aria-labelledby={titleId}
       className="gap-4 rounded-lg bg-secondary px-7 py-6"
     >
-      <span className="inline-flex self-start rounded-full border border-input px-2.5 py-0.5 font-mono text-xs tracking-meta text-body uppercase">
-        {label("categories", kvintet.category)}
-      </span>
+      <div className="flex flex-wrap gap-2">
+        {kvintet.categories.map((slug) => (
+          <span
+            key={slug}
+            className="inline-flex rounded-full border border-input px-2.5 py-0.5 font-mono text-meta tracking-meta text-body uppercase"
+          >
+            {label("categories", slug)}
+          </span>
+        ))}
+      </div>
 
       <div className="flex items-center justify-between gap-4">
         <h2
@@ -64,8 +88,23 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
         />
       </div>
 
+      {kvintet.reasons.length ? (
+        // Plain text, not a list: the card's list is its members.
+        <p className="flex flex-wrap gap-2">
+          <span className="sr-only">{t("kvintet.reasons.label")}</span>
+          {kvintet.reasons.map((reason) => (
+            <span
+              key={`${reason.code}-${"tag" in reason ? reason.tag : ""}`}
+              className="rounded-full border border-border px-2.5 py-0.5 text-sm text-body"
+            >
+              {describeReason(reason, t, label)}
+            </span>
+          ))}
+        </p>
+      ) : null}
+
       {kvintet.meetingFrequency ? (
-        <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
+        <p className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
           {t("kvintet.suitsAll", { value: t(`meetingFrequency.${kvintet.meetingFrequency}`) })}
         </p>
       ) : null}
@@ -77,9 +116,10 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
             className="flex items-center gap-3 border-t border-border py-2.5"
           >
             {/* The feed never carries a name, so the face is seeded by the seat, not the person. */}
-            <Blobatar
-              name={`${kvintet.id}-seat-${index}`}
-              className="size-10 shrink-0"
+            <AnonymousBlobatar
+              seed={`${kvintet.id}-seat-${index}`}
+              className="size-12 shrink-0"
+              motion="hover"
             />
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
               <p className="text-base font-semibold text-foreground sm:w-56 sm:shrink-0">
@@ -94,10 +134,7 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
             key={`free-${index}`}
             className="flex items-center gap-3 border-t border-border py-2.5 text-muted-foreground"
           >
-            <span
-              aria-hidden="true"
-              className="size-10 shrink-0 rounded-full border border-dashed border-border"
-            />
+            <FreeSeat className="size-12" />
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
               <p className="text-base font-semibold sm:w-56 sm:shrink-0">{t("kvintet.vacancy")}</p>
               <p className="text-sm">{t("kvintet.vacancyHint")}</p>

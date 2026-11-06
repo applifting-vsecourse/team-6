@@ -74,6 +74,46 @@ export class MessageRepository {
     return (forward ? rows : rows.reverse()).map(toMessage);
   }
 
+  /** Messages from other members (and from deleted accounts) after the caller's read mark. */
+  async countUnread(userId: string, kvintetId: string): Promise<number> {
+    const member = await this.prisma.kvintetMember.findUnique({
+      where: { userId },
+      select: { lastReadMessageId: true },
+    });
+    if (!member) return 0;
+    return this.prisma.message.count({
+      where: {
+        kvintetId,
+        kind: 'USER',
+        id: { gt: member.lastReadMessageId },
+        // `not` alone would drop NULL authors, i.e. members who deleted their account.
+        OR: [{ authorId: null }, { authorId: { not: userId } }],
+      },
+    });
+  }
+
+  /**
+   * Moves the caller's read mark up to `lastMessageId`, never backwards and never past the
+   * newest message, so a made-up id cannot hide messages that are yet to come. Matching no row
+   * (the caller just left) is fine: there is nothing left to mark.
+   */
+  async markRead(
+    userId: string,
+    kvintetId: string,
+    lastMessageId: number,
+  ): Promise<void> {
+    await this.prisma.$executeRaw`
+      UPDATE "kvintet_member"
+      SET "lastReadMessageId" = GREATEST(
+        "lastReadMessageId",
+        LEAST(
+          ${lastMessageId}::int,
+          COALESCE((SELECT MAX("id") FROM "message" WHERE "kvintetId" = ${kvintetId}::uuid), 0)
+        )
+      )
+      WHERE "userId" = ${userId} AND "kvintetId" = ${kvintetId}::uuid`;
+  }
+
   /**
    * Locks the kvintet row, then re-checks membership and status: the guard alone is
    * not enough because a concurrent Leave can pass it. The lock also makes ids commit

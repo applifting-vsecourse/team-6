@@ -9,10 +9,13 @@ import { ROUTES } from "@/app/routes"
 import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Seo } from "@/components/Seo"
 import { Blobatar } from "@/components/ui/blobatar"
+import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api-client"
 import { formatDate } from "@/lib/date"
 import { getErrorMessage } from "@/lib/errorMessage"
 
+import { DeleteAccountDialog } from "@/features/account/components/DeleteAccountDialog"
+import { useDeleteAccount } from "@/features/account/hooks/useDeleteAccount"
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
 import { useSession } from "@/features/auth/hooks/useSession"
 import { messagesQueryOptions } from "@/features/chat/api/chatApi"
@@ -62,6 +65,8 @@ function OverviewPage() {
   const profileQuery = useQuery(profileQueryOptions(user?.id))
   const profile = profileQuery.data
   const isOnboarded = Boolean(profile?.onboardingCompletedAt)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const deleteAccount = useDeleteAccount()
 
   const myKvintet = useMyKvintet()
   const kvintet = myKvintet.data
@@ -262,15 +267,15 @@ function OverviewPage() {
                 />
               )}
 
-              {feedQuery.isSuccess && feedQuery.data.length === 0 && (
+              {feedQuery.isSuccess && feedQuery.data.items.length === 0 && (
                 <div className="rounded-[12px] border border-[#DDE2EC] bg-white p-8 text-center text-[#5B6582] dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
                   <p className="text-[15px]">{t("overview.noKvintet.empty")}</p>
                 </div>
               )}
 
-              {feedQuery.isSuccess && feedQuery.data.length > 0 && (
+              {feedQuery.isSuccess && feedQuery.data.items.length > 0 && (
                 <div className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {feedQuery.data.slice(0, 3).map((proposal) => (
+                  {feedQuery.data.items.slice(0, 3).map((proposal) => (
                     <ProposalCard
                       key={proposal.id}
                       proposal={proposal}
@@ -602,8 +607,25 @@ function OverviewPage() {
               />
             </>
           )}
+
+          <div className="mt-4 flex justify-end border-t border-[#DDE2EC] pt-4 dark:border-slate-800">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-auto self-start p-0 text-sm text-destructive underline underline-offset-4 hover:bg-transparent hover:text-destructive/80"
+              onClick={() => setIsDeleteDialogOpen(true)}
+            >
+              {t("account.deleteAccount")}
+            </Button>
+          </div>
         </div>
       </div>
+      <DeleteAccountDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={() => deleteAccount.mutate()}
+        isDeleting={deleteAccount.isPending}
+      />
     </>
   )
 }
@@ -689,8 +711,8 @@ function ProposalCard({
   const freeSeats = Math.max(proposal.capacity - proposal.memberCount, 0)
 
   const metaParts: string[] = []
-  if (proposal.category) {
-    metaParts.push(label("categories", proposal.category))
+  if (proposal.categories.length > 0) {
+    metaParts.push(proposal.categories.map((c) => label("categories", c)).join(", "))
   }
   if (proposal.meetingFrequency) {
     metaParts.push(t(`meetingFrequency.${proposal.meetingFrequency}`))

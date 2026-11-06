@@ -2,7 +2,7 @@ import type { ComponentType, ReactNode } from "react"
 import type * as ReactQuery from "@tanstack/react-query"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import type * as ReactRouter from "@tanstack/react-router"
-import { render, screen } from "@testing-library/react"
+import { fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -61,7 +61,7 @@ const mockMyKvintet = vi.hoisted(() => ({
 }))
 
 const mockFeed = vi.hoisted(() => ({
-  data: [] as FeedKvintet[],
+  data: { items: [] as FeedKvintet[], fallback: false },
   isLoading: false,
   isError: false,
   isSuccess: true,
@@ -86,6 +86,7 @@ const mockMessages = vi.hoisted(() => ({
   },
   isLoading: false,
 }))
+const deleteAccountMutate = vi.fn()
 
 vi.mock("@/features/auth/hooks/useSession", () => ({
   useSession: () => ({ user: { id: "u1", name: "Jana Nováková", username: "jana" } }),
@@ -101,6 +102,10 @@ vi.mock("@/lib/api-client", () => ({
       json: vi.fn().mockResolvedValue({}),
     })),
   },
+}))
+
+vi.mock("@/features/account/hooks/useDeleteAccount", () => ({
+  useDeleteAccount: () => ({ mutate: deleteAccountMutate, isPending: false }),
 }))
 
 vi.mock("sonner", () => ({
@@ -148,6 +153,7 @@ const OverviewPage = Route.options.component as ComponentType
 describe("OverviewPage - 4 States and Lifecycle", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    deleteAccountMutate.mockReset()
     mockProfile.data = {
       id: "p1",
       userId: "u1",
@@ -163,7 +169,7 @@ describe("OverviewPage - 4 States and Lifecycle", () => {
     mockMyKvintet.data = null
     mockMyKvintet.isLoading = false
     mockMyKvintet.isError = false
-    mockFeed.data = []
+    mockFeed.data = { items: [], fallback: false }
     mockFeed.isLoading = false
     mockFeed.isError = false
     mockMessages.data = { messages: [], hasEarlier: false }
@@ -194,33 +200,38 @@ describe("OverviewPage - 4 States and Lifecycle", () => {
 
   describe("State 2: No Kvintet", () => {
     it("shows best-matching proposals inline with Join button, See all and Start your own", async () => {
-      mockFeed.data = [
-        {
-          id: "k-1",
-          title: "AI at work",
-          category: "technology",
-          capacity: 5,
-          memberCount: 3,
-          meetingFrequency: "BIWEEKLY",
-          members: [
-            { position: "Dev", teach: [], learn: [], interests: [] },
-            { position: "PM", teach: [], learn: [], interests: [] },
-            { position: "Designer", teach: [], learn: [], interests: [] },
-          ],
-        },
-        {
-          id: "k-2",
-          title: "Python for Data",
-          category: "technology",
-          capacity: 5,
-          memberCount: 2,
-          meetingFrequency: "WEEKLY",
-          members: [
-            { position: "Analyst", teach: [], learn: [], interests: [] },
-            { position: "Dev", teach: [], learn: [], interests: [] },
-          ],
-        },
-      ]
+      mockFeed.data = {
+        fallback: false,
+        items: [
+          {
+            id: "k-1",
+            title: "AI at work",
+            categories: ["technology"],
+            capacity: 5,
+            memberCount: 3,
+            meetingFrequency: "BIWEEKLY",
+            members: [
+              { position: "Dev", teach: [], learn: [], interests: [] },
+              { position: "PM", teach: [], learn: [], interests: [] },
+              { position: "Designer", teach: [], learn: [], interests: [] },
+            ],
+            reasons: [],
+          },
+          {
+            id: "k-2",
+            title: "Python for Data",
+            categories: ["technology"],
+            capacity: 5,
+            memberCount: 2,
+            meetingFrequency: "WEEKLY",
+            members: [
+              { position: "Analyst", teach: [], learn: [], interests: [] },
+              { position: "Dev", teach: [], learn: [], interests: [] },
+            ],
+            reasons: [],
+          },
+        ],
+      }
 
       renderWithClient(<OverviewPage />)
 
@@ -442,5 +453,23 @@ describe("OverviewPage - 4 States and Lifecycle", () => {
       await userEvent.click(retryBtn)
       expect(mockProfile.refetch).toHaveBeenCalled()
     })
+  })
+
+  it("opens delete account dialog from profile card and confirms deletion", async () => {
+    renderWithClient(<OverviewPage />)
+
+    const triggerButton = screen.getByRole("button", { name: "Delete account" })
+    expect(triggerButton).toBeInTheDocument()
+
+    fireEvent.click(triggerButton)
+
+    expect(await screen.findByRole("heading", { name: "Delete account" })).toBeInTheDocument()
+    expect(screen.getByText(/Are you sure you want to delete your account\?/i)).toBeInTheDocument()
+
+    // Confirm button in dialog (the trigger button is aria-hidden while dialog is open)
+    const confirmButton = screen.getByRole("button", { name: "Delete account" })
+    fireEvent.click(confirmButton)
+
+    expect(deleteAccountMutate).toHaveBeenCalledOnce()
   })
 })
