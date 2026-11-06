@@ -58,7 +58,7 @@ export function Step1Profile({ initialData, allTags, onContinue }: Step1ProfileP
       className="flex flex-col gap-7"
     >
       <div className="flex flex-col gap-2">
-        <h1 className="font-serif text-title text-foreground">{t("onboarding.step1.title")}</h1>
+        <h1 className="text-title text-foreground">{t("onboarding.step1.title")}</h1>
         <p className="text-lg text-foreground/80">{t("onboarding.step1.description")}</p>
       </div>
 

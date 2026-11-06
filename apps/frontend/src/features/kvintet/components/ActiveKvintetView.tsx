@@ -35,14 +35,14 @@ export function ActiveKvintetView({ kvintet, onLeave, isLeaving }: ActiveKvintet
       {/* Header section */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <span className="inline-flex rounded-full bg-primary/10 px-3 py-1 font-mono text-xs tracking-meta text-primary uppercase">
+          <span className="inline-flex rounded-full bg-primary/10 px-3 py-1 font-mono text-meta tracking-meta text-primary uppercase">
             {t("kvintet.statusActive")}
           </span>
         </div>
 
         <h1 className="text-title">{kvintet.title}</h1>
 
-        <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
+        <p className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
           {formattedPreferences
             ? t("kvintet.activeSubtitleWithPreferences", {
                 date: activatedDate,

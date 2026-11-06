@@ -43,7 +43,7 @@ export function KvintetCapacity({ filled, total }: KvintetCapacityProps) {
           />
         ))}
       </div>
-      <p className="font-mono text-xs tracking-meta whitespace-nowrap text-body uppercase">
+      <p className="font-mono text-meta tracking-meta whitespace-nowrap text-body uppercase">
         {t("kvintet.seats", { filled: formatNumber(filled), total: formatNumber(total) })}
       </p>
     </div>

@@ -1,8 +1,6 @@
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import { GazeBlobatar } from "@/components/GazeBlobatar"
-import { Blobatar } from "@/components/ui/blobatar"
+import { HoverGazeBlobatar } from "@/components/HoverGazeBlobatar"
 import { formatTime } from "@/lib/date"
 import { cn } from "@/lib/utils"
 
@@ -18,9 +16,6 @@ const DELETED_AUTHOR_SEED = "deleted-member"
 
 export function MessageItem({ message, isOwn }: MessageItemProps) {
   const { t } = useTranslation()
-  // A chat has many avatars, so they stay static and only the one under the mouse is mounted animated.
-  const [isHovered, setIsHovered] = useState(false)
-
   if (message.kind === "SYSTEM") {
     return <li className="text-center text-sm text-muted-foreground">{message.body}</li>
   }
@@ -31,21 +26,11 @@ export function MessageItem({ message, isOwn }: MessageItemProps) {
 
   return (
     <li className={cn("flex items-end gap-3", isOwn && "flex-row-reverse")}>
-      <span
-        className="mb-0.5 shrink-0"
-        onPointerEnter={(event) => setIsHovered(event.pointerType === "mouse")}
-        onPointerLeave={() => setIsHovered(false)}
-      >
-        {isHovered ? (
-          <GazeBlobatar
-            name={seed}
-            animate="hover"
-            travel={6}
-          />
-        ) : (
-          <Blobatar name={seed} />
-        )}
-      </span>
+      {/* A chat has many avatars: static, and only the one under the mouse is animated. */}
+      <HoverGazeBlobatar
+        name={seed}
+        className="mb-0.5 size-9"
+      />
       <div className={cn("flex max-w-xl min-w-0 flex-col gap-1", isOwn && "items-end")}>
         <p className="flex items-baseline gap-2 text-sm">
           <span className="font-semibold text-foreground">{name}</span>

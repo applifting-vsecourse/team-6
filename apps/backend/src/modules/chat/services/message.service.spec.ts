@@ -73,4 +73,63 @@ describe('MessageService', () => {
     repository.send.mockResolvedValueOnce({ result: 'sent', message });
     await expect(service.send('u1', 'Hi')).resolves.toEqual(message);
   });
+
+  describe('unread and read marks', () => {
+    it('counts for an active kvintet', async () => {
+      const { repository, service } = setup();
+      repository.findAccess.mockResolvedValue({
+        kvintetId: 'k1',
+        active: true,
+      });
+      repository.countUnread.mockResolvedValue(3);
+
+      await expect(service.unread('u1')).resolves.toEqual({
+        active: true,
+        count: 3,
+      });
+      expect(repository.countUnread).toHaveBeenCalledWith('u1', 'k1');
+    });
+
+    it('answers a forming kvintet with active: false instead of an error', async () => {
+      const { repository, service } = setup();
+      repository.findAccess.mockResolvedValue({
+        kvintetId: 'k1',
+        active: false,
+      });
+
+      await expect(service.unread('u1')).resolves.toEqual({
+        active: false,
+        count: 0,
+      });
+      expect(repository.countUnread).not.toHaveBeenCalled();
+    });
+
+    it('refuses a caller outside any kvintet with 403', async () => {
+      const { repository, service } = setup();
+      repository.findAccess.mockResolvedValue(null);
+
+      await expect(service.unread('u1')).rejects.toThrow(ForbiddenException);
+      await expect(service.markRead('u1', 5)).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+
+    it('marks read in an active kvintet and refuses a forming one', async () => {
+      const { repository, service } = setup();
+      repository.findAccess.mockResolvedValueOnce({
+        kvintetId: 'k1',
+        active: true,
+      });
+      await service.markRead('u1', 5);
+      expect(repository.markRead).toHaveBeenCalledWith('u1', 'k1', 5);
+
+      repository.findAccess.mockResolvedValueOnce({
+        kvintetId: 'k1',
+        active: false,
+      });
+      const error = await service.markRead('u1', 5).catch((e) => e);
+      expect(error).toBeInstanceOf(ConflictException);
+      expect(error.getResponse()).toMatchObject({ code: 'kvintet_not_active' });
+    });
+  });
 });

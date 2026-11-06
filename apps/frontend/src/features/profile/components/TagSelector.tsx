@@ -67,7 +67,7 @@ export function TagSelector({
   return (
     <div className="flex flex-col gap-3 border-t border-border pt-6">
       <div className="flex flex-col gap-0.5">
-        <h3 className="font-serif text-subheading font-semibold text-foreground">{title}</h3>
+        <h3 className="text-subheading font-semibold text-foreground">{title}</h3>
         {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
       </div>
 
@@ -100,7 +100,7 @@ export function TagSelector({
 
       {suggestedTags.length > 0 && (
         <div className="flex flex-col gap-2 pt-1">
-          <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
+          <p className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
             {t("onboarding.step1.recommended")}
           </p>
           <div className="flex flex-wrap gap-2">

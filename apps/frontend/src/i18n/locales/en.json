@@ -299,12 +299,24 @@
   },
   "layout": {
     "closeMenu": "Close menu",
+    "communityRules": "Community rules",
     "contactSupport": "Contact support",
+    "createAccount": "Create account",
+    "findYourKvintet": "Find your kvintet.",
+    "goTo": "Go to",
+    "groupChat": "Group chat",
+    "howItWorks": "How Kvintet works",
+    "learnMore": "Learn more",
     "mainNavigation": "Main navigation",
     "menu": "Menu",
     "openMenu": "Open menu",
+    "rules": "Rules",
+    "settings": "Settings",
+    "support": "Support",
     "switchToDark": "Switch to dark theme",
-    "switchToLight": "Switch to light theme"
+    "switchToLight": "Switch to light theme",
+    "unreadMessages_one": "{{count}} unread message",
+    "unreadMessages_other": "{{count}} unread messages"
   },
   "meetingFrequency": {
     "BIWEEKLY": "every 14 days",
@@ -391,6 +403,7 @@
       "title": "What do you expect from a kvintet?"
     },
     "stepProgress": "Step {{current}} of {{total}}",
+    "stepShort": "{{current}} / {{total}}",
     "title": "Onboarding"
   },
   "overview": {

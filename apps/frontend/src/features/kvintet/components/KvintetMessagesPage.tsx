@@ -32,7 +32,7 @@ export function KvintetMessagesPage({ renderChat }: KvintetMessagesPageProps) {
   return (
     <>
       <Seo title={t("chat.pageTitle")} />
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 md:py-12">
+      <div className="mx-auto flex w-full max-w-300 flex-col gap-6 px-4 py-8 md:py-12">
         {isLoading ? (
           <div className="flex flex-col gap-3">
             <Skeleton className="h-5 w-24 rounded-md" />

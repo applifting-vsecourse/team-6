@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
-import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -21,11 +20,17 @@ import { Step1Profile } from "@/features/profile/components/Step1Profile"
 import { Step2Availability } from "@/features/profile/components/Step2Availability"
 import { Step3Questionnaire } from "@/features/profile/components/Step3Questionnaire"
 
+export type OnboardingStep = 1 | 2 | 3
+export const ONBOARDING_TOTAL_STEPS = 3
+
 type OnboardingWizardProps = {
   userId?: string
+  // The step lives in the URL (the app header shows it too), so the route owns it.
+  step: OnboardingStep
+  onStepChange: (step: OnboardingStep) => void
 }
 
-export function OnboardingWizard({ userId }: OnboardingWizardProps = {}) {
+export function OnboardingWizard({ userId, step, onStepChange }: OnboardingWizardProps) {
   const referenceQuery = useQuery(referenceQueryOptions())
   const profileQuery = useQuery(profileQueryOptions(userId))
 
@@ -57,6 +62,8 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps = {}) {
   return (
     <OnboardingWizardForm
       userId={userId}
+      step={step}
+      onStepChange={onStepChange}
       profile={profileQuery.data ?? null}
       allTags={allTags}
     />
@@ -65,16 +72,22 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps = {}) {
 
 type OnboardingWizardFormProps = {
   userId?: string
+  step: OnboardingStep
+  onStepChange: (step: OnboardingStep) => void
   profile: ProfileResponse
   allTags: Tag[]
 }
 
-function OnboardingWizardForm({ userId, profile, allTags }: OnboardingWizardFormProps) {
-  const { t } = useTranslation()
+function OnboardingWizardForm({
+  userId,
+  step: currentStep,
+  onStepChange: setCurrentStep,
+  profile,
+  allTags,
+}: OnboardingWizardFormProps) {
   const navigate = useNavigate()
   const saveProfileMutation = useSaveProfile(userId)
 
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const wizardTopRef = useRef<HTMLDivElement | null>(null)
 
@@ -183,15 +196,10 @@ function OnboardingWizardForm({ userId, profile, allTags }: OnboardingWizardForm
       ref={wizardTopRef}
       className="flex scroll-mt-6 flex-col gap-8"
     >
-      <div className="flex flex-col gap-2">
-        <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
-          {t("onboarding.stepProgress", { current: currentStep, total: 3 })}
-        </p>
-        <OnboardingProgress
-          currentStep={currentStep}
-          totalSteps={3}
-        />
-      </div>
+      <OnboardingProgress
+        currentStep={currentStep}
+        totalSteps={ONBOARDING_TOTAL_STEPS}
+      />
 
       {errorMessage && (
         <Alert variant="destructive">

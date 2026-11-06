@@ -1,7 +1,12 @@
 import { QueryClient } from "@tanstack/react-query"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
-import { MESSAGE_POLL_LIMIT, messagesQueryOptions, type ChatMessage } from "./chatApi"
+import {
+  MESSAGE_POLL_LIMIT,
+  messagesQueryOptions,
+  unreadQueryOptions,
+  type ChatMessage,
+} from "./chatApi"
 
 const apiGet = vi.fn<(path: string, options: { searchParams: Record<string, number> }) => unknown>()
 
@@ -77,5 +82,23 @@ describe("messagesQueryOptions", () => {
       searchParams: { after: 1 + MESSAGE_POLL_LIMIT },
     })
     expect(apiGet).toHaveBeenCalledTimes(3)
+  })
+})
+
+describe("unreadQueryOptions", () => {
+  it("parses the unread state and refuses anything else", async () => {
+    const queryClient = new QueryClient()
+    apiGet.mockReturnValueOnce({ active: true, count: 2 })
+
+    await expect(queryClient.fetchQuery(unreadQueryOptions())).resolves.toEqual({
+      active: true,
+      count: 2,
+    })
+    expect(apiGet).toHaveBeenCalledWith("kvintets/mine/messages/unread", undefined)
+
+    apiGet.mockReturnValueOnce({ count: "2" })
+    await expect(
+      queryClient.fetchQuery({ ...unreadQueryOptions(), staleTime: 0 }),
+    ).rejects.toThrow()
   })
 })
