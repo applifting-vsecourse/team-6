@@ -92,13 +92,13 @@ export function Step3Questionnaire({
       className="flex flex-col gap-7"
     >
       <div className="flex flex-col gap-2">
-        <h1 className="font-serif text-title text-foreground">{t("onboarding.step3.title")}</h1>
+        <h1 className="text-title text-foreground">{t("onboarding.step3.title")}</h1>
         <p className="text-lg text-foreground/80">{t("onboarding.step3.description")}</p>
       </div>
 
       <div className="flex flex-col gap-3 border-t border-border pt-6">
         <div className="flex flex-col gap-0.5">
-          <h3 className="font-serif text-subheading font-semibold text-foreground">
+          <h3 className="text-subheading font-semibold text-foreground">
             {t("onboarding.step3.expectationsTitle")}
           </h3>
           <p className="text-sm text-muted-foreground">{t("onboarding.step3.expectationsHint")}</p>
@@ -128,7 +128,7 @@ export function Step3Questionnaire({
         )}
       >
         <div className="flex flex-col gap-1">
-          <h3 className="font-serif text-subheading font-semibold text-foreground">
+          <h3 className="text-subheading font-semibold text-foreground">
             {t("onboarding.step3.frequencyTitle")}
           </h3>
           {error && (
@@ -166,7 +166,7 @@ export function Step3Questionnaire({
 
       <div className="flex flex-col gap-3 border-t border-border pt-6">
         <div className="flex flex-col gap-0.5">
-          <h3 className="font-serif text-subheading font-semibold text-foreground">
+          <h3 className="text-subheading font-semibold text-foreground">
             {t("onboarding.step3.noteTitle")}
           </h3>
           <p className="text-sm text-muted-foreground">{t("onboarding.step3.noteOptional")}</p>

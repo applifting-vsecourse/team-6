@@ -101,7 +101,7 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
       className="flex flex-col gap-7"
     >
       <div className="flex flex-col gap-2">
-        <h1 className="font-serif text-title text-foreground">{t("onboarding.step2.title")}</h1>
+        <h1 className="text-title text-foreground">{t("onboarding.step2.title")}</h1>
         <p className="text-lg text-foreground/80">{t("onboarding.step2.description")}</p>
       </div>
 
@@ -113,7 +113,7 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
         )}
       >
         <div className="flex flex-col gap-1">
-          <h3 className="font-serif text-subheading font-semibold text-foreground">
+          <h3 className="text-subheading font-semibold text-foreground">
             {t("onboarding.step2.daysTitle")}
           </h3>
           {daysError && (
@@ -159,7 +159,7 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
         )}
       >
         <div className="flex flex-col gap-1">
-          <h3 className="font-serif text-subheading font-semibold text-foreground">
+          <h3 className="text-subheading font-semibold text-foreground">
             {t("onboarding.step2.timeOfDayTitle")}
           </h3>
           {timeOfDayError && (
@@ -213,7 +213,7 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
         className="flex flex-col gap-3 border-t border-border pt-6"
       >
         <div className="flex flex-col gap-0.5">
-          <h3 className="font-serif text-subheading font-semibold text-foreground">
+          <h3 className="text-subheading font-semibold text-foreground">
             {t("onboarding.step2.whereTitle")}
           </h3>
           <p className="text-sm text-muted-foreground">{t("onboarding.step2.whereHint")}</p>

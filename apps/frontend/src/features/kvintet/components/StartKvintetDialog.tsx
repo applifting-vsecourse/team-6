@@ -99,7 +99,7 @@ export function StartKvintetDialog({ isOpen, onOpenChange }: StartKvintetDialogP
         className="gap-5 p-8 max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:max-w-full max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-b-none max-sm:data-[state=closed]:slide-out-to-bottom max-sm:data-[state=closed]:zoom-out-100 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=open]:zoom-in-100 sm:max-w-140"
       >
         <DialogHeader className="gap-5 text-left">
-          <DialogTitle className="font-serif text-heading font-medium">
+          <DialogTitle className="text-heading font-semibold">
             {t("kvintet.dialog.title")}
           </DialogTitle>
           <DialogDescription className="text-base text-body">

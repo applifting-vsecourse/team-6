@@ -7,8 +7,10 @@ import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOpt
 import { useSession } from "@/features/auth/hooks/useSession"
 import { profileQueryOptions } from "@/features/profile/api/profileApi"
 import { OnboardingWizard } from "@/features/profile/components/OnboardingWizard"
+import { onboardingSearchSchema } from "@/features/profile/lib/onboardingSearch"
 
 export const Route = createFileRoute("/_ProtectedPages/onboarding")({
+  validateSearch: onboardingSearchSchema,
   loader: async ({ context }) => {
     const session = await context.queryClient.ensureQueryData(authSessionQueryOptions())
     await context.queryClient.ensureQueryData(profileQueryOptions(session?.user?.id))
@@ -19,12 +21,18 @@ export const Route = createFileRoute("/_ProtectedPages/onboarding")({
 function OnboardingPage() {
   const { t } = useTranslation()
   const { user } = useSession()
+  const { step } = Route.useSearch()
+  const navigate = Route.useNavigate()
 
   return (
     <>
       <Seo title={t("onboarding.title")} />
       <div className="mx-auto w-full max-w-[672px] px-4 py-8 md:py-16">
-        <OnboardingWizard userId={user?.id} />
+        <OnboardingWizard
+          userId={user?.id}
+          step={step}
+          onStepChange={(next) => void navigate({ search: { step: next } })}
+        />
       </div>
     </>
   )

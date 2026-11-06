@@ -1,5 +1,6 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
 import { ListMessagesQueryDto } from '@/modules/chat/controllers/dto/list-messages-query.dto';
+import { MarkReadDto } from '@/modules/chat/controllers/dto/mark-read.dto';
 import { SendMessageDto } from '@/modules/chat/controllers/dto/send-message.dto';
 import { MessageController } from '@/modules/chat/controllers/message.controller';
 import { ChatMessage } from '@/modules/chat/domain/message';
@@ -128,5 +129,37 @@ describe('MessageController', () => {
     await expect(
       pipe.transform({ after: '2147483647' }, meta),
     ).resolves.toMatchObject({ after: 2147483647 });
+  });
+
+  it('delegates unread and read to the service for the caller', async () => {
+    const service = mock<MessageService>();
+    service.unread.mockResolvedValue({ active: true, count: 2 });
+    const controller = new MessageController(service);
+
+    await expect(controller.unread(caller)).resolves.toEqual({
+      active: true,
+      count: 2,
+    });
+    await controller.markRead(caller, { lastMessageId: 9 });
+    expect(service.markRead).toHaveBeenCalledWith('u1', 9);
+  });
+
+  it('rejects a read mark outside the id range with a 400', async () => {
+    const pipe = createValidationPipe();
+    const meta = { type: 'body', metatype: MarkReadDto } as const;
+
+    const tooBig = await pipe
+      .transform({ lastMessageId: 2147483648 }, meta)
+      .catch((e) => e);
+    expect((tooBig as ValidationFailedException).errors).toEqual([
+      { field: 'lastMessageId', code: 'max' },
+    ]);
+
+    const missing = await pipe.transform({}, meta).catch((e) => e);
+    expect(missing).toBeInstanceOf(ValidationFailedException);
+
+    await expect(
+      pipe.transform({ lastMessageId: 0 }, meta),
+    ).resolves.toMatchObject({ lastMessageId: 0 });
   });
 });

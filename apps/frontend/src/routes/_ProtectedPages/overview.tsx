@@ -105,7 +105,7 @@ function OverviewPage() {
   return (
     <>
       <Seo title={t("overview.title")} />
-      <div className="relative mx-auto w-full max-w-4xl px-4 pt-16 pb-24">
+      <div className="relative mx-auto w-full max-w-300 px-4 pt-16 pb-24">
         <ThemedImage
           light={watermark}
           dark={watermarkDark}
@@ -114,7 +114,7 @@ function OverviewPage() {
           className="pointer-events-none absolute top-2 right-4 hidden size-45.5 md:block"
         />
         <div className="flex flex-col gap-2">
-          <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
+          <p className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
             {formatLongDate(new Date())}
           </p>
           <h1 className="text-title">
@@ -136,10 +136,10 @@ function OverviewPage() {
         <div className="mt-8 grid grid-cols-1 items-start gap-8 md:grid-cols-3">
           {/* Next step block */}
           <div className="flex flex-col gap-4 rounded-lg border border-primary/20 bg-background p-8 md:col-span-2">
-            <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
+            <p className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
               {nextStep.badge}
             </p>
-            <h2 className="font-serif text-2xl font-semibold text-foreground">{nextStep.title}</h2>
+            <h2 className="text-2xl font-semibold text-foreground">{nextStep.title}</h2>
             <p className="text-base text-foreground/80">{nextStep.description}</p>
             <div className="pt-1">
               <Button asChild>
@@ -157,7 +157,7 @@ function OverviewPage() {
 
           {/* Profile side card */}
           <div className="flex flex-col gap-3.5 rounded-lg border border-border bg-background p-6">
-            <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
+            <p className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
               {t("overview.profileCard.badge")}
             </p>
             <div className="flex flex-wrap gap-1.5 pt-0.5">

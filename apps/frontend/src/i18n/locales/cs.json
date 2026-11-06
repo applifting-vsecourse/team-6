@@ -308,12 +308,26 @@
   },
   "layout": {
     "closeMenu": "Zavřít menu",
+    "communityRules": "Pravidla komunity",
     "contactSupport": "Kontaktovat podporu",
+    "createAccount": "Vytvořit účet",
+    "findYourKvintet": "Najděte svůj kvintet.",
+    "goTo": "Přejít na",
+    "groupChat": "Skupinový chat",
+    "howItWorks": "Jak Kvintet funguje",
+    "learnMore": "Zjistit více",
     "mainNavigation": "Hlavní navigace",
     "menu": "Menu",
     "openMenu": "Otevřít menu",
+    "rules": "Pravidla",
+    "settings": "Nastavení",
+    "support": "Podpora",
     "switchToDark": "Přepnout na tmavý motiv",
-    "switchToLight": "Přepnout na světlý motiv"
+    "switchToLight": "Přepnout na světlý motiv",
+    "unreadMessages_few": "{{count}} nepřečtené zprávy",
+    "unreadMessages_many": "{{count}} nepřečtené zprávy",
+    "unreadMessages_one": "{{count}} nepřečtená zpráva",
+    "unreadMessages_other": "{{count}} nepřečtených zpráv"
   },
   "meetingFrequency": {
     "BIWEEKLY": "jednou za 14 dní",
@@ -400,6 +414,7 @@
       "title": "Co od kvintetu očekáváte?"
     },
     "stepProgress": "Krok {{current}} ze {{total}}",
+    "stepShort": "{{current}} / {{total}}",
     "title": "Úvodní nastavení"
   },
   "overview": {

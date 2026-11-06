@@ -26,7 +26,7 @@ export function MyKvintetPage() {
   return (
     <>
       <Seo title={t("nav.myKvintet")} />
-      <div className="mx-auto w-full max-w-4xl px-4 py-8 md:py-12">
+      <div className="mx-auto w-full max-w-300 px-4 py-8 md:py-12">
         {isLoading ? (
           <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-3">
