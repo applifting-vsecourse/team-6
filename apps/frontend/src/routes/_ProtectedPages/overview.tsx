@@ -9,13 +9,10 @@ import { ROUTES } from "@/app/routes"
 import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Seo } from "@/components/Seo"
 import { Blobatar } from "@/components/ui/blobatar"
-import { Button } from "@/components/ui/button"
 import { api } from "@/lib/api-client"
 import { formatDate } from "@/lib/date"
 import { getErrorMessage } from "@/lib/errorMessage"
 
-import { DeleteAccountDialog } from "@/features/account/components/DeleteAccountDialog"
-import { useDeleteAccount } from "@/features/account/hooks/useDeleteAccount"
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
 import { useSession } from "@/features/auth/hooks/useSession"
 import { messagesQueryOptions } from "@/features/chat/api/chatApi"
@@ -65,8 +62,6 @@ function OverviewPage() {
   const profileQuery = useQuery(profileQueryOptions(user?.id))
   const profile = profileQuery.data
   const isOnboarded = Boolean(profile?.onboardingCompletedAt)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const deleteAccount = useDeleteAccount()
 
   const myKvintet = useMyKvintet()
   const kvintet = myKvintet.data
@@ -607,25 +602,8 @@ function OverviewPage() {
               />
             </>
           )}
-
-          <div className="mt-4 flex justify-end border-t border-[#DDE2EC] pt-4 dark:border-slate-800">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-auto self-start p-0 text-sm text-destructive underline underline-offset-4 hover:bg-transparent hover:text-destructive/80"
-              onClick={() => setIsDeleteDialogOpen(true)}
-            >
-              {t("account.deleteAccount")}
-            </Button>
-          </div>
         </div>
       </div>
-      <DeleteAccountDialog
-        isOpen={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-        onConfirm={() => deleteAccount.mutate()}
-        isDeleting={deleteAccount.isPending}
-      />
     </>
   )
 }

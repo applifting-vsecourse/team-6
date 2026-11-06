@@ -2,7 +2,7 @@ import type { ComponentType, ReactNode } from "react"
 import type * as ReactQuery from "@tanstack/react-query"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import type * as ReactRouter from "@tanstack/react-router"
-import { fireEvent, render, screen } from "@testing-library/react"
+import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -86,7 +86,6 @@ const mockMessages = vi.hoisted(() => ({
   },
   isLoading: false,
 }))
-const deleteAccountMutate = vi.fn()
 
 vi.mock("@/features/auth/hooks/useSession", () => ({
   useSession: () => ({ user: { id: "u1", name: "Jana Nováková", username: "jana" } }),
@@ -102,10 +101,6 @@ vi.mock("@/lib/api-client", () => ({
       json: vi.fn().mockResolvedValue({}),
     })),
   },
-}))
-
-vi.mock("@/features/account/hooks/useDeleteAccount", () => ({
-  useDeleteAccount: () => ({ mutate: deleteAccountMutate, isPending: false }),
 }))
 
 vi.mock("sonner", () => ({
@@ -153,7 +148,6 @@ const OverviewPage = Route.options.component as ComponentType
 describe("OverviewPage - 4 States and Lifecycle", () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    deleteAccountMutate.mockReset()
     mockProfile.data = {
       id: "p1",
       userId: "u1",
@@ -453,23 +447,5 @@ describe("OverviewPage - 4 States and Lifecycle", () => {
       await userEvent.click(retryBtn)
       expect(mockProfile.refetch).toHaveBeenCalled()
     })
-  })
-
-  it("opens delete account dialog from profile card and confirms deletion", async () => {
-    renderWithClient(<OverviewPage />)
-
-    const triggerButton = screen.getByRole("button", { name: "Delete account" })
-    expect(triggerButton).toBeInTheDocument()
-
-    fireEvent.click(triggerButton)
-
-    expect(await screen.findByRole("heading", { name: "Delete account" })).toBeInTheDocument()
-    expect(screen.getByText(/Are you sure you want to delete your account\?/i)).toBeInTheDocument()
-
-    // Confirm button in dialog (the trigger button is aria-hidden while dialog is open)
-    const confirmButton = screen.getByRole("button", { name: "Delete account" })
-    fireEvent.click(confirmButton)
-
-    expect(deleteAccountMutate).toHaveBeenCalledOnce()
   })
 })
