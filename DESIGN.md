@@ -23,19 +23,19 @@ The app has **two themes: light and dark**, switched in the header (`ThemeSwitch
 
 - **Cards are for separable items in a list** — an offer, a search result, a product. They are not page sections and not layout tools.
 - **Never nest a card inside a card.** If content needs grouping inside a card, use spacing and a hairline divider.
-- **A page is not a card.** Page content sits on `background` in a centred column (`max-w-120` for forms, `max-w-2xl` for reading, `max-w-4xl` for wide layouts), not inside a floating panel.
+- **A page is not a card.** Page content sits on `background` in a centred column (`max-w-105` for the sign-in form, `max-w-120` for other forms, `max-w-180` for the community rules, `max-w-2xl` for reading, `max-w-4xl` for wide layouts), not inside a floating panel.
 - **Every page keeps the app chrome.** The header and footer (`PageLayout`) are present on every route, including login and sign-up. Pages never render as standalone islands.
 - Forbidden by default: the centred-hero-plus-three-feature-cards layout, carousels, and any section whose only purpose is to look full.
 
 ## Spacing
 
-Use the scale only: `1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 9, 10, 12, 14, 16, 22, 24, 28, 40` (Tailwind units — 4px…160px; the half steps and 5, 9, 10, 22, 28, 40 come from the Figma). No arbitrary values like `p-[13px]`. Related things get `gap-2`/`gap-3`; fields in a form get `gap-5`; separate blocks get `gap-6`/`gap-8`.
+Use the scale only: `1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10, 12, 14, 16, 22, 24, 28, 40` (Tailwind units — 4px…160px; the half steps and 5, 7, 9, 10, 22, 28, 40 come from the Figma). No arbitrary values like `p-[13px]`. Related things get `gap-2`/`gap-3`; fields in a form get `gap-5`; separate blocks get `gap-6`/`gap-8`.
 
 ## Type
 
 - One `h1` per page. Headings step down without skipping.
 - Three families: **Newsreader** (`font-serif`, headings and the logo; `h1`–`h3` get it from the base layer), **Source Sans 3** (`font-sans`, everything else) and **IBM Plex Mono** (`font-mono`, meta labels only).
-- Sizes come from the scale: `text-sm` hints, `text-label` (15px, semibold) buttons and form labels, `text-base` body, `text-lg` lead text, `text-subheading` (21px) item titles, `text-heading` (28px) section titles, `text-title` (40px) page titles, `text-display` (64px) the landing headline only. Letter-spacing is part of the size token; do not add `tracking-*` to headings.
+- Sizes come from the scale: `text-sm` hints, `text-label` (15px, semibold) buttons and form labels, `text-base` body, `text-lg` lead text, `text-subheading` (21px) item titles, `text-heading` (28px) section titles, `text-title` (40px) page titles, `text-display` (64px) the landing headline only. Forms and reading pages (sign in, community rules) use the smaller Figma `C/h1`: `text-h1-mobile md:text-h1` (27px / 32px) for the `h1`, `text-compact md:text-lead` (15px / 17px) under it, and `text-h3` (17px) for a short block title. Letter-spacing is part of the size token; do not add `tracking-*` to headings.
 - Sentence case everywhere. No ALL CAPS except the one meta label style: `font-mono text-xs uppercase tracking-meta text-muted-foreground`, used for dates, step numbers and the footer line.
 - One italic accent word per hero or greeting at most (`<em>` inside an `h1`).
 
