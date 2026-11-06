@@ -24,8 +24,8 @@
     "passwordHint_one": "Alespoň {{count}} znak",
     "passwordHint_other": "Alespoň {{count}} znaků",
     "preview": {
-      "title": "To jste vy!",
-      "caption": "Každý blobatar je jedinečný."
+      "caption": "Každý blobatar je jedinečný.",
+      "title": "To jste vy!"
     },
     "signIn": "Přihlásit se",
     "signInDescription": "Vítejte zpět v Kvintetu.",

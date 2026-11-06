@@ -23,8 +23,8 @@
     "passwordHint_one": "At least {{count}} character",
     "passwordHint_other": "At least {{count}} characters",
     "preview": {
-      "title": "That's you!",
-      "caption": "Each blobatar is unique."      
+      "caption": "Each blobatar is unique.",
+      "title": "That's you!"
     },
     "signIn": "Sign in",
     "signInDescription": "Welcome back to Kvintet.",
