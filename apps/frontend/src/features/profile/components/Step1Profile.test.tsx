@@ -86,7 +86,6 @@ describe("Step1Profile", () => {
     await userEvent.click(await screen.findByRole("button", { name: "Tech & dev" }))
 
     await userEvent.click(screen.getByRole("button", { name: "Select role Software Engineer" }))
-    await userEvent.click(await screen.findByRole("button", { name: "Tech & dev" }))
     await userEvent.click(screen.getByRole("button", { name: "Select role Frontend Developer" }))
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
 

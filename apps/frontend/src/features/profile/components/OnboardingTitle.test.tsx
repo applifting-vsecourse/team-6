@@ -29,6 +29,9 @@ describe("OnboardingTitle", () => {
       />,
     )
     expect(container.querySelector("svg")).toBeNull()
+    // No avatar: no grid and no pinned column, so title and description start at the same edge.
+    expect(screen.getByRole("heading").className).not.toContain("col-start-2")
+    expect(container.firstElementChild?.className).not.toContain("grid")
 
     rerender(
       <AvatarSeedContext.Provider value="jana">
