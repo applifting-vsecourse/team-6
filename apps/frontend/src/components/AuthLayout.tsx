@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 
 type AuthLayoutProps = {
   title: string
-  description: string
+  description?: string
   children: ReactNode
   footer: ReactNode
   // App header slot, passed in so `components/` does not import from `features/auth`.
@@ -41,7 +41,9 @@ export function AuthLayout({
           <div className="flex items-start justify-between gap-4">
             <div>
               <h1 className="text-title">{title}</h1>
-              <p className="mt-2 text-lg text-muted-foreground">{description}</p>
+              {description ? (
+                <p className="mt-2 text-lg text-muted-foreground">{description}</p>
+              ) : null}
             </div>
             {titleAccessory ? <div className="shrink-0 lg:hidden">{titleAccessory}</div> : null}
           </div>

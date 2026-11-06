@@ -66,7 +66,6 @@ function SignUpPage() {
       <AuthLayout
         header={<AppHeader />}
         title={t("auth.signUpTitle")}
-        description={t("auth.signUpDescription")}
         titleAccessory={
           <SignUpPreview
             username={username}

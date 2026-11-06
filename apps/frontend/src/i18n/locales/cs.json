@@ -24,14 +24,13 @@
     "passwordHint_one": "Alespoň {{count}} znak",
     "passwordHint_other": "Alespoň {{count}} znaků",
     "preview": {
-      "caption": "To jste vy! Každý blobatar je jedinečný.",
-      "title": "Takto vás uvidí ostatní"
+      "title": "To jste vy!",
+      "caption": "Každý blobatar je jedinečný."
     },
     "signIn": "Přihlásit se",
     "signInDescription": "Vítejte zpět v Kvintetu.",
     "signOut": "Odhlásit se",
     "signUp": "Registrovat se",
-    "signUpDescription": "Potom vám najdeme kvintet.",
     "signUpTitle": "Vytvořte si účet",
     "username": "Uživatelské jméno",
     "usernameHint": "Podle něj se vytvoří váš blobatar.",

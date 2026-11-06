@@ -23,14 +23,13 @@
     "passwordHint_one": "At least {{count}} character",
     "passwordHint_other": "At least {{count}} characters",
     "preview": {
-      "caption": "That's you! Each blobatar is unique.",
-      "title": "This is how others will see you"
+      "title": "That's you!",
+      "caption": "Each blobatar is unique."      
     },
     "signIn": "Sign in",
     "signInDescription": "Welcome back to Kvintet.",
     "signOut": "Sign out",
     "signUp": "Sign up",
-    "signUpDescription": "Then we'll find your kvintet.",
     "signUpTitle": "Create your account",
     "username": "Username",
     "usernameHint": "Your blobatar is made from it. Others only see the blobatar.",
