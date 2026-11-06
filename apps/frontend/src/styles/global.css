@@ -26,6 +26,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-soft: var(--destructive-soft);
   --color-highlight: var(--highlight);
   --color-highlight-foreground: var(--highlight-foreground);
   --color-highlight-soft: var(--highlight-soft);
@@ -124,6 +125,8 @@
   /* danger */
   --destructive: #c93b3b;
   --destructive-foreground: #ffffff;
+  /* danger-soft: fill of an error alert */
+  --destructive-soft: #fbe3e3;
   /* Figma `accent`: small blue highlights (unread badge, active dot, links). Not for actions. */
   --highlight: #2f5bd3;
   --highlight-foreground: #ffffff;
@@ -176,6 +179,7 @@
   /* danger */
   --destructive: #ff8a8a;
   --destructive-foreground: #0d1220;
+  --destructive-soft: #3a1c22;
   /* accent */
   --highlight: #8db4ff;
   --highlight-foreground: #0d1220;
