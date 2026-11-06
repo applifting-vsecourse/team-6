@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
-import { HOW_IT_WORKS_ANCHOR, ROUTES } from "@/app/routes"
+import { ROUTES } from "@/app/routes"
 import { SUPPORT_EMAIL } from "@/config/support"
 
 export function Footer() {
@@ -12,8 +12,7 @@ export function Footer() {
       <div className="mx-auto flex w-full max-w-300 flex-col gap-2.5 md:h-16 md:flex-row md:items-center md:gap-6">
         <div className="flex flex-wrap gap-x-5 gap-y-1 text-small text-muted-foreground md:gap-6">
           <Link
-            to={ROUTES.home}
-            hash={HOW_IT_WORKS_ANCHOR}
+            to={ROUTES.howItWorks}
             className="hover:underline"
           >
             {t("layout.howItWorks")}
