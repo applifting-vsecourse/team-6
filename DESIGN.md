@@ -54,7 +54,7 @@ Use the scale only: `1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 14, 16, 22, 24` (Tai
 
 ## People are blobatars
 
-Kvintet shows no photos, so every person is represented by a generated avatar from [blobatar](https://blobatar.dev): the same string always renders the same creature, with nothing stored or uploaded. Use `Blobatar` from `@/components/ui/blobatar` wherever a person appears (chat messages, member lists, kvintet cards) — never initials, stock icons or a hand-rolled avatar. One decorative use is not a person: the field chips of the onboarding role picker (Figma B1) carry a static `size-6` blobatar seeded by the field id, as a mark for the category. It never animates, and it is the only place a blobatar stands for something other than one person.
+Kvintet shows no photos, so every person is represented by a generated avatar from [blobatar](https://blobatar.dev): the same string always renders the same creature, with nothing stored or uploaded. Use `Blobatar` from `@/components/ui/blobatar` wherever a person appears (chat messages, member lists, kvintet cards) — never initials, stock icons or a hand-rolled avatar.
 
 - **Seed:** the user's `username`, falling back to `id` when there is none. Use the same seed everywhere, or one person turns into two faces. Never seed from the e-mail (it is private).
 - **Static by default.** A static blobatar is one `<img>`; an animated one is ~12 SVG nodes. Lists and chat (many avatars, small) stay static; the chat swaps in the animated one only for the avatar under the mouse.
