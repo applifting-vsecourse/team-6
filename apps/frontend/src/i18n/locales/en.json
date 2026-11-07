@@ -479,11 +479,6 @@
     },
     "greeting": "Hi, {{name}}",
     "greetingAnonymous": "Hi",
-    "howItWorks": {
-      "p1": "— A kvintet forms automatically when five people join.",
-      "p2": "— With three or four members it forms when everyone votes yes.",
-      "p3": "— Once formed, you'll see names and a group chat opens."
-    },
     "nextStep": {
       "badge": "YOUR NEXT STEP",
       "button": "See proposals",

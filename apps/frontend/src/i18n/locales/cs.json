@@ -485,11 +485,6 @@
     },
     "greeting": "Ahoj, {{name}}",
     "greetingAnonymous": "Ahoj",
-    "howItWorks": {
-      "p1": "— Kvintet vznikne sám, když se přidá pět lidí.",
-      "p2": "— Se třemi nebo čtyřmi členy vznikne, když všichni hlasují pro.",
-      "p3": "— Po vzniku uvidíte jména a otevře se skupinový chat."
-    },
     "nextStep": {
       "badge": "VÁŠ DALŠÍ KROK",
       "button": "Zobrazit návrhy",
