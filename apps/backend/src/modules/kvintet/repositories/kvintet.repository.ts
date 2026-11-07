@@ -413,7 +413,20 @@ export class KvintetRepository {
         votedCount,
         totalCount,
       },
+      beginsSeen: membership.beginsSeenAt !== null,
     };
+  }
+
+  /**
+   * Records that the caller has seen the "Kvintet begins" page. Only an ACTIVE kvintet counts, so
+   * a call while it is still forming cannot skip the page, and the first mark wins when called
+   * again. Matching no row (not a member) is not an error.
+   */
+  async markBeginsSeen(userId: string): Promise<void> {
+    await this.prisma.kvintetMember.updateMany({
+      where: { userId, beginsSeenAt: null, kvintet: { status: 'ACTIVE' } },
+      data: { beginsSeenAt: new Date() },
+    });
   }
 
   async vote(kvintetId: string, userId: string): Promise<void> {

@@ -169,6 +169,7 @@ describe('KvintetController', () => {
         votedCount: 3,
         totalCount: 4,
       },
+      beginsSeen: false,
     };
 
     const mockUser = {
@@ -177,6 +178,15 @@ describe('KvintetController', () => {
       name: 'A',
       role: 'user' as const,
     };
+
+    it('requires MemberGuard on marking the begins page as seen', () => {
+      const guards = Reflect.getMetadata(
+        '__guards__',
+        KvintetController.prototype.markBeginsSeen,
+      );
+
+      expect(guards).toContain(MemberGuard);
+    });
 
     it('requires MemberGuard on getMyKvintet, vote, and leave', () => {
       const getMyKvintetGuards = Reflect.getMetadata(

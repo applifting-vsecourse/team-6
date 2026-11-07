@@ -75,6 +75,7 @@ describe("ProposalKvintetView", () => {
       votedCount: 3,
       totalCount: 4,
     },
+    beginsSeen: true,
   }
 
   it("renders proposal status, vote banner, and member roles without other members' names", () => {
@@ -145,6 +146,7 @@ describe("ProposalKvintetView", () => {
         votedCount: 0,
         totalCount: 1,
       },
+      beginsSeen: true,
     }
 
     render(

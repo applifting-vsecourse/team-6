@@ -19,6 +19,8 @@ export type SeatMember = {
   seed: string
   /** Someone you have not met yet: grey, so the face reveals nothing. */
   anonymous?: boolean
+  /** Written under the seat, e.g. the first name. Leave out where names are not known. */
+  label?: string
 }
 
 type KvintetSeatsProps = {
@@ -28,6 +30,8 @@ type KvintetSeatsProps = {
   motion?: BlobatarMotion
   /** Only when the table stands alone; leave it out when the text beside it says the same. */
   label?: string
+  /** The dashed ring behind the seats; Figma K3 / M9 ("Kvintet begins") draws none. */
+  hasGuide?: boolean
   className?: string
 }
 
@@ -35,8 +39,16 @@ type KvintetSeatsProps = {
  * A kvintet as exactly five seats on a ring: members first, then dashed free seats, never a
  * number. It fills its parent (a square), so the parent sets the size. Figma A1 and M1 draw
  * the seats at 22 % of the width on a ring of radius 36 % on desktop, 23 % and 34 % on a phone.
+ * Figma K3 / M9 ("Kvintet begins") draws them at 27 % on a ring of 36.5 % with their names
+ * underneath and no guide ring: pass `hasGuide={false}` and the two variables in `className`.
  */
-export function KvintetSeats({ members, motion = "always", label, className }: KvintetSeatsProps) {
+export function KvintetSeats({
+  members,
+  motion = "always",
+  label,
+  hasGuide = true,
+  className,
+}: KvintetSeatsProps) {
   return (
     <div
       role={label ? "img" : undefined}
@@ -46,13 +58,15 @@ export function KvintetSeats({ members, motion = "always", label, className }: K
         className,
       )}
     >
-      <span
-        aria-hidden="true"
-        className="absolute rounded-full border border-dashed border-input"
-        style={{
-          inset: "calc(50% - var(--seat-radius))",
-        }}
-      />
+      {hasGuide ? (
+        <span
+          aria-hidden="true"
+          className="absolute rounded-full border border-dashed border-input"
+          style={{
+            inset: "calc(50% - var(--seat-radius))",
+          }}
+        />
+      ) : null}
       {POSITIONS.map((position, i) => {
         const member = members[i]
         return (
@@ -81,6 +95,11 @@ export function KvintetSeats({ members, motion = "always", label, className }: K
                 className="size-full"
               />
             )}
+            {member?.label ? (
+              <span className="absolute top-full left-1/2 -translate-x-1/2 text-small whitespace-nowrap text-foreground md:text-label md:font-medium">
+                {member.label}
+              </span>
+            ) : null}
           </span>
         )
       })}

@@ -358,6 +358,7 @@ describe('KvintetService.getMyKvintet', () => {
       votedCount: 3,
       totalCount: 4,
     },
+    beginsSeen: false,
   };
 
   it('returns kvintet details if caller is a member', async (): Promise<void> => {
@@ -405,6 +406,7 @@ describe('KvintetService.vote', () => {
       votedCount: 3,
       totalCount: 4,
     },
+    beginsSeen: false,
   };
 
   it('casts vote and returns updated details', async (): Promise<void> => {
@@ -475,5 +477,16 @@ describe('KvintetService.leave', () => {
     repository.findMembership.mockResolvedValue(null);
 
     await expect(service.leave('u1')).rejects.toThrow(ForbiddenException);
+  });
+});
+
+describe('KvintetService.markBeginsSeen', () => {
+  it('records the mark for the caller', async (): Promise<void> => {
+    const { repository, service } = setup();
+    repository.markBeginsSeen.mockResolvedValue(undefined);
+
+    await service.markBeginsSeen('u1');
+
+    expect(repository.markBeginsSeen).toHaveBeenCalledWith('u1');
   });
 });

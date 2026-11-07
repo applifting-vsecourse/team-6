@@ -100,4 +100,11 @@ export class KvintetDetailsDto {
 
   @ApiProperty({ type: KvintetVoteStatusDto })
   voteStatus!: KvintetVoteStatusDto;
+
+  @ApiProperty({
+    example: false,
+    description:
+      'Whether the caller has already seen the "Kvintet begins" page. The UI sends them there once, when the kvintet is ACTIVE and this is false.',
+  })
+  beginsSeen!: boolean;
 }

@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react"
+import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 
 import { KvintetSeats, type SeatMember } from "@/components/KvintetSeats"
@@ -45,6 +45,28 @@ describe("KvintetSeats", () => {
       />,
     )
     expect(container.querySelector("[role=img]")).toHaveAttribute("aria-label", "A kvintet of five")
+  })
+
+  it("writes a member's label under their seat and none for free seats", () => {
+    const { container } = render(
+      <KvintetSeats members={[{ seed: "a", label: "Jana (you)" }, { seed: "b" }]} />,
+    )
+
+    expect(screen.getByText("Jana (you)")).toBeInTheDocument()
+    expect(container.querySelectorAll("[data-seat] > span.absolute")).toHaveLength(1)
+  })
+
+  it("draws the dashed guide ring unless told not to", () => {
+    const withGuide = render(<KvintetSeats members={people(5)} />)
+    const without = render(
+      <KvintetSeats
+        members={people(5)}
+        hasGuide={false}
+      />,
+    )
+
+    expect(withGuide.container.querySelectorAll("[aria-hidden=true].border-dashed")).toHaveLength(1)
+    expect(without.container.querySelectorAll("[aria-hidden=true].border-dashed")).toHaveLength(0)
   })
 
   it("draws an anonymous member grey and a normal one in colour", () => {

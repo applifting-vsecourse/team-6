@@ -14,6 +14,7 @@ vi.mock("@/features/kvintet/hooks/useMyKvintet", () => ({
 }))
 
 vi.mock("@tanstack/react-router", () => ({
+  Navigate: ({ to }: { to: string }) => <div data-testid="navigate">{to}</div>,
   Link: ({ children, to, className }: { children?: ReactNode; to: string; className?: string }) => (
     <a
       href={to}
@@ -89,6 +90,7 @@ describe("MyKvintetPage", () => {
         votedCount: 0,
         totalCount: 1,
       },
+      beginsSeen: true,
     }
 
     mockUseMyKvintet.mockReturnValue({
@@ -111,7 +113,7 @@ describe("MyKvintetPage", () => {
     expect(screen.getByText("Designérka (you)")).toBeInTheDocument()
   })
 
-  it("renders active view when kvintet is active", () => {
+  it("renders active view when kvintet is active and its start was already seen", () => {
     const mockActive: KvintetDetails = {
       id: "k1",
       title: "Aktivní skupina",
@@ -159,6 +161,7 @@ describe("MyKvintetPage", () => {
         votedCount: 2,
         totalCount: 2,
       },
+      beginsSeen: true,
     }
 
     mockUseMyKvintet.mockReturnValue({
@@ -179,5 +182,38 @@ describe("MyKvintetPage", () => {
 
     expect(screen.getByText("Active kvintet")).toBeInTheDocument()
     expect(screen.getAllByText(/Petr Svoboda/).length).toBeGreaterThan(0)
+  })
+
+  it("sends an active kvintet to the begins page the first time only", () => {
+    mockUseMyKvintet.mockReturnValue({
+      data: {
+        id: "k1",
+        title: "Aktivní skupina",
+        status: "ACTIVE",
+        createdAt: "2026-10-21T10:00:00.000Z",
+        activatedAt: "2026-10-21T12:00:00.000Z",
+        commonPreferences: null,
+        capacity: 5,
+        openSeatsCount: 0,
+        members: [],
+        voteStatus: { canVote: false, userHasVoted: true, votedCount: 0, totalCount: 0 },
+        beginsSeen: false,
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn() as never,
+      vote: vi.fn(),
+      isVoting: false,
+      voteError: null,
+      leave: vi.fn(),
+      isLeaving: false,
+      leaveError: null,
+    })
+
+    render(<MyKvintetPage />)
+
+    expect(screen.getByTestId("navigate")).toHaveTextContent("/kvintet/begins")
+    expect(screen.queryByText("Active kvintet")).not.toBeInTheDocument()
   })
 })

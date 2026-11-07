@@ -450,4 +450,45 @@ describe('KvintetRepository (Postgres)', () => {
       [...users].sort(),
     );
   });
+
+  it('marks the begins page as seen only once the kvintet is ACTIVE, and keeps the first mark', async () => {
+    const users = await createUsers(3, 'begins');
+    const kvintetId = await createKvintet(users);
+
+    // Still forming: the mark is refused silently, so the page cannot be skipped.
+    await repository.markBeginsSeen(users[0]);
+    expect(
+      (await repository.findKvintetDetailsByUserId(users[0]))?.beginsSeen,
+    ).toBe(false);
+
+    for (const user of users) await repository.vote(kvintetId, user);
+    expect(
+      (await repository.findKvintetDetailsByUserId(users[0]))?.beginsSeen,
+    ).toBe(false);
+
+    await repository.markBeginsSeen(users[0]);
+    const first = await prisma.kvintetMember.findUniqueOrThrow({
+      where: { userId: users[0] },
+    });
+    await repository.markBeginsSeen(users[0]);
+    const again = await prisma.kvintetMember.findUniqueOrThrow({
+      where: { userId: users[0] },
+    });
+
+    expect(first.beginsSeenAt).not.toBeNull();
+    expect(again.beginsSeenAt).toEqual(first.beginsSeenAt);
+    // The mark is per member: the others still have to see it.
+    expect(
+      (await repository.findKvintetDetailsByUserId(users[0]))?.beginsSeen,
+    ).toBe(true);
+    expect(
+      (await repository.findKvintetDetailsByUserId(users[1]))?.beginsSeen,
+    ).toBe(false);
+  });
+
+  it('does not fail for a user who is in no kvintet', async () => {
+    const [user] = await createUsers(1, 'begins-none');
+
+    await expect(repository.markBeginsSeen(user)).resolves.toBeUndefined();
+  });
 });

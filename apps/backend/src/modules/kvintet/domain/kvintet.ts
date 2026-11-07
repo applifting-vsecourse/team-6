@@ -100,4 +100,6 @@ export interface KvintetDetails {
   openSeatsCount: number;
   members: KvintetMemberDetails[];
   voteStatus: KvintetVoteStatus;
+  /** The caller has opened the "Kvintet begins" page (see `markBeginsSeen`). */
+  beginsSeen: boolean;
 }

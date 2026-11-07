@@ -171,6 +171,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
             votedCount: (myKvintetData?.voteStatus.votedCount ?? 0) + 1,
             totalCount: myKvintetData?.voteStatus.totalCount ?? 4,
           },
+          beginsSeen: true,
         }) as never
       }
       return createResponseMock({}) as never
@@ -374,6 +375,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
         votedCount: 3,
         totalCount: 4,
       },
+      beginsSeen: true,
     }
 
     it("shows members, vote state ('3 OF 4 WANT TO START') and Vote button when user can vote", async () => {
@@ -403,6 +405,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
           votedCount: 0,
           totalCount: 2,
         },
+        beginsSeen: true,
       }
 
       renderWithClient(<OverviewPage />)
@@ -423,6 +426,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
           ...formingKvintet.voteStatus,
           userHasVoted: true,
         },
+        beginsSeen: true,
       }
 
       renderWithClient(<OverviewPage />)
@@ -440,7 +444,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       // Dialog opens
       expect(
-        screen.getByRole("heading", { name: "Are you sure you want to leave?" }),
+        await screen.findByRole("heading", { name: "Are you sure you want to leave?" }),
       ).toBeInTheDocument()
 
       // Confirm leaving inside the dialog
@@ -498,6 +502,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
         votedCount: 5,
         totalCount: 5,
       },
+      beginsSeen: true,
     }
 
     it("shows group blobatars and latest chat message with button opening chat directly", async () => {
