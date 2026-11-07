@@ -94,7 +94,7 @@ describe("HeaderMenu avatar", () => {
 describe("HeaderMenu dropdown", () => {
   beforeEach(() => useSession.mockReset())
 
-  it("shows name, @username and sign out, and no profile link yet", async () => {
+  it("shows name, @username, profile link and sign out", async () => {
     useSession.mockReturnValue({ user: { id: "u1", name: "Jana Nováková", username: "jana" } })
     render(<HeaderMenu />)
 
@@ -102,7 +102,7 @@ describe("HeaderMenu dropdown", () => {
 
     const menu = await screen.findByRole("menu")
     expect(within(menu).getByText("@jana")).toBeInTheDocument()
+    expect(within(menu).getByRole("link", { name: "Profile" })).toBeInTheDocument()
     expect(within(menu).getByRole("menuitem", { name: "Sign out" })).toBeInTheDocument()
-    expect(within(menu).queryByText("Profile")).not.toBeInTheDocument()
   })
 })
