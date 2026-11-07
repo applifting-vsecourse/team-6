@@ -437,7 +437,8 @@
         "q2": "Na jaký projekt nebo koníček se teď nejvíc těšíte?",
         "q3": "Jaký byl váš největší pracovní 'aha' moment za poslední dobu?",
         "q4": "Kdybyste mohli zautomatizovat jednu otravnou věc v práci, co by to bylo?",
-        "send": "Poslat do chatu"
+        "send": "Poslat do chatu",
+        "sentToast": "Otázka byla odeslána do chatu"
       },
       "leaveHint": "Ostatní budou pokračovat bez vás.",
       "nextMeeting": {

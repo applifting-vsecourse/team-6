@@ -55,6 +55,13 @@ describe("postSignInPath", () => {
 
   it("sends users who have not finished onboarding to onboarding, even with a deep link", () => {
     expect(postSignInPath(encoded("/profile"), false)).toBe("/onboarding")
+    expect(postSignInPath(encoded("/profile?tab=2"), false)).toBe("/onboarding")
+  })
+
+  it("keeps overview or onboarding deep links with query or hash for users who have not finished onboarding", () => {
+    expect(postSignInPath(encoded("/overview?x=1"), false)).toBe("/overview?x=1")
+    expect(postSignInPath(encoded("/overview#top"), false)).toBe("/overview#top")
+    expect(postSignInPath(encoded("/onboarding?step=2"), false)).toBe("/onboarding?step=2")
   })
 
   it("sends users who have not finished onboarding to Overview when there is no deep link", () => {

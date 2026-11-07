@@ -24,7 +24,12 @@ const isSameOriginPath = (target: string) =>
 export const postSignInPath = (from?: string, hasOnboarded = isOnboarded()) => {
   const target = from ? decodeRedirectUri(from) : undefined
   if (target && isSameOriginPath(target)) {
-    if (!hasOnboarded && target !== ROUTES.overview && target !== ROUTES.onboarding) {
+    const targetUrl = new URL(target, "http://app.invalid")
+    if (
+      !hasOnboarded &&
+      targetUrl.pathname !== ROUTES.overview &&
+      targetUrl.pathname !== ROUTES.onboarding
+    ) {
       return ROUTES.onboarding
     }
     return target
