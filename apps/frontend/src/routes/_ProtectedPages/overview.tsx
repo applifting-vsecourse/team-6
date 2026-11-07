@@ -22,6 +22,7 @@ import {
   kvintetFeedQueryOptions,
   type FeedKvintet,
 } from "@/features/kvintet/api/kvintetFeedQueryOptions"
+import { KvintetTableDiagram } from "@/features/kvintet/components/KvintetTableDiagram"
 import { LeaveKvintetDialog } from "@/features/kvintet/components/LeaveKvintetDialog"
 import { StartKvintetDialog } from "@/features/kvintet/components/StartKvintetDialog"
 import { useJoinKvintet } from "@/features/kvintet/hooks/useJoinKvintet"
@@ -37,14 +38,6 @@ const ICEBREAKER_KEYS = [
   "overview.active.icebreaker.q3",
   "overview.active.icebreaker.q4",
 ] as const
-
-const HOME_SEAT_POSITIONS = [
-  { left: 112, top: 10 },
-  { left: 209, top: 80.5 },
-  { left: 172, top: 194.5 },
-  { left: 52, top: 194.5 },
-  { left: 15, top: 80.5 },
-]
 
 export const Route = createFileRoute("/_ProtectedPages/overview")({
   loader: async ({ context }) => {
@@ -321,7 +314,10 @@ function OverviewPage() {
                   <div className="flex flex-col items-start gap-6 lg:flex-row">
                     {/* Left Card: Vote & Table */}
                     <div className="flex w-full flex-1 flex-col items-center gap-9 rounded-lg border border-border bg-card p-8 md:flex-row">
-                      <HomeTableDiagram members={kvintet.members} />
+                      <KvintetTableDiagram
+                        members={kvintet.members}
+                        isCompact
+                      />
 
                       <div className="flex w-full flex-1 flex-col items-start gap-3">
                         {kvintet.voteStatus.canVote ||
@@ -470,7 +466,10 @@ function OverviewPage() {
                     {/* Left Card: Group */}
                     <div className="flex w-full flex-1 flex-col gap-6 rounded-lg border border-border bg-card p-8">
                       <div className="flex flex-col items-center gap-8 md:flex-row">
-                        <HomeTableDiagram members={kvintet.members} />
+                        <KvintetTableDiagram
+                          members={kvintet.members}
+                          isCompact
+                        />
 
                         <div className="flex w-full flex-1 flex-col items-start gap-3.5">
                           <h3 className="text-h3 font-semibold text-foreground">
@@ -589,71 +588,6 @@ function OverviewPage() {
         </div>
       </div>
     </>
-  )
-}
-
-function HomeTableDiagram({ members }: { members: KvintetMember[] }) {
-  const { t } = useTranslation()
-
-  return (
-    <div
-      className="relative size-[300px] shrink-0"
-      role="img"
-      aria-label={t("kvintet.table.title")}
-    >
-      <svg
-        viewBox="0 0 300 300"
-        className="pointer-events-none absolute inset-0 size-[300px]"
-      >
-        <circle
-          cx="150"
-          cy="150"
-          r="102"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1"
-          strokeDasharray="3 5"
-          className="text-border"
-        />
-      </svg>
-
-      {HOME_SEAT_POSITIONS.map((pos, idx) => {
-        const member = members[idx]
-        if (!member) {
-          return (
-            <div
-              key={`free-${idx}`}
-              style={{ left: pos.left, top: pos.top }}
-              className="absolute flex size-[76px] items-center justify-center"
-            >
-              <div className="size-[59.28px] rounded-full border-[1.5px] border-dashed border-input" />
-            </div>
-          )
-        }
-
-        const displayName =
-          member.name ??
-          member.role ??
-          String(t("kvintet.diagram.memberNumber", { number: idx + 1 }))
-        const label = member.isCurrentUser
-          ? `${displayName} (${t("kvintet.members.you")})`
-          : displayName
-
-        return (
-          <div
-            key={member.userId || idx}
-            style={{ left: pos.left, top: pos.top }}
-            className="absolute flex size-[76px] items-center justify-center rounded-full"
-          >
-            <GazeBlobatar
-              name={member.username ?? member.userId}
-              title={label}
-              className="size-[76px]"
-            />
-          </div>
-        )
-      })}
-    </div>
   )
 }
 

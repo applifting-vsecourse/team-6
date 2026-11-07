@@ -5,7 +5,7 @@ import { PageLayout } from "@/components/PageLayout"
 import { Seo } from "@/components/Seo"
 
 import { AppHeader } from "@/features/auth/components/AppHeader"
-import { HowItWorksPage } from "@/features/legal/components/HowItWorksPage"
+import { HowItWorksPage } from "@/features/kvintet/components/HowItWorksPage"
 
 export const Route = createFileRoute("/how-it-works")({
   component: HowItWorksRoute,
