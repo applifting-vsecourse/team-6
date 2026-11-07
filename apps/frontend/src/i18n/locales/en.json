@@ -165,35 +165,36 @@
       "heading": "Group chat",
       "openMessages": "Open messages"
     },
-    "count_one": "{{formatted}} proposal",
-    "count_other": "{{formatted}} proposals",
+    "count_one": "{{formatted}} kvintet · best match first",
+    "count_other": "{{formatted}} kvintets · best match first",
     "diagram": {
       "memberNumber": "Member {{number}}"
     },
     "dialog": {
       "cancel": "Cancel",
-      "category": "Categories",
-      "categoryHint": "Pick up to {{max}}. Others find the proposal by category in the filter.",
+      "category": "Category",
+      "categoryPlaceholder": "Pick a category",
       "confirmLeave": "Leave",
-      "description": "You will be its first member. Others will see the topic, your role and tags – not your name.",
-      "details": "Short description (optional)",
+      "description": "You'll be its first member. Others join by topic.",
+      "details": "A few more words (optional)",
       "detailsPlaceholder": "e.g. I run a 10-person agency and want to share what works for us.",
       "leaveActiveConfirm": "You will leave the active kvintet. If fewer than 3 members remain, the kvintet will be disbanded.",
       "leaveProposalConfirm": "You will leave this proposal. When someone joins or leaves, everyone's votes are reset.",
       "leaveTitle": "Are you sure you want to leave?",
-      "submit": "Start proposal",
-      "title": "Start a new proposal",
-      "topic": "Topic or problem",
-      "topicHint": "What should the group talk about?"
+      "note": "Others will see the topic and your role. Your name only once the group starts.",
+      "submit": "Start a kvintet",
+      "title": "Start a kvintet",
+      "topic": "What do you want to talk about",
+      "topicHint": "Short and specific – that's how people find you."
     },
     "empty": {
-      "text": "Proposals that fit your profile will show up here.",
-      "title": "No proposals for you yet"
+      "text": "Kvintets that fit your profile will show up here.",
+      "title": "No kvintets for you yet"
     },
     "emptyFiltered": {
-      "showAll": "Clear filter",
-      "text": "Try another category, or start your own proposal in this one.",
-      "title": "No proposals in {{category}} yet"
+      "showAll": "Clear filters",
+      "text": "Try other filters, or start your own kvintet.",
+      "title": "No kvintets match these filters"
     },
     "emptyState": {
       "description": "Your group will appear here once you join a proposal.",
@@ -203,18 +204,22 @@
     "error": {
       "retry": "Try again",
       "text": "Something went wrong on our side. Please try again.",
-      "title": "Couldn't load proposals"
+      "title": "Couldn't load kvintets"
     },
-    "fallback": "Nothing fits your profile closely yet, so here are all open proposals, closest first.",
+    "fallback": "Nothing fits your profile closely yet, so here are all open kvintets, closest first.",
     "filter": {
       "all": "All",
-      "label": "Category"
+      "frequency": "How often",
+      "topic": "Topic"
     },
-    "interests": "Interests: {{tags}}",
-    "join": "Join this proposal",
+    "frequency": {
+      "BIWEEKLY": "Every two weeks",
+      "MONTHLY": "Once a month",
+      "WEEKLY": "Every week"
+    },
+    "join": "Join",
     "joined": "You joined the proposal.",
-    "learns": "Wants to learn: {{tags}}",
-    "loading": "Loading proposals…",
+    "loading": "Loading kvintets…",
     "member": "Member",
     "members": {
       "capacity": "{{count}} of 5",
@@ -231,7 +236,6 @@
       "you": "(you)"
     },
     "myKvintetTitle": "My kvintet",
-    "namesHidden": "You will see the names once the kvintet forms.",
     "nextSteps": {
       "heading": "What happens next",
       "step1": "With 3 or 4 members, the kvintet can start right away if everyone votes yes.",
@@ -256,28 +260,24 @@
       "teach": "Someone here wants to learn {{tag}}",
       "topic": "Your topic: {{category}}"
     },
+    "seatCount": "{{filled}} / {{total}}",
     "seats": "{{filled}} of {{total}}",
     "startOwn": {
-      "button": "Start a new proposal",
-      "text": "Start your own on a topic that interests you – others will join you.",
-      "title": "Nothing fits?"
+      "button": "Start a kvintet"
     },
     "started": "Your proposal is open. Others can join it now.",
     "statusActive": "Active kvintet",
     "statusProposal": "Proposal · {{count}} of 5",
-    "subtitle": "Every group that fits your profile. Choose by topic – you can only be in one proposal at a time.",
+    "subtitle": "Pick a kvintet by topic.",
     "suitsAll": "Suits everyone: {{value}}",
     "table": {
       "description": "Arrange your first meeting in the group chat. You run the kvintet yourselves – no facilitator, no ratings.",
       "title": "Five people, <em className=\"italic\">one table.</em>"
     },
-    "teaches": "Teaches: {{tags}}",
-    "title": "Proposals for you",
-    "vacancy": "Free seat",
-    "vacancyHint": "It could be you.",
+    "title": "Kvintets",
+    "vacancy": "Free",
     "validation": {
       "categoryRequired": "Choose a category",
-      "categoryTooMany": "Choose at most {{max}} categories",
       "descriptionTooLong": "The description can be at most {{max}} characters",
       "titleRequired": "Enter a topic",
       "titleTooLong": "The topic can be at most {{max}} characters"
