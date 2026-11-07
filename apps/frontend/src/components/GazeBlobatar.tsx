@@ -1,6 +1,7 @@
 import type { ComponentProps } from "react"
 import { useGaze } from "@blobatar/react/gaze"
 import type { Palette } from "blobatar"
+import type { Expression } from "blobatar/expression"
 
 import "blobatar/motion.css"
 import "blobatar/gaze.css"
@@ -19,6 +20,8 @@ type GazeBlobatarProps = {
   travel?: number
   /** Colour override, e.g. the grey of an anonymous seat. */
   palette?: Palette
+  /** A pose to hold while it idles and looks around, e.g. `happy`. */
+  expression?: Expression
 } & Pick<ComponentProps<typeof Blobatar>, "size">
 
 /** Animated avatar whose eyes follow the cursor. Static `Blobatar` stays the default for lists. */
@@ -29,6 +32,7 @@ export function GazeBlobatar({
   animate = "always",
   travel = 3,
   palette,
+  expression,
   size,
 }: GazeBlobatarProps) {
   const { ref } = useGaze({ travel, lookAt: "pointer" })
@@ -39,7 +43,7 @@ export function GazeBlobatar({
       name={name}
       size={size}
       className={cn("overflow-visible", className)}
-      blobatar={{ animate, ref, title, palette }}
+      blobatar={{ animate, ref, title, palette, expression }}
     />
   )
 }

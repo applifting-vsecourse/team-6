@@ -56,6 +56,19 @@ describe("KvintetSeats", () => {
     expect(container.querySelectorAll("[data-seat] > span.absolute")).toHaveLength(1)
   })
 
+  it("draws the dashed guide ring unless told not to", () => {
+    const withGuide = render(<KvintetSeats members={people(5)} />)
+    const without = render(
+      <KvintetSeats
+        members={people(5)}
+        hasGuide={false}
+      />,
+    )
+
+    expect(withGuide.container.querySelectorAll("[aria-hidden=true].border-dashed")).toHaveLength(1)
+    expect(without.container.querySelectorAll("[aria-hidden=true].border-dashed")).toHaveLength(0)
+  })
+
   it("draws an anonymous member grey and a normal one in colour", () => {
     const grey = render(<KvintetSeats members={[{ seed: "seat-1", anonymous: true }]} />)
     const colour = render(<KvintetSeats members={[{ seed: "seat-1" }]} />)

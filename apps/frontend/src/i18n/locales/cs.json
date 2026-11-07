@@ -143,16 +143,16 @@
     "validation_failed": "Některé zadané hodnoty nejsou platné."
   },
   "howItWorks": {
-    "intro": "Kvintet spojuje lidi v malých skupinách až do pěti členů, aby sdíleli své znalosti a učili se navzájem.",
-    "principlesTitle": "Hlavní zásady",
-    "seoTitle": "Jak funguje Kvintet",
-    "step1Text": "Vaše role, co můžete předat a co se chcete naučit. Pomocí štítků, bez fotek.",
-    "step1Title": "Představte se",
-    "step2Text": "Uvidíte skupiny, které k vám sedí – role a zájmy, jména zůstávají skrytá až do spuštění.",
-    "step2Title": "Vyberte si návrh",
-    "step3Text": "S pěti členy vznikne sám. Se třemi nebo čtyřmi, když všichni odhlasují spuštění. Pak se otevře skupinový chat.",
-    "step3Title": "Vznik kvintetu",
-    "title": "Jak funguje Kvintet"
+    "seoTitle": "Jak Kvintet funguje",
+    "step1Text": "Co umíte a co se chcete naučit.",
+    "step1Title": "Profil",
+    "step2Text": "Vybíráte podle tématu. Jména zůstanou skrytá, dokud kvintet nezačne.",
+    "step2Title": "Výběr kvintetu",
+    "step3Text": "Při pěti lidech kvintet začne. Při třech nebo čtyřech, když všichni řeknou ano.",
+    "step3Title": "Start skupiny",
+    "step4Text": "Kde a jak často se potkáte, je na vás.",
+    "step4Title": "Setkání",
+    "title": "Jak Kvintet funguje"
   },
   "kvintet": {
     "actions": {
@@ -318,18 +318,24 @@
     }
   },
   "landing": {
-    "caption": "Žádné fotky, žádná hodnocení – jen lidé a témata.",
     "createAccount": "Vytvořit účet",
+    "eyebrow": "Zdarma · Bez fotek · Bez hodnocení",
     "goToOverview": "Přejít na přehled",
-    "heroText": "Kvintet posadí k jednomu stolu pět lidí, kteří se od sebe můžou něco naučit. Skupinu si vybíráte podle tématu, ne podle toho, koho už znáte.",
-    "heroTitle": "Najděte si svůj <em>kvintet</em>.",
+    "heroText": "Kvintet vás spojí se čtyřmi lidmi, které zajímá stejné téma. Každý něco učí, každý se něco učí.",
+    "heroTextShort": "Kvintet vás spojí se čtyřmi lidmi, které zajímá stejné téma. Každý učí, každý se učí.",
+    "heroTitle1": "Pět lidí, jedno téma.",
+    "heroTitle2": "Učíte se jeden od druhého.",
     "howItWorks": "Jak to funguje",
-    "step1Text": "Vaše role, s čím můžete poradit a co se chcete naučit. Štítky, žádné fotky.",
-    "step1Title": "Řekněte nám něco o sobě",
-    "step2Text": "Uvidíte všechny skupiny, které k vám sedí – role a zájmy, jména zůstanou skrytá, dokud skupina nevznikne.",
-    "step2Title": "Vyberte si návrh",
-    "step3Text": "S pěti členy vznikne sám. Se třemi nebo čtyřmi, když všichni hlasují pro. Pak se otevře skupinový chat.",
-    "step3Title": "Založte svůj kvintet"
+    "rulesLead": "Pro všechny platí stejná pravidla.",
+    "rulesLink": "Přečtěte si pravidla",
+    "step1Text": "Co umíte a co se chcete naučit. Zabere to 3 minuty.",
+    "step1TextShort": "Co umíte a co se chcete naučit.",
+    "step1Title": "Řekněte nám o sobě",
+    "step2Text": "Vybíráte podle tématu. Jména zůstanou skrytá, dokud kvintet nezačne.",
+    "step2TextShort": "Jména zůstanou skrytá, dokud kvintet nezačne.",
+    "step2Title": "Vyberte si kvintet",
+    "step3Text": "Jakmile kvintet začne, otevře se skupinový chat.",
+    "step3Title": "Sejděte se"
   },
   "layout": {
     "closeMenu": "Zavřít menu",
@@ -497,11 +503,6 @@
     },
     "greeting": "Ahoj, {{name}}",
     "greetingAnonymous": "Ahoj",
-    "howItWorks": {
-      "p1": "— Kvintet vznikne sám, když se přidá pět lidí.",
-      "p2": "— Se třemi nebo čtyřmi členy vznikne, když všichni hlasují pro.",
-      "p3": "— Po vzniku uvidíte jména a otevře se skupinový chat."
-    },
     "nextStep": {
       "badge": "VÁŠ DALŠÍ KROK",
       "button": "Zobrazit návrhy",

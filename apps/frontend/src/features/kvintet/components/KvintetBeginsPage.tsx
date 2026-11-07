@@ -108,7 +108,8 @@ export function KvintetBeginsPage() {
         {/* The Figma table is taller than the ring: its top seat overhangs it, names hang below. */}
         <div className="mt-1 mb-6 w-68 md:-mt-1.5 md:mb-2.5 md:w-89">
           <KvintetSeats
-            className="[--seat:26.5%] md:[--seat:27%]"
+            hasGuide={false}
+            className="[--seat-radius:36.5%] [--seat:26.5%] md:[--seat-radius:36.5%] md:[--seat:27%]"
             members={toSeats(kvintet.members, t("kvintet.members.you"), (number) =>
               t("kvintet.diagram.memberNumber", { number }),
             )}

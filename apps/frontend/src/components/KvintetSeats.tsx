@@ -30,23 +30,43 @@ type KvintetSeatsProps = {
   motion?: BlobatarMotion
   /** Only when the table stands alone; leave it out when the text beside it says the same. */
   label?: string
+  /** The dashed ring behind the seats; Figma K3 / M9 ("Kvintet begins") draws none. */
+  hasGuide?: boolean
   className?: string
 }
 
 /**
  * A kvintet as exactly five seats on a ring: members first, then dashed free seats, never a
- * number. It fills a square, so the parent sets the size and the seats scale with it. The
- * default geometry is Figma K3 / M9 ("Kvintet begins"): seats 27 % of the width on a ring of
- * radius 36.5 % (96 px / 130 px at 356 px, 72 px / 100 px at 272 px). Names sit directly under
- * their seat and still fit inside the square.
+ * number. It fills its parent (a square), so the parent sets the size. Figma A1 and M1 draw
+ * the seats at 22 % of the width on a ring of radius 36 % on desktop, 23 % and 34 % on a phone.
+ * Figma K3 / M9 ("Kvintet begins") draws them at 27 % on a ring of 36.5 % with their names
+ * underneath and no guide ring: pass `hasGuide={false}` and the two variables in `className`.
  */
-export function KvintetSeats({ members, motion = "always", label, className }: KvintetSeatsProps) {
+export function KvintetSeats({
+  members,
+  motion = "always",
+  label,
+  hasGuide = true,
+  className,
+}: KvintetSeatsProps) {
   return (
     <div
       role={label ? "img" : undefined}
       aria-label={label}
-      className={cn("relative aspect-square w-full [--seat-radius:36.5%] [--seat:27%]", className)}
+      className={cn(
+        "relative aspect-square w-full [--seat-radius:34%] [--seat:23.1%] md:[--seat-radius:36%] md:[--seat:22.1%]",
+        className,
+      )}
     >
+      {hasGuide ? (
+        <span
+          aria-hidden="true"
+          className="absolute rounded-full border border-dashed border-input"
+          style={{
+            inset: "calc(50% - var(--seat-radius))",
+          }}
+        />
+      ) : null}
       {POSITIONS.map((position, i) => {
         const member = members[i]
         return (
