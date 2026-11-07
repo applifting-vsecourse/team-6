@@ -308,7 +308,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       const startBtn = await screen.findByRole("button", { name: "Start your own" })
       await userEvent.click(startBtn)
 
-      expect(screen.getByRole("heading", { name: /Start a kvintet/i })).toBeInTheDocument()
+      expect(await screen.findByRole("heading", { name: /Start a kvintet/i })).toBeInTheDocument()
     })
   })
 

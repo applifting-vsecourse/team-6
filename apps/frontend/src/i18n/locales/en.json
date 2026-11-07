@@ -141,15 +141,15 @@
     "validation_failed": "Some of the entered values are not valid."
   },
   "howItWorks": {
-    "intro": "Kvintet connects people in small groups of up to five to share knowledge and learn from each other.",
-    "principlesTitle": "Key principles",
     "seoTitle": "How Kvintet works",
-    "step1Text": "Your role, what you can teach and what you want to learn. Tags, no photos.",
-    "step1Title": "Tell us about yourself",
-    "step2Text": "You see every group that fits you – roles and interests, names stay hidden until the group forms.",
-    "step2Title": "Pick a proposal",
-    "step3Text": "With five members it forms on its own. With three or four, when everyone votes yes. Then the group chat opens.",
-    "step3Title": "Form your kvintet",
+    "step1Text": "What you know and what you'd like to learn.",
+    "step1Title": "Profile",
+    "step2Text": "Choose by topic. Names stay hidden until it starts.",
+    "step2Title": "Picking a kvintet",
+    "step3Text": "Five people – it starts. Three or four – when all say yes.",
+    "step3Title": "Group start",
+    "step4Text": "Where and how often is up to you.",
+    "step4Title": "Meeting up",
     "title": "How Kvintet works"
   },
   "kvintet": {
@@ -300,18 +300,24 @@
     }
   },
   "landing": {
-    "caption": "No photos, no ratings – just people and topics.",
-    "createAccount": "Create an account",
+    "createAccount": "Create account",
+    "eyebrow": "Free · No photos · No ratings",
     "goToOverview": "Go to overview",
-    "heroText": "Kvintet seats five people at one table who can learn something from each other. You pick the group by topic, not by who you already know.",
-    "heroTitle": "Find your <em>kvintet</em>.",
+    "heroText": "Meet four people who care about the same topic. Everyone teaches something, everyone learns something.",
+    "heroTextShort": "Meet four people who care about the same topic. Everyone teaches, everyone learns.",
+    "heroTitle1": "Five people. One kvintet.",
+    "heroTitle2": "Learn from each other.",
     "howItWorks": "How it works",
-    "step1Text": "Your role, what you can teach and what you want to learn. Tags, no photos.",
-    "step1Title": "Tell us about yourself",
-    "step2Text": "You see every group that fits you – roles and interests, names stay hidden until the group forms.",
-    "step2Title": "Pick a proposal",
-    "step3Text": "With five members it forms on its own. With three or four, when everyone votes yes. Then the group chat opens.",
-    "step3Title": "Form your kvintet"
+    "rulesLead": "The same rules apply to everyone.",
+    "rulesLink": "Read the rules",
+    "step1Text": "What you know and what you'd like to learn. 3 minutes.",
+    "step1TextShort": "What you know and what you'd like to learn.",
+    "step1Title": "Tell us about you",
+    "step2Text": "Choose by topic. Names stay hidden until it starts.",
+    "step2TextShort": "Names stay hidden until it starts.",
+    "step2Title": "Pick a kvintet",
+    "step3Text": "Once your kvintet starts, the group chat opens.",
+    "step3Title": "Meet up"
   },
   "layout": {
     "closeMenu": "Close menu",
@@ -477,11 +483,6 @@
     },
     "greeting": "Hi, {{name}}",
     "greetingAnonymous": "Hi",
-    "howItWorks": {
-      "p1": "— A kvintet forms automatically when five people join.",
-      "p2": "— With three or four members it forms when everyone votes yes.",
-      "p3": "— Once formed, you'll see names and a group chat opens."
-    },
     "nextStep": {
       "badge": "YOUR NEXT STEP",
       "button": "See proposals",
