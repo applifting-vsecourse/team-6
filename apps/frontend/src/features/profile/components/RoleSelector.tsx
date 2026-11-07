@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react"
 import { Check } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
-import { Blobatar } from "@/components/ui/blobatar"
+import { HoverGazeBlobatar } from "@/components/HoverGazeBlobatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -150,8 +150,8 @@ export function RoleSelector({
             onClick={() => setFieldId(item.id)}
             className={cn("h-auto px-3 py-2", item.id !== fieldId && "bg-card")}
           >
-            {/* Decorative: the label is written next to it. One face per field, seeded by its id. */}
-            <Blobatar
+            {/* Decorative: the label is written next to it. One face per field, seeded by its id; it follows the mouse while hovered (a row of chips is a list). */}
+            <HoverGazeBlobatar
               name={`field-${item.id}`}
               className="size-6"
             />
