@@ -173,7 +173,8 @@ export function ProposalKvintetView({
         }}
         isLeaving={isLeaving}
         isActiveKvintet={false}
-        avatarSeed={currentMember ? (currentMember.username ?? currentMember.userId) : undefined}
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+        avatarSeed={currentMember ? currentMember.username || currentMember.userId : undefined}
       />
     </div>
   )

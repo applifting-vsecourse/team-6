@@ -1,17 +1,19 @@
 import type { ReactNode } from "react"
-import { render, screen } from "@testing-library/react"
+import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import type { TFunction } from "i18next"
 import { HTTPError } from "ky"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import type { ProfileResponse } from "@/features/profile/api/profileApi"
 import type { useProfile } from "@/features/profile/hooks/useProfile"
 
-import { ProfilePage } from "./ProfilePage"
+import { formatWhenAndWhere, ProfilePage } from "./profile"
 
 vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
 
 vi.mock("@tanstack/react-router", () => ({
+  createFileRoute: () => () => ({}),
   Link: ({
     children,
     to,
@@ -33,10 +35,20 @@ vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => vi.fn(),
 }))
 
-const mockUseProfile = vi.fn<() => ReturnType<typeof useProfile>>()
+const mockUseProfile = vi.fn<(...args: unknown[]) => ReturnType<typeof useProfile>>()
 
 vi.mock("@/features/profile/hooks/useProfile", () => ({
-  useProfile: () => mockUseProfile(),
+  useProfile: (...args: unknown[]) => mockUseProfile(...args),
+}))
+
+const mockDeleteMutate = vi.fn()
+let isDeletePending = false
+
+vi.mock("@/features/account/hooks/useDeleteAccount", () => ({
+  useDeleteAccount: () => ({
+    mutate: mockDeleteMutate,
+    isPending: isDeletePending,
+  }),
 }))
 
 const defaultUser = {
@@ -44,6 +56,10 @@ const defaultUser = {
   name: "Jana Nováková",
   username: "jana.novakova",
 }
+
+vi.mock("@/features/auth/hooks/useSession", () => ({
+  useSession: () => ({ user: defaultUser }),
+}))
 
 const mockProfile: ProfileResponse = {
   userId: "u-1",
@@ -94,6 +110,15 @@ function mockProfileData(
 describe("ProfilePage", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    isDeletePending = false
+  })
+
+  it("calls useProfile with user.id to hit the query cache warmed by loader", () => {
+    mockUseProfile.mockReturnValue(mockProfileData())
+
+    render(<ProfilePage user={defaultUser} />)
+
+    expect(mockUseProfile).toHaveBeenCalledWith("u-1")
   })
 
   it("renders large blobatar in the header with alt text / accessible title", () => {
@@ -184,40 +209,49 @@ describe("ProfilePage", () => {
     expect(screen.getByText("No preferences set yet")).toBeInTheDocument()
   })
 
-  it("opens delete account dialog when clicking delete button", async () => {
+  it("opens real delete account dialog and confirms account deletion", async () => {
     mockUseProfile.mockReturnValue(mockProfileData())
 
-    const mockRenderDialog = vi.fn(
-      ({ isOpen, onOpenChange }: { isOpen: boolean; onOpenChange: (open: boolean) => void }) =>
-        isOpen ? (
-          <div role="dialog">
-            <h2>Delete account dialog</h2>
-            <button onClick={() => onOpenChange(false)}>Cancel</button>
-          </div>
-        ) : null,
-    )
-
-    render(
-      <ProfilePage
-        user={defaultUser}
-        renderDeleteAccountDialog={mockRenderDialog}
-      />,
-    )
+    render(<ProfilePage user={defaultUser} />)
 
     const deleteSection = screen.getByRole("heading", { name: "Delete account" })
     expect(deleteSection).toBeInTheDocument()
     expect(screen.getByText("Removes everything. Can't be undone.")).toBeInTheDocument()
 
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+
+    // Click Delete account button in danger zone
     const deleteButton = screen.getByRole("button", { name: "Delete account" })
     await userEvent.click(deleteButton)
 
-    expect(mockRenderDialog).toHaveBeenCalledWith(
-      expect.objectContaining({
-        isOpen: true,
-        avatarSeed: "jana.novakova",
-      }),
-    )
-    expect(screen.getByRole("dialog")).toBeInTheDocument()
+    // Real DeleteAccountDialog opens
+    const dialog = screen.getByRole("dialog")
+    expect(dialog).toBeInTheDocument()
+    expect(screen.getByText(/Are you sure you want to delete your account\?/i)).toBeInTheDocument()
+
+    // Click confirm Delete account button inside dialog
+    const confirmButton = within(dialog).getByRole("button", { name: "Delete account" })
+    await userEvent.click(confirmButton)
+
+    expect(mockDeleteMutate).toHaveBeenCalledOnce()
+  })
+
+  it("closes delete account dialog when cancel is clicked without triggering deletion", async () => {
+    mockUseProfile.mockReturnValue(mockProfileData())
+
+    render(<ProfilePage user={defaultUser} />)
+
+    const deleteButton = screen.getByRole("button", { name: "Delete account" })
+    await userEvent.click(deleteButton)
+
+    const dialog = screen.getByRole("dialog")
+    expect(dialog).toBeInTheDocument()
+
+    const cancelButton = within(dialog).getByRole("button", { name: "Cancel" })
+    await userEvent.click(cancelButton)
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+    expect(mockDeleteMutate).not.toHaveBeenCalled()
   })
 
   it("renders loading state when isLoading is true", () => {
@@ -229,10 +263,13 @@ describe("ProfilePage", () => {
     )
 
     const { container } = render(<ProfilePage user={defaultUser} />)
-    expect(container.querySelectorAll("[data-slot=skeleton]").length).toBeGreaterThan(0)
+
+    const skeletons = container.querySelectorAll("[data-slot=skeleton]")
+    expect(skeletons.length).toBeGreaterThan(0)
+    expect(screen.queryByRole("heading", { name: "Jana Nováková" })).not.toBeInTheDocument()
   })
 
-  it("renders error state with retry button when isError is true", async () => {
+  it("renders error alert with retry button when isError is true", async () => {
     const mockRefetch = vi.fn().mockResolvedValue({})
     mockUseProfile.mockReturnValue(
       mockProfileData({
@@ -277,7 +314,7 @@ describe("ProfilePage", () => {
     expect(screen.getByText("You need to sign in first.")).toBeInTheDocument()
   })
 
-  it("falls back to user id when username is an empty string", () => {
+  it("falls back to user id when username is an empty string", async () => {
     mockUseProfile.mockReturnValue(mockProfileData())
 
     render(
@@ -292,5 +329,84 @@ describe("ProfilePage", () => {
 
     const avatar = document.body.querySelector("[data-slot=avatar]")
     expect(avatar).toBeInTheDocument()
+
+    // Open delete dialog and verify dialog avatar also renders
+    const deleteButton = screen.getByRole("button", { name: "Delete account" })
+    await userEvent.click(deleteButton)
+
+    const dialog = screen.getByRole("dialog")
+    expect(dialog).toBeInTheDocument()
+    const dialogAvatar = dialog.querySelector("[data-slot=avatar]")
+    expect(dialogAvatar).toBeInTheDocument()
+  })
+})
+
+describe("formatWhenAndWhere", () => {
+  const tMock = ((key: string, options?: { count?: number }) => {
+    const translations: Record<string, string> = {
+      "profile.when.allDays": "All days",
+      "profile.when.weekdays": "Weekdays",
+      "profile.when.weekends": "Weekends",
+      "profile.when.mornings": "mornings",
+      "profile.when.afternoons": "afternoons",
+      "profile.when.evenings": "evenings",
+      "meetingFrequency.BIWEEKLY": "every 14 days",
+      "meetingFrequency.WEEKLY": "weekly",
+    }
+    if (key === "profile.withinRadius") {
+      return `within ${options?.count ?? 0} km`
+    }
+    return translations[key] ?? key
+  }) as unknown as TFunction
+
+  it("returns null if profile is null", () => {
+    expect(formatWhenAndWhere(null, tMock)).toBeNull()
+  })
+
+  it("returns null if no when and where fields are present", () => {
+    const empty = {
+      ...mockProfile,
+      weekdays: false,
+      weekends: false,
+      mornings: false,
+      afternoons: false,
+      evenings: false,
+      cityName: null,
+      radiusKm: null,
+      meetingFrequency: null,
+    }
+    expect(formatWhenAndWhere(empty, tMock)).toBeNull()
+  })
+
+  it("formats weekdays and weekends as all days with times, city with radius and frequency", () => {
+    const full = {
+      ...mockProfile,
+      weekdays: true,
+      weekends: true,
+      mornings: true,
+      afternoons: false,
+      evenings: true,
+      cityName: "Brno",
+      radiusKm: 15,
+      meetingFrequency: "WEEKLY" as const,
+    }
+    expect(formatWhenAndWhere(full, tMock)).toBe(
+      "All days mornings, evenings · Brno, within 15 km · weekly",
+    )
+  })
+
+  it("formats city without radius when radius is 0 or null", () => {
+    const withoutRadius = {
+      ...mockProfile,
+      weekdays: false,
+      weekends: true,
+      mornings: false,
+      afternoons: true,
+      evenings: false,
+      cityName: "Ostrava",
+      radiusKm: 0,
+      meetingFrequency: null,
+    }
+    expect(formatWhenAndWhere(withoutRadius, tMock)).toBe("Weekends afternoons · Ostrava")
   })
 })

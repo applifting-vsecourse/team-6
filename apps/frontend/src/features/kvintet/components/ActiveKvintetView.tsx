@@ -125,7 +125,8 @@ export function ActiveKvintetView({ kvintet, onLeave, isLeaving }: ActiveKvintet
         }}
         isLeaving={isLeaving}
         isActiveKvintet={true}
-        avatarSeed={currentMember ? (currentMember.username ?? currentMember.userId) : undefined}
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+        avatarSeed={currentMember ? currentMember.username || currentMember.userId : undefined}
       />
     </div>
   )

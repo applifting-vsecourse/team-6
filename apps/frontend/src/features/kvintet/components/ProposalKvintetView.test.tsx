@@ -1,9 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 
 import type { KvintetDetails } from "@/features/kvintet/api/kvintetApi"
 
 import { ProposalKvintetView } from "./ProposalKvintetView"
+
+vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
 
 describe("ProposalKvintetView", () => {
   const mockKvintet: KvintetDetails = {
@@ -166,5 +169,37 @@ describe("ProposalKvintetView", () => {
       ),
     ).toBeInTheDocument()
     expect(screen.queryByRole("button", { name: "Yes, start now" })).not.toBeInTheDocument()
+  })
+
+  it("uses userId as avatarSeed in leave dialog when currentMember username is empty string", async () => {
+    const handleLeave = vi.fn()
+    const kvintetWithEmptyUsername: KvintetDetails = {
+      ...mockKvintet,
+      members: [
+        {
+          ...mockKvintet.members[0]!,
+          username: "",
+          userId: "fallback-proposal-user-id",
+          isCurrentUser: true,
+        },
+        ...mockKvintet.members.slice(1),
+      ],
+    }
+
+    render(
+      <ProposalKvintetView
+        kvintet={kvintetWithEmptyUsername}
+        onVote={vi.fn()}
+        isVoting={false}
+        onLeave={handleLeave}
+        isLeaving={false}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole("button", { name: "Leave proposal" }))
+    const dialog = screen.getByRole("dialog")
+    expect(dialog).toBeInTheDocument()
+    const avatar = dialog.querySelector("[data-slot=avatar]")
+    expect(avatar).toBeInTheDocument()
   })
 })
