@@ -1,3 +1,4 @@
+import { Fragment } from "react"
 import type { TFunction } from "i18next"
 import { Loader2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
@@ -5,13 +6,10 @@ import { useTranslation } from "react-i18next"
 import { AnonymousBlobatar, FreeSeat } from "@/components/AnonymousBlobatar"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { formatList } from "@/lib/date"
+import { formatNumber } from "@/lib/date"
 
 import type { FeedKvintet, FeedReason } from "@/features/kvintet/api/kvintetFeedQueryOptions"
-import { KvintetCapacity } from "@/features/kvintet/components/KvintetCapacity"
 import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
-
-type Member = FeedKvintet["members"][number]
 
 type KvintetCardProps = {
   kvintet: FeedKvintet
@@ -19,21 +17,6 @@ type KvintetCardProps = {
   // Another join is in flight; the user can only be in one kvintet.
   isDisabled: boolean
   onJoin: (kvintetId: string) => void
-}
-
-function describeMember(
-  member: Member,
-  t: TFunction,
-  label: ReturnType<typeof useSlugLabel>,
-): string {
-  const tags = (slugs: string[]) => formatList(slugs.map((slug) => label("tags", slug)))
-  return [
-    member.teach.length ? t("kvintet.teaches", { tags: tags(member.teach) }) : null,
-    member.learn.length ? t("kvintet.learns", { tags: tags(member.learn) }) : null,
-    member.interests.length ? t("kvintet.interests", { tags: tags(member.interests) }) : null,
-  ]
-    .filter(Boolean)
-    .join(" · ")
 }
 
 function describeReason(
@@ -58,62 +41,48 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
   const label = useSlugLabel()
   const freeSeats = Math.max(kvintet.capacity - kvintet.members.length, 0)
   const titleId = `kvintet-${kvintet.id}`
+  const seatCount = t("kvintet.seatCount", {
+    filled: formatNumber(kvintet.members.length),
+    total: formatNumber(kvintet.capacity),
+  })
 
   return (
     <Card
       aria-labelledby={titleId}
-      className="gap-4 rounded-lg bg-secondary px-7 py-6"
+      className="gap-4.5 rounded-lg px-4.5 py-4.5 sm:px-6 sm:py-6"
     >
-      <div className="flex flex-wrap gap-2">
-        {kvintet.categories.map((slug) => (
-          <span
-            key={slug}
-            className="inline-flex rounded-full border border-input px-2.5 py-0.5 font-mono text-meta tracking-meta text-body uppercase"
-          >
-            {label("categories", slug)}
-          </span>
-        ))}
-      </div>
-
-      <div className="flex items-center justify-between gap-4">
+      {/* Desktop: title, category pills, seat count on the right. Mobile: one mono line above the
+          title ("TECHNOLOGY · 3 / 5"); `sm:contents` hands the pieces to the row on desktop. */}
+      <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2.5">
         <h2
           id={titleId}
-          className="text-heading font-semibold"
+          className="text-h3 font-semibold"
         >
           {kvintet.title}
         </h2>
-        <KvintetCapacity
-          filled={kvintet.members.length}
-          total={kvintet.capacity}
-        />
+        <div className="order-first flex flex-wrap gap-x-1.5 font-mono text-meta tracking-meta text-muted-foreground uppercase sm:contents">
+          {kvintet.categories.map((slug) => (
+            <Fragment key={slug}>
+              <span className="sm:rounded-full sm:border sm:border-input sm:px-2.5 sm:py-0.75 sm:font-sans sm:text-small sm:tracking-normal sm:normal-case">
+                {label("categories", slug)}
+              </span>
+              <span
+                aria-hidden
+                className="sm:hidden"
+              >
+                ·
+              </span>
+            </Fragment>
+          ))}
+          <span className="sm:ml-auto">{seatCount}</span>
+        </div>
       </div>
 
-      {kvintet.reasons.length ? (
-        // Plain text, not a list: the card's list is its members.
-        <p className="flex flex-wrap gap-2">
-          <span className="sr-only">{t("kvintet.reasons.label")}</span>
-          {kvintet.reasons.map((reason) => (
-            <span
-              key={`${reason.code}-${"tag" in reason ? reason.tag : ""}`}
-              className="rounded-full border border-border px-2.5 py-0.5 text-sm text-body"
-            >
-              {describeReason(reason, t, label)}
-            </span>
-          ))}
-        </p>
-      ) : null}
-
-      {kvintet.meetingFrequency ? (
-        <p className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
-          {t("kvintet.suitsAll", { value: t(`meetingFrequency.${kvintet.meetingFrequency}`) })}
-        </p>
-      ) : null}
-
-      <ul>
+      <ul className="flex flex-wrap gap-x-3.5 gap-y-4 sm:gap-x-7">
         {kvintet.members.map((member, index) => (
           <li
             key={index}
-            className="flex items-center gap-3 border-t border-border py-2.5"
+            className="flex flex-col items-center gap-1.5 text-small text-foreground"
           >
             {/* The feed never carries a name, so the face is seeded by the seat, not the person. */}
             <AnonymousBlobatar
@@ -121,39 +90,46 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
               className="size-12 shrink-0"
               motion="hover"
             />
-            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
-              <p className="text-base font-semibold text-foreground sm:w-56 sm:shrink-0">
-                {member.position ?? t("kvintet.member")}
-              </p>
-              <p className="text-sm text-body">{describeMember(member, t, label)}</p>
-            </div>
+            <span className="max-w-24 text-center">{member.position ?? t("kvintet.member")}</span>
           </li>
         ))}
         {Array.from({ length: freeSeats }, (_, index) => (
           <li
             key={`free-${index}`}
-            className="flex items-center gap-3 border-t border-border py-2.5 text-muted-foreground"
+            className="flex flex-col items-center gap-1.5 text-small text-muted-foreground"
           >
-            <FreeSeat className="size-12" />
-            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
-              <p className="text-base font-semibold sm:w-56 sm:shrink-0">{t("kvintet.vacancy")}</p>
-              <p className="text-sm">{t("kvintet.vacancyHint")}</p>
-            </div>
+            <span className="grid size-12 place-items-center">
+              <FreeSeat className="size-9" />
+            </span>
+            <span>{t("kvintet.vacancy")}</span>
           </li>
         ))}
       </ul>
 
-      <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:gap-4">
+      {kvintet.reasons.length ? (
+        <p className="text-small text-body">
+          <span className="sr-only">{t("kvintet.reasons.label")} </span>
+          {kvintet.reasons.map((reason) => describeReason(reason, t, label)).join(" · ")}
+        </p>
+      ) : null}
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3 sm:border-t sm:border-border sm:pt-4">
+        {kvintet.meetingFrequency ? (
+          <p className="text-small text-muted-foreground sm:flex-1">
+            {t(`kvintet.frequency.${kvintet.meetingFrequency}`)}
+          </p>
+        ) : (
+          <span className="sm:flex-1" />
+        )}
         <Button
           variant="outline"
-          className="max-sm:w-full"
+          className="h-11 max-sm:w-full"
           disabled={isDisabled}
           onClick={() => onJoin(kvintet.id)}
         >
           {isJoining ? <Loader2 className="animate-spin" /> : null}
           {t("kvintet.join")}
         </Button>
-        <p className="text-sm text-muted-foreground">{t("kvintet.namesHidden")}</p>
       </div>
     </Card>
   )

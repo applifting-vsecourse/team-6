@@ -42,13 +42,9 @@ const feedSchema = z.object({
   fallback: z.boolean(),
 })
 
-export const kvintetFeedQueryOptions = (category?: string) =>
+// The whole feed is fetched once; the page filters it by category and frequency.
+export const kvintetFeedQueryOptions = () =>
   queryOptions({
-    queryKey: kvintetKeys.feed(category),
-    queryFn: async () =>
-      feedSchema.parse(
-        await api
-          .get("kvintets/feed", { searchParams: category ? { category } : undefined })
-          .json(),
-      ),
+    queryKey: kvintetKeys.feed(),
+    queryFn: async () => feedSchema.parse(await api.get("kvintets/feed").json()),
   })
