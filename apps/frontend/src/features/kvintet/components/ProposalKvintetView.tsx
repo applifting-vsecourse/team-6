@@ -32,6 +32,7 @@ export function ProposalKvintetView({
   const remainingVotes = Math.max(0, kvintet.voteStatus.totalCount - kvintet.voteStatus.votedCount)
 
   const formattedPreferences = formatCommonPreferences(kvintet.commonPreferences, t)
+  const currentMember = kvintet.members.find((m) => m.isCurrentUser)
 
   return (
     <div className="flex flex-col gap-8">
@@ -172,6 +173,7 @@ export function ProposalKvintetView({
         }}
         isLeaving={isLeaving}
         isActiveKvintet={false}
+        avatarSeed={currentMember ? (currentMember.username ?? currentMember.userId) : undefined}
       />
     </div>
   )
