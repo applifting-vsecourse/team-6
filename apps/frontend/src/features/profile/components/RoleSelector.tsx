@@ -108,9 +108,11 @@ export function RoleSelector({
   const searchResults = useMemo(() => {
     const lowerSearch = search.trim().toLowerCase()
 
+    // Nothing until the person types, so opening the search does not dump all roles.
+    if (lowerSearch === "") return []
+
     return PREDEFINED_ROLES.filter((role) => {
       if (activeRoles.includes(role.id) || activeRoles.includes(role.slug)) return false
-      if (lowerSearch === "") return true
       return (
         getRoleLabel(role.slug).toLowerCase().includes(lowerSearch) ||
         role.slug.toLowerCase().includes(lowerSearch)

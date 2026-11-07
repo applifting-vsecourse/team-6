@@ -69,6 +69,14 @@ describe("RoleSelector", () => {
     expect(screen.getByRole("button", { name: "Remove role Copywriter" })).toBeInTheDocument()
   })
 
+  it("lists no role until something is typed in the search", async () => {
+    render(<Selector />)
+
+    await userEvent.click(screen.getByRole("button", { name: "Not here? Search all roles" }))
+
+    expect(screen.queryByRole("button", { name: /^Select role / })).not.toBeInTheDocument()
+  })
+
   it("finds a role of any field with the search", async () => {
     render(<Selector />)
 
