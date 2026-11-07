@@ -29,6 +29,7 @@
   --color-destructive-soft: var(--destructive-soft);
   --color-highlight: var(--highlight);
   --color-highlight-foreground: var(--highlight-foreground);
+  --color-highlight-soft: var(--highlight-soft);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -136,6 +137,8 @@
   /* Figma `accent`: small blue highlights (unread badge, active dot, links). Not for actions. */
   --highlight: #2f5bd3;
   --highlight-foreground: #ffffff;
+  /* accent-soft: fill of a selected chip */
+  --highlight-soft: #e3ebff;
   /* line */
   --border: #dde2ec;
   /* line-strong */
@@ -187,6 +190,7 @@
   /* accent */
   --highlight: #8db4ff;
   --highlight-foreground: #0d1220;
+  --highlight-soft: #1c2a4a;
   /* line */
   --border: #27304a;
   /* line-strong */

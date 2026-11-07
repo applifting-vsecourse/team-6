@@ -14,6 +14,7 @@
     "acceptCodeOfConduct": "I have read and accept the <coc>code of conduct</coc>",
     "confirmPassword": "Confirm password",
     "createAccount": "Create account",
+    "editProfile": "Edit profile",
     "email": "Email",
     "emailPlaceholder": "e.g. jana@company.com",
     "haveAccount": "Already have an account?",
@@ -86,10 +87,11 @@
     "back": "Back",
     "close": "Close",
     "continue": "Continue",
-    "finish": "Finish",
+    "finish": "Done",
     "goHome": "Go home",
     "language": "Language",
     "reload": "Reload",
+    "retry": "Retry",
     "saving": "Saving…",
     "theme": "Theme",
     "themeDark": "Dark",
@@ -349,18 +351,25 @@
     "step1": {
       "addRole": "Select role {{name}}",
       "addTag": "Add tag {{name}}",
-      "changeLaterNote": "You can change your profile later.",
       "description": "We'll suggest groups based on your profile. Others will see your role and tags – never a photo.",
+      "fields": {
+        "data": "Data & AI",
+        "design": "Design",
+        "education": "Education & other",
+        "marketing": "Marketing & sales",
+        "people": "People & finance",
+        "product": "Product & management",
+        "tech": "Tech & dev"
+      },
       "interestsTitle": "Interests",
       "learnTitle": "What I want to learn",
-      "recommended": "RECOMMENDED",
-      "recommendedRoles": "RECOMMENDED ROLES",
       "removeRole": "Remove role {{name}}",
       "removeTag": "Remove tag {{name}}",
-      "role": "Role",
-      "roleHint": "Pick one or more roles that best match what you do.",
+      "role": "What do you do?",
+      "roleHint": "Pick your field, then your role.",
       "rolePlaceholder": "e.g. Software Engineer",
       "roleRequired": "Select at least one role",
+      "searchAllRoles": "Not here? Search all roles",
       "searchRoleAria": "Search role",
       "searchRolePlaceholder": "Search role…",
       "searchTagsAria": "Search tags in {{section}}",
@@ -373,14 +382,13 @@
       "afternoons": "Afternoons",
       "daysRequired": "Please select at least one day option (weekdays or weekends).",
       "daysTitle": "Days",
-      "description": "Pick everything that suits you. It helps us match people who can actually meet.",
+      "description": "So you meet people nearby.",
       "evenings": "Evenings",
       "geolocationDenied": "Location access was denied. You can select the center directly on the map.",
       "geolocationUnavailable": "Geolocation is not supported in this browser.",
       "locating": "Locating…",
       "locationRequired": "Please select a location on the map.",
-      "mapHint": "Drag the pin or click on the map to set the center, and adjust the radius slider to choose the area where you want to see other Kvinteds.",
-      "mapTitle": "Geographic Area & Meeting Radius",
+      "mapHint": "Drag the pin. Others only see the distance.",
       "mornings": "Mornings",
       "radius": "How far can you travel?",
       "radiusOption": "Up to {{count}} km",
@@ -392,39 +400,85 @@
       "useCurrentLocation": "Use my location",
       "weekdays": "Weekdays",
       "weekends": "Weekends",
-      "whereHint": "Choose the geographic area and your travel distance.",
       "whereTitle": "Where"
     },
     "step3": {
-      "description": "Two short questions. There are no wrong answers.",
+      "description": "Last two. No wrong answers.",
       "expectations": {
         "learn": "Learn something new",
         "meet": "Meet new people",
         "share": "Share what I know",
         "solve": "Solve a specific problem"
       },
-      "expectationsHint": "Pick freely.",
-      "expectationsTitle": "What do you want from the group?",
-      "finishHint": "Then you'll see proposals that match you.",
+      "expectationsHint": "You can pick more than one.",
+      "expectationsTitle": "Why do you want to join a kvintet",
+      "finishHint": "Then we'll show you kvintets that suit you.",
       "frequency": {
         "biweekly": "Every two weeks",
         "monthly": "Once a month",
         "weekly": "Every week"
       },
       "frequencyRequired": "Select how often you want to meet",
-      "frequencyTitle": "How often do you want to meet?",
+      "frequencyTitle": "How often do you want to meet",
       "noteOptional": "Optional.",
       "notePlaceholder": "e.g. I prefer to meet in English.",
       "noteTitle": "Anything the group should know about you?",
-      "title": "What do you expect from a kvintet?"
+      "title": "What do you expect from the group?"
     },
     "stepProgress": "Step {{current}} of {{total}}",
     "stepShort": "{{current}} / {{total}}",
     "title": "Onboarding"
   },
   "overview": {
-    "greeting": "Welcome, <em>{{name}}</em>",
-    "greetingAnonymous": "Welcome",
+    "active": {
+      "beforeMeeting": "BEFORE THE NEXT MEETING",
+      "chatDescription": "Plan your next meeting together.",
+      "chatHeading": "Group chat",
+      "heading": "Your kvintet",
+      "icebreaker": {
+        "another": "Another question",
+        "label": "Icebreaker question",
+        "q1": "What new thing did you learn at work this month?",
+        "q2": "What's a project or hobby you're currently excited about?",
+        "q3": "What was your biggest professional 'aha' moment recently?",
+        "q4": "If you could automate one tedious part of your work, what would it be?",
+        "send": "Send to chat",
+        "sentToast": "Question sent to chat"
+      },
+      "leaveHint": "The others carry on without you.",
+      "nextMeeting": {
+        "body": "No date yet. Suggest one in the chat.",
+        "label": "Next meeting"
+      },
+      "noMessages": "No messages yet. Say hello!",
+      "openChat": "Open chat",
+      "subtitle": "{{title}} · {{count}} people · since {{date}}",
+      "tip": {
+        "body": "Everyone shares one goal for the next 3 months.",
+        "label": "Tip for the group"
+      }
+    },
+    "forming": {
+      "canVoteDescription": "Start with four now, or wait for one more. It starts when all four agree.",
+      "canVoteTitle": "Start now or wait for a fifth?",
+      "heading": "Your kvintet is forming",
+      "leaveKvintet": "Leave kvintet",
+      "seatsStatus": "{{seats}} OF {{capacity}} SEATS · {{voted}} OF {{total}} WANT TO START",
+      "teachesWants": "teaches {{offers}} · wants {{seeks}}",
+      "teachesWantsFallback": "teaches {{role}}",
+      "voteButton": "Start now",
+      "voteHint": "Others will only see that you voted.",
+      "votedDescription": "You voted to start. Waiting for the others.",
+      "votedStatus": "You voted to start. Waiting for the others.",
+      "votedTitle": "Waiting for others to vote",
+      "waitingDescription": "At three you can vote to start. We'll let you know.",
+      "waitingSeatsStatus": "{{seats}} OF {{capacity}} SEATS · WAITING FOR MORE",
+      "waitingTitle": "Waiting for more people",
+      "whoSubtitle": "Names appear once you start.",
+      "whoTitle": "Who's here"
+    },
+    "greeting": "Hi, {{name}}",
+    "greetingAnonymous": "Hi",
     "howItWorks": {
       "p1": "— A kvintet forms automatically when five people join.",
       "p2": "— With three or four members it forms when everyone votes yes.",
@@ -442,6 +496,19 @@
       "description": "See who's in your group and what happens next.",
       "title": "Head to your kvintet"
     },
+    "noKvintet": {
+      "empty": "No proposals available right now.",
+      "join": "Join",
+      "joining": "Joining…",
+      "lead": "Pick a kvintet – these fit you best.",
+      "leadAfterLeave": "Pick a new kvintet – these fit you best.",
+      "leftNotice": "You left “{{title}}”",
+      "leftNoticeHint": "You can join another kvintet any time.",
+      "nothingFits": "Nothing fits?",
+      "seeAll": "See all",
+      "startOwn": "Start your own",
+      "startYourOwnHint": "Start your own – others will join."
+    },
     "profileCard": {
       "badge": "YOUR PROFILE",
       "daysWeekdays": "weekdays",
@@ -458,8 +525,15 @@
       "timeEvenings": "evenings",
       "timeMornings": "mornings"
     },
-    "subtitle": "You're not in any kvintet yet. Start by picking a proposal.",
-    "subtitleMember": "You're in a kvintet. Check on your group.",
+    "profileNotFinished": {
+      "button": "Finish profile",
+      "description": "Two short steps left – about 2 minutes.",
+      "lead": "Almost there!",
+      "stepBadge": "STEP 1 OF 3 DONE",
+      "title": "Finish your profile"
+    },
+    "subtitle": "You are not in a kvintet yet. Start by picking a proposal.",
+    "subtitleMember": "You are in a kvintet. See how your group is doing.",
     "title": "Overview"
   },
   "roles": {
