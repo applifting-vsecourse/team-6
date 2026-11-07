@@ -48,6 +48,7 @@ const kvintet = (status: "ACTIVE" | "FORMING"): KvintetDetails => ({
   openSeatsCount: 0,
   members: [member("u1", "Jana Nováková", true), member("u2", "Petr Svoboda")],
   voteStatus: { canVote: false, userHasVoted: true, votedCount: 2, totalCount: 2 },
+  beginsSeen: true,
 })
 
 const state = (overrides: Partial<ReturnType<typeof useMyKvintet>>) =>

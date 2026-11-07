@@ -10,8 +10,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { formatDayAndMonth, formatTime } from "@/lib/date"
 
 import type { KvintetMember } from "@/features/kvintet/api/kvintetApi"
+import { useMarkBeginsSeen } from "@/features/kvintet/hooks/useMarkBeginsSeen"
 import { useMyKvintet } from "@/features/kvintet/hooks/useMyKvintet"
-import { markBeginsSeen } from "@/features/kvintet/lib/beginsSeen"
 
 const TITLE_KEYS = { 3: "three", 4: "four", 5: "five" } as const
 
@@ -37,11 +37,12 @@ export function KvintetBeginsPage() {
   const { t } = useTranslation()
   const { data: kvintet, isLoading, isError, refetch } = useMyKvintet()
   const isActive = kvintet?.status === "ACTIVE"
-  const kvintetId = kvintet?.id
+  const hasSeen = kvintet?.beginsSeen
+  const { mutate: markSeen } = useMarkBeginsSeen()
 
   useEffect(() => {
-    if (kvintetId && isActive) markBeginsSeen(kvintetId)
-  }, [kvintetId, isActive])
+    if (isActive && hasSeen === false) markSeen()
+  }, [isActive, hasSeen, markSeen])
 
   if (isLoading) {
     return (

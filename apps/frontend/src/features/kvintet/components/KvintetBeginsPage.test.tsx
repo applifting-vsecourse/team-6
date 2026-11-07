@@ -1,17 +1,21 @@
 import type { ReactNode } from "react"
 import { render, screen } from "@testing-library/react"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import type { KvintetDetails, KvintetMember } from "@/features/kvintet/api/kvintetApi"
 import type { useMyKvintet } from "@/features/kvintet/hooks/useMyKvintet"
-import { hasSeenBegins } from "@/features/kvintet/lib/beginsSeen"
 
 import { KvintetBeginsPage } from "./KvintetBeginsPage"
 
 const mockUseMyKvintet = vi.fn<() => ReturnType<typeof useMyKvintet>>()
+const mockMarkSeen = vi.fn()
 
 vi.mock("@/features/kvintet/hooks/useMyKvintet", () => ({
   useMyKvintet: () => mockUseMyKvintet(),
+}))
+
+vi.mock("@/features/kvintet/hooks/useMarkBeginsSeen", () => ({
+  useMarkBeginsSeen: () => ({ mutate: mockMarkSeen }),
 }))
 
 vi.mock("@tanstack/react-router", () => ({
@@ -33,7 +37,11 @@ const member = (id: string, name: string | null, isCurrentUser = false): Kvintet
   isCurrentUser,
 })
 
-const kvintet = (members: KvintetMember[], status: KvintetDetails["status"] = "ACTIVE") =>
+const kvintet = (
+  members: KvintetMember[],
+  status: KvintetDetails["status"] = "ACTIVE",
+  hasSeen = false,
+) =>
   ({
     id: "k1",
     title: "AI v práci – co opravdu funguje",
@@ -45,6 +53,7 @@ const kvintet = (members: KvintetMember[], status: KvintetDetails["status"] = "A
     openSeatsCount: 5 - members.length,
     members,
     voteStatus: { canVote: false, userHasVoted: true, votedCount: 0, totalCount: 0 },
+    beginsSeen: hasSeen,
   }) satisfies KvintetDetails
 
 const give = (data: KvintetDetails | null | undefined, extra: object = {}) =>
@@ -73,9 +82,8 @@ const five = [
 
 beforeEach(() => {
   mockUseMyKvintet.mockReset()
-  localStorage.clear()
+  mockMarkSeen.mockReset()
 })
-afterEach(() => localStorage.clear())
 
 describe("KvintetBeginsPage", () => {
   it("greets a full kvintet with the topic, first names and you on top", () => {
@@ -143,12 +151,16 @@ describe("KvintetBeginsPage", () => {
     expect(screen.getByText("Member 2")).toBeInTheDocument()
   })
 
-  it("marks the start as seen, so /kvintet stops redirecting here", () => {
+  it("tells the server the start was seen, but only while it has not been", () => {
     give(kvintet(five))
+    const { unmount } = render(<KvintetBeginsPage />)
+    expect(mockMarkSeen).toHaveBeenCalledTimes(1)
+    unmount()
+    mockMarkSeen.mockClear()
 
+    give(kvintet(five, "ACTIVE", true))
     render(<KvintetBeginsPage />)
-
-    expect(hasSeenBegins("k1")).toBe(true)
+    expect(mockMarkSeen).not.toHaveBeenCalled()
   })
 
   it("sends a user without an active kvintet to My kvintet", () => {
@@ -160,7 +172,7 @@ describe("KvintetBeginsPage", () => {
     give(kvintet(five, "FORMING"))
     render(<KvintetBeginsPage />)
     expect(screen.getByTestId("navigate")).toHaveTextContent(/^\/kvintet$/)
-    expect(hasSeenBegins("k1")).toBe(false)
+    expect(mockMarkSeen).not.toHaveBeenCalled()
   })
 
   it("shows an error with a retry", () => {

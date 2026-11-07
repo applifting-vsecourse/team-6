@@ -4,7 +4,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import type { KvintetDetails } from "@/features/kvintet/api/kvintetApi"
 import type { useMyKvintet } from "@/features/kvintet/hooks/useMyKvintet"
-import { markBeginsSeen } from "@/features/kvintet/lib/beginsSeen"
 
 import { MyKvintetPage } from "./MyKvintetPage"
 
@@ -31,7 +30,6 @@ vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
 describe("MyKvintetPage", () => {
   beforeEach(() => {
     mockUseMyKvintet.mockReset()
-    localStorage.clear()
   })
 
   it("renders empty state when user has no kvintet", () => {
@@ -92,6 +90,7 @@ describe("MyKvintetPage", () => {
         votedCount: 0,
         totalCount: 1,
       },
+      beginsSeen: true,
     }
 
     mockUseMyKvintet.mockReturnValue({
@@ -115,7 +114,6 @@ describe("MyKvintetPage", () => {
   })
 
   it("renders active view when kvintet is active and its start was already seen", () => {
-    markBeginsSeen("k1")
     const mockActive: KvintetDetails = {
       id: "k1",
       title: "Aktivní skupina",
@@ -163,6 +161,7 @@ describe("MyKvintetPage", () => {
         votedCount: 2,
         totalCount: 2,
       },
+      beginsSeen: true,
     }
 
     mockUseMyKvintet.mockReturnValue({
@@ -198,6 +197,7 @@ describe("MyKvintetPage", () => {
         openSeatsCount: 0,
         members: [],
         voteStatus: { canVote: false, userHasVoted: true, votedCount: 0, totalCount: 0 },
+        beginsSeen: false,
       },
       isLoading: false,
       isError: false,

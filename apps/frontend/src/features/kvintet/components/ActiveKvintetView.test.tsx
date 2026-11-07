@@ -100,6 +100,7 @@ describe("ActiveKvintetView", () => {
       votedCount: 5,
       totalCount: 5,
     },
+    beginsSeen: true,
   }
 
   it("renders active kvintet with all member names, roles and interests visible", () => {

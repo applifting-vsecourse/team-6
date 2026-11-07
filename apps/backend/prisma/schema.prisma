@@ -241,6 +241,9 @@ model KvintetMember {
   joinedAt  DateTime     @default(now())
   // Newest chat message this member has seen; everything after it from others counts as unread.
   lastReadMessageId Int  @default(0)
+  // When this member first opened the "Kvintet begins" page; null until then. The UI sends
+  // them there once, when the kvintet is ACTIVE and this is still null.
+  beginsSeenAt DateTime?
   vote      KvintetVote?
 
   @@id([kvintetId, userId])

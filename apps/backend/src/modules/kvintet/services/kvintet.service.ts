@@ -147,6 +147,10 @@ export class KvintetService {
     return updated;
   }
 
+  async markBeginsSeen(userId: string): Promise<void> {
+    await this.repository.markBeginsSeen(userId);
+  }
+
   async leave(userId: string): Promise<{ success: boolean }> {
     const membership = await this.repository.findMembership(userId);
     if (!membership) {

@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 
 import { useMyKvintet } from "@/features/kvintet/hooks/useMyKvintet"
-import { hasSeenBegins } from "@/features/kvintet/lib/beginsSeen"
 
 import { ActiveKvintetView } from "./ActiveKvintetView"
 import { EmptyKvintetState } from "./EmptyKvintetState"
@@ -58,7 +57,7 @@ export function MyKvintetPage() {
           </div>
         ) : !kvintet ? (
           <EmptyKvintetState />
-        ) : kvintet.status === "ACTIVE" && !hasSeenBegins(kvintet.id) ? (
+        ) : kvintet.status === "ACTIVE" && !kvintet.beginsSeen ? (
           // First time in this active kvintet: the "Kvintet begins" page, once.
           <Navigate
             to={ROUTES.kvintetBegins}
