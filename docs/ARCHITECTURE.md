@@ -176,9 +176,9 @@ Routes (TanStack Router, file-based). Guards are pathless layout routes (`_Authe
 | `/profile`                                                    | signed in + onboarded    |
 | `/board`, `/board/new`                                        | signed in + onboarded    |
 | `/kvintet/feed`, `/kvintet`, `/kvintet/messages`              | signed in + onboarded    |
+| `/admin`                                                      | admin                    |
 
 The chat has its own page, `/kvintet/messages`, linked from the "Open messages" button on an `ACTIVE` kvintet's `/kvintet` page; it shows the kvintet title, a back link and the member names, and sends anyone whose kvintet is missing or not `ACTIVE` back to `/kvintet`. Features may not import each other, so the `kvintet` feature renders that page and takes the chat as a render prop that the route supplies.
-| `/admin` | admin |
 
 - Features live in `src/features/{account,profile,board,kvintet,chat,admin,legal}`. Business decisions stay in hooks and on the server, not in components.
 - Filters that change the list (board category) live in the URL search params. So does the onboarding step (`/onboarding?step=2`): the app header shows "Step 2 of 3" and has to know it, and a reload keeps the step. The route owns it and hands it to the wizard as props; the server still validates the whole profile, so skipping ahead through the URL only skips client-side checks.

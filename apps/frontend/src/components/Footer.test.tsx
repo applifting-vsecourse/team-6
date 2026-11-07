@@ -31,7 +31,7 @@ describe("Footer", () => {
 
     expect(screen.getByRole("link", { name: "How Kvintet works" })).toHaveAttribute(
       "href",
-      "/#how-it-works",
+      "/how-it-works",
     )
     expect(screen.getByRole("link", { name: "Rules" })).toHaveAttribute("href", "/code-of-conduct")
     // jsdom applies no CSS, so both the short and the long label are in the name.

@@ -3,7 +3,7 @@ import { Link, type LinkProps } from "@tanstack/react-router"
 import { ChevronRight, Menu, X } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
-import { HOW_IT_WORKS_ANCHOR, ROUTES } from "@/app/routes"
+import { ROUTES } from "@/app/routes"
 import { DisabledNavItem } from "@/components/Header/DisabledNavItem"
 import { LanguageSwitcher } from "@/components/Header/LanguageSwitcher"
 import { NAV_ITEMS, type NavDisabled } from "@/components/Header/nav"
@@ -157,12 +157,7 @@ export function MobileMenu({
               className="flex flex-col gap-1"
             >
               <p className={cn(META_LABEL, "pb-1")}>{t("layout.learnMore")}</p>
-              <MenuLink
-                to={ROUTES.home}
-                hash={HOW_IT_WORKS_ANCHOR}
-              >
-                {t("layout.howItWorks")}
-              </MenuLink>
+              <MenuLink to={ROUTES.howItWorks}>{t("layout.howItWorks")}</MenuLink>
               <MenuLink to={ROUTES.codeOfConduct}>{t("layout.communityRules")}</MenuLink>
             </nav>
           ) : null}

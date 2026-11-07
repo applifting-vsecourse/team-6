@@ -436,7 +436,8 @@
         "q2": "What's a project or hobby you're currently excited about?",
         "q3": "What was your biggest professional 'aha' moment recently?",
         "q4": "If you could automate one tedious part of your work, what would it be?",
-        "send": "Send to chat"
+        "send": "Send to chat",
+        "sentToast": "Question sent to chat"
       },
       "leaveHint": "The others carry on without you.",
       "nextMeeting": {
