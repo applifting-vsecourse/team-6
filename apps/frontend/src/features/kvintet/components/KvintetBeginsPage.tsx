@@ -23,7 +23,9 @@ function toSeats(
 ): SeatMember[] {
   const ordered = [...members].sort((a, b) => Number(b.isCurrentUser) - Number(a.isCurrentUser))
   return ordered.map((member, index) => {
-    const name = member.name?.trim().split(/\s+/)[0] ?? member.role ?? fallback(index + 1)
+    // `find(Boolean)` rather than `??`: an empty or blank name must fall through too.
+    const name =
+      [member.name?.trim().split(/\s+/)[0], member.role].find(Boolean) ?? fallback(index + 1)
     return {
       seed: member.username ?? member.userId,
       label: member.isCurrentUser ? `${name} ${you}` : name,

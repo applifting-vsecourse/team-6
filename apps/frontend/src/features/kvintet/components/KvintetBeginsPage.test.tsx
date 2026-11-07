@@ -134,6 +134,15 @@ describe("KvintetBeginsPage", () => {
     expect(screen.getByText("Member 2")).toBeInTheDocument()
   })
 
+  it("treats an empty or blank name like a missing one", () => {
+    give(kvintet([{ ...member("u1", "  ", true), role: "Designérka" }, member("u2", "")]))
+
+    render(<KvintetBeginsPage />)
+
+    expect(screen.getByText("Designérka (you)")).toBeInTheDocument()
+    expect(screen.getByText("Member 2")).toBeInTheDocument()
+  })
+
   it("marks the start as seen, so /kvintet stops redirecting here", () => {
     give(kvintet(five))
 
