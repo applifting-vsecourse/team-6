@@ -170,6 +170,7 @@
       "title": {
         "five": "There are five of you. The kvintet begins.",
         "four": "There are four of you. The kvintet begins.",
+        "other": "The kvintet begins.",
         "three": "There are three of you. The kvintet begins."
       }
     },

@@ -133,6 +133,17 @@ describe("KvintetBeginsPage", () => {
     expect(container.querySelectorAll('[data-seat="free"]')).toHaveLength(2)
   })
 
+  it("names no number when members have left an active kvintet", () => {
+    give(kvintet(five.slice(0, 2)))
+
+    const { container } = render(<KvintetBeginsPage />)
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "The kvintet begins." }),
+    ).toBeInTheDocument()
+    expect(container.querySelectorAll('[data-seat="free"]')).toHaveLength(3)
+  })
+
   it("falls back to the role, then to a numbered member, when there is no name", () => {
     give(kvintet([{ ...member("u1", null, true), role: "Designérka" }, member("u2", null)]))
 

@@ -80,7 +80,8 @@ export function KvintetBeginsPage() {
   }
 
   const count = kvintet.members.length
-  const titleKey = TITLE_KEYS[count as keyof typeof TITLE_KEYS] ?? "five"
+  // Members can leave an ACTIVE kvintet, so a smaller group gets a title that names no number.
+  const titleKey = TITLE_KEYS[count as keyof typeof TITLE_KEYS] ?? "other"
   const startedAt = kvintet.activatedAt ?? kvintet.createdAt
 
   return (
