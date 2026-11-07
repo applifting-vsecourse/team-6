@@ -198,7 +198,6 @@
       "description": "You'll be its first member. Others join by topic.",
       "details": "A few more words (optional)",
       "detailsPlaceholder": "e.g. I run a 10-person agency and want to share what works for us.",
-      "leaveActiveConfirm": "You will leave the active kvintet. If fewer than 3 members remain, the kvintet will be disbanded.",
       "leaveActiveDescription": "Others will see that you left. Then you can join another kvintet.",
       "leaveActiveNotice": "The others carry on without you.",
       "leaveActiveTitle": "Leave the kvintet?",
@@ -568,6 +567,9 @@
       "learn": "Nothing added yet",
       "teach": "Nothing added yet",
       "whenAndWhere": "No preferences set yet"
+    },
+    "error": {
+      "title": "Couldn't load profile"
     },
     "newUsernameHint": "New username, new blobatar.",
     "sections": {

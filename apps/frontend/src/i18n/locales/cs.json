@@ -202,7 +202,6 @@
       "description": "Budete v něm první. Další se přidají podle tématu.",
       "details": "Pár slov navíc (nepovinné)",
       "detailsPlaceholder": "např. Vedu agenturu s 10 lidmi a chci sdílet, co nám funguje.",
-      "leaveActiveConfirm": "Opustíte aktivní kvintet. Pokud ve skupině zůstanou méně než 3 členové, kvintet zanikne.",
       "leaveActiveDescription": "Ostatní uvidí, že jste odešli. Pak se můžete přidat do jiného kvintetu.",
       "leaveActiveNotice": "Ostatní pokračují bez vás.",
       "leaveActiveTitle": "Opustit kvintet?",
@@ -574,6 +573,9 @@
       "learn": "Zatím nic nepřidáno",
       "teach": "Zatím nic nepřidáno",
       "whenAndWhere": "Zatím nenastaveno"
+    },
+    "error": {
+      "title": "Profil se nepodařilo načíst"
     },
     "newUsernameHint": "Nové uživatelské jméno, nový blobatar.",
     "sections": {

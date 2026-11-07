@@ -8,6 +8,7 @@ import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { getErrorMessage } from "@/lib/errorMessage"
 import { useSlugLabel } from "@/lib/useSlugLabel"
 
 import type { ProfileResponse } from "@/features/profile/api/profileApi"
@@ -81,7 +82,7 @@ export type ProfilePageProps = {
 export function ProfilePage({ user, renderDeleteAccountDialog }: ProfilePageProps) {
   const { t } = useTranslation()
   const label = useSlugLabel()
-  const { profile, isLoading, isError, refetch } = useProfile()
+  const { profile, isLoading, isError, error, refetch } = useProfile()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   if (isLoading) {
@@ -107,9 +108,9 @@ export function ProfilePage({ user, renderDeleteAccountDialog }: ProfilePageProp
     return (
       <div className="mx-auto flex w-full max-w-[760px] flex-col gap-5 px-4 py-7 md:py-12">
         <Alert variant="destructive">
-          <AlertTitle>{t("common.reload")}</AlertTitle>
+          <AlertTitle>{t("profile.error.title")}</AlertTitle>
           <AlertDescription className="mt-2 flex flex-col items-start gap-4">
-            <span>{t("errors.internal_error")}</span>
+            <span>{getErrorMessage(error)}</span>
             <Button
               variant="outline"
               onClick={() => void refetch()}
@@ -122,7 +123,9 @@ export function ProfilePage({ user, renderDeleteAccountDialog }: ProfilePageProp
     )
   }
 
-  const seed = user?.username ?? user?.id ?? "user"
+  // An empty username falls back to the id, matching HeaderMenu and onboarding.
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+  const seed = user?.username || user?.id || "user"
   const displayName = user?.name ?? ""
 
   // Subtitle: @username · role/position

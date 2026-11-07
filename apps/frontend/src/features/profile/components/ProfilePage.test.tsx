@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { HTTPError } from "ky"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import type { ProfileResponse } from "@/features/profile/api/profileApi"
@@ -244,9 +245,52 @@ describe("ProfilePage", () => {
 
     render(<ProfilePage user={defaultUser} />)
 
-    expect(screen.getByText(/Something went wrong on our side/i)).toBeInTheDocument()
+    expect(screen.getByText("Couldn't load profile")).toBeInTheDocument()
+    expect(screen.getByText("An unexpected error occurred.")).toBeInTheDocument()
     const retryBtn = screen.getByRole("button", { name: "Retry" })
     await userEvent.click(retryBtn)
     expect(mockRefetch).toHaveBeenCalledOnce()
+  })
+
+  it("renders specific translated server error from getErrorMessage", () => {
+    const error = new HTTPError(
+      new Response(JSON.stringify({ code: "unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      }),
+      new Request("http://localhost/api/profile/u-1"),
+      {} as never,
+    )
+    Object.assign(error, { data: { code: "unauthorized" } })
+
+    mockUseProfile.mockReturnValue(
+      mockProfileData({
+        profile: null,
+        isError: true,
+        error,
+      }),
+    )
+
+    render(<ProfilePage user={defaultUser} />)
+
+    expect(screen.getByText("Couldn't load profile")).toBeInTheDocument()
+    expect(screen.getByText("You need to sign in first.")).toBeInTheDocument()
+  })
+
+  it("falls back to user id when username is an empty string", () => {
+    mockUseProfile.mockReturnValue(mockProfileData())
+
+    render(
+      <ProfilePage
+        user={{
+          id: "u-fallback-123",
+          name: "Test User",
+          username: "",
+        }}
+      />,
+    )
+
+    const avatar = document.body.querySelector("[data-slot=avatar]")
+    expect(avatar).toBeInTheDocument()
   })
 })
