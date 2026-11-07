@@ -175,11 +175,11 @@ Routes (TanStack Router, file-based). Guards are pathless layout routes (`_Authe
 | `/overview`, `/profile`                                             | signed in + onboarded    |
 | `/board`, `/board/new`                                              | signed in + onboarded    |
 | `/kvintet/feed`, `/kvintet`, `/kvintet/messages`, `/kvintet/begins` | signed in + onboarded    |
+| `/admin`                                                            | admin                    |
 
 The chat has its own page, `/kvintet/messages`, linked from the "Open messages" button on an `ACTIVE` kvintet's `/kvintet` page; it shows the kvintet title, a back link and the member names, and sends anyone whose kvintet is missing or not `ACTIVE` back to `/kvintet`. Features may not import each other, so the `kvintet` feature renders that page and takes the chat as a render prop that the route supplies.
 
 The first time a member opens an `ACTIVE` kvintet, `/kvintet` sends them once to `/kvintet/begins` ("There are five of you. The kvintet begins.": the group in colour, the topic, links to the chat and to the members). The backend does not track it: the "seen" mark is a `localStorage` key per kvintet id (`features/kvintet/lib/beginsSeen.ts`), so a second browser or cleared storage shows the page once more; blocked storage counts as seen. `/kvintet/begins` itself sends anyone without an `ACTIVE` kvintet back to `/kvintet`.
-| `/admin` | admin |
 
 - Features live in `src/features/{account,profile,board,kvintet,chat,admin,legal}`. Business decisions stay in hooks and on the server, not in components.
 - Filters that change the list (board category) live in the URL search params. So does the onboarding step (`/onboarding?step=2`): the app header shows "Step 2 of 3" and has to know it, and a reload keeps the step. The route owns it and hands it to the wizard as props; the server still validates the whole profile, so skipping ahead through the URL only skips client-side checks.
