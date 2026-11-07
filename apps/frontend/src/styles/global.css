@@ -33,6 +33,7 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-track: var(--track);
+  --color-overlay: var(--overlay);
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
@@ -146,6 +147,8 @@
   --shadow-2xl: 0px 2px 10px 0px hsl(0 0% 0% / 0.25);
   /* line: empty progress track */
   --track: #dde2ec;
+  /* Figma `overlay`: the scrim behind a dialog, used at 60% */
+  --overlay: #10172a;
 }
 
 /* Dark palette (Figma dark frames). Only colours change; type, radius and shadows are shared. */
@@ -186,6 +189,7 @@
   --input: #3a4566;
   --ring: #eaeef8;
   --track: #27304a;
+  --overlay: #05080f;
 }
 
 @layer base {

@@ -153,37 +153,38 @@
       "heading": "Skupinový chat",
       "openMessages": "Otevřít zprávy"
     },
-    "count_few": "{{formatted}} návrhy",
-    "count_many": "{{formatted}} návrhu",
-    "count_one": "{{formatted}} návrh",
-    "count_other": "{{formatted}} návrhů",
+    "count_few": "{{formatted}} kvintety · nejlepší shoda první",
+    "count_many": "{{formatted}} kvintetu · nejlepší shoda první",
+    "count_one": "{{formatted}} kvintet · nejlepší shoda první",
+    "count_other": "{{formatted}} kvintetů · nejlepší shoda první",
     "diagram": {
       "memberNumber": "Člen {{number}}"
     },
     "dialog": {
       "cancel": "Zrušit",
       "category": "Kategorie",
-      "categoryHint": "Vyberte nejvýše {{max}}. Podle kategorie návrh najdou ostatní ve filtru.",
+      "categoryPlaceholder": "Zvolte kategorii",
       "confirmLeave": "Opustit",
-      "description": "Budete jeho prvním členem. Ostatní uvidí téma, vaši roli a štítky – ne vaše jméno.",
-      "details": "Krátký popis (nepovinné)",
+      "description": "Budete v něm první. Další se přidají podle tématu.",
+      "details": "Pár slov navíc (nepovinné)",
       "detailsPlaceholder": "např. Vedu agenturu s 10 lidmi a chci sdílet, co nám funguje.",
       "leaveActiveConfirm": "Opustíte aktivní kvintet. Pokud ve skupině zůstanou méně než 3 členové, kvintet zanikne.",
       "leaveProposalConfirm": "Opustíte tento návrh. Když někdo přijde nebo odejde, hlasy všech se vynulují.",
       "leaveTitle": "Opravdu chcete odejít?",
-      "submit": "Založit návrh",
-      "title": "Založit nový návrh",
-      "topic": "Téma nebo problém",
-      "topicHint": "O čem se má skupina bavit?"
+      "note": "Ostatní uvidí téma a vaši roli. Vaše jméno až po zahájení skupiny.",
+      "submit": "Založit kvintet",
+      "title": "Založit kvintet",
+      "topic": "O čem chcete mluvit",
+      "topicHint": "Stručně a konkrétně – podle toho vás lidé najdou."
     },
     "empty": {
-      "text": "Tady se objeví návrhy, které odpovídají vašemu profilu.",
-      "title": "Zatím pro vás nemáme žádný návrh"
+      "text": "Tady se objeví kvintety, které odpovídají vašemu profilu.",
+      "title": "Zatím pro vás nemáme žádný kvintet"
     },
     "emptyFiltered": {
-      "showAll": "Zrušit filtr",
-      "text": "Zkuste jinou kategorii, nebo založte vlastní návrh v této kategorii.",
-      "title": "V kategorii {{category}} zatím není žádný návrh"
+      "showAll": "Zrušit filtry",
+      "text": "Zkuste jiné filtry, nebo založte vlastní kvintet.",
+      "title": "Těmto filtrům zatím nic neodpovídá"
     },
     "emptyState": {
       "description": "Vaše skupina se tu objeví, až se přidáte k návrhu.",
@@ -193,18 +194,22 @@
     "error": {
       "retry": "Zkusit znovu",
       "text": "Na naší straně se něco pokazilo. Zkuste to prosím znovu.",
-      "title": "Návrhy se nepodařilo načíst"
+      "title": "Kvintety se nepodařilo načíst"
     },
-    "fallback": "Vašemu profilu zatím žádný návrh přesně neodpovídá, proto ukazujeme všechny otevřené, nejbližší první.",
+    "fallback": "Vašemu profilu zatím žádný kvintet přesně neodpovídá, proto ukazujeme všechny otevřené, nejbližší první.",
     "filter": {
       "all": "Vše",
-      "label": "Kategorie"
+      "frequency": "Jak často",
+      "topic": "Téma"
     },
-    "interests": "Zájmy: {{tags}}",
-    "join": "Přidat se k návrhu",
+    "frequency": {
+      "BIWEEKLY": "Jednou za 14 dní",
+      "MONTHLY": "Jednou za měsíc",
+      "WEEKLY": "Každý týden"
+    },
+    "join": "Přidat se",
     "joined": "Přidali jste se k návrhu.",
-    "learns": "Chce se naučit: {{tags}}",
-    "loading": "Načítáme návrhy…",
+    "loading": "Načítáme kvintety…",
     "member": "Člen",
     "members": {
       "capacity": "{{count}} z 5",
@@ -221,7 +226,6 @@
       "you": "(vy)"
     },
     "myKvintetTitle": "Můj kvintet",
-    "namesHidden": "Jména uvidíte, až kvintet vznikne.",
     "nextSteps": {
       "heading": "Co bude dál",
       "step1": "Se 3 nebo 4 členy může kvintet začít hned, když všichni hlasují pro.",
@@ -246,28 +250,24 @@
       "teach": "Někdo se tu chce naučit {{tag}}",
       "topic": "Vaše téma: {{category}}"
     },
+    "seatCount": "{{filled}} / {{total}}",
     "seats": "{{filled}} z {{total}}",
     "startOwn": {
-      "button": "Založit nový návrh",
-      "text": "Založte vlastní s tématem, které vás zajímá – ostatní se přidají k vám.",
-      "title": "Nesedí vám žádný návrh?"
+      "button": "Založit kvintet"
     },
     "started": "Váš návrh je otevřený. Ostatní se k němu teď mohou přidat.",
     "statusActive": "Aktivní kvintet",
     "statusProposal": "Návrh · {{count}} z 5",
-    "subtitle": "Všechny skupiny, které odpovídají vašemu profilu. Vybírejte podle tématu – být můžete vždy jen v jednom návrhu.",
+    "subtitle": "Vyberte si kvintet podle tématu.",
     "suitsAll": "Všem vyhovuje: {{value}}",
     "table": {
       "description": "Domluvte si první setkání ve skupinovém chatu. Kvintet si řídíte sami – bez facilitátora a bez hodnocení.",
       "title": "Pět lidí, <em className=\"italic\">jeden stůl.</em>"
     },
-    "teaches": "Učí: {{tags}}",
-    "title": "Návrhy pro vás",
-    "vacancy": "Volné místo",
-    "vacancyHint": "Můžete to být vy.",
+    "title": "Kvintety",
+    "vacancy": "Volné",
     "validation": {
       "categoryRequired": "Vyberte kategorii",
-      "categoryTooMany": "Vyberte nejvýše {{max}} kategorie",
       "descriptionTooLong": "Popis může mít nejvýše {{max}} znaků",
       "titleRequired": "Zadejte téma",
       "titleTooLong": "Téma může mít nejvýše {{max}} znaků"
