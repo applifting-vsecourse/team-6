@@ -10,5 +10,6 @@ describe("AppLoadingScreen", () => {
     render(<AppLoadingScreen />)
 
     expect(screen.getByRole("status")).toHaveTextContent("Loading…")
+    expect(screen.getByRole("main")).toBeInTheDocument()
   })
 })

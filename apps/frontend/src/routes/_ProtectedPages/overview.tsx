@@ -143,9 +143,11 @@ function OverviewPage() {
                 <OverviewError
                   title={t("overview.error.title")}
                   text={t("overview.error.text")}
-                  onRetry={() =>
-                    void (profileQuery.isError ? profileQuery.refetch() : myKvintet.refetch())
-                  }
+                  onRetry={() => {
+                    // Both can fail; refetch each one that did, so one retry clears them all.
+                    if (profileQuery.isError) void profileQuery.refetch()
+                    if (myKvintet.isError) void myKvintet.refetch()
+                  }}
                 />
               )}
             </>
