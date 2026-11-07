@@ -11,7 +11,7 @@
     "deleteSuccess": "Your account has been deleted successfully."
   },
   "auth": {
-    "acceptCodeOfConduct": "I have read and accept the <coc>code of conduct</coc>",
+    "acceptCodeOfConduct": "I agree to the <coc>community rules</coc>",
     "confirmPassword": "Confirm password",
     "createAccount": "Create account",
     "editProfile": "Edit profile",
@@ -23,16 +23,20 @@
     "password": "Password",
     "passwordHint_one": "At least {{count}} character",
     "passwordHint_other": "At least {{count}} characters",
+    "preview": {
+      "caption": "Each blobatar is unique.",
+      "title": "That's you!"
+    },
     "signIn": "Sign in",
     "signInDescription": "Sign in with your email and password.",
     "signInTitle": "Welcome back",
     "signOut": "Sign out",
     "signUp": "Sign up",
-    "signUpDescription": "Create your Kvintet account.",
+    "signUpTitle": "Create your account",
     "username": "Username",
-    "usernameHint": "Your avatar is generated from your username.",
+    "usernameHint": "Your blobatar is made from it. Others only see the blobatar.",
     "validation": {
-      "codeOfConductRequired": "You must accept the code of conduct",
+      "codeOfConductRequired": "Please agree to the rules first.",
       "emailInvalid": "Invalid email",
       "emailRequired": "Email is required",
       "nameRequired": "Name is required",
@@ -117,8 +121,8 @@
       "PASSWORD_TOO_SHORT": "This password is too short.",
       "USERNAME_IS_ALREADY_TAKEN": "This username is already taken.",
       "USERNAME_TOO_SHORT": "This username is too short.",
-      "USER_ALREADY_EXISTS": "An account with this email already exists.",
-      "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "An account with this email already exists."
+      "USER_ALREADY_EXISTS": "You already have an account with this email. Try signing in.",
+      "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "You already have an account with this email. Try signing in."
     },
     "bad_request": "The request was not valid.",
     "conflict": "This conflicts with existing data.",

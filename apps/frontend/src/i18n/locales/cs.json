@@ -11,7 +11,7 @@
     "deleteSuccess": "Váš účet byl úspěšně smazán."
   },
   "auth": {
-    "acceptCodeOfConduct": "Přečetl/a jsem si <coc>kodex chování</coc> a souhlasím s ním",
+    "acceptCodeOfConduct": "Souhlasím s <coc>pravidly komunity</coc>",
     "confirmPassword": "Potvrzení hesla",
     "createAccount": "Vytvořit účet",
     "editProfile": "Upravit profil",
@@ -24,16 +24,20 @@
     "passwordHint_few": "Alespoň {{count}} znaky",
     "passwordHint_one": "Alespoň {{count}} znak",
     "passwordHint_other": "Alespoň {{count}} znaků",
+    "preview": {
+      "caption": "Každý blobatar je jedinečný.",
+      "title": "To jste vy!"
+    },
     "signIn": "Přihlásit se",
     "signInDescription": "Přihlaste se e-mailem a heslem.",
     "signInTitle": "Vítejte zpět",
     "signOut": "Odhlásit se",
     "signUp": "Registrovat se",
-    "signUpDescription": "Vytvořte si účet v Kvintetu.",
+    "signUpTitle": "Vytvořte si účet",
     "username": "Uživatelské jméno",
-    "usernameHint": "Váš avatar se vytváří z uživatelského jména.",
+    "usernameHint": "Podle něj se vytvoří váš blobatar.",
     "validation": {
-      "codeOfConductRequired": "Musíte souhlasit s kodexem chování",
+      "codeOfConductRequired": "Nejdříve souhlaste s pravidly.",
       "emailInvalid": "Neplatný e-mail",
       "emailRequired": "Zadejte e-mail",
       "nameRequired": "Zadejte jméno",
@@ -119,8 +123,8 @@
       "PASSWORD_TOO_SHORT": "Heslo je příliš krátké.",
       "USERNAME_IS_ALREADY_TAKEN": "Toto uživatelské jméno je již obsazené.",
       "USERNAME_TOO_SHORT": "Uživatelské jméno je příliš krátké.",
-      "USER_ALREADY_EXISTS": "Účet s tímto e-mailem už existuje.",
-      "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "Účet s tímto e-mailem už existuje."
+      "USER_ALREADY_EXISTS": "Účet s tímto e-mailem už máte. Zkuste se přihlásit.",
+      "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "Účet s tímto e-mailem už máte. Zkuste se přihlásit."
     },
     "bad_request": "Požadavek nebyl platný.",
     "conflict": "Tohle je v rozporu s existujícími daty.",
