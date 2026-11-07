@@ -4,7 +4,7 @@ import { HoverGazeBlobatar } from "@/components/HoverGazeBlobatar"
 import { formatTime } from "@/lib/date"
 import { cn } from "@/lib/utils"
 
-import type { ChatMessage } from "@/features/chat/api/chatApi"
+import { KVINTET_STARTED, type ChatMessage } from "@/features/chat/api/chatApi"
 
 type MessageItemProps = {
   message: ChatMessage
@@ -17,7 +17,12 @@ const DELETED_AUTHOR_SEED = "deleted-member"
 export function MessageItem({ message, isOwn }: MessageItemProps) {
   const { t } = useTranslation()
   if (message.kind === "SYSTEM") {
-    return <li className="text-center text-sm text-muted-foreground">{message.body}</li>
+    // The body is a code; one we do not know yet is shown as it is rather than hidden.
+    return (
+      <li className="text-center text-small text-muted-foreground">
+        {message.body === KVINTET_STARTED ? t("chat.system.kvintetStarted") : message.body}
+      </li>
+    )
   }
 
   const name = isOwn ? t("chat.you") : (message.authorName ?? t("chat.deletedMember"))
@@ -25,18 +30,25 @@ export function MessageItem({ message, isOwn }: MessageItemProps) {
   const seed = message.authorUsername ?? message.authorId ?? DELETED_AUTHOR_SEED
 
   return (
-    <li className={cn("flex items-end gap-3", isOwn && "flex-row-reverse")}>
+    <li className={cn("flex items-end gap-2 md:gap-2.5", isOwn && "flex-row-reverse")}>
       {/* A chat has many avatars: static, and only the one under the mouse is animated. */}
       <HoverGazeBlobatar
         name={seed}
-        className="mb-0.5 size-9"
+        className="size-7.5 md:size-9"
       />
       <div className={cn("flex max-w-xl min-w-0 flex-col gap-1", isOwn && "items-end")}>
-        <p className="flex items-baseline gap-2 text-sm">
-          <span className="font-semibold text-foreground">{name}</span>
+        {/* Phone: one muted "Name · time" line. From md: bold name and a mono time. */}
+        <p className="flex items-baseline gap-1.5 text-small text-muted-foreground md:gap-2 md:text-label">
+          <span className="md:font-medium md:text-foreground">{name}</span>
+          <span
+            aria-hidden="true"
+            className="md:hidden"
+          >
+            ·
+          </span>
           <time
             dateTime={message.createdAt}
-            className="font-mono text-xs text-muted-foreground"
+            className="md:font-mono md:text-meta md:tracking-meta md:uppercase"
           >
             {formatTime(message.createdAt)}
           </time>
@@ -44,8 +56,8 @@ export function MessageItem({ message, isOwn }: MessageItemProps) {
         {/* Plain text only: React escapes it, whitespace-pre-wrap keeps the author's line breaks. */}
         <p
           className={cn(
-            "rounded-lg px-3 py-2.5 text-base break-words whitespace-pre-wrap text-foreground",
-            isOwn ? "bg-primary/10" : "bg-secondary",
+            "rounded-lg px-3 py-2 text-compact break-words whitespace-pre-wrap text-foreground md:px-3.5 md:py-2.5",
+            isOwn ? "bg-highlight-soft" : "bg-secondary",
           )}
         >
           {message.body}
