@@ -61,7 +61,7 @@ Kvintet shows no photos, so every person is represented by a generated avatar fr
   - **Grey** — not met yet. Anyone outside your group: feed, proposals, "who's here" before the kvintet starts.
   - **Colour** (`Blobatar`) — you, and your group once it has started.
   - **Dashed circle** — a seat nobody has taken. Never a "+" or an empty avatar.
-- **A kvintet is a group of five seats, never a number.** One shared component draws it, as a compact row (cards) or as a ring (the table of the home page and "kvintet begins"; seats scale with the container). Members first, free seats after, always five in total.
+- **A kvintet is a group of five seats, never a number.** One shared component (`KvintetSeats`) draws it, as a compact row (cards) or as a ring (the table of the home page and "kvintet begins"; seats scale with the container). Its default geometry is Figma K3/M9: seats 27 % of the width on a ring of radius 36.5 % (96 px / 130 px at 356 px wide, 72 px / 100 px at 272 px), with the name directly under the seat. Members first, free seats after, always five in total.
 - **Sizes** come from the Figma, so pick the one for the job rather than a new value:
 
   | Use                                               | Size   | Class     |

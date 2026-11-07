@@ -1,6 +1,6 @@
 import i18n from "@/i18n"
 
-import { formatDate, formatLongDate, formatNumber, formatTime } from "./date"
+import { formatDate, formatDayMonth, formatLongDate, formatNumber, formatTime } from "./date"
 
 afterEach(() => i18n.changeLanguage("en"))
 
@@ -21,6 +21,12 @@ describe("locale formatting", () => {
   it("writes the time of day without a date", () => {
     expect(formatTime(date)).toMatch(/^\d{1,2}:\d{2}/)
     expect(formatTime(date)).not.toContain("2026")
+  })
+
+  it("writes the day and month without a year", async () => {
+    expect(formatDayMonth("2026-10-22T12:00:00Z")).toBe("October 22")
+    await i18n.changeLanguage("cs")
+    expect(formatDayMonth("2026-10-22T12:00:00Z")).toBe("22. října")
   })
 
   it("writes the long date in the active language", async () => {

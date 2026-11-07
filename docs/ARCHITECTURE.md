@@ -168,15 +168,17 @@ Member-only routes use `mine` instead of `:id`, so a client cannot address someo
 
 Routes (TanStack Router, file-based). Guards are pathless layout routes (`_Authenticated`, `_Onboarded`, `_Admin`) whose loader checks the session and redirects. `_Onboarded` sends users without a finished profile to `/onboarding`; `_Admin` shows the 404 page to non-admins.
 
-| Route                                            | Access                   |
-| ------------------------------------------------ | ------------------------ |
-| `/`, `/login`, `/signup`, `/code-of-conduct`     | public                   |
-| `/onboarding`                                    | signed in, not onboarded |
-| `/overview`, `/profile`                          | signed in + onboarded    |
-| `/board`, `/board/new`                           | signed in + onboarded    |
-| `/kvintet/feed`, `/kvintet`, `/kvintet/messages` | signed in + onboarded    |
+| Route                                                               | Access                   |
+| ------------------------------------------------------------------- | ------------------------ |
+| `/`, `/login`, `/signup`, `/code-of-conduct`                        | public                   |
+| `/onboarding`                                                       | signed in, not onboarded |
+| `/overview`, `/profile`                                             | signed in + onboarded    |
+| `/board`, `/board/new`                                              | signed in + onboarded    |
+| `/kvintet/feed`, `/kvintet`, `/kvintet/messages`, `/kvintet/begins` | signed in + onboarded    |
 
 The chat has its own page, `/kvintet/messages`, linked from the "Open messages" button on an `ACTIVE` kvintet's `/kvintet` page; it shows the kvintet title, a back link and the member names, and sends anyone whose kvintet is missing or not `ACTIVE` back to `/kvintet`. Features may not import each other, so the `kvintet` feature renders that page and takes the chat as a render prop that the route supplies.
+
+The first time a member opens an `ACTIVE` kvintet, `/kvintet` sends them once to `/kvintet/begins` ("There are five of you. The kvintet begins.": the group in colour, the topic, links to the chat and to the members). The backend does not track it: the "seen" mark is a `localStorage` key per kvintet id (`features/kvintet/lib/beginsSeen.ts`), so a second browser or cleared storage shows the page once more; blocked storage counts as seen. `/kvintet/begins` itself sends anyone without an `ACTIVE` kvintet back to `/kvintet`.
 | `/admin` | admin |
 
 - Features live in `src/features/{account,profile,board,kvintet,chat,admin,legal}`. Business decisions stay in hooks and on the server, not in components.

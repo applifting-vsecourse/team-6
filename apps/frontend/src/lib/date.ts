@@ -16,6 +16,13 @@ export function formatLongDate(date: string | number | Date) {
   )
 }
 
+// "October 22" / "22. října"
+export function formatDayMonth(date: string | number | Date) {
+  return new Intl.DateTimeFormat(i18n.resolvedLanguage, { day: "numeric", month: "long" }).format(
+    new Date(date),
+  )
+}
+
 // "6:02 PM" / "18:02"
 export function formatTime(date: string | number | Date) {
   return new Intl.DateTimeFormat(i18n.resolvedLanguage, { timeStyle: "short" }).format(

@@ -146,6 +146,19 @@
     "activeSubtitle": "FORMED ON {{date}} · {{count}} MEMBERS",
     "activeSubtitleWithPreferences": "FORMED ON {{date}} · {{count}} MEMBERS · SUITS EVERYONE: {{preferences}}",
     "alreadyMember": "You are already in a proposal.",
+    "begins": {
+      "dateAt": "{{date}} at {{time}}",
+      "eyebrowFive": "The fifth person joined",
+      "eyebrowStarted": "The kvintet has started",
+      "lead": "Say hi and plan your first meeting.",
+      "messageGroup": "Message the group",
+      "seeMembers": "See members",
+      "title": {
+        "five": "There are five of you. The kvintet begins.",
+        "four": "There are four of you. The kvintet begins.",
+        "three": "There are three of you. The kvintet begins."
+      }
+    },
     "chat": {
       "description": "Arrange your first meeting in the group chat.",
       "heading": "Group chat",

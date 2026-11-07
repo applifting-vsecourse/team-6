@@ -148,6 +148,19 @@
     "activeSubtitle": "VZNIKL {{date}} · {{count}} ČLENŮ",
     "activeSubtitleWithPreferences": "VZNIKL {{date}} · {{count}} ČLENŮ · VŠEM VYHOVUJE: {{preferences}}",
     "alreadyMember": "V návrhu už jste.",
+    "begins": {
+      "dateAt": "{{date}} v {{time}}",
+      "eyebrowFive": "se přidal pátý",
+      "eyebrowStarted": "kvintet začal",
+      "lead": "Teď uvidíte jména ostatních. Naplánujte první setkání.",
+      "messageGroup": "Napsat skupině",
+      "seeMembers": "Zobrazit členy",
+      "title": {
+        "five": "Je vás pět. Kvintet začíná.",
+        "four": "Jste čtyři. Kvintet začíná.",
+        "three": "Jste tři. Kvintet začíná."
+      }
+    },
     "chat": {
       "description": "Domluvte si první setkání ve skupinovém chatu.",
       "heading": "Skupinový chat",
