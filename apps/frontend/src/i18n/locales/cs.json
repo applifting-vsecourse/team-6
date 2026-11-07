@@ -92,6 +92,7 @@
     "back": "Zpět",
     "close": "Zavřít",
     "continue": "Pokračovat",
+    "edit": "Upravit",
     "finish": "Hotovo",
     "goHome": "Na úvodní stránku",
     "language": "Jazyk",
@@ -181,13 +182,18 @@
       "category": "Kategorie",
       "categoryPlaceholder": "Zvolte kategorii",
       "confirmLeave": "Opustit",
+      "confirmLeaveActive": "Opustit kvintet",
       "description": "Budete v něm první. Další se přidají podle tématu.",
       "details": "Pár slov navíc (nepovinné)",
       "detailsPlaceholder": "např. Vedu agenturu s 10 lidmi a chci sdílet, co nám funguje.",
-      "leaveActiveConfirm": "Opustíte aktivní kvintet. Pokud ve skupině zůstanou méně než 3 členové, kvintet zanikne.",
+      "leaveActiveDescription": "Ostatní uvidí, že jste odešli. Pak se můžete přidat do jiného kvintetu.",
+      "leaveActiveNotice": "Ostatní pokračují bez vás.",
+      "leaveActiveTitle": "Opustit kvintet?",
       "leaveProposalConfirm": "Opustíte tento návrh. Když někdo přijde nebo odejde, hlasy všech se vynulují.",
       "leaveTitle": "Opravdu chcete odejít?",
+      "leaving": "Odcházím…",
       "note": "Ostatní uvidí téma a vaši roli. Vaše jméno až po zahájení skupiny.",
+      "stay": "Zůstat",
       "submit": "Založit kvintet",
       "title": "Založit kvintet",
       "topic": "O čem chcete mluvit",
@@ -313,7 +319,8 @@
   "nav": {
     "kvintetFeed": "Kvintety",
     "kvintetFeedDisabled": "Už jste v kvintetu, proto ostatní návrhy nelze procházet.",
-    "overview": "Domů"
+    "overview": "Domů",
+    "profile": "Profil"
   },
   "onboarding": {
     "step1": {
@@ -496,6 +503,39 @@
     "subtitle": "Zatím nejste v žádném kvintetu. Začněte výběrem návrhu.",
     "subtitleMember": "Jste v kvintetu. Podívejte se, jak se vaší skupině daří.",
     "title": "Přehled"
+  },
+  "profile": {
+    "dangerZone": {
+      "button": "Smazat účet",
+      "description": "Smaže všechno. Tento krok nelze vzít zpět.",
+      "title": "Smazat účet"
+    },
+    "empty": {
+      "interests": "Zatím nic nepřidáno",
+      "learn": "Zatím nic nepřidáno",
+      "teach": "Zatím nic nepřidáno",
+      "whenAndWhere": "Zatím nenastaveno"
+    },
+    "error": {
+      "title": "Profil se nepodařilo načíst"
+    },
+    "newUsernameHint": "Nové uživatelské jméno, nový blobatar.",
+    "sections": {
+      "interests": "Zajímá mě",
+      "learn": "Chci se naučit",
+      "teach": "Umím naučit",
+      "whenAndWhere": "Kdy a kde"
+    },
+    "title": "Profil",
+    "when": {
+      "afternoons": "odpoledne",
+      "allDays": "Všední dny i víkendy",
+      "evenings": "večer",
+      "mornings": "dopoledne",
+      "weekdays": "Všední dny",
+      "weekends": "Víkendy"
+    },
+    "withinRadius": "v okruhu {{count}} km"
   },
   "roles": {
     "account-manager": "Account manažer",

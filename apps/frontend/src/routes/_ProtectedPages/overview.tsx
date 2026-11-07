@@ -504,6 +504,7 @@ function OverviewPage() {
                     onConfirm={handleLeave}
                     isLeaving={myKvintet.isLeaving}
                     isActiveKvintet={false}
+                    avatarSeed={user ? user.username || user.id : undefined}
                   />
                 </>
               )}
@@ -647,6 +648,7 @@ function OverviewPage() {
                     onConfirm={handleLeave}
                     isLeaving={myKvintet.isLeaving}
                     isActiveKvintet={true}
+                    avatarSeed={user ? user.username || user.id : undefined}
                   />
                 </>
               )}

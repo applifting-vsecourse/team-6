@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import { sleepy } from "blobatar/expression"
-import { LogOut } from "lucide-react"
+import { LogOut, User } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
@@ -54,8 +54,9 @@ export function HeaderMenu() {
   return (
     <>
       {/* On a phone the avatar only says who is signed in; the menu holds everything else. */}
-      <Blobatar
+      <GazeBlobatar
         name={seedOf(user)}
+        animate="always"
         className="size-8 md:hidden"
       />
       <DropdownMenu>
@@ -66,7 +67,7 @@ export function HeaderMenu() {
           >
             <GazeBlobatar
               name={seedOf(user)}
-              animate="hover"
+              animate="always"
               travel={7}
               className="size-7.5"
             />
@@ -84,8 +85,9 @@ export function HeaderMenu() {
           className="w-60"
         >
           <DropdownMenuLabel className="flex items-center gap-3 p-2.5">
-            <Blobatar
+            <GazeBlobatar
               name={seedOf(user)}
+              animate="always"
               className="size-8"
             />
             <div className="flex min-w-0 flex-col">
@@ -98,6 +100,12 @@ export function HeaderMenu() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Link to={ROUTES.profile}>
+              <User className="size-4" />
+              {t("nav.profile")}
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => signOut.mutate()}
             disabled={signOut.isPending}
@@ -171,11 +179,12 @@ export function MobileAccount() {
 
   return (
     <div className="flex items-center gap-4 rounded-lg border border-border bg-card p-4">
-      <Blobatar
+      <GazeBlobatar
         name={seedOf(user)}
-        className="size-12"
+        animate="always"
+        className="size-12 shrink-0"
       />
-      <div className="flex min-w-0 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <p className="truncate font-semibold text-foreground">{user.name}</p>
         {user.username ? (
           <p className="truncate text-sm text-muted-foreground">@{user.username}</p>
