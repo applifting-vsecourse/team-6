@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 
-import { NotFound } from "@/components/Error/NotFound"
+import { NotFound, NotFoundContent } from "@/components/Error/NotFound"
 import { RootErrorBoundary } from "@/components/Error/RootErrorBoundary"
 
 vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
@@ -18,6 +18,15 @@ describe("NotFound", () => {
     expect(screen.getByRole("heading", { name: "This page doesn't exist" })).toBeInTheDocument()
     expect(screen.getByText("404")).toBeInTheDocument()
     expect(screen.getByRole("link", { name: "Back home" })).toHaveAttribute("href", "/")
+    expect(screen.getByRole("contentinfo")).toBeInTheDocument()
+  })
+
+  it("renders no header or footer of its own inside a layout that has them", () => {
+    render(<NotFoundContent />)
+
+    expect(screen.getByRole("heading", { name: "This page doesn't exist" })).toBeInTheDocument()
+    expect(screen.queryByRole("banner")).not.toBeInTheDocument()
+    expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument()
   })
 })
 

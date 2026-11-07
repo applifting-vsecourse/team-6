@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect, useMatch } from "@tanstack/react-rou
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
+import { NotFoundContent } from "@/components/Error/NotFound"
 import { PageLayout } from "@/components/PageLayout"
 import { Seo } from "@/components/Seo"
 
@@ -23,6 +24,8 @@ export const Route = createFileRoute("/_ProtectedPages")({
     })
   },
   component: Layout,
+  // Unknown URLs under this layout render in its outlet, which already has the header and footer.
+  notFoundComponent: NotFoundContent,
 })
 
 function Layout() {

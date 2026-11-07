@@ -13,24 +13,32 @@ type NotFoundProps = {
   header: ReactNode
 }
 
-export function NotFound({ header }: NotFoundProps) {
+/** The 404 itself, for routes that already render the page chrome around their outlet. */
+export function NotFoundContent() {
   const { t } = useTranslation()
 
   return (
+    <div className="pt-20 pb-22 md:pt-30">
+      <ErrorLayout
+        seed="seat-7"
+        eyebrow="404"
+        title={t("errors.pageNotFound")}
+        description={t("errors.pageNotFoundDescription")}
+        action={
+          <Button asChild>
+            <Link to={ROUTES.home}>{t("common.goHome")}</Link>
+          </Button>
+        }
+      />
+    </div>
+  )
+}
+
+/** The 404 with its own chrome, for unknown URLs that no layout route claims. */
+export function NotFound({ header }: NotFoundProps) {
+  return (
     <PageLayout header={header}>
-      <div className="pt-20 pb-22 md:pt-30">
-        <ErrorLayout
-          seed="seat-7"
-          eyebrow="404"
-          title={t("errors.pageNotFound")}
-          description={t("errors.pageNotFoundDescription")}
-          action={
-            <Button asChild>
-              <Link to={ROUTES.home}>{t("common.goHome")}</Link>
-            </Button>
-          }
-        />
-      </div>
+      <NotFoundContent />
     </PageLayout>
   )
 }
