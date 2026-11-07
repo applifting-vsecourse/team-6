@@ -3,12 +3,14 @@ import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { cn } from "@/lib/utils"
 
 import {
   DEFAULT_RADIUS_KM,
   LocationMapPicker,
 } from "@/features/profile/components/LocationMapPicker"
+import { OnboardingCard } from "@/features/profile/components/OnboardingCard"
+import { OnboardingTitle } from "@/features/profile/components/OnboardingTitle"
+import { checkboxClass } from "@/features/profile/lib/optionStyles"
 
 export type Step2Data = {
   weekdays: boolean
@@ -45,9 +47,9 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
   const [timeOfDayError, setTimeOfDayError] = useState<string | null>(null)
   const [locationError, setLocationError] = useState<string | null>(null)
 
-  const daysSectionRef = useRef<HTMLDivElement | null>(null)
-  const timeOfDaySectionRef = useRef<HTMLDivElement | null>(null)
-  const mapSectionRef = useRef<HTMLDivElement | null>(null)
+  const daysSectionRef = useRef<HTMLElement | null>(null)
+  const timeOfDaySectionRef = useRef<HTMLElement | null>(null)
+  const mapSectionRef = useRef<HTMLElement | null>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -95,130 +97,89 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
     })
   }
 
+  const option = (
+    isChecked: boolean,
+    label: string,
+    onCheckedChange: (isChecked: boolean) => void,
+  ) => (
+    <label className="flex cursor-pointer items-center gap-2.5 text-compact text-foreground">
+      <Checkbox
+        className={checkboxClass}
+        checked={isChecked}
+        onCheckedChange={(value) => onCheckedChange(Boolean(value))}
+      />
+      {label}
+    </label>
+  )
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-7"
+      className="flex flex-col gap-5 md:gap-6"
     >
-      <div className="flex flex-col gap-2">
-        <h1 className="text-title text-foreground">{t("onboarding.step2.title")}</h1>
-        <p className="text-lg text-foreground/80">{t("onboarding.step2.description")}</p>
-      </div>
+      <OnboardingTitle
+        title={t("onboarding.step2.title")}
+        description={t("onboarding.step2.description")}
+      />
 
-      <div
+      <OnboardingCard
         ref={daysSectionRef}
-        className={cn(
-          "flex flex-col gap-3 border-t border-border pt-6 transition-colors",
-          daysError && "rounded-lg border border-destructive/60 bg-destructive/5 p-4",
-        )}
+        title={t("onboarding.step2.daysTitle")}
+        isInvalid={Boolean(daysError)}
       >
-        <div className="flex flex-col gap-1">
-          <h3 className="text-subheading font-semibold text-foreground">
-            {t("onboarding.step2.daysTitle")}
-          </h3>
-          {daysError && (
-            <p
-              className="text-sm font-medium text-destructive"
-              role="alert"
-            >
-              {daysError}
-            </p>
-          )}
+        <div className="flex flex-col gap-3 md:flex-row md:gap-7">
+          {option(hasWeekdays, t("onboarding.step2.weekdays"), (isChecked) => {
+            setHasWeekdays(isChecked)
+            if (isChecked || hasWeekends) setDaysError(null)
+          })}
+          {option(hasWeekends, t("onboarding.step2.weekends"), (isChecked) => {
+            setHasWeekends(isChecked)
+            if (isChecked || hasWeekdays) setDaysError(null)
+          })}
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:gap-6">
-          <label className="flex cursor-pointer items-center gap-2.5">
-            <Checkbox
-              checked={hasWeekdays}
-              onCheckedChange={(checked) => {
-                const isChecked = Boolean(checked)
-                setHasWeekdays(isChecked)
-                if (isChecked || hasWeekends) setDaysError(null)
-              }}
-            />
-            <span className="text-base text-foreground">{t("onboarding.step2.weekdays")}</span>
-          </label>
-          <label className="flex cursor-pointer items-center gap-2.5">
-            <Checkbox
-              checked={hasWeekends}
-              onCheckedChange={(checked) => {
-                const isChecked = Boolean(checked)
-                setHasWeekends(isChecked)
-                if (isChecked || hasWeekdays) setDaysError(null)
-              }}
-            />
-            <span className="text-base text-foreground">{t("onboarding.step2.weekends")}</span>
-          </label>
-        </div>
-      </div>
+        {daysError && (
+          <p
+            className="text-small font-medium text-destructive"
+            role="alert"
+          >
+            {daysError}
+          </p>
+        )}
+      </OnboardingCard>
 
-      <div
+      <OnboardingCard
         ref={timeOfDaySectionRef}
-        className={cn(
-          "flex flex-col gap-3 border-t border-border pt-6 transition-colors",
-          timeOfDayError && "rounded-lg border border-destructive/60 bg-destructive/5 p-4",
+        title={t("onboarding.step2.timeOfDayTitle")}
+        isInvalid={Boolean(timeOfDayError)}
+      >
+        <div className="flex flex-col gap-3 md:flex-row md:gap-7">
+          {option(hasMornings, t("onboarding.step2.mornings"), (isChecked) => {
+            setHasMornings(isChecked)
+            if (isChecked || hasAfternoons || hasEvenings) setTimeOfDayError(null)
+          })}
+          {option(hasAfternoons, t("onboarding.step2.afternoons"), (isChecked) => {
+            setHasAfternoons(isChecked)
+            if (hasMornings || isChecked || hasEvenings) setTimeOfDayError(null)
+          })}
+          {option(hasEvenings, t("onboarding.step2.evenings"), (isChecked) => {
+            setHasEvenings(isChecked)
+            if (hasMornings || hasAfternoons || isChecked) setTimeOfDayError(null)
+          })}
+        </div>
+        {timeOfDayError && (
+          <p
+            className="text-small font-medium text-destructive"
+            role="alert"
+          >
+            {timeOfDayError}
+          </p>
         )}
-      >
-        <div className="flex flex-col gap-1">
-          <h3 className="text-subheading font-semibold text-foreground">
-            {t("onboarding.step2.timeOfDayTitle")}
-          </h3>
-          {timeOfDayError && (
-            <p
-              className="text-sm font-medium text-destructive"
-              role="alert"
-            >
-              {timeOfDayError}
-            </p>
-          )}
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:gap-6">
-          <label className="flex cursor-pointer items-center gap-2.5">
-            <Checkbox
-              checked={hasMornings}
-              onCheckedChange={(checked) => {
-                const isChecked = Boolean(checked)
-                setHasMornings(isChecked)
-                if (isChecked || hasAfternoons || hasEvenings) setTimeOfDayError(null)
-              }}
-            />
-            <span className="text-base text-foreground">{t("onboarding.step2.mornings")}</span>
-          </label>
-          <label className="flex cursor-pointer items-center gap-2.5">
-            <Checkbox
-              checked={hasAfternoons}
-              onCheckedChange={(checked) => {
-                const isChecked = Boolean(checked)
-                setHasAfternoons(isChecked)
-                if (hasMornings || isChecked || hasEvenings) setTimeOfDayError(null)
-              }}
-            />
-            <span className="text-base text-foreground">{t("onboarding.step2.afternoons")}</span>
-          </label>
-          <label className="flex cursor-pointer items-center gap-2.5">
-            <Checkbox
-              checked={hasEvenings}
-              onCheckedChange={(checked) => {
-                const isChecked = Boolean(checked)
-                setHasEvenings(isChecked)
-                if (hasMornings || hasAfternoons || isChecked) setTimeOfDayError(null)
-              }}
-            />
-            <span className="text-base text-foreground">{t("onboarding.step2.evenings")}</span>
-          </label>
-        </div>
-      </div>
+      </OnboardingCard>
 
-      <div
+      <OnboardingCard
         ref={mapSectionRef}
-        className="flex flex-col gap-3 border-t border-border pt-6"
+        isInvalid={Boolean(locationError)}
       >
-        <div className="flex flex-col gap-0.5">
-          <h3 className="text-subheading font-semibold text-foreground">
-            {t("onboarding.step2.whereTitle")}
-          </h3>
-          <p className="text-sm text-muted-foreground">{t("onboarding.step2.whereHint")}</p>
-        </div>
-
         <LocationMapPicker
           latitude={latitude}
           longitude={longitude}
@@ -234,22 +195,28 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
         {locationError && (
           <p
             role="alert"
-            className="text-sm font-medium text-destructive"
+            className="text-small font-medium text-destructive"
           >
             {locationError}
           </p>
         )}
-      </div>
+      </OnboardingCard>
 
-      <div className="flex items-center justify-between pt-2">
+      <div className="flex items-center gap-3 md:justify-between">
         <Button
           type="button"
           variant="outline"
+          className="flex-1 bg-card md:flex-none"
           onClick={onBack}
         >
           {t("common.back")}
         </Button>
-        <Button type="submit">{t("common.continue")}</Button>
+        <Button
+          type="submit"
+          className="flex-1 md:flex-none"
+        >
+          {t("common.continue")}
+        </Button>
       </div>
     </form>
   )
