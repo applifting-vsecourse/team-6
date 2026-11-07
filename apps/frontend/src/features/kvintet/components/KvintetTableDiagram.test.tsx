@@ -55,4 +55,32 @@ describe("KvintetTableDiagram", () => {
     await userEvent.hover(screen.getByRole("img", { name: "Jana Nováková (you)" }))
     expect(await screen.findByRole("tooltip")).toHaveTextContent("Jana Nováková (you)")
   })
+
+  it("renders compact diagram without outer card heading and description when isCompact is true", () => {
+    const members: KvintetMember[] = [
+      {
+        userId: "u1",
+        username: "jana",
+        name: "Jana Nováková",
+        role: "Designer",
+        teachTags: [],
+        learnTags: [],
+        interestTags: [],
+        hasVoted: false,
+        isCurrentUser: true,
+      },
+    ]
+
+    const { rerender } = render(<KvintetTableDiagram members={members} />)
+    expect(screen.getByRole("heading", { level: 2 })).toBeInTheDocument()
+
+    rerender(
+      <KvintetTableDiagram
+        members={members}
+        isCompact
+      />,
+    )
+    expect(screen.queryByRole("heading", { level: 2 })).not.toBeInTheDocument()
+    expect(screen.getByRole("img", { name: /Five people/i })).toBeInTheDocument()
+  })
 })

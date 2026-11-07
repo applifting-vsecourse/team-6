@@ -3,6 +3,7 @@ export const ROUTES = {
   login: "/login",
   signup: "/signup",
   codeOfConduct: "/code-of-conduct",
+  howItWorks: "/how-it-works",
   overview: "/overview",
   kvintetFeed: "/kvintet/feed",
   myKvintet: "/kvintet",

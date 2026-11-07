@@ -7,6 +7,7 @@ import type { KvintetMember } from "@/features/kvintet/api/kvintetApi"
 
 type KvintetTableDiagramProps = {
   members: KvintetMember[]
+  isCompact?: boolean
 }
 
 // Five seats on a circle in a 300x300 space, starting at the top and going clockwise.
@@ -21,87 +22,105 @@ const SEAT_POSITIONS = Array.from({ length: 5 }, (_, i) => {
 
 const AVATAR_SIZE = 56
 
-export function KvintetTableDiagram({ members }: KvintetTableDiagramProps) {
+export function KvintetTableDiagram({ members, isCompact = false }: KvintetTableDiagramProps) {
   const { t } = useTranslation()
+
+  const diagram = (
+    <TooltipProvider>
+      <div className="relative shrink-0">
+        <svg
+          viewBox="0 0 300 300"
+          className="size-56 sm:size-64 md:size-72"
+          role="img"
+          aria-label={t("kvintet.table.title")}
+        >
+          {/* 5 translucent seat circles, so the overlaps read as a flower */}
+          {SEAT_POSITIONS.map((pos, idx) => {
+            const member = members[idx]
+            const isCurrentUser = member?.isCurrentUser
+
+            return (
+              <circle
+                key={idx}
+                cx={pos.cx}
+                cy={pos.cy}
+                r={PETAL_RADIUS}
+                className={`stroke-1 ${
+                  isCurrentUser
+                    ? "fill-primary/30 stroke-primary/60"
+                    : "fill-primary/15 stroke-primary/40"
+                }`}
+              />
+            )
+          })}
+
+          {/* Center table dot */}
+          <circle
+            cx="150"
+            cy="150"
+            r="3.5"
+            className="fill-foreground"
+          />
+
+          {/* Member blobatars on their seats or dashed circle for free seats */}
+          {SEAT_POSITIONS.map((pos, idx) => {
+            const member = members[idx]
+            if (!member) {
+              return (
+                <circle
+                  key={`free-${idx}`}
+                  cx={pos.cx}
+                  cy={pos.cy}
+                  r={AVATAR_SIZE / 2}
+                  className="fill-none stroke-muted-foreground/40 stroke-[1.5]"
+                  strokeDasharray="4 4"
+                />
+              )
+            }
+
+            const displayName =
+              member.name ??
+              member.role ??
+              String(t("kvintet.diagram.memberNumber", { number: idx + 1 }))
+            const label = member.isCurrentUser
+              ? `${displayName} ${String(t("kvintet.members.you"))}`
+              : displayName
+
+            return (
+              <foreignObject
+                key={idx}
+                x={pos.cx - AVATAR_SIZE / 2}
+                y={pos.cy - AVATAR_SIZE / 2}
+                width={AVATAR_SIZE}
+                height={AVATAR_SIZE}
+              >
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="block size-14 rounded-full">
+                      <GazeBlobatar
+                        name={member.username ?? member.userId}
+                        title={label}
+                        className="size-14"
+                      />
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>{label}</TooltipContent>
+                </Tooltip>
+              </foreignObject>
+            )
+          })}
+        </svg>
+      </div>
+    </TooltipProvider>
+  )
+
+  if (isCompact) {
+    return diagram
+  }
 
   return (
     <div className="flex flex-col items-center gap-8 rounded-lg border border-border bg-card p-6 md:flex-row md:gap-12 md:p-8">
-      {/* Visual circular table diagram */}
-      <TooltipProvider>
-        <div className="relative shrink-0">
-          <svg
-            viewBox="0 0 300 300"
-            className="size-60 md:size-72"
-            role="img"
-            aria-label={t("kvintet.table.title")}
-          >
-            {/* 5 translucent seat circles, so the overlaps read as a flower */}
-            {SEAT_POSITIONS.map((pos, idx) => {
-              const member = members[idx]
-              const isCurrentUser = member?.isCurrentUser
-
-              return (
-                <circle
-                  key={idx}
-                  cx={pos.cx}
-                  cy={pos.cy}
-                  r={PETAL_RADIUS}
-                  className={`stroke-1 ${
-                    isCurrentUser
-                      ? "fill-primary/30 stroke-primary/60"
-                      : "fill-primary/15 stroke-primary/40"
-                  }`}
-                />
-              )
-            })}
-
-            {/* Center table dot */}
-            <circle
-              cx="150"
-              cy="150"
-              r="3.5"
-              className="fill-foreground"
-            />
-
-            {/* Member blobatars on their seats; hovering shows the name */}
-            {SEAT_POSITIONS.map((pos, idx) => {
-              const member = members[idx]
-              if (!member) return null
-
-              const displayName =
-                member.name ??
-                member.role ??
-                String(t("kvintet.diagram.memberNumber", { number: idx + 1 }))
-              const label = member.isCurrentUser
-                ? `${displayName} ${String(t("kvintet.members.you"))}`
-                : displayName
-
-              return (
-                <foreignObject
-                  key={idx}
-                  x={pos.cx - AVATAR_SIZE / 2}
-                  y={pos.cy - AVATAR_SIZE / 2}
-                  width={AVATAR_SIZE}
-                  height={AVATAR_SIZE}
-                >
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="block size-14 rounded-full">
-                        <GazeBlobatar
-                          name={member.username ?? member.userId}
-                          title={label}
-                          className="size-14"
-                        />
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent>{label}</TooltipContent>
-                  </Tooltip>
-                </foreignObject>
-              )
-            })}
-          </svg>
-        </div>
-      </TooltipProvider>
+      {diagram}
 
       {/* Description text */}
       <div className="flex flex-col gap-2.5">

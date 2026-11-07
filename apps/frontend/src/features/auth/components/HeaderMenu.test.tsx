@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { beforeEach, describe, expect, it, vi } from "vitest"
@@ -6,6 +7,17 @@ import { HeaderMenu, MobileAccount, MobileSignOut } from "@/features/auth/compon
 
 // The gaze driver needs browser APIs jsdom lacks (matchMedia, ResizeObserver).
 vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
+
+vi.mock("@tanstack/react-router", () => ({
+  Link: ({ children, to, className }: { children?: ReactNode; to: string; className?: string }) => (
+    <a
+      href={to}
+      className={className}
+    >
+      {children}
+    </a>
+  ),
+}))
 
 const useSession = vi.fn<() => { user: { id: string; name: string; username: string } | null }>()
 const signOut = vi.fn()

@@ -26,8 +26,10 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-soft: var(--destructive-soft);
   --color-highlight: var(--highlight);
   --color-highlight-foreground: var(--highlight-foreground);
+  --color-highlight-soft: var(--highlight-soft);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -64,6 +66,18 @@
   --text-subheading--line-height: 1.75rem;
   --text-label: 0.875rem;
   --text-label--line-height: 1.4;
+  /* Figma C/h1 (page title of forms and reading pages), C/h1m on a phone, C/lead and C/h3.
+     The 15px C/body is `compact` below. */
+  --text-h1: 2rem;
+  --text-h1--line-height: 1.2;
+  --text-h1--letter-spacing: -0.01em;
+  --text-h1-mobile: 1.6875rem;
+  --text-h1-mobile--line-height: 1.22;
+  --text-h1-mobile--letter-spacing: -0.01em;
+  --text-lead: 1.0625rem;
+  --text-lead--line-height: 1.5;
+  --text-h3: 1.0625rem;
+  --text-h3--line-height: 1.35;
   /* Figma C/small, C/mono and the wordmark. */
   --text-compact: 0.9375rem;
   --text-compact--line-height: 1.5;
@@ -111,9 +125,13 @@
   /* danger */
   --destructive: #c93b3b;
   --destructive-foreground: #ffffff;
+  /* danger-soft: fill of an error alert */
+  --destructive-soft: #fbe3e3;
   /* Figma `accent`: small blue highlights (unread badge, active dot, links). Not for actions. */
   --highlight: #2f5bd3;
   --highlight-foreground: #ffffff;
+  /* accent-soft: fill of a selected chip */
+  --highlight-soft: #e3ebff;
   /* line */
   --border: #dde2ec;
   /* line-strong */
@@ -161,9 +179,11 @@
   /* danger */
   --destructive: #ff8a8a;
   --destructive-foreground: #0d1220;
+  --destructive-soft: #3a1c22;
   /* accent */
   --highlight: #8db4ff;
   --highlight-foreground: #0d1220;
+  --highlight-soft: #1c2a4a;
   /* line */
   --border: #27304a;
   /* line-strong */
