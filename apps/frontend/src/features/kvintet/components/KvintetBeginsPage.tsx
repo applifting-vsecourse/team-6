@@ -7,7 +7,7 @@ import { KvintetSeats, type SeatMember } from "@/components/KvintetSeats"
 import { Seo } from "@/components/Seo"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { formatDayMonth, formatTime } from "@/lib/date"
+import { formatDayAndMonth, formatTime } from "@/lib/date"
 
 import type { KvintetMember } from "@/features/kvintet/api/kvintetApi"
 import { useMyKvintet } from "@/features/kvintet/hooks/useMyKvintet"
@@ -90,7 +90,7 @@ export function KvintetBeginsPage() {
           {/* The date is left out on a phone, as in M9. */}
           <span className="max-md:hidden">
             {t("kvintet.begins.dateAt", {
-              date: formatDayMonth(startedAt),
+              date: formatDayAndMonth(startedAt),
               time: formatTime(startedAt),
             })}{" "}
           </span>

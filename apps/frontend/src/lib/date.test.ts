@@ -1,6 +1,13 @@
 import i18n from "@/i18n"
 
-import { formatDate, formatDayMonth, formatLongDate, formatNumber, formatTime } from "./date"
+import {
+  formatDate,
+  formatDayAndMonth,
+  formatHeaderDate,
+  formatLongDate,
+  formatNumber,
+  formatTime,
+} from "./date"
 
 afterEach(() => i18n.changeLanguage("en"))
 
@@ -23,15 +30,19 @@ describe("locale formatting", () => {
     expect(formatTime(date)).not.toContain("2026")
   })
 
-  it("writes the day and month without a year", async () => {
-    expect(formatDayMonth("2026-10-22T12:00:00Z")).toBe("October 22")
-    await i18n.changeLanguage("cs")
-    expect(formatDayMonth("2026-10-22T12:00:00Z")).toBe("22. října")
-  })
-
   it("writes the long date in the active language", async () => {
     expect(formatLongDate("2026-10-20T12:00:00Z")).toBe("Tuesday, October 20, 2026")
     await i18n.changeLanguage("cs")
     expect(formatLongDate("2026-10-20T12:00:00Z")).toBe("úterý 20. října 2026")
+  })
+
+  it("formats day and month and capitalized header date", async () => {
+    const fixed = "2026-11-07T12:00:00Z"
+    expect(formatDayAndMonth(fixed)).toBe("November 7")
+    expect(formatHeaderDate(fixed)).toBe("Saturday, November 7")
+
+    await i18n.changeLanguage("cs")
+    expect(formatDayAndMonth(fixed)).toBe("7. listopadu")
+    expect(formatHeaderDate(fixed)).toBe("Sobota 7. listopadu")
   })
 })

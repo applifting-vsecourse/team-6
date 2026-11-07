@@ -6,9 +6,11 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
-import { cn } from "@/lib/utils"
 
 import type { MeetingFrequency } from "@/features/profile/api/profileApi"
+import { OnboardingCard } from "@/features/profile/components/OnboardingCard"
+import { OnboardingTitle } from "@/features/profile/components/OnboardingTitle"
+import { checkboxClass, radioClass } from "@/features/profile/lib/optionStyles"
 
 type Step3Data = {
   expectations: string[]
@@ -37,7 +39,7 @@ export function Step3Questionnaire({
   )
   const [note, setNote] = useState(initialData.note)
   const [error, setError] = useState<string | null>(null)
-  const frequencySectionRef = useRef<HTMLDivElement | null>(null)
+  const frequencySectionRef = useRef<HTMLElement | null>(null)
 
   const expectationOptions: {
     id: string
@@ -89,125 +91,110 @@ export function Step3Questionnaire({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-7"
+      className="flex flex-col gap-5 md:gap-6"
     >
-      <div className="flex flex-col gap-2">
-        <h1 className="text-title text-foreground">{t("onboarding.step3.title")}</h1>
-        <p className="text-lg text-foreground/80">{t("onboarding.step3.description")}</p>
-      </div>
+      <OnboardingTitle
+        title={t("onboarding.step3.title")}
+        description={t("onboarding.step3.description")}
+      />
 
-      <div className="flex flex-col gap-3 border-t border-border pt-6">
-        <div className="flex flex-col gap-0.5">
-          <h3 className="text-subheading font-semibold text-foreground">
-            {t("onboarding.step3.expectationsTitle")}
-          </h3>
-          <p className="text-sm text-muted-foreground">{t("onboarding.step3.expectationsHint")}</p>
-        </div>
-
-        <div className="flex flex-col gap-3 pt-1">
+      <OnboardingCard
+        title={t("onboarding.step3.expectationsTitle")}
+        hint={t("onboarding.step3.expectationsHint")}
+      >
+        <div className="flex flex-col gap-3">
           {expectationOptions.map((opt) => (
             <label
               key={opt.id}
-              className="flex cursor-pointer items-center gap-2.5"
+              className="flex cursor-pointer items-center gap-2.5 text-compact text-foreground"
             >
               <Checkbox
+                className={checkboxClass}
                 checked={expectations.includes(opt.id)}
                 onCheckedChange={() => toggleExpectation(opt.id)}
               />
-              <span className="text-base text-foreground">{t(opt.labelKey)}</span>
+              {t(opt.labelKey)}
             </label>
           ))}
         </div>
-      </div>
+      </OnboardingCard>
 
-      <div
+      <OnboardingCard
         ref={frequencySectionRef}
-        className={cn(
-          "flex flex-col gap-3 border-t border-border pt-6 transition-colors",
-          error && "rounded-lg border border-destructive/60 bg-destructive/5 p-4",
-        )}
+        title={t("onboarding.step3.frequencyTitle")}
+        isInvalid={Boolean(error)}
       >
-        <div className="flex flex-col gap-1">
-          <h3 className="text-subheading font-semibold text-foreground">
-            {t("onboarding.step3.frequencyTitle")}
-          </h3>
-          {error && (
-            <p
-              className="text-sm font-medium text-destructive"
-              role="alert"
-            >
-              {error}
-            </p>
-          )}
-        </div>
-
         <RadioGroup
           value={meetingFrequency ?? ""}
           onValueChange={(val) => {
             setMeetingFrequency(val as MeetingFrequency)
             if (error) setError(null)
           }}
-          className="gap-3 pt-1"
+          className="gap-3"
         >
           {frequencyOptions.map((opt) => (
             <label
               key={opt.id}
-              className="flex cursor-pointer items-center gap-2.5"
+              className="flex cursor-pointer items-center gap-2.5 text-compact text-foreground"
             >
               <RadioGroupItem
+                className={radioClass}
                 value={opt.id}
                 id={`freq-${opt.id}`}
               />
-              <span className="text-base text-foreground">{t(opt.labelKey)}</span>
+              {t(opt.labelKey)}
             </label>
           ))}
         </RadioGroup>
-      </div>
-
-      <div className="flex flex-col gap-3 border-t border-border pt-6">
-        <div className="flex flex-col gap-0.5">
-          <h3 className="text-subheading font-semibold text-foreground">
-            {t("onboarding.step3.noteTitle")}
-          </h3>
-          <p className="text-sm text-muted-foreground">{t("onboarding.step3.noteOptional")}</p>
-        </div>
-
-        <div className="flex flex-col gap-1.5 pt-1">
-          <Label
-            htmlFor="onboarding-note"
-            className="sr-only"
+        {error && (
+          <p
+            className="text-small font-medium text-destructive"
+            role="alert"
           >
-            {t("onboarding.step3.noteTitle")}
-          </Label>
-          <Textarea
-            id="onboarding-note"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder={t("onboarding.step3.notePlaceholder")}
-            rows={3}
-          />
-        </div>
-      </div>
+            {error}
+          </p>
+        )}
+      </OnboardingCard>
 
-      <div className="flex flex-col-reverse items-start justify-between gap-4 pt-2 sm:flex-row sm:items-center">
+      <OnboardingCard
+        title={t("onboarding.step3.noteTitle")}
+        hint={t("onboarding.step3.noteOptional")}
+      >
+        <Label
+          htmlFor="onboarding-note"
+          className="sr-only"
+        >
+          {t("onboarding.step3.noteTitle")}
+        </Label>
+        <Textarea
+          id="onboarding-note"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder={t("onboarding.step3.notePlaceholder")}
+          rows={3}
+        />
+      </OnboardingCard>
+
+      <div className="flex items-center gap-3">
         <Button
           type="button"
           variant="outline"
+          className="flex-1 bg-card md:flex-none"
           onClick={onBack}
           disabled={isSubmitting}
         >
           {t("common.back")}
         </Button>
-        <div className="flex w-full flex-col-reverse items-start gap-4 sm:w-auto sm:flex-row sm:items-center">
-          <p className="text-sm text-muted-foreground">{t("onboarding.step3.finishHint")}</p>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full sm:w-auto"
-          >
-            {isSubmitting ? t("common.saving") : t("common.finish")}
-          </Button>
-        </div>
+        <p className="hidden text-small text-muted-foreground md:block md:flex-1">
+          {t("onboarding.step3.finishHint")}
+        </p>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="flex-1 md:flex-none"
+        >
+          {isSubmitting ? t("common.saving") : t("common.finish")}
+        </Button>
       </div>
     </form>
   )

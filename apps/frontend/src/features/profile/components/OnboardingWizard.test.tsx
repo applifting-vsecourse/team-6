@@ -94,6 +94,7 @@ describe("OnboardingWizard", () => {
 
     // Step 1
     expect(await screen.findByText("Tell us about yourself")).toBeInTheDocument()
+    await userEvent.click(await screen.findByRole("button", { name: "Tech & dev" }))
     await userEvent.click(screen.getByRole("button", { name: "Select role Software Engineer" }))
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
 
@@ -105,10 +106,10 @@ describe("OnboardingWizard", () => {
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
 
     // Step 3
-    expect(await screen.findByText("What do you expect from a kvintet?")).toBeInTheDocument()
+    expect(await screen.findByText("What do you expect from the group?")).toBeInTheDocument()
     await userEvent.click(screen.getByLabelText("Learn something new"))
     await userEvent.click(screen.getByLabelText("Every week"))
-    await userEvent.click(screen.getByRole("button", { name: "Finish" }))
+    await userEvent.click(screen.getByRole("button", { name: "Done" }))
 
     expect(mockMutateAsync).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -147,7 +148,7 @@ describe("OnboardingWizard", () => {
     expect(await screen.findByText("When and where can you meet?")).toBeInTheDocument()
     await userEvent.click(screen.getByLabelText("Evenings"))
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
-    await userEvent.click(await screen.findByRole("button", { name: "Finish" }))
+    await userEvent.click(await screen.findByRole("button", { name: "Done" }))
 
     expect(mockMutateAsync).toHaveBeenCalledWith(
       expect.objectContaining({ cityId: null, latitude: 49.19, longitude: 16.6, radiusKm: 30 }),
@@ -158,6 +159,7 @@ describe("OnboardingWizard", () => {
     render(<Wizard />, { wrapper: createWrapper() })
 
     expect(await screen.findByText("Tell us about yourself")).toBeInTheDocument()
+    await userEvent.click(await screen.findByRole("button", { name: "Design" }))
     await userEvent.click(screen.getByRole("button", { name: "Select role UX/UI Designer" }))
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
 
@@ -190,6 +192,8 @@ describe("OnboardingWizard", () => {
       />,
       { wrapper: createWrapper() },
     )
+
+    await userEvent.click(await screen.findByRole("button", { name: "Design" }))
 
     await userEvent.click(await screen.findByRole("button", { name: "Select role UX/UI Designer" }))
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))

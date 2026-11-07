@@ -22,7 +22,7 @@ describe("Step3Questionnaire", () => {
       />,
     )
 
-    await userEvent.click(screen.getByRole("button", { name: "Finish" }))
+    await userEvent.click(screen.getByRole("button", { name: "Done" }))
     expect(onFinish).not.toHaveBeenCalled()
     expect(screen.getByText("Select how often you want to meet")).toBeInTheDocument()
     expect(scrollIntoViewMock).toHaveBeenCalled()
@@ -50,7 +50,7 @@ describe("Step3Questionnaire", () => {
       screen.getByPlaceholderText("e.g. I prefer to meet in English."),
       "Prefer English",
     )
-    await userEvent.click(screen.getByRole("button", { name: "Finish" }))
+    await userEvent.click(screen.getByRole("button", { name: "Done" }))
 
     expect(onFinish).toHaveBeenCalledWith({
       expectations: ["learn_new"],

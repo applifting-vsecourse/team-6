@@ -16,13 +16,6 @@ export function formatLongDate(date: string | number | Date) {
   )
 }
 
-// "October 22" / "22. října"
-export function formatDayMonth(date: string | number | Date) {
-  return new Intl.DateTimeFormat(i18n.resolvedLanguage, { day: "numeric", month: "long" }).format(
-    new Date(date),
-  )
-}
-
 // "6:02 PM" / "18:02"
 export function formatTime(date: string | number | Date) {
   return new Intl.DateTimeFormat(i18n.resolvedLanguage, { timeStyle: "short" }).format(
@@ -39,4 +32,22 @@ export function formatList(items: string[]) {
 
 export function formatNumber(value: number, options?: Intl.NumberFormatOptions) {
   return new Intl.NumberFormat(i18n.resolvedLanguage, options).format(value)
+}
+
+// "Sobota 7. listopadu" / "Saturday, November 7"
+export function formatHeaderDate(date: string | number | Date = new Date()) {
+  const formatted = new Intl.DateTimeFormat(i18n.resolvedLanguage, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(new Date(date))
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1)
+}
+
+// "7. listopadu" / "November 7"
+export function formatDayAndMonth(date: string | number | Date) {
+  return new Intl.DateTimeFormat(i18n.resolvedLanguage, {
+    day: "numeric",
+    month: "long",
+  }).format(new Date(date))
 }

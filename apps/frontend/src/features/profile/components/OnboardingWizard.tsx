@@ -19,18 +19,26 @@ import { OnboardingProgress } from "@/features/profile/components/OnboardingProg
 import { Step1Profile } from "@/features/profile/components/Step1Profile"
 import { Step2Availability } from "@/features/profile/components/Step2Availability"
 import { Step3Questionnaire } from "@/features/profile/components/Step3Questionnaire"
+import { AvatarSeedContext } from "@/features/profile/lib/avatarSeedContext"
 
 export type OnboardingStep = 1 | 2 | 3
 export const ONBOARDING_TOTAL_STEPS = 3
 
 type OnboardingWizardProps = {
   userId?: string
+  // Seed of the person's own blobatar beside the page title; none hides it.
+  avatarSeed?: string
   // The step lives in the URL (the app header shows it too), so the route owns it.
   step: OnboardingStep
   onStepChange: (step: OnboardingStep) => void
 }
 
-export function OnboardingWizard({ userId, step, onStepChange }: OnboardingWizardProps) {
+export function OnboardingWizard({
+  userId,
+  avatarSeed,
+  step,
+  onStepChange,
+}: OnboardingWizardProps) {
   const referenceQuery = useQuery(referenceQueryOptions())
   const profileQuery = useQuery(profileQueryOptions(userId))
 
@@ -60,13 +68,15 @@ export function OnboardingWizard({ userId, step, onStepChange }: OnboardingWizar
   const allTags = referenceQuery.data?.tags ?? []
 
   return (
-    <OnboardingWizardForm
-      userId={userId}
-      step={step}
-      onStepChange={onStepChange}
-      profile={profileQuery.data ?? null}
-      allTags={allTags}
-    />
+    <AvatarSeedContext.Provider value={avatarSeed}>
+      <OnboardingWizardForm
+        userId={userId}
+        step={step}
+        onStepChange={onStepChange}
+        profile={profileQuery.data ?? null}
+        allTags={allTags}
+      />
+    </AvatarSeedContext.Provider>
   )
 }
 
@@ -194,7 +204,7 @@ function OnboardingWizardForm({
   return (
     <div
       ref={wizardTopRef}
-      className="flex scroll-mt-6 flex-col gap-8"
+      className="flex scroll-mt-6 flex-col gap-5 md:gap-6"
     >
       <OnboardingProgress
         currentStep={currentStep}

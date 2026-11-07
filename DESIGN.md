@@ -21,9 +21,9 @@ The app has **two themes: light and dark**, switched in the header (`ThemeSwitch
 
 ## Layout
 
-- **Cards are for separable items in a list** — an offer, a search result, a product. They are not page sections and not layout tools.
+- **Cards are for separable items in a list** — an offer, a search result, a product. They are not page sections and not layout tools. The one exception is the onboarding form (Figma B1–B3), where each question is one card on `background`; such a card holds a single question and never another card.
 - **Never nest a card inside a card.** If content needs grouping inside a card, use spacing and a hairline divider.
-- **A page is not a card.** Page content sits on `background` in a centred column (`max-w-105` for the sign-in form, `max-w-120` for other forms, `max-w-180` for the community rules, `max-w-2xl` for reading, `max-w-4xl` for wide layouts), not inside a floating panel.
+- **A page is not a card.** Page content sits on `background` in a centred column (`max-w-105` for the sign-in form, `max-w-120` for other forms, `max-w-160` for the onboarding steps, `max-w-180` for the community rules, `max-w-2xl` for reading, `max-w-4xl` for wide layouts), not inside a floating panel.
 - **Every page keeps the app chrome.** The header and footer (`PageLayout`) are present on every route, including login and sign-up. Pages never render as standalone islands.
 - Forbidden by default: the centred-hero-plus-three-feature-cards layout, carousels, and any section whose only purpose is to look full.
 
