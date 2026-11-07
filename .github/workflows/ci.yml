@@ -61,6 +61,9 @@ jobs:
       - name: Test backend
         run: pnpm backend test
 
+      - name: Integration tests backend
+        run: pnpm backend test:integration
+
       - name: Test frontend
         run: pnpm frontend test:ci
 
