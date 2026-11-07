@@ -52,6 +52,8 @@ describe("Step1Profile", () => {
       />,
     )
 
+    await userEvent.click(await screen.findByRole("button", { name: "Marketing & sales" }))
+
     await userEvent.click(screen.getByRole("button", { name: "Select role Marketing Specialist" }))
     await userEvent.click(screen.getByRole("button", { name: "Add tag Excel" }))
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
@@ -80,6 +82,8 @@ describe("Step1Profile", () => {
         onContinue={onContinue}
       />,
     )
+
+    await userEvent.click(await screen.findByRole("button", { name: "Tech & dev" }))
 
     await userEvent.click(screen.getByRole("button", { name: "Select role Software Engineer" }))
     await userEvent.click(screen.getByRole("button", { name: "Select role Frontend Developer" }))

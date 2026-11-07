@@ -62,7 +62,7 @@ describe("AppHeader", () => {
     expect(menu.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/login")
     expect(menu.getByRole("link", { name: "How Kvintet works" })).toHaveAttribute(
       "href",
-      "/#how-it-works",
+      "/how-it-works",
     )
     expect(menu.getByRole("link", { name: "Community rules" })).toBeInTheDocument()
     expect(menu.queryByRole("button", { name: "Sign out" })).not.toBeInTheDocument()

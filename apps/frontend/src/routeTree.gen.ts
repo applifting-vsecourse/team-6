@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtectedPagesRouteImport } from './routes/_ProtectedPages'
 import { Route as CodeOfConductRouteImport } from './routes/code-of-conduct'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ProtectedPagesOnboardingRouteImport } from './routes/_ProtectedPages/onboarding'
@@ -32,6 +33,11 @@ const ProtectedPagesRoute = ProtectedPagesRouteImport.update({
 const CodeOfConductRoute = CodeOfConductRouteImport.update({
   id: '/code-of-conduct',
   path: '/code-of-conduct',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -77,6 +83,7 @@ const ProtectedPagesKvintetMessagesRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/code-of-conduct': typeof CodeOfConductRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/onboarding': typeof ProtectedPagesOnboardingRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/code-of-conduct': typeof CodeOfConductRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/onboarding': typeof ProtectedPagesOnboardingRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_ProtectedPages': typeof ProtectedPagesRouteWithChildren
   '/code-of-conduct': typeof CodeOfConductRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/_ProtectedPages/onboarding': typeof ProtectedPagesOnboardingRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/code-of-conduct'
+    | '/how-it-works'
     | '/login'
     | '/signup'
     | '/onboarding'
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/code-of-conduct'
+    | '/how-it-works'
     | '/login'
     | '/signup'
     | '/onboarding'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_ProtectedPages'
     | '/code-of-conduct'
+    | '/how-it-works'
     | '/login'
     | '/signup'
     | '/_ProtectedPages/onboarding'
@@ -150,6 +162,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProtectedPagesRoute: typeof ProtectedPagesRouteWithChildren
   CodeOfConductRoute: typeof CodeOfConductRoute
+  HowItWorksRoute: typeof HowItWorksRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
 }
@@ -175,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/code-of-conduct'
       fullPath: '/code-of-conduct'
       preLoaderRoute: typeof CodeOfConductRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -253,6 +273,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedPagesRoute: ProtectedPagesRouteWithChildren,
   CodeOfConductRoute: CodeOfConductRoute,
+  HowItWorksRoute: HowItWorksRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
 }
