@@ -78,7 +78,9 @@ export const Route = createFileRoute("/_ProtectedPages/profile")({
   loader: async ({ context }) => {
     const session = await context.queryClient.ensureQueryData(authSessionQueryOptions())
     if (session?.user?.id) {
-      await context.queryClient.ensureQueryData(profileQueryOptions(session.user.id))
+      await context.queryClient
+        .prefetchQuery(profileQueryOptions(session.user.id))
+        .catch(() => undefined)
     }
   },
   component: ProfileRoute,
@@ -167,6 +169,27 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
 
   const whenAndWhere = formatWhenAndWhere(profile, t) ?? t("profile.empty.whenAndWhere")
 
+  const tagSections = [
+    {
+      key: "teach",
+      title: t("profile.sections.teach"),
+      tags: profile?.teaches,
+      emptyText: t("profile.empty.teach"),
+    },
+    {
+      key: "learn",
+      title: t("profile.sections.learn"),
+      tags: profile?.learns,
+      emptyText: t("profile.empty.learn"),
+    },
+    {
+      key: "interests",
+      title: t("profile.sections.interests"),
+      tags: profile?.interests,
+      emptyText: t("profile.empty.interests"),
+    },
+  ] as const
+
   return (
     <div className="mx-auto flex w-full max-w-[760px] flex-col gap-5 px-4 py-7 pb-10 md:py-12 md:pb-22">
       {/* 1. Identity section */}
@@ -190,105 +213,44 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
         </div>
       </section>
 
-      {/* 2. I can teach (Umím naučit) */}
-      <section className="flex flex-col gap-2.5 rounded-xl border border-border bg-card p-4 md:gap-3 md:p-5">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-h3 font-semibold text-foreground">{t("profile.sections.teach")}</h2>
-          <Button
-            asChild
-            variant="ghost"
-            className="h-auto p-0 text-label font-medium text-foreground hover:bg-transparent hover:text-muted-foreground md:px-4.5 md:py-2.75"
-          >
-            <Link
-              to={ROUTES.onboarding}
-              search={{ step: 1 }}
+      {/* 2. Tag sections (I can teach, I want to learn, I'm interested in) */}
+      {tagSections.map((section) => (
+        <section
+          key={section.key}
+          className="flex flex-col gap-2.5 rounded-xl border border-border bg-card p-4 md:gap-3 md:p-5"
+        >
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-h3 font-semibold text-foreground">{section.title}</h2>
+            <Button
+              asChild
+              variant="ghost"
+              className="h-auto p-0 text-label font-medium text-foreground hover:bg-transparent hover:text-muted-foreground md:px-4.5 md:py-2.75"
             >
-              {t("common.edit")}
-            </Link>
-          </Button>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {profile?.teaches && profile.teaches.length > 0 ? (
-            profile.teaches.map((tag) => (
-              <TagBadge
-                key={tag.id}
-                label={label("tags", tag.slug)}
-                variant="readOnly"
-              />
-            ))
-          ) : (
-            <p className="text-small text-muted-foreground">{t("profile.empty.teach")}</p>
-          )}
-        </div>
-      </section>
+              <Link
+                to={ROUTES.onboarding}
+                search={{ step: 1 }}
+              >
+                {t("common.edit")}
+              </Link>
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {section.tags && section.tags.length > 0 ? (
+              section.tags.map((tag) => (
+                <TagBadge
+                  key={tag.id}
+                  label={label("tags", tag.slug)}
+                  variant="readOnly"
+                />
+              ))
+            ) : (
+              <p className="text-small text-muted-foreground">{section.emptyText}</p>
+            )}
+          </div>
+        </section>
+      ))}
 
-      {/* 3. I want to learn (Chci se naučit) */}
-      <section className="flex flex-col gap-2.5 rounded-xl border border-border bg-card p-4 md:gap-3 md:p-5">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-h3 font-semibold text-foreground">{t("profile.sections.learn")}</h2>
-          <Button
-            asChild
-            variant="ghost"
-            className="h-auto p-0 text-label font-medium text-foreground hover:bg-transparent hover:text-muted-foreground md:px-4.5 md:py-2.75"
-          >
-            <Link
-              to={ROUTES.onboarding}
-              search={{ step: 1 }}
-            >
-              {t("common.edit")}
-            </Link>
-          </Button>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {profile?.learns && profile.learns.length > 0 ? (
-            profile.learns.map((tag) => (
-              <TagBadge
-                key={tag.id}
-                label={label("tags", tag.slug)}
-                variant="readOnly"
-              />
-            ))
-          ) : (
-            <p className="text-small text-muted-foreground">{t("profile.empty.learn")}</p>
-          )}
-        </div>
-      </section>
-
-      {/* 4. I'm interested in (Zajímá mě) */}
-      <section className="flex flex-col gap-2.5 rounded-xl border border-border bg-card p-4 md:gap-3 md:p-5">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-h3 font-semibold text-foreground">
-            {t("profile.sections.interests")}
-          </h2>
-          <Button
-            asChild
-            variant="ghost"
-            className="h-auto p-0 text-label font-medium text-foreground hover:bg-transparent hover:text-muted-foreground md:px-4.5 md:py-2.75"
-          >
-            <Link
-              to={ROUTES.onboarding}
-              search={{ step: 1 }}
-            >
-              {t("common.edit")}
-            </Link>
-          </Button>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {profile?.interests && profile.interests.length > 0 ? (
-            profile.interests.map((tag) => (
-              <TagBadge
-                key={tag.id}
-                label={label("tags", tag.slug)}
-                variant="readOnly"
-              />
-            ))
-          ) : (
-            <p className="text-small text-muted-foreground">{t("profile.empty.interests")}</p>
-          )}
-        </div>
-      </section>
-
-      {/* 5. When and where (Kdy a kde) */}
+      {/* 3. When and where (Kdy a kde) */}
       <section className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4 md:gap-1.5 md:p-5">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-h3 font-semibold text-foreground">

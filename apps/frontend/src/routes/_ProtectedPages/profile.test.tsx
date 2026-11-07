@@ -8,12 +8,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { ProfileResponse } from "@/features/profile/api/profileApi"
 import type { useProfile } from "@/features/profile/hooks/useProfile"
 
-import { formatWhenAndWhere, ProfilePage } from "./profile"
+import { formatWhenAndWhere, ProfilePage, Route } from "./profile"
 
 vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
 
 vi.mock("@tanstack/react-router", () => ({
-  createFileRoute: () => () => ({}),
+  createFileRoute: () => (options: unknown) => ({ options }),
   Link: ({
     children,
     to,
@@ -408,5 +408,40 @@ describe("formatWhenAndWhere", () => {
       meetingFrequency: null,
     }
     expect(formatWhenAndWhere(withoutRadius, tMock)).toBe("Weekends afternoons · Ostrava")
+  })
+})
+
+describe("Profile route loader", () => {
+  it("prefetches profile when session user exists", async () => {
+    const mockEnsure = vi.fn().mockResolvedValue({ user: { id: "u-1" } })
+    const mockPrefetch = vi.fn().mockResolvedValue(undefined)
+    const context = {
+      queryClient: {
+        ensureQueryData: mockEnsure,
+        prefetchQuery: mockPrefetch,
+      },
+    }
+
+    const loader = (Route as unknown as { options: { loader: (args: unknown) => Promise<void> } })
+      .options.loader
+    await loader({ context })
+
+    expect(mockEnsure).toHaveBeenCalledOnce()
+    expect(mockPrefetch).toHaveBeenCalledOnce()
+  })
+
+  it("does not reject the loader when profile prefetch fails", async () => {
+    const mockEnsure = vi.fn().mockResolvedValue({ user: { id: "u-1" } })
+    const mockPrefetch = vi.fn().mockRejectedValue(new Error("Network failed"))
+    const context = {
+      queryClient: {
+        ensureQueryData: mockEnsure,
+        prefetchQuery: mockPrefetch,
+      },
+    }
+
+    const loader = (Route as unknown as { options: { loader: (args: unknown) => Promise<void> } })
+      .options.loader
+    await expect(loader({ context })).resolves.toBeUndefined()
   })
 })

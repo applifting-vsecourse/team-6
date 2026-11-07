@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Button } from "@/components/ui/button"
 import {
+  bottomSheetDialogContentClassName,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -39,7 +40,7 @@ export function DeleteAccountDialog({
       open={isOpen}
       onOpenChange={handleOpenChange}
     >
-      <DialogContent className="gap-4 bg-card p-6 max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:max-w-full max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-b-none max-sm:p-4 max-sm:pt-3 max-sm:pb-7 max-sm:data-[state=closed]:slide-out-to-bottom max-sm:data-[state=closed]:zoom-out-100 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=open]:zoom-in-100 sm:max-w-[480px] sm:rounded-[14px] sm:p-7">
+      <DialogContent className={bottomSheetDialogContentClassName}>
         <span
           aria-hidden
           className="mx-auto h-1 w-10 rounded-full bg-input sm:hidden"
