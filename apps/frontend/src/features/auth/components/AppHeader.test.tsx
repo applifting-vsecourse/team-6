@@ -84,10 +84,10 @@ describe("AppHeader", () => {
     useSession.mockReturnValue({ user: jana })
     render(<AppHeader navDisabled={{ "/kvintet/feed": "You are already in a proposal." }} />)
 
-    const item = screen.getByRole("link", { name: "Proposals" })
+    const item = screen.getByRole("link", { name: "Kvintets" })
     expect(item).toHaveAttribute("aria-disabled", "true")
     expect(item).not.toHaveAttribute("href")
-    expect(screen.getByRole("link", { name: "Overview" })).toHaveAttribute("href", "/overview")
+    expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("href", "/overview")
 
     await userEvent.hover(item)
 

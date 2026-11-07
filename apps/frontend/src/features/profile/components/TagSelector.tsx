@@ -1,7 +1,5 @@
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo } from "react"
 import { useTranslation } from "react-i18next"
-
-import { Input } from "@/components/ui/input"
 
 import type { Tag } from "@/features/profile/api/profileApi"
 import { OnboardingCard } from "@/features/profile/components/OnboardingCard"
@@ -17,6 +15,9 @@ type TagSelectorProps = {
   onRemoveTag: (tagId: string) => void
 }
 
+// Figma B1 shows three suggestions per card; picking one brings the next one in.
+const SUGGESTION_COUNT = 3
+
 export function TagSelector({
   title,
   hint,
@@ -27,7 +28,6 @@ export function TagSelector({
   onRemoveTag,
 }: TagSelectorProps) {
   const { t } = useTranslation()
-  const [search, setSearch] = useState("")
 
   const getTagLabel = useCallback(
     (tag: Tag): string => {
@@ -44,26 +44,13 @@ export function TagSelector({
   )
 
   const suggestedTags = useMemo(() => {
-    const lowerSearch = search.trim().toLowerCase()
-
-    if (lowerSearch !== "") {
-      return allTags.filter((tag) => {
-        if (selectedTagIds.includes(tag.id)) return false
-        const label = getTagLabel(tag).toLowerCase()
-        const hasMatchingLabel = label.includes(lowerSearch)
-        const hasMatchingSlug = tag.slug.toLowerCase().includes(lowerSearch)
-        return Boolean(hasMatchingLabel || hasMatchingSlug)
-      })
-    }
-
-    // Default suggestions from defaultSuggestedSlugs, falling back to first available
-    const preferred = allTags.filter(
-      (tag) => defaultSuggestedSlugs.includes(tag.slug) && !selectedTagIds.includes(tag.id),
+    const unselected = allTags.filter((tag) => !selectedTagIds.includes(tag.id))
+    const preferred = unselected.filter((tag) => defaultSuggestedSlugs.includes(tag.slug))
+    return [...preferred, ...unselected.filter((tag) => !preferred.includes(tag))].slice(
+      0,
+      SUGGESTION_COUNT,
     )
-    if (preferred.length > 0) return preferred
-
-    return allTags.filter((tag) => !selectedTagIds.includes(tag.id)).slice(0, 6)
-  }, [allTags, defaultSuggestedSlugs, getTagLabel, search, selectedTagIds])
+  }, [allTags, defaultSuggestedSlugs, selectedTagIds])
 
   return (
     <OnboardingCard
@@ -91,25 +78,12 @@ export function TagSelector({
               key={tag.id}
               label={getTagLabel(tag)}
               variant="suggested"
-              onAction={() => {
-                onSelectTag(tag.id)
-                setSearch("")
-              }}
+              onAction={() => onSelectTag(tag.id)}
               actionAriaLabel={t("onboarding.step1.addTag", { name: getTagLabel(tag) })}
             />
           ))}
         </div>
       )}
-
-      <Input
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") e.preventDefault()
-        }}
-        placeholder={t("onboarding.step1.searchTagsPlaceholder")}
-        aria-label={t("onboarding.step1.searchTagsAria", { section: title })}
-      />
     </OnboardingCard>
   )
 }

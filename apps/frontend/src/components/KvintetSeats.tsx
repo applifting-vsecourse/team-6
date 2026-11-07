@@ -26,7 +26,11 @@ export type SeatMember = {
 type KvintetSeatsProps = {
   /** At most five; the rest of the table is filled with free seats. */
   members: SeatMember[]
-  /** `always` for one group of five (DESIGN.md, "People are blobatars"). */
+  /** `ring` is the table of the home page; `row` is the compact version for cards. */
+  layout?: "ring" | "row"
+  /** Written under a free seat in the `row` layout, e.g. "Free". */
+  freeLabel?: string
+  /** `always` for one group of five (the ring's default), `hover` in a list (the row's default). */
   motion?: BlobatarMotion
   /** Only when the table stands alone; leave it out when the text beside it says the same. */
   label?: string
@@ -44,11 +48,56 @@ type KvintetSeatsProps = {
  */
 export function KvintetSeats({
   members,
-  motion = "always",
+  layout = "ring",
+  freeLabel,
+  motion = layout === "row" ? "hover" : "always",
   label,
   hasGuide = true,
   className,
 }: KvintetSeatsProps) {
+  if (layout === "row") {
+    return (
+      <ul
+        role={label ? "img" : undefined}
+        aria-label={label}
+        className={cn("flex flex-wrap gap-x-3.5 gap-y-3", className)}
+      >
+        {Array.from({ length: SEATS }, (_, i) => {
+          const member = members[i]
+          return (
+            <li
+              key={i}
+              data-seat={member ? "member" : "free"}
+              className={cn(
+                "flex flex-col items-center gap-1.5 text-small",
+                member ? "text-foreground" : "text-muted-foreground",
+              )}
+            >
+              <span className="grid size-9 place-items-center">
+                {!member ? (
+                  <FreeSeat className="size-7" />
+                ) : member.anonymous ? (
+                  <AnonymousBlobatar
+                    seed={member.seed}
+                    motion={motion}
+                    className="size-9"
+                  />
+                ) : (
+                  <Face
+                    seed={member.seed}
+                    motion={motion}
+                    className="size-9"
+                  />
+                )}
+              </span>
+              <span className="max-w-16 truncate">{member ? member.label : freeLabel}</span>
+            </li>
+          )
+        })}
+      </ul>
+    )
+  }
+
   return (
     <div
       role={label ? "img" : undefined}

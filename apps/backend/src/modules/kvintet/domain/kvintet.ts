@@ -20,6 +20,15 @@ export type OpenKvintet = {
   members: (MemberProfile & { match: MatchProfile })[];
 };
 
+/** Days and parts of the day that every member of a kvintet has picked. */
+export type CommonAvailability = {
+  weekdays: boolean;
+  weekends: boolean;
+  mornings: boolean;
+  afternoons: boolean;
+  evenings: boolean;
+};
+
 /** One kvintet as the feed lists it, ready for the response. */
 export type FeedItem = {
   id: string;
@@ -29,6 +38,8 @@ export type FeedItem = {
   memberCount: number;
   /** Set only when every member picked the same meeting frequency. */
   meetingFrequency: MeetingFrequency | null;
+  /** Only what every member picked; no location. */
+  commonAvailability: CommonAvailability;
   members: Pick<MemberProfile, 'position' | 'teach' | 'learn' | 'interests'>[];
   /** Up to three reasons it suits the caller, strongest first. The score itself is never sent. */
   reasons: MatchReason[];

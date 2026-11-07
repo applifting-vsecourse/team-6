@@ -76,4 +76,19 @@ describe("KvintetSeats", () => {
     expect(grey.container.innerHTML).toMatch(/ced4de/i)
     expect(colour.container.innerHTML).not.toMatch(/ced4de/i)
   })
+
+  it("lays the row out with a label under every seat and 'Free' for the empty ones", () => {
+    const { container } = render(
+      <KvintetSeats
+        layout="row"
+        freeLabel="Free"
+        members={[{ seed: "a", anonymous: true, label: "Backend" }]}
+      />,
+    )
+
+    expect(count(container, "member")).toBe(1)
+    expect(count(container, "free")).toBe(4)
+    expect(screen.getByText("Backend")).toBeInTheDocument()
+    expect(screen.getAllByText("Free")).toHaveLength(4)
+  })
 })

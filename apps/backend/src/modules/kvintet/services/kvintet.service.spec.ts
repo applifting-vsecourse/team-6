@@ -138,6 +138,29 @@ describe('KvintetService.feed', () => {
     ]);
   });
 
+  it('reports an availability only when every member has it', async () => {
+    const { repository, service } = setup();
+    repository.isMember.mockResolvedValue(false);
+    repository.findOpenKvintets.mockResolvedValue([
+      kvintet([
+        member(null, matchProfile({ evenings: true, weekdays: true })),
+        member(null, matchProfile({ evenings: true, weekends: true })),
+      ]),
+    ]);
+
+    const {
+      items: [item],
+    } = await service.feed('u1');
+
+    expect(item.commonAvailability).toEqual({
+      weekdays: false,
+      weekends: false,
+      mornings: false,
+      afternoons: false,
+      evenings: true,
+    });
+  });
+
   it('counts the members and sends only role and tags for each', async () => {
     const { repository, service } = setup();
     repository.isMember.mockResolvedValue(false);
@@ -157,6 +180,13 @@ describe('KvintetService.feed', () => {
       capacity: 5,
       memberCount: 1,
       meetingFrequency: 'WEEKLY',
+      commonAvailability: {
+        weekdays: false,
+        weekends: false,
+        mornings: false,
+        afternoons: false,
+        evenings: false,
+      },
       members: [
         {
           position: 'Backend developer',

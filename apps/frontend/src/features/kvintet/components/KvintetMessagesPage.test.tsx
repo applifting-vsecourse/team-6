@@ -86,7 +86,7 @@ describe("KvintetMessagesPage", () => {
     expect(
       screen.getByRole("heading", { name: "AI v práci – co opravdu funguje" }),
     ).toBeInTheDocument()
-    expect(screen.getByRole("link", { name: "My kvintet" })).toHaveAttribute("href", "/kvintet")
+    expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("href", "/overview")
     expect(
       screen.getByText("Jana Nováková, Petr Svoboda · only members can read the messages"),
     ).toBeInTheDocument()
@@ -96,12 +96,12 @@ describe("KvintetMessagesPage", () => {
   it.each([
     ["a kvintet that is still forming", { data: kvintet("FORMING") }],
     ["no kvintet at all", { data: null }],
-  ])("sends the user back to My kvintet for %s", (_name, overrides) => {
+  ])("sends the user back to Home for %s", (_name, overrides) => {
     state(overrides)
 
     render(<KvintetMessagesPage renderChat={() => <p>chat</p>} />)
 
-    expect(screen.getByText("navigated to /kvintet")).toBeInTheDocument()
+    expect(screen.getByText("navigated to /overview")).toBeInTheDocument()
     expect(screen.queryByText("chat")).not.toBeInTheDocument()
   })
 

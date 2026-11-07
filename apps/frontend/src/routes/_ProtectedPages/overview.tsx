@@ -1,12 +1,14 @@
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute, Link, Navigate } from "@tanstack/react-router"
 import type { TFunction } from "i18next"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { ROUTES } from "@/app/routes"
+import { AnonymousBlobatar, Face } from "@/components/AnonymousBlobatar"
 import { GazeBlobatar } from "@/components/GazeBlobatar"
+import { KvintetSeats, type SeatMember } from "@/components/KvintetSeats"
 import { Seo } from "@/components/Seo"
 import { Blobatar } from "@/components/ui/blobatar"
 import { Button } from "@/components/ui/button"
@@ -17,16 +19,16 @@ import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOpt
 import { useSession } from "@/features/auth/hooks/useSession"
 import { messagesQueryOptions } from "@/features/chat/api/chatApi"
 import { useSendMessage } from "@/features/chat/hooks/useMessages"
-import type { KvintetMember } from "@/features/kvintet/api/kvintetApi"
+import type { KvintetDetails, KvintetMember } from "@/features/kvintet/api/kvintetApi"
 import {
   kvintetFeedQueryOptions,
   type FeedKvintet,
 } from "@/features/kvintet/api/kvintetFeedQueryOptions"
-import { KvintetTableDiagram } from "@/features/kvintet/components/KvintetTableDiagram"
 import { LeaveKvintetDialog } from "@/features/kvintet/components/LeaveKvintetDialog"
 import { StartKvintetDialog } from "@/features/kvintet/components/StartKvintetDialog"
 import { useJoinKvintet } from "@/features/kvintet/hooks/useJoinKvintet"
 import { useMyKvintet } from "@/features/kvintet/hooks/useMyKvintet"
+import { formatSharedPreferences } from "@/features/kvintet/lib/formatPreferences"
 import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
 import { profileQueryOptions } from "@/features/profile/api/profileApi"
 
@@ -38,6 +40,35 @@ const ICEBREAKER_KEYS = [
   "overview.active.icebreaker.q3",
   "overview.active.icebreaker.q4",
 ] as const
+
+// Seat and ring sizes read off Figma H3/H4 (desktop) and M5 (phone).
+const RING_CLASS =
+  "w-48 shrink-0 [--seat-radius:42%] [--seat:22%] md:w-72 md:[--seat-radius:35.4%] md:[--seat:20.1%]"
+
+const LEAVE_BUTTON_CLASS =
+  "cursor-pointer self-start text-label font-medium text-destructive underline underline-offset-2 transition-opacity hover:opacity-80"
+
+/** You first, so the seat at the top of the ring and the first row of the list are yours. */
+function youFirst(members: KvintetMember[]): KvintetMember[] {
+  return [...members].sort((a, b) => Number(b.isCurrentUser) - Number(a.isCurrentUser))
+}
+
+/**
+ * The same seed everywhere for the same person. You are seeded by your session, because the
+ * kvintet carries no username for anyone while it forms; people you have not met get a seat seed,
+ * grey.
+ */
+function seatSeed(
+  kvintet: KvintetDetails,
+  member: KvintetMember,
+  index: number,
+  ownSeed: string,
+): SeatMember {
+  if (member.isCurrentUser) return { seed: ownSeed }
+  return kvintet.status === "ACTIVE"
+    ? { seed: member.username ?? member.userId }
+    : { seed: `${kvintet.id}-seat-${index}`, anonymous: true }
+}
 
 export const Route = createFileRoute("/_ProtectedPages/overview")({
   loader: async ({ context }) => {
@@ -110,10 +141,21 @@ function OverviewPage() {
     })
   }
 
+  const ownSeed = user?.username ?? user?.id ?? ""
   const firstName = user?.name.split(" ")[0]
   const headerDate = formatHeaderDate()
 
   const isInitialLoading = profileQuery.isLoading || (isOnboarded && myKvintet.isLoading)
+
+  // First time in this active kvintet: the "Kvintet begins" page, once.
+  if (isOnboarded && kvintet?.status === "ACTIVE" && !kvintet.beginsSeen) {
+    return (
+      <Navigate
+        to={ROUTES.kvintetBegins}
+        replace
+      />
+    )
+  }
 
   return (
     <>
@@ -314,12 +356,14 @@ function OverviewPage() {
                   <div className="flex flex-col items-start gap-6 lg:flex-row">
                     {/* Left Card: Vote & Table */}
                     <div className="flex w-full flex-1 flex-col items-center gap-9 rounded-lg border border-border bg-card p-8 md:flex-row">
-                      <KvintetTableDiagram
-                        members={kvintet.members}
-                        isCompact
+                      <KvintetSeats
+                        members={youFirst(kvintet.members).map((m, i) =>
+                          seatSeed(kvintet, m, i, ownSeed),
+                        )}
+                        className={RING_CLASS}
                       />
 
-                      <div className="flex w-full flex-1 flex-col items-start gap-3">
+                      <div className="flex w-full flex-1 flex-col items-center gap-3 text-center md:items-start md:text-left">
                         {kvintet.voteStatus.canVote ||
                         kvintet.voteStatus.userHasVoted ||
                         kvintet.members.length >= 3 ? (
@@ -342,8 +386,9 @@ function OverviewPage() {
                             </p>
                             <div className="pt-1">
                               {!kvintet.voteStatus.userHasVoted ? (
-                                <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+                                <div className="flex w-full flex-col items-center gap-3 md:w-auto md:flex-row">
                                   <Button
+                                    className="max-md:w-full"
                                     onClick={() => myKvintet.vote()}
                                     disabled={myKvintet.isVoting}
                                   >
@@ -351,7 +396,7 @@ function OverviewPage() {
                                       ? t("kvintet.vote.voting")
                                       : t("overview.forming.voteButton")}
                                   </Button>
-                                  <span className="text-small text-muted-foreground">
+                                  <span className="text-small text-muted-foreground max-md:hidden">
                                     {t("overview.forming.voteHint")}
                                   </span>
                                 </div>
@@ -382,7 +427,7 @@ function OverviewPage() {
                     </div>
 
                     {/* Right Card: Who's here */}
-                    <div className="flex w-full shrink-0 flex-col gap-3 rounded-lg border border-border bg-card p-5 lg:w-85">
+                    <div className="hidden w-full shrink-0 flex-col gap-3 rounded-lg border border-border bg-card p-5 md:flex lg:w-85">
                       <div className="flex flex-col gap-0.5">
                         <h3 className="text-h3 font-semibold text-foreground">
                           {t("overview.forming.whoTitle")}
@@ -393,45 +438,65 @@ function OverviewPage() {
                       </div>
 
                       <div className="flex flex-col divide-y divide-border">
-                        {kvintet.members.map((member, idx) => (
-                          <div
-                            key={member.userId}
-                            className="flex items-center gap-3 py-2 first:pt-2"
-                          >
-                            <div className="size-8 shrink-0 overflow-hidden rounded-full">
-                              <Blobatar
-                                name={
-                                  member.isCurrentUser
-                                    ? (user?.username ?? user?.id ?? member.userId)
-                                    : `${kvintet.id}-seat-${idx}`
-                                }
-                                className="size-8"
-                              />
+                        {youFirst(kvintet.members).map((member, idx) => {
+                          const { seed, anonymous: isAnonymous } = seatSeed(
+                            kvintet,
+                            member,
+                            idx,
+                            ownSeed,
+                          )
+                          return (
+                            <div
+                              key={member.userId}
+                              className="flex items-center gap-3 py-2 first:pt-2"
+                            >
+                              {isAnonymous ? (
+                                <AnonymousBlobatar
+                                  seed={seed}
+                                  motion="hover"
+                                  className="size-8 shrink-0"
+                                />
+                              ) : (
+                                <Face
+                                  seed={seed}
+                                  motion="hover"
+                                  className="size-8 shrink-0"
+                                />
+                              )}
+                              <div className="flex min-w-0 flex-col">
+                                <p className="truncate text-compact font-medium text-foreground">
+                                  {(member.role ? roleLabel(member.role, label) : null) ??
+                                    member.name ??
+                                    t("kvintet.members.openSeat")}
+                                  {member.isCurrentUser ? ` ${t("kvintet.members.you")}` : ""}
+                                </p>
+                                <p className="truncate text-small text-muted-foreground">
+                                  {describeMemberSummary(member, t, label)}
+                                </p>
+                              </div>
                             </div>
-                            <div className="flex min-w-0 flex-col">
-                              <p className="truncate text-compact font-medium text-foreground">
-                                {(member.role ? roleLabel(member.role, label) : null) ??
-                                  member.name ??
-                                  t("kvintet.members.openSeat")}
-                                {member.isCurrentUser ? ` (${t("kvintet.members.you")})` : ""}
-                              </p>
-                              <p className="truncate text-small text-muted-foreground">
-                                {describeMemberSummary(member, t, label)}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
+                          )
+                        })}
                       </div>
 
                       <button
                         type="button"
                         onClick={() => setIsLeaveDialogOpen(true)}
-                        className="mt-1 cursor-pointer self-start text-label font-medium text-destructive underline underline-offset-2 transition-opacity hover:opacity-80"
+                        className={`mt-1 ${LEAVE_BUTTON_CLASS}`}
                       >
                         {t("overview.forming.leaveKvintet")}
                       </button>
                     </div>
                   </div>
+
+                  {/* M5: no "Who's here" list on a phone, so Leave sits under the card. */}
+                  <button
+                    type="button"
+                    onClick={() => setIsLeaveDialogOpen(true)}
+                    className={`md:hidden ${LEAVE_BUTTON_CLASS}`}
+                  >
+                    {t("overview.forming.leaveKvintet")}
+                  </button>
 
                   <LeaveKvintetDialog
                     isOpen={isLeaveDialogOpen}
@@ -466,9 +531,11 @@ function OverviewPage() {
                     {/* Left Card: Group */}
                     <div className="flex w-full flex-1 flex-col gap-6 rounded-lg border border-border bg-card p-8">
                       <div className="flex flex-col items-center gap-8 md:flex-row">
-                        <KvintetTableDiagram
-                          members={kvintet.members}
-                          isCompact
+                        <KvintetSeats
+                          members={youFirst(kvintet.members).map((m, i) =>
+                            seatSeed(kvintet, m, i, ownSeed),
+                          )}
+                          className={RING_CLASS}
                         />
 
                         <div className="flex w-full flex-1 flex-col items-start gap-3.5">
@@ -507,7 +574,7 @@ function OverviewPage() {
                             <button
                               type="button"
                               onClick={() => setIsLeaveDialogOpen(true)}
-                              className="cursor-pointer text-label font-medium text-destructive underline underline-offset-2 transition-opacity hover:opacity-80"
+                              className={LEAVE_BUTTON_CLASS}
                             >
                               {t("overview.forming.leaveKvintet")}
                             </button>
@@ -604,51 +671,41 @@ function ProposalCard({
 }) {
   const { t } = useTranslation()
   const label = useSlugLabel()
-  const freeSeats = Math.max(proposal.capacity - proposal.memberCount, 0)
-
-  const metaParts: string[] = []
-  if (proposal.categories.length > 0) {
-    metaParts.push(proposal.categories.map((c) => label("categories", c)).join(", "))
-  }
-  if (proposal.meetingFrequency) {
-    metaParts.push(t(`meetingFrequency.${proposal.meetingFrequency}`))
-  }
-  const metaText = metaParts.join(" · ")
 
   return (
     <div className="flex flex-col justify-between gap-3.5 rounded-lg border border-border bg-card p-5">
       <div className="flex flex-col gap-3.5">
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="line-clamp-1 text-h3 font-semibold text-foreground">{proposal.title}</h3>
+        <div className="flex flex-wrap gap-1.5">
+          {proposal.categories.map((slug) => (
+            <span
+              key={slug}
+              className="rounded-full border border-input px-2.5 py-0.75 text-small text-foreground"
+            >
+              {label("categories", slug)}
+            </span>
+          ))}
+        </div>
+        <div className="flex items-baseline justify-between gap-2">
+          <h3 className="text-h3 font-semibold text-foreground">{proposal.title}</h3>
           <span className="shrink-0 font-mono text-meta font-medium text-muted-foreground">
             {proposal.memberCount} / {proposal.capacity}
           </span>
         </div>
 
-        {/* Seats row */}
-        <div className="flex items-center gap-1.5">
-          {proposal.members.map((_, idx) => (
-            <div
-              key={idx}
-              className="size-9 shrink-0 overflow-hidden rounded-full"
-            >
-              <Blobatar
-                name={`${proposal.id}-seat-${idx}`}
-                className="size-9"
-              />
-            </div>
-          ))}
-          {Array.from({ length: freeSeats }, (_, idx) => (
-            <div
-              key={`free-${idx}`}
-              className="flex size-9 shrink-0 items-center justify-center"
-            >
-              <div className="size-7 rounded-full border-[1.5px] border-dashed border-input" />
-            </div>
-          ))}
-        </div>
+        {/* The feed never carries a name, so the faces are grey and seeded by the seat. */}
+        <KvintetSeats
+          layout="row"
+          freeLabel={t("kvintet.vacancy")}
+          members={proposal.members.map((member, idx) => ({
+            seed: `${proposal.id}-seat-${idx}`,
+            anonymous: true,
+            label: member.position ? roleLabel(member.position, label) : t("kvintet.member"),
+          }))}
+        />
 
-        <p className="line-clamp-1 text-small text-muted-foreground">{metaText || "—"}</p>
+        <p className="text-small text-muted-foreground">
+          {formatSharedPreferences(proposal, t) || "—"}
+        </p>
       </div>
 
       <Button

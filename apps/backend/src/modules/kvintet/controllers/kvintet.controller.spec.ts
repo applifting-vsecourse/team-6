@@ -123,12 +123,21 @@ describe('KvintetController', () => {
     expect(Object.keys(item).sort()).toEqual([
       'capacity',
       'categories',
+      'commonAvailability',
       'id',
       'meetingFrequency',
       'memberCount',
       'members',
       'reasons',
       'title',
+    ]);
+    // Days and parts of the day only: never a place.
+    expect(Object.keys(item.commonAvailability).sort()).toEqual([
+      'afternoons',
+      'evenings',
+      'mornings',
+      'weekdays',
+      'weekends',
     ]);
     expect(Object.keys(item.members[0]).sort()).toEqual([
       'interests',

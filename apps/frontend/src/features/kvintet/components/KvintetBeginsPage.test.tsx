@@ -114,7 +114,7 @@ describe("KvintetBeginsPage", () => {
       "href",
       "/kvintet/messages",
     )
-    expect(screen.getByRole("link", { name: "See members" })).toHaveAttribute("href", "/kvintet")
+    expect(screen.getByRole("link", { name: "See members" })).toHaveAttribute("href", "/overview")
   })
 
   it("says how many there are and keeps free seats when fewer than five started", () => {
@@ -174,15 +174,15 @@ describe("KvintetBeginsPage", () => {
     expect(mockMarkSeen).not.toHaveBeenCalled()
   })
 
-  it("sends a user without an active kvintet to My kvintet", () => {
+  it("sends a user without an active kvintet to Home", () => {
     give(null)
     const { unmount } = render(<KvintetBeginsPage />)
-    expect(screen.getByTestId("navigate")).toHaveTextContent(/^\/kvintet$/)
+    expect(screen.getByTestId("navigate")).toHaveTextContent(/^\/overview$/)
     unmount()
 
     give(kvintet(five, "FORMING"))
     render(<KvintetBeginsPage />)
-    expect(screen.getByTestId("navigate")).toHaveTextContent(/^\/kvintet$/)
+    expect(screen.getByTestId("navigate")).toHaveTextContent(/^\/overview$/)
     expect(mockMarkSeen).not.toHaveBeenCalled()
   })
 
