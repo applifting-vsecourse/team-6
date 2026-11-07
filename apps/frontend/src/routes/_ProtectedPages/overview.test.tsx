@@ -309,7 +309,9 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       const startBtn = await screen.findByRole("button", { name: "Start your own" })
       await userEvent.click(startBtn)
 
-      expect(screen.getByRole("heading", { name: /Start a new proposal/i })).toBeInTheDocument()
+      expect(
+        await screen.findByRole("heading", { name: /Start a new proposal/i }),
+      ).toBeInTheDocument()
     })
   })
 
@@ -444,7 +446,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       // Dialog opens
       expect(
-        screen.getByRole("heading", { name: "Are you sure you want to leave?" }),
+        await screen.findByRole("heading", { name: "Are you sure you want to leave?" }),
       ).toBeInTheDocument()
 
       // Confirm leaving inside the dialog
