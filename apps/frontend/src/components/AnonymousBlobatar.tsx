@@ -75,7 +75,8 @@ export function FreeSeat({ className }: { className?: string }) {
     <span
       aria-hidden="true"
       className={cn(
-        "block size-8 shrink-0 rounded-full border border-dashed border-border",
+        // Figma: a 1.5px dashed ring in the strong line colour.
+        "block size-8 shrink-0 rounded-full border-[1.5px] border-dashed border-input",
         className,
       )}
     />

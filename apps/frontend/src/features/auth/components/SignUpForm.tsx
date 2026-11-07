@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Link } from "@tanstack/react-router"
 import type { TFunction } from "i18next"
@@ -8,7 +8,6 @@ import { Trans, useTranslation } from "react-i18next"
 import { z } from "zod"
 
 import { ROUTES } from "@/app/routes"
-import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -66,16 +65,31 @@ const defaultValues: FormValues = {
 type SignUpFormProps = {
   isLoading: boolean
   errorMessage?: string | null
+  /** Server rejected the e-mail (already taken): shown under the field, not in the alert. */
+  emailError?: string | null
+  /** Lets the page draw the live avatar preview from what is being typed. */
+  onUsernameChange?: (value: string) => void
   onSubmit: (values: FormValues) => void | Promise<void>
 }
 
-export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProps) {
+export function SignUpForm({
+  isLoading,
+  errorMessage,
+  emailError,
+  onUsernameChange,
+  onSubmit,
+}: SignUpFormProps) {
   const { t } = useTranslation()
   const schema = useMemo(() => createSchema(t), [t])
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues,
   })
+  const { setError } = form
+
+  useEffect(() => {
+    if (emailError) setError("email", { message: emailError })
+  }, [emailError, setError])
 
   return (
     <Form {...form}>
@@ -107,18 +121,16 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t("auth.username")}</FormLabel>
-              <div className="flex items-center gap-3">
-                <FormControl>
-                  <Input
-                    autoComplete="username"
-                    {...field}
-                  />
-                </FormControl>
-                <GazeBlobatar
-                  name={field.value.trim()}
-                  className="size-16"
+              <FormControl>
+                <Input
+                  autoComplete="username"
+                  {...field}
+                  onChange={(event) => {
+                    field.onChange(event)
+                    onUsernameChange?.(event.target.value)
+                  }}
                 />
-              </div>
+              </FormControl>
               <FormDescription>{t("auth.usernameHint")}</FormDescription>
               <FormMessage />
             </FormItem>
@@ -232,7 +244,7 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           disabled={isLoading}
         >
           {isLoading ? <Loader2 className="size-4 animate-spin" /> : null}
-          {t("auth.signUp")}
+          {t("auth.createAccount")}
         </Button>
       </form>
     </Form>

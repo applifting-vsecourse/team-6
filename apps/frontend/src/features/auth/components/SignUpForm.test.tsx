@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react"
 import {
   createMemoryHistory,
   createRootRoute,
@@ -10,10 +11,9 @@ import userEvent from "@testing-library/user-event"
 
 import { SignUpForm } from "./SignUpForm"
 
-// The gaze driver needs browser APIs jsdom lacks (matchMedia, ResizeObserver).
-vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
+type FormExtras = Partial<ComponentProps<typeof SignUpForm>>
 
-async function renderForm(onSubmit = vi.fn()) {
+async function renderForm(onSubmit = vi.fn(), extras: FormExtras = {}) {
   const rootRoute = createRootRoute()
   const indexRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -22,6 +22,7 @@ async function renderForm(onSubmit = vi.fn()) {
       <SignUpForm
         isLoading={false}
         onSubmit={onSubmit}
+        {...extras}
       />
     ),
   })
@@ -35,7 +36,7 @@ async function renderForm(onSubmit = vi.fn()) {
     history: createMemoryHistory({ initialEntries: ["/"] }),
   })
   render(<RouterProvider router={router} />)
-  await screen.findByRole("button", { name: "Sign up" })
+  await screen.findByRole("button", { name: "Create account" })
   return onSubmit
 }
 
@@ -51,7 +52,7 @@ describe("SignUpForm code of conduct consent", () => {
   it("links to the code of conduct from the checkbox label", async () => {
     await renderForm()
 
-    expect(screen.getByRole("link", { name: "code of conduct" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "community rules" })).toHaveAttribute(
       "href",
       "/code-of-conduct",
     )
@@ -62,9 +63,9 @@ describe("SignUpForm code of conduct consent", () => {
     const onSubmit = await renderForm()
     await fillRequiredFields(user)
 
-    await user.click(screen.getByRole("button", { name: "Sign up" }))
+    await user.click(screen.getByRole("button", { name: "Create account" }))
 
-    expect(await screen.findByText("You must accept the code of conduct")).toBeInTheDocument()
+    expect(await screen.findByText("Please agree to the rules first.")).toBeInTheDocument()
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
@@ -74,7 +75,7 @@ describe("SignUpForm code of conduct consent", () => {
     await fillRequiredFields(user)
 
     await user.click(screen.getByRole("checkbox"))
-    await user.click(screen.getByRole("button", { name: "Sign up" }))
+    await user.click(screen.getByRole("button", { name: "Create account" }))
 
     expect(onSubmit).toHaveBeenCalledOnce()
     expect(onSubmit.mock.calls[0]?.[0]).toMatchObject({ acceptCodeOfConduct: true })
@@ -90,7 +91,7 @@ describe("SignUpForm password rules", () => {
     await user.type(screen.getByLabelText("Confirm password"), "different1")
     await user.click(screen.getByRole("checkbox"))
 
-    await user.click(screen.getByRole("button", { name: "Sign up" }))
+    await user.click(screen.getByRole("button", { name: "Create account" }))
 
     expect(await screen.findByText("Passwords must match")).toBeInTheDocument()
     expect(onSubmit).not.toHaveBeenCalled()
@@ -106,24 +107,31 @@ describe("SignUpForm password rules", () => {
     await user.type(screen.getByLabelText("Confirm password"), "short")
     await user.click(screen.getByRole("checkbox"))
 
-    await user.click(screen.getByRole("button", { name: "Sign up" }))
+    await user.click(screen.getByRole("button", { name: "Create account" }))
 
     expect(await screen.findByText("Password must be at least 8 characters")).toBeInTheDocument()
     expect(onSubmit).not.toHaveBeenCalled()
   })
 })
 
-describe("SignUpForm avatar preview", () => {
-  it("updates the avatar preview as the username is typed", async () => {
+describe("SignUpForm username preview", () => {
+  it("reports the username as it is typed", async () => {
     const user = userEvent.setup()
-    await renderForm()
-    const preview = () => document.querySelector("[data-slot=avatar]")?.innerHTML
+    const onUsernameChange = vi.fn()
+    await renderForm(vi.fn(), { onUsernameChange })
 
     await user.type(screen.getByLabelText("Username"), "jana")
-    const before = preview()
-    await user.type(screen.getByLabelText("Username"), "2")
 
-    expect(before).toBeTruthy()
-    expect(preview()).not.toBe(before)
+    expect(onUsernameChange).toHaveBeenLastCalledWith("jana")
+    expect(screen.getByLabelText("Username")).toHaveValue("jana")
+  })
+})
+
+describe("SignUpForm taken e-mail", () => {
+  it("shows the server's e-mail error under the field", async () => {
+    await renderForm(vi.fn(), { emailError: "You already have an account with this email." })
+
+    expect(await screen.findByText("You already have an account with this email.")).toBeVisible()
+    expect(screen.getByLabelText("Email")).toHaveAttribute("aria-invalid", "true")
   })
 })

@@ -30,7 +30,7 @@ The app has **two themes: light and dark**, switched in the header (`ThemeSwitch
 
 ## Spacing
 
-Use the scale only: `1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10, 12, 14, 16, 22, 24, 28, 40` (Tailwind units — 4px…160px; the half steps and 5, 7, 9, 10, 22, 28, 40 come from the Figma). No arbitrary values like `p-[13px]`. Related things get `gap-2`/`gap-3`; fields in a form get `gap-5`; separate blocks get `gap-6`/`gap-8`.
+Use the scale only: `0.75, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10, 12, 14, 16, 22, 24, 28, 40` (Tailwind units — 4px…160px; the half steps, 0.75 and 5, 7, 9, 10, 22, 28, 40 come from the Figma). No arbitrary values like `p-[13px]`. Related things get `gap-2`/`gap-3`; fields in a form get `gap-5`; separate blocks get `gap-6`/`gap-8`.
 
 ## Type
 
@@ -70,6 +70,7 @@ Kvintet shows no photos, so every person is represented by a generated avatar fr
   | Inline, in a chip or tile                         | 24 px  | `size-6`  |
   | Compact list ("who's here"), last message on home | 32 px  | `size-8`  |
   | Chat message, seats in a proposal card on home    | 36 px  | `size-9`  |
+  | Header of the "Start a kvintet" dialog            | 44 px  | `size-11` |
   | Member row in the feed, nav bar, mobile menu      | 48 px  | `size-12` |
   | Page title accent (onboarding), empty-state group | 56 px  | `size-14` |
   | "Kvintet begins", profile header                  | 96 px  | `size-24` |
