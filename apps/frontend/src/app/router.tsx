@@ -6,13 +6,15 @@ import { RootErrorBoundary } from "@/components/Error/RootErrorBoundary"
 import { queryClient } from "@/config/react-query"
 import { routeTree } from "@/routeTree.gen"
 
+import { AppHeader } from "@/features/auth/components/AppHeader"
+
 export const router = createRouter({
   routeTree,
   context: { queryClient },
   defaultPreload: "intent",
   defaultPreloadStaleTime: 0,
   scrollRestoration: true,
-  defaultNotFoundComponent: NotFound,
+  defaultNotFoundComponent: () => <NotFound header={<AppHeader />} />,
   defaultErrorComponent: ({ error }) => <RootErrorBoundary error={error} />,
   defaultPendingComponent: AppLoadingScreen,
 })

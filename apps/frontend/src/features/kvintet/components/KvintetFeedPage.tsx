@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { ROUTES } from "@/app/routes"
-import { LogoMark } from "@/components/LogoMark"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { StateAlert } from "@/components/StateAlert"
+import { StateCard } from "@/components/StateCard"
 import { Button } from "@/components/ui/button"
 import { formatNumber } from "@/lib/date"
 
@@ -19,6 +19,7 @@ import { StartKvintetDialog } from "@/features/kvintet/components/StartKvintetDi
 import { useJoinKvintet } from "@/features/kvintet/hooks/useJoinKvintet"
 import { isApiError } from "@/features/kvintet/lib/apiError"
 import type { Frequency } from "@/features/kvintet/lib/frequencies"
+import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
 
 type KvintetFeedPageProps = {
   /** Category slugs from the URL; ones that are not known categories are ignored. */
@@ -45,6 +46,7 @@ export function KvintetFeedPage({
   const kvintets = useQuery(kvintetFeedQueryOptions())
   const items = kvintets.data?.items
   const join = useJoinKvintet()
+  const label = useSlugLabel()
 
   // The feed answers 409 to someone who is already in a kvintet.
   const isMember = isApiError(kvintets.error, "already_in_kvintet")
@@ -67,6 +69,13 @@ export function KvintetFeedPage({
         (kvintet.meetingFrequency !== null && frequency.includes(kvintet.meetingFrequency))),
   )
   const isFilteredEmpty = Boolean(items?.length) && visible?.length === 0
+
+  // "Nothing in Languages" when one topic is picked; a generic line for any other mix.
+  const [onlyCategory] = activeCategories
+  const filteredTitle =
+    onlyCategory && activeCategories.length === 1 && !frequency.length
+      ? t("kvintet.emptyFiltered.title", { filter: label("categories", onlyCategory) })
+      : t("kvintet.emptyFiltered.titleMany")
 
   const openStart = () => setIsStartOpen(true)
   const clearFilters = () => {
@@ -108,48 +117,36 @@ export function KvintetFeedPage({
             {kvintets.isPending ? <KvintetFeedSkeleton /> : null}
 
             {kvintets.isError && !isMember ? (
-              <Alert
-                variant="destructive"
-                className="grid-cols-[0.5rem_1fr_auto]"
+              <StateAlert
+                seed="seat-5"
+                title={t("kvintet.error.title")}
+                text={t("kvintet.error.text")}
               >
-                <AlertTitle className="col-start-2">{t("kvintet.error.title")}</AlertTitle>
-                <AlertDescription className="col-start-2 row-start-2 text-sm">
-                  {t("kvintet.error.text")}
-                </AlertDescription>
                 <Button
                   variant="outline"
-                  className="col-start-3 row-span-2 row-start-1 text-foreground"
+                  className="bg-card text-foreground max-sm:w-full"
                   onClick={() => void kvintets.refetch()}
                 >
                   {t("kvintet.error.retry")}
                 </Button>
-              </Alert>
+              </StateAlert>
             ) : null}
 
             {items?.length === 0 || isFilteredEmpty ? (
-              <div className="flex flex-col items-center gap-3 rounded-lg border border-border px-6 py-12 text-center">
-                <LogoMark className="size-12" />
-                <h2 className="text-subheading font-semibold">
-                  {isFilteredEmpty ? t("kvintet.emptyFiltered.title") : t("kvintet.empty.title")}
-                </h2>
-                <p className="text-sm text-body">
-                  {isFilteredEmpty ? t("kvintet.emptyFiltered.text") : t("kvintet.empty.text")}
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={openStart}
-                >
-                  {t("kvintet.startOwn.button")}
-                </Button>
+              <StateCard
+                title={isFilteredEmpty ? filteredTitle : t("kvintet.empty.title")}
+                text={isFilteredEmpty ? t("kvintet.emptyFiltered.text") : t("kvintet.empty.text")}
+              >
+                <Button onClick={openStart}>{t("kvintet.startOwn.button")}</Button>
                 {isFilteredEmpty ? (
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     onClick={clearFilters}
                   >
                     {t("kvintet.emptyFiltered.showAll")}
                   </Button>
                 ) : null}
-              </div>
+              </StateCard>
             ) : null}
 
             {visible?.length ? (

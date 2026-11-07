@@ -585,7 +585,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       renderWithClient(<OverviewPage />)
 
-      const retryBtn = await screen.findByRole("button", { name: "Retry" })
+      const retryBtn = await screen.findByRole("button", { name: "Try again" })
       expect(retryBtn).toBeInTheDocument()
 
       // When retrying, it triggers a refetch
@@ -607,7 +607,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       renderWithClient(<OverviewPage />)
 
-      const retryBtn = await screen.findByRole("button", { name: "Retry" })
+      const retryBtn = await screen.findByRole("button", { name: "Try again" })
       expect(retryBtn).toBeInTheDocument()
 
       await userEvent.click(retryBtn)

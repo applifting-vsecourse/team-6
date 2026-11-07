@@ -8,10 +8,13 @@ import { toast } from "sonner"
 import { ROUTES } from "@/app/routes"
 import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Seo } from "@/components/Seo"
+import { StateAlert } from "@/components/StateAlert"
 import { Blobatar } from "@/components/ui/blobatar"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import { formatDate, formatDayAndMonth, formatHeaderDate } from "@/lib/date"
 import { getErrorMessage } from "@/lib/errorMessage"
+import { cn } from "@/lib/utils"
 
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
 import { useSession } from "@/features/auth/hooks/useSession"
@@ -114,33 +117,42 @@ function OverviewPage() {
   const headerDate = formatHeaderDate()
 
   const isInitialLoading = profileQuery.isLoading || (isOnboarded && myKvintet.isLoading)
+  const hasLoadError = profileQuery.isError || myKvintet.isError
 
   return (
     <>
       <Seo title={t("overview.title")} />
       <div className="w-full bg-background text-foreground">
         <div className="mx-auto flex max-w-7xl flex-col gap-7 px-6 py-12 pb-22 md:px-16 lg:px-28">
-          {/* Loading state */}
-          {isInitialLoading && <OverviewSkeleton />}
-
-          {/* Profile Error state */}
-          {!isInitialLoading && profileQuery.isError && (
-            <OverviewError
-              error={profileQuery.error}
-              onRetry={() => profileQuery.refetch()}
-            />
-          )}
-
-          {/* My Kvintet Error state */}
-          {!isInitialLoading && !profileQuery.isError && myKvintet.isError && (
-            <OverviewError
-              error={myKvintet.error}
-              onRetry={() => myKvintet.refetch()}
-            />
+          {/* Loading and error states keep the greeting, so the page does not jump when it loads. */}
+          {(isInitialLoading || hasLoadError) && (
+            <>
+              <div className="flex flex-col gap-1.5">
+                <p className="font-mono text-meta font-medium tracking-meta text-muted-foreground uppercase">
+                  {headerDate}
+                </p>
+                <h1 className="text-h1-mobile font-semibold text-foreground md:text-h1">
+                  {firstName
+                    ? t("overview.greeting", { name: firstName })
+                    : t("overview.greetingAnonymous")}
+                </h1>
+              </div>
+              {isInitialLoading ? (
+                <OverviewSkeleton />
+              ) : (
+                <OverviewError
+                  title={t("overview.error.title")}
+                  text={t("overview.error.text")}
+                  onRetry={() =>
+                    void (profileQuery.isError ? profileQuery.refetch() : myKvintet.refetch())
+                  }
+                />
+              )}
+            </>
           )}
 
           {/* Content */}
-          {!isInitialLoading && !profileQuery.isError && !myKvintet.isError && (
+          {!isInitialLoading && !hasLoadError && (
             <>
               {/* State 1: Profile not finished */}
               {!isOnboarded && (
@@ -239,8 +251,9 @@ function OverviewPage() {
 
                   {feedQuery.isError && (
                     <OverviewError
-                      error={feedQuery.error}
-                      onRetry={() => feedQuery.refetch()}
+                      title={t("kvintet.error.title")}
+                      text={t("kvintet.error.text")}
+                      onRetry={() => void feedQuery.refetch()}
                     />
                   )}
 
@@ -664,30 +677,66 @@ function ProposalCard({
 }
 
 function OverviewSkeleton() {
+  const { t } = useTranslation()
   return (
-    <div className="flex flex-col gap-7">
-      <div className="flex flex-col gap-1.5">
-        <div className="h-3 w-32 animate-pulse rounded bg-muted" />
-        <div className="h-9 w-64 animate-pulse rounded bg-muted" />
-        <div className="h-5 w-48 animate-pulse rounded bg-muted" />
+    <div
+      role="status"
+      className="flex flex-col gap-7"
+    >
+      <div
+        aria-hidden="true"
+        className="grid gap-4 md:grid-cols-3"
+      >
+        {[0, 1, 2].map((card) => (
+          <div
+            key={card}
+            className={cn(
+              "flex flex-col gap-3.5 rounded-lg border border-border bg-card p-5",
+              card === 2 && "max-md:hidden",
+            )}
+          >
+            <Skeleton className="h-4 w-45 max-w-full" />
+            <div className="flex gap-2">
+              {[0, 1, 2, 3, 4].map((seat) => (
+                <Skeleton
+                  key={seat}
+                  className="size-10 rounded-full"
+                />
+              ))}
+            </div>
+            <Skeleton className="h-3 w-35 max-w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        ))}
       </div>
-      <div className="h-56 animate-pulse rounded-lg border border-border bg-card" />
+      <p className="text-small text-muted-foreground">{t("overview.loading")}</p>
     </div>
   )
 }
 
-function OverviewError({ error, onRetry }: { error: unknown; onRetry: () => void }) {
+function OverviewError({
+  title,
+  text,
+  onRetry,
+}: {
+  title: string
+  text: string
+  onRetry: () => void
+}) {
   const { t } = useTranslation()
   return (
-    <div className="flex flex-col items-center gap-4 rounded-lg border border-destructive/20 bg-destructive-soft p-8 text-center">
-      <p className="text-compact text-destructive">{getErrorMessage(error)}</p>
+    <StateAlert
+      title={title}
+      text={text}
+    >
       <Button
         variant="outline"
+        className="bg-card text-foreground"
         onClick={onRetry}
       >
         {t("common.retry")}
       </Button>
-    </div>
+    </StateAlert>
   )
 }
 

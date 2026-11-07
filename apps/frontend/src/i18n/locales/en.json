@@ -92,10 +92,11 @@
     "close": "Close",
     "continue": "Continue",
     "finish": "Done",
-    "goHome": "Go home",
+    "goHome": "Back home",
     "language": "Language",
+    "loadingApp": "Loading…",
     "reload": "Reload",
-    "retry": "Retry",
+    "retry": "Try again",
     "saving": "Saving…",
     "theme": "Theme",
     "themeDark": "Dark",
@@ -131,8 +132,8 @@
     "kvintet_not_active": "This kvintet's chat opens once the kvintet is active.",
     "kvintet_not_open": "This proposal is full or no longer open.",
     "not_found": "We couldn't find what you were looking for.",
-    "pageNotFound": "Page not found",
-    "pageNotFoundDescription": "The page you're looking for doesn't exist or has been moved.",
+    "pageNotFound": "This page doesn't exist",
+    "pageNotFoundDescription": "This link leads nowhere.",
     "signInFailed": "Sign in failed",
     "signUpFailed": "Sign up failed",
     "somethingWentWrong": "Something went wrong",
@@ -206,13 +207,14 @@
       "topicHint": "Short and specific – that's how people find you."
     },
     "empty": {
-      "text": "Kvintets that fit your profile will show up here.",
-      "title": "No kvintets for you yet"
+      "text": "Be the first – others will join.",
+      "title": "Nothing here yet"
     },
     "emptyFiltered": {
-      "showAll": "Clear filters",
-      "text": "Try other filters, or start your own kvintet.",
-      "title": "No kvintets match these filters"
+      "showAll": "Clear filter",
+      "text": "Try another topic – or start one.",
+      "title": "Nothing in {{filter}}",
+      "titleMany": "Nothing for these filters"
     },
     "emptyState": {
       "description": "Your group will appear here once you join a proposal.",
@@ -221,8 +223,8 @@
     },
     "error": {
       "retry": "Try again",
-      "text": "Something went wrong on our side. Please try again.",
-      "title": "Couldn't load kvintets"
+      "text": "Something broke on our side.",
+      "title": "We couldn't load the kvintets"
     },
     "fallback": "Nothing fits your profile closely yet, so here are all open kvintets, closest first.",
     "filter": {
@@ -237,7 +239,7 @@
     },
     "join": "Join",
     "joined": "You joined the proposal.",
-    "loading": "Loading kvintets…",
+    "loading": "Looking for kvintets that suit you…",
     "member": "Member",
     "members": {
       "capacity": "{{count}} of 5",
@@ -476,6 +478,10 @@
         "label": "Tip for the group"
       }
     },
+    "error": {
+      "text": "Something broke on our side. Your kvintet is safe.",
+      "title": "We couldn't load your home page"
+    },
     "forming": {
       "canVoteDescription": "Start with four now, or wait for one more. It starts when all four agree.",
       "canVoteTitle": "Start now or wait for a fifth?",
@@ -497,6 +503,7 @@
     },
     "greeting": "Hi, {{name}}",
     "greetingAnonymous": "Hi",
+    "loading": "Getting your home ready…",
     "nextStep": {
       "badge": "YOUR NEXT STEP",
       "button": "See proposals",
