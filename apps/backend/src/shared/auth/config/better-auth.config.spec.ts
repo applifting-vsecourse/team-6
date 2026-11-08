@@ -1,4 +1,7 @@
-import { betterAuthCoreConfig } from './better-auth.config';
+import {
+  betterAuthCoreConfig,
+  resolveBetterAuthPlugins,
+} from './better-auth.config';
 
 describe('betterAuthCoreConfig', () => {
   it('enables rate limiting with generous global default and strict custom rules on auth endpoints', () => {
@@ -15,16 +18,17 @@ describe('betterAuthCoreConfig', () => {
     expect(rules?.['/reset-password']).toEqual({ window: 60, max: 5 });
   });
 
-  it('filters out open-api documentation plugin in production mode', () => {
-    const filterForEnv = (env: string): { id?: string }[] =>
-      (betterAuthCoreConfig.plugins ?? []).filter(
-        (plugin) => env !== 'production' || plugin.id !== 'open-api',
-      );
+  describe('resolveBetterAuthPlugins', () => {
+    it('omits open-api documentation plugin in production mode', () => {
+      const prodPlugins = resolveBetterAuthPlugins('production');
+      expect(prodPlugins.some((p) => p.id === 'open-api')).toBe(false);
+      expect(prodPlugins.some((p) => p.id === 'username')).toBe(true);
+    });
 
-    const prodPlugins = filterForEnv('production');
-    expect(prodPlugins.some((p) => p.id === 'open-api')).toBe(false);
-
-    const devPlugins = filterForEnv('development');
-    expect(devPlugins.some((p) => p.id === 'open-api')).toBe(true);
+    it('includes open-api documentation plugin in non-production mode', () => {
+      const devPlugins = resolveBetterAuthPlugins('development');
+      expect(devPlugins.some((p) => p.id === 'open-api')).toBe(true);
+      expect(devPlugins.some((p) => p.id === 'username')).toBe(true);
+    });
   });
 });

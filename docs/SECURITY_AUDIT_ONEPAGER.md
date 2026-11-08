@@ -1,11 +1,11 @@
 # Kvintet Security Audit & Risk Assessment: Executive One-Pager
 
 **Project:** Kvintet (Applifting VSE Course — Team 6)  
-**Branch:** `feature/72-security-audit` (Synchronized with latest `develop`)  
-**Audience:** Executive Stakeholders, Course Instructors & Sprint Demo Evaluators  
+**Target:** `develop` (Sprint 5 / Milestone 2 Security Audit Deliverable)  
+**Audience:** Course Instructors, Sprint Demo Evaluators & Engineering Stakeholders  
 **Scope:** Full-Stack Web Application (NestJS, PostgreSQL, BetterAuth, React, Docker, Nginx)  
 **Date:** November 2026  
-**Auditor:** Antigravity Security Agent
+**Auditor:** Team 6 Security Audit Working Group
 
 ---
 
@@ -81,7 +81,7 @@ The audit identified **8 security risk items** across sensitive logging, authent
 
 ### What Was Treated:
 
-- Applied `pnpm.overrides` for `next` (15.2.4), `handlebars` (^4.7.10), `proxy-addr` (^2.0.8), `shell-quote` (^1.11.0), `mysql2` (^3.22.0), and `fast-uri` (^3.1.9).
+- Applied targeted `pnpm.overrides` for active transitive dependencies: `proxy-addr` (^2.0.8, addressing GHSA-qrm8-w9w4-4458), `shell-quote` (^1.11.0, addressing GHSA-2qmg-vc5r-7557), and `fast-uri` (^3.1.9, addressing GHSA-43hx-pvhq-4537). Dropped unused overrides that are not in the active dependency tree.
 - Upgraded `better-auth` (1.7.18) and `vite` (8.2.4).
 - **Result:** **100% of critical vulnerabilities were completely eliminated** (from 10 criticals to 0), and total vulnerabilities were cut by 50% (from 144 to 72).
 
@@ -101,7 +101,7 @@ The audit identified **8 security risk items** across sensitive logging, authent
 
 The codebase has undergone full continuous integration verification:
 
-- **Backend Tests:** **212 / 212 tests PASSING** across 24 test suites (`pnpm backend test`).
+- **Backend Tests:** **229 / 229 tests PASSING** across 27 test suites (`pnpm backend test`).
 - **Frontend Tests:** **302 / 302 tests PASSING** across 59 test files (`pnpm frontend test:ci`).
 - **Static Analysis & Linting:** 0 ESLint errors or warnings across frontend and backend.
 - **Type Safety:** 100% clean TypeScript type check (`tsc --noEmit`).

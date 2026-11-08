@@ -21,7 +21,7 @@ Pilot scale: ≤ 500 users, tens online at once. One backend container and one P
 1. **The server owns every rule** (capacity, group size, voting, who may see what). The frontend displays and validates for convenience only.
 2. **Invariants live in the database:** unique constraints, foreign keys, and transactions with row locks. Never in-process state.
 3. **Derive, don't schedule.** "Offer is full / past", "kvintet is formed" and feed suitability come from current rows in the request that reads them.
-4. **Privacy by construction.** The feed uses its own DTO without name, e-mail or user id. Admin endpoints return aggregates only. Never log e-mails, names or message bodies; the logs are shared across the course.
+4. **Privacy by construction.** The feed uses its own DTO without name, e-mail or user id. While a kvintet is `FORMING`, peer member `userId`s returned by `GET /kvintets/mine` are masked with deterministic ephemeral HMAC tokens (`anon-[hash]`) derived from an HMAC secret, the kvintet id, and user id, preventing pre-activation user deanonymization or profile scraping. Real database `userId`s are only unmasked once the kvintet transitions to `ACTIVE`. Admin endpoints return aggregates only. Never log e-mails, names or message bodies; the logs are shared across the course.
 5. **One layering everywhere.** Backend module: controller + DTOs → service → repository → domain type; only the repository touches Prisma. Frontend feature: `api/` (zod schema, query options), `hooks/`, `components/`.
 
 ## 3. Backend
@@ -45,6 +45,27 @@ Shared (`src/shared/…`):
 - **Errors:** a global exception filter (`shared/errors`) returns `{ statusCode, code, message }` with a stable `code`; the English `message` is for logs and developers, never shown to users. Validation failures (global `ValidationPipe`) use `code: "validation_failed"` plus `errors: [{ field, code }]`, where `code` is the failed class-validator constraint (`isNotEmpty`, `maxLength`, …). The frontend translates by code. A thrown `HttpException` can carry its own code (`new ConflictException({ code: 'kvintet_not_open', message })`); otherwise the code comes from the status. Codes in use: `already_in_kvintet` (409: join, start or feed while the caller already has a kvintet), `kvintet_not_open` (409: join a kvintet that is full or no longer `FORMING`) and `kvintet_not_active` (409: read or send chat messages before the kvintet is `ACTIVE`).
 
 A transaction never spans repositories of different modules. When one use case must write data of two modules, the module that owns the use case writes both, through its own repository (see Leave).
+
+### Rate Limiting and Network Topology
+
+Abuse prevention and DoS mitigation operate on two coordinated layers:
+
+1. **NestJS Global Throttler (`@nestjs/throttler`):**
+   - **Global ceiling:** 300 requests per 60 seconds per client IP across all API routes (`ThrottlerGuard`). This generous limit accommodates high-density student campus networks sharing a single NAT gateway without falsely throttling concurrent peers.
+   - **Polling exemptions:** Frequent background polling endpoints (`@SkipThrottle()`) are explicitly excluded from consuming the IP budget: `GET /kvintets/mine/messages` (chat polling), `GET /kvintets/mine/messages/unread` (header badge polling), `GET /kvintets/mine` (roster/vote polling), and `GET /health`.
+   - **Chat burst protection:** `POST /kvintets/mine/messages` enforces a strict `@Throttle({ default: { limit: 20, ttl: 60000 } })` to mitigate automated spam floods in active groups.
+
+2. **BetterAuth Authentication Rate Limiting:**
+   - **Session & reading ceiling:** 100 requests per 60 seconds baseline across `/api/auth/*` to guarantee `get-session` navigation checks never trigger unexpected `429 Too Many Requests`.
+   - **Credential endpoints (`customRules`):** Tight limits on sensitive mutation routes to block brute-force attacks:
+     - `/sign-in/email`: 10 req / 60s
+     - `/sign-up/email`: 5 req / 60s
+     - `/forget-password`: 5 req / 60s
+     - `/reset-password`: 5 req / 60s
+
+3. **Reverse Proxy & Client IP Resolution (`trust proxy`):**
+   - Express is configured with `appInstance.set('trust proxy', trustProxyValue)` where `trustProxyValue` defaults to `1` (or the `TRUST_PROXY` environment variable).
+   - In production on Coolify, incoming external requests terminate TLS at the Coolify reverse proxy (Traefik edge) and are forwarded over the internal Docker network directly to the backend container. The frontend container is an Nginx static file host that does not proxy API calls. `trust proxy: 1` correctly extracts the real client IP from the single edge proxy hop (`X-Forwarded-For`). If upstream proxy hops (e.g. Cloudflare or external CDN) are introduced, `TRUST_PROXY` can be set to the corresponding hop count.
 
 ### Data model
 
@@ -196,4 +217,4 @@ The chat has its own page, `/kvintet/messages`, linked from the "Open chat" butt
 - Claim, join, vote, leave and delete-account need integration tests against a real Postgres. The race tests fire N requests with `Promise.all` at the last spot or the fifth seat. Also cover "leave after the others voted". The first story that needs them adds a `postgres` service container to `ci.yml`. Never point tests at the production database.
 - Auth: a sign-up payload with `role: "admin"` or its own consent timestamp is ignored, and sign-up without consent fails.
 - Every route has a test for 401 (no session), 403 (not onboarded, not admin, not a member). A non-member never gets data from another kvintet.
-- All free text (offers, messages) has a maximum length in its DTO. Rate limiting is not part of the MVP.
+- All free text (offers, messages) has a maximum length in its DTO. Rate limiting is enforced via NestJS Throttler and BetterAuth rateLimit rules, with unit tests covering custom rules, endpoint exemptions, and security controls.

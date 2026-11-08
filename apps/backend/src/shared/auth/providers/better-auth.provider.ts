@@ -3,7 +3,10 @@ import { renderEmail } from '@/core/email/render';
 import { ResetPassword } from '@/core/email/templates/reset-password';
 import { VerifyEmail } from '@/core/email/templates/verify-email';
 import { PrismaService } from '@/core/prisma/prisma.service';
-import { betterAuthCoreConfig } from '@/shared/auth/config/better-auth.config';
+import {
+  betterAuthCoreConfig,
+  resolveBetterAuthPlugins,
+} from '@/shared/auth/config/better-auth.config';
 import { codeOfConductDatabaseHooks } from '@/shared/auth/hooks/code-of-conduct.hook';
 import { Config } from '@/shared/config/config.service';
 import { Inject, Provider } from '@nestjs/common';
@@ -63,9 +66,7 @@ const createAuth = (
       },
       sendOnSignUp: true,
     },
-    plugins: (betterAuthCoreConfig.plugins ?? []).filter(
-      (plugin) => config.nodeEnv !== 'production' || plugin.id !== 'open-api',
-    ),
+    plugins: resolveBetterAuthPlugins(config.nodeEnv),
   });
 
 export type BetterAuth = ReturnType<typeof createAuth>;

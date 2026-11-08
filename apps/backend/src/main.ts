@@ -39,9 +39,16 @@ async function main(): Promise<void> {
 
   const appInstance = app.getHttpAdapter().getInstance();
 
-  // Enable trust proxy for reverse-proxy environments (Coolify, Nginx, Docker)
-  // Ensures req.ip reflects the real client IP for rate limiting instead of the proxy container IP
-  appInstance.set('trust proxy', 1);
+  // Enable trust proxy for reverse-proxy environments (Coolify Traefik, Docker)
+  // Ensures req.ip reflects the real client IP for rate limiting instead of the proxy container IP.
+  // Defaults to 1 (single reverse-proxy hop in Coolify). Can be overridden via TRUST_PROXY env var.
+  const trustProxyEnv = process.env.TRUST_PROXY;
+  const trustProxyValue = trustProxyEnv
+    ? isNaN(Number(trustProxyEnv))
+      ? trustProxyEnv
+      : Number(trustProxyEnv)
+    : 1;
+  appInstance.set('trust proxy', trustProxyValue);
 
   const betterAuth = app.get<BetterAuth>('BetterAuth');
   // Express 5 (via NestJS 11) requires named wildcards — a bare `*` throws.
