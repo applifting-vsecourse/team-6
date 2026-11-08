@@ -74,7 +74,7 @@
     "pageTitle": "Messages",
     "retry": "Try again",
     "showEarlier": "Show earlier messages",
-    "subtitle": "Only group members can read the messages.",
+    "subtitle": "Only kvintet members can read the messages.",
     "system": {
       "kvintetStarted": "The kvintet has started. Say hello!"
     },
@@ -195,7 +195,7 @@
       "leaveProposalConfirm": "You will leave this proposal. When someone joins or leaves, everyone's votes are reset.",
       "leaveTitle": "Are you sure you want to leave?",
       "leaving": "Leaving…",
-      "note": "Others will see the topic and your role. Your name only once the group starts.",
+      "note": "Others will see the topic and your role. Your name only once the kvintet starts.",
       "stay": "Stay",
       "submit": "Start a kvintet",
       "title": "Start a kvintet",
@@ -430,6 +430,8 @@
       },
       "noMessages": "No messages yet. Say hello!",
       "openChat": "Open chat",
+      "openChatUnread_one": "Open chat ({{count}} new)",
+      "openChatUnread_other": "Open chat ({{count}} new)",
       "subtitle": "{{title}} · {{count}} people · since {{date}}",
       "tip": {
         "body": "Everyone shares one goal for the next 3 months.",
@@ -452,7 +454,7 @@
       "votedDescription": "You voted to start. Waiting for the others.",
       "votedStatus": "You voted to start. Waiting for the others.",
       "votedTitle": "Waiting for others to vote",
-      "waitingDescription": "At three you can vote to start. We'll let you know.",
+      "waitingDescription": "At three you can vote to start. You'll see it here.",
       "waitingSeatsStatus": "{{seats}} OF {{capacity}} SEATS · WAITING FOR MORE",
       "waitingTitle": "Waiting for more people",
       "whoSubtitle": "Names appear once you start.",
@@ -464,7 +466,7 @@
     "nextStep": {
       "badge": "YOUR NEXT STEP",
       "button": "See proposals",
-      "description": "We found proposals that match your profile. Pick by topic – you'll see names once the group forms.",
+      "description": "We found proposals that match your profile. Pick by topic – you'll see names once the kvintet forms.",
       "title": "Pick a proposal"
     },
     "nextStepMember": {
@@ -520,8 +522,10 @@
       "title": "Delete account"
     },
     "empty": {
+      "expectations": "Nothing added yet",
       "interests": "Nothing added yet",
       "learn": "Nothing added yet",
+      "role": "No role added yet",
       "teach": "Nothing added yet",
       "whenAndWhere": "No preferences set yet"
     },
@@ -529,12 +533,15 @@
       "title": "Couldn't load profile"
     },
     "sections": {
+      "expectations": "What you expect",
       "interests": "I'm interested in",
       "learn": "I want to learn",
+      "role": "My role",
       "teach": "I can teach",
       "whenAndWhere": "When and where"
     },
     "title": "Profile",
+    "usernameHint": "Change your username to get a new blobatar.",
     "when": {
       "afternoons": "afternoons",
       "allDays": "Weekdays and weekends",

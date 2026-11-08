@@ -139,6 +139,31 @@ describe("ProfilePage", () => {
 
     expect(screen.getByRole("heading", { name: "Jana Nováková" })).toBeInTheDocument()
     expect(screen.getByText(/@jana.novakova · Marketing specialist/)).toBeInTheDocument()
+    expect(screen.getByText("Change your username to get a new blobatar.")).toBeInTheDocument()
+  })
+
+  it("shows the role and the expectations, each with an edit link to its onboarding step", () => {
+    mockUseProfile.mockReturnValue(
+      mockProfileData({
+        profile: { ...mockProfile, expectations: ["learn_new", "share_knowledge"] },
+      }),
+    )
+
+    render(<ProfilePage user={defaultUser} />)
+
+    const role = screen.getByRole("heading", { name: "My role" }).closest("section")!
+    expect(role).toHaveTextContent("Marketing Specialist · Marketing specialist")
+    expect(within(role).getByRole("link", { name: "Edit" })).toHaveAttribute(
+      "href",
+      "/onboarding?step=1",
+    )
+
+    const expects = screen.getByRole("heading", { name: "What you expect" }).closest("section")!
+    expect(expects).toHaveTextContent("Learn something new · Share what I know")
+    expect(within(expects).getByRole("link", { name: "Edit" })).toHaveAttribute(
+      "href",
+      "/onboarding?step=3",
+    )
   })
 
   it("renders teach, learn and interest tag sections with edit links to step 1", () => {
@@ -164,11 +189,15 @@ describe("ProfilePage", () => {
 
     // Edit buttons link to onboarding step 1
     const links = screen.getAllByRole("link", { name: "Edit" })
-    expect(links.length).toBe(4) // 3 tags sections + 1 when & where
-    expect(links[0]).toHaveAttribute("href", "/onboarding?step=1")
-    expect(links[1]).toHaveAttribute("href", "/onboarding?step=1")
-    expect(links[2]).toHaveAttribute("href", "/onboarding?step=1")
-    expect(links[3]).toHaveAttribute("href", "/onboarding?step=2")
+    expect(links.length).toBe(6) // role, 3 tag sections, when & where, expectations
+    expect(links.map((link) => link.getAttribute("href"))).toEqual([
+      "/onboarding?step=1",
+      "/onboarding?step=1",
+      "/onboarding?step=1",
+      "/onboarding?step=1",
+      "/onboarding?step=2",
+      "/onboarding?step=3",
+    ])
   })
 
   it("renders when and where formatted string", () => {
@@ -204,7 +233,7 @@ describe("ProfilePage", () => {
     render(<ProfilePage user={defaultUser} />)
 
     const emptyTags = screen.getAllByText("Nothing added yet")
-    expect(emptyTags.length).toBe(3) // teach, learn, interests
+    expect(emptyTags.length).toBe(4) // teach, learn, interests, expectations
     expect(screen.getByText("No preferences set yet")).toBeInTheDocument()
   })
 

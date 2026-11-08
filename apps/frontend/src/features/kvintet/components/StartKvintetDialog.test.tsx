@@ -70,7 +70,7 @@ describe("StartKvintetDialog", () => {
     ).toBeInTheDocument()
     expect(
       screen.getByText(
-        "Others will see the topic and your role. Your name only once the group starts.",
+        "Others will see the topic and your role. Your name only once the kvintet starts.",
       ),
     ).toBeInTheDocument()
     expect(screen.getByRole("dialog").querySelector("[data-slot='avatar']")).not.toBeNull()

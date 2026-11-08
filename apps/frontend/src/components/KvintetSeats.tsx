@@ -125,7 +125,9 @@ export function KvintetSeats({
                     </SeatTooltip>
                   )}
                 </span>
-                <span className="max-w-16 truncate">{member ? member.label : freeLabel}</span>
+                <span className="line-clamp-2 max-w-16 text-center break-words">
+                  {member ? member.label : freeLabel}
+                </span>
               </li>
             )
           })}

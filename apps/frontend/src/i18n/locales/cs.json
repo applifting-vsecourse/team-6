@@ -76,7 +76,7 @@
     "pageTitle": "Zprávy",
     "retry": "Zkusit znovu",
     "showEarlier": "Zobrazit starší zprávy",
-    "subtitle": "Zprávy čtou jen členové skupiny.",
+    "subtitle": "Zprávy čtou jen členové kvintetu.",
     "system": {
       "kvintetStarted": "Kvintet začal. Pozdravte se!"
     },
@@ -199,7 +199,7 @@
       "leaveProposalConfirm": "Opustíte tento návrh. Když někdo přijde nebo odejde, hlasy všech se vynulují.",
       "leaveTitle": "Opravdu chcete odejít?",
       "leaving": "Odcházím…",
-      "note": "Ostatní uvidí téma a vaši roli. Vaše jméno až po zahájení skupiny.",
+      "note": "Ostatní uvidí téma a vaši roli. Vaše jméno až po zahájení kvintetu.",
       "stay": "Zůstat",
       "submit": "Založit kvintet",
       "title": "Založit kvintet",
@@ -436,6 +436,10 @@
       },
       "noMessages": "Zatím žádné zprávy. Napište první!",
       "openChat": "Otevřít chat",
+      "openChatUnread_few": "Otevřít chat ({{count}} nové)",
+      "openChatUnread_many": "Otevřít chat ({{count}} nové)",
+      "openChatUnread_one": "Otevřít chat ({{count}} nová)",
+      "openChatUnread_other": "Otevřít chat ({{count}} nových)",
       "subtitle": "{{title}} · {{count}} lidí · od {{date}}",
       "tip": {
         "body": "Každý sdílí jeden cíl na příští 3 měsíce.",
@@ -458,7 +462,7 @@
       "votedDescription": "Hlasovali jste pro spuštění. Čeká se na ostatní.",
       "votedStatus": "Hlasovali jste pro zahájení. Čeká se na ostatní.",
       "votedTitle": "Čeká se na hlasy ostatních",
-      "waitingDescription": "Ve třech můžete hlasovat o zahájení. Dáme vám vědět.",
+      "waitingDescription": "Ve třech můžete hlasovat o zahájení. Uvidíte to tady.",
       "waitingSeatsStatus": "{{seats}} Z {{capacity}} MÍST · ČEKÁME NA DALŠÍ",
       "waitingTitle": "Čekáme na další lidi",
       "whoSubtitle": "Jména se zobrazí, až začnete.",
@@ -470,7 +474,7 @@
     "nextStep": {
       "badge": "VÁŠ DALŠÍ KROK",
       "button": "Zobrazit návrhy",
-      "description": "Našli jsme návrhy, které odpovídají vašemu profilu. Vyberte podle tématu – jména uvidíte, až skupina vznikne.",
+      "description": "Našli jsme návrhy, které odpovídají vašemu profilu. Vyberte podle tématu – jména uvidíte, až kvintet vznikne.",
       "title": "Vyberte si návrh"
     },
     "nextStepMember": {
@@ -526,8 +530,10 @@
       "title": "Smazat účet"
     },
     "empty": {
+      "expectations": "Zatím nic nepřidáno",
       "interests": "Zatím nic nepřidáno",
       "learn": "Zatím nic nepřidáno",
+      "role": "Zatím bez role",
       "teach": "Zatím nic nepřidáno",
       "whenAndWhere": "Zatím nenastaveno"
     },
@@ -535,12 +541,15 @@
       "title": "Profil se nepodařilo načíst"
     },
     "sections": {
+      "expectations": "Co očekáváte",
       "interests": "Zajímá mě",
       "learn": "Chci se naučit",
+      "role": "Moje role",
       "teach": "Umím naučit",
       "whenAndWhere": "Kdy a kde"
     },
     "title": "Profil",
+    "usernameHint": "Změňte uživatelské jméno a získáte nový blobatar.",
     "when": {
       "afternoons": "odpoledne",
       "allDays": "Všední dny i víkendy",

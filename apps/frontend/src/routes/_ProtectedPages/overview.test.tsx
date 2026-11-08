@@ -121,6 +121,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
   let profileData: typeof defaultProfile | null
   let myKvintetData: KvintetDetails | null
   let feedData: { items: FeedKvintet[]; fallback: boolean }
+  let unreadCount: number
   let messagesData: {
     id: number
     kind: "USER" | "SYSTEM"
@@ -137,12 +138,16 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
     myKvintetData = null
     feedData = { items: [], fallback: false }
     messagesData = []
+    unreadCount = 0
 
     vi.mocked(api.get).mockImplementation((path: unknown) => {
       const p = String(path)
       if (p.includes("me/profile")) {
         if (!profileData) return createResponseMock(null, 204) as never
         return createResponseMock(profileData, 200) as never
+      }
+      if (p.includes("kvintets/mine/messages/unread")) {
+        return createResponseMock({ active: true, count: unreadCount }, 200) as never
       }
       if (p.includes("kvintets/mine/messages")) {
         return createResponseMock(messagesData, 200) as never
@@ -213,6 +218,8 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
         expect.stringContaining("kvintets/feed"),
         expect.anything(),
       )
+      // So must the kvintet query: the API answers 403 until the profile is finished
+      expect(vi.mocked(api.get).mock.calls.map(([url]) => url)).not.toContain("kvintets/mine")
     })
   })
 
@@ -514,7 +521,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
         await screen.findByRole("heading", { name: "Waiting for more people" }),
       ).toBeInTheDocument()
       expect(
-        screen.getByText("At three you can vote to start. We'll let you know."),
+        screen.getByText("At three you can vote to start. You'll see it here."),
       ).toBeInTheDocument()
       expect(screen.queryByRole("button", { name: "Start now" })).not.toBeInTheDocument()
     })
@@ -674,6 +681,26 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(await screen.findByRole("tooltip")).toHaveTextContent("Petr")
     })
 
+    it("counts the unread messages on the button that opens the chat", async () => {
+      myKvintetData = activeKvintet
+      unreadCount = 2
+
+      renderWithClient(<OverviewPage />)
+
+      expect(await screen.findByRole("link", { name: "Open chat (2 new)" })).toHaveAttribute(
+        "href",
+        "/kvintet/messages",
+      )
+    })
+
+    it("writes plain 'Open chat' when nothing is unread", async () => {
+      myKvintetData = activeKvintet
+
+      renderWithClient(<OverviewPage />)
+
+      expect(await screen.findByRole("link", { name: "Open chat" })).toBeInTheDocument()
+    })
+
     it("previews the latest message from a member, never a system line", async () => {
       myKvintetData = activeKvintet
       messagesData = [
@@ -829,10 +856,10 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(profileCalls()).toBe(profileBefore)
     })
 
-    it("loads both again with one retry when both queries failed", async () => {
+    it("loads the profile again when it failed, without asking for a kvintet yet", async () => {
       vi.mocked(api.get).mockImplementation((path: unknown) => {
         const p = String(path)
-        if (p.includes("me/profile") || p.includes("kvintets/mine")) {
+        if (p.includes("me/profile")) {
           return createErrorResponseMock(apiError(500, "internal_server_error")) as never
         }
         return createResponseMock({}) as never
@@ -842,11 +869,11 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       expect(await screen.findByText("We couldn't load your home page")).toBeInTheDocument()
       const profileBefore = profileCalls()
-      const kvintetBefore = kvintetCalls()
 
       await userEvent.click(screen.getByRole("button", { name: "Try again" }))
       await waitFor(() => expect(profileCalls()).toBeGreaterThan(profileBefore))
-      await waitFor(() => expect(kvintetCalls()).toBeGreaterThan(kvintetBefore))
+      // The API answers 403 for a kvintet until the profile is finished, so it is not asked.
+      expect(kvintetCalls()).toBe(0)
     })
   })
 })

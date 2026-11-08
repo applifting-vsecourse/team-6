@@ -37,6 +37,11 @@ type DemoKvintet = {
   active?: boolean;
   // How many of the first members have already voted to start.
   votes?: number;
+  // What the group has written so far, oldest first. `from` is an index into `members`.
+  chat?: { from: number; body: string; minutesAgo: number }[];
+  // How many chat lines each member (by index) has read; everyone else has read all of them.
+  // The rest count as unread for them, except their own.
+  readCounts?: Record<number, number>;
 };
 
 const minutesAgo = (minutes: number): Date =>
@@ -123,13 +128,44 @@ export async function createDemoKvintets(
       },
     });
 
+    let startedId = 0;
     if (kvintet.active) {
-      await prisma.message.create({
+      startedId = (
+        await prisma.message.create({
+          data: {
+            kvintetId: created.id,
+            kind: 'SYSTEM',
+            body: KVINTET_STARTED,
+            createdAt: created.activatedAt ?? undefined,
+          },
+        })
+      ).id;
+    }
+
+    const chat = kvintet.chat ?? [];
+    const chatIds: number[] = [];
+    for (const line of chat) {
+      const message = await prisma.message.create({
         data: {
           kvintetId: created.id,
-          kind: 'SYSTEM',
-          body: KVINTET_STARTED,
-          createdAt: created.activatedAt ?? undefined,
+          authorId: kvintet.members[line.from].userId,
+          kind: 'USER',
+          body: line.body,
+          createdAt: minutesAgo(line.minutesAgo),
+        },
+      });
+      chatIds.push(message.id);
+    }
+
+    // The read mark is the id of the newest line a member has seen.
+    for (const [index, member] of kvintet.members.entries()) {
+      const readCount = kvintet.readCounts?.[index] ?? chat.length;
+      await prisma.kvintetMember.update({
+        where: {
+          kvintetId_userId: { kvintetId: created.id, userId: member.userId },
+        },
+        data: {
+          lastReadMessageId: readCount > 0 ? chatIds[readCount - 1] : startedId,
         },
       });
     }

@@ -328,6 +328,32 @@ export const seedDatabase = async (
       categories: ['software-development'],
       active: true,
       votes: 5,
+      // Dana has read the first two lines, so she sees "2 new" next to "Open chat" (and
+      // Filip, who has read four, sees "1 new").
+      chat: [
+        {
+          from: 2,
+          body: 'Hi everyone! Great that there are five of us. When would suit you for the first meeting?',
+          minutesAgo: 1500,
+        },
+        {
+          from: 1,
+          body: 'Thursday evening works for me. How about Café Lajka in Karlín?',
+          minutesAgo: 1440,
+        },
+        {
+          from: 4,
+          body: "Thursday is perfect. I'll book a table for five at 18:30.",
+          minutesAgo: 1380,
+        },
+        { from: 3, body: 'Count me in.', minutesAgo: 1300 },
+        {
+          from: 2,
+          body: "I'll bring a few examples of tools that work for us.",
+          minutesAgo: 10,
+        },
+      ],
+      readCounts: { 3: 2, 4: 4 },
       members: [
         {
           userId: anna.id,

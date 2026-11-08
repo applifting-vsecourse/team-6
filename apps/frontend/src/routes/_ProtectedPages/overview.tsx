@@ -22,6 +22,7 @@ import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOpt
 import { useSession } from "@/features/auth/hooks/useSession"
 import { messagesQueryOptions } from "@/features/chat/api/chatApi"
 import { useSendMessage } from "@/features/chat/hooks/useMessages"
+import { useUnreadMessages } from "@/features/chat/hooks/useUnread"
 import type { KvintetDetails, KvintetMember } from "@/features/kvintet/api/kvintetApi"
 import {
   kvintetFeedQueryOptions,
@@ -91,7 +92,7 @@ function OverviewPage() {
   const profile = profileQuery.data
   const isOnboarded = Boolean(profile?.onboardingCompletedAt)
 
-  const myKvintet = useMyKvintet()
+  const myKvintet = useMyKvintet(isOnboarded)
   const kvintet = myKvintet.data
 
   const feedQuery = useQuery({
@@ -104,6 +105,9 @@ function OverviewPage() {
     enabled: Boolean(isOnboarded && kvintet?.status === "ACTIVE" && kvintet?.id),
     refetchInterval: false,
   })
+
+  // The same query as the header's badge, so asking again costs nothing.
+  const { unreadCount } = useUnreadMessages(Boolean(isOnboarded && kvintet?.status === "ACTIVE"))
 
   // System lines ("kvintet_started", "Eva left") belong in the chat, not in this preview.
   const lastMessage = messagesQuery.data?.messages.findLast((m) => m.kind === "USER")
@@ -553,7 +557,11 @@ function OverviewPage() {
                           )}
 
                           <Button asChild>
-                            <Link to={ROUTES.kvintetMessages}>{t("overview.active.openChat")}</Link>
+                            <Link to={ROUTES.kvintetMessages}>
+                              {unreadCount > 0
+                                ? t("overview.active.openChatUnread", { count: unreadCount })
+                                : t("overview.active.openChat")}
+                            </Link>
                           </Button>
 
                           <div className="flex w-full flex-col items-start gap-1 border-t border-border pt-3.5">

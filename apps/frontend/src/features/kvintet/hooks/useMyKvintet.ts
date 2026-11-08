@@ -10,9 +10,10 @@ import {
 } from "@/features/kvintet/api/kvintetApi"
 import { kvintetKeys } from "@/features/kvintet/api/kvintetKeys"
 
-export function useMyKvintet() {
+/** `isEnabled` is false until the profile is finished: the API answers 403 before that. */
+export function useMyKvintet(isEnabled = true) {
   const queryClient = useQueryClient()
-  const query = useQuery(myKvintetQueryOptions())
+  const query = useQuery({ ...myKvintetQueryOptions(), enabled: isEnabled })
 
   const voteMutation = useMutation({
     mutationFn: voteToStartKvintet,

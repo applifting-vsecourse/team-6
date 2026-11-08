@@ -74,6 +74,44 @@ export function formatWhenAndWhere(
   return parts.join(" · ")
 }
 
+const EXPECTATION_LABELS = {
+  learn_new: "onboarding.step3.expectations.learn",
+  share_knowledge: "onboarding.step3.expectations.share",
+  meet_people: "onboarding.step3.expectations.meet",
+  solve_problem: "onboarding.step3.expectations.solve",
+} as const
+
+/** The "Edit" link of a section: it opens the onboarding step that holds those answers. */
+function EditLink({ step }: { step: 1 | 2 | 3 }) {
+  const { t } = useTranslation()
+  return (
+    <Button
+      asChild
+      variant="ghost"
+      className="h-auto p-0 text-label font-medium text-foreground hover:bg-transparent hover:text-muted-foreground md:px-4.5 md:py-2.75"
+    >
+      <Link
+        to={ROUTES.onboarding}
+        search={{ step }}
+      >
+        {t("common.edit")}
+      </Link>
+    </Button>
+  )
+}
+
+function TextSection({ title, step, text }: { title: string; step: 1 | 2 | 3; text: string }) {
+  return (
+    <section className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4 md:p-5">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-h3 font-semibold text-foreground">{title}</h2>
+        <EditLink step={step} />
+      </div>
+      <p className="text-compact text-muted-foreground md:text-body">{text}</p>
+    </section>
+  )
+}
+
 export const Route = createFileRoute("/_ProtectedPages/profile")({
   loader: async ({ context }) => {
     const session = await context.queryClient.ensureQueryData(authSessionQueryOptions())
@@ -169,6 +207,21 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
 
   const whenAndWhere = formatWhenAndWhere(profile, t) ?? t("profile.empty.whenAndWhere")
 
+  // The field and the role, e.g. "Marketing & sales · Marketing specialist".
+  const roleSummary =
+    [...(profile?.roles ?? []).map((r) => label("roles", r)), profile?.position]
+      .filter(Boolean)
+      .join(" · ") || t("profile.empty.role")
+
+  const expectations =
+    (profile?.expectations ?? [])
+      .map((id) =>
+        id in EXPECTATION_LABELS
+          ? t(EXPECTATION_LABELS[id as keyof typeof EXPECTATION_LABELS])
+          : id,
+      )
+      .join(" · ") || t("profile.empty.expectations")
+
   const tagSections = [
     {
       key: "teach",
@@ -207,8 +260,17 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
           {subtitle ? (
             <p className="text-compact text-muted-foreground md:text-lead">{subtitle}</p>
           ) : null}
+          <p className="hidden text-small text-muted-foreground md:block">
+            {t("profile.usernameHint")}
+          </p>
         </div>
       </section>
+
+      <TextSection
+        title={t("profile.sections.role")}
+        step={1}
+        text={roleSummary}
+      />
 
       {/* 2. Tag sections (I can teach, I want to learn, I'm interested in) */}
       {tagSections.map((section) => (
@@ -218,18 +280,7 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
         >
           <div className="flex items-center justify-between gap-2">
             <h2 className="text-h3 font-semibold text-foreground">{section.title}</h2>
-            <Button
-              asChild
-              variant="ghost"
-              className="h-auto p-0 text-label font-medium text-foreground hover:bg-transparent hover:text-muted-foreground md:px-4.5 md:py-2.75"
-            >
-              <Link
-                to={ROUTES.onboarding}
-                search={{ step: 1 }}
-              >
-                {t("common.edit")}
-              </Link>
-            </Button>
+            <EditLink step={1} />
           </div>
           <div className="flex flex-wrap gap-2">
             {section.tags && section.tags.length > 0 ? (
@@ -253,21 +304,16 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
           <h2 className="text-h3 font-semibold text-foreground">
             {t("profile.sections.whenAndWhere")}
           </h2>
-          <Button
-            asChild
-            variant="ghost"
-            className="h-auto p-0 text-label font-medium text-foreground hover:bg-transparent hover:text-muted-foreground md:px-4.5 md:py-2.75"
-          >
-            <Link
-              to={ROUTES.onboarding}
-              search={{ step: 2 }}
-            >
-              {t("common.edit")}
-            </Link>
-          </Button>
+          <EditLink step={2} />
         </div>
         <p className="text-compact text-muted-foreground md:text-body">{whenAndWhere}</p>
       </section>
+
+      <TextSection
+        title={t("profile.sections.expectations")}
+        step={3}
+        text={expectations}
+      />
 
       {/* 6. Danger zone (Delete account) */}
       <section className="flex flex-col items-start gap-2.5 border-t border-border pt-5 md:pt-6">
