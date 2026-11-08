@@ -381,7 +381,7 @@
       "whereTitle": "Where"
     },
     "step3": {
-      "description": "Last two. No wrong answers.",
+      "description": "Almost done. No wrong answers.",
       "expectations": {
         "learn": "Learn something new",
         "meet": "Meet new people",
@@ -445,8 +445,8 @@
       "title": "We couldn't load your home page"
     },
     "forming": {
-      "canVoteDescription": "Start with four now, or wait for one more. It starts when all four agree.",
-      "canVoteTitle": "Start now or wait for a fifth?",
+      "canVoteDescription": "Start now, or wait for more people. It starts when everyone here agrees.",
+      "canVoteTitle": "Start now or wait for more?",
       "heading": "Your kvintet is forming",
       "leaveKvintet": "Leave kvintet",
       "seatsStatus": "{{seats}} OF {{capacity}} SEATS · {{voted}} OF {{total}} WANT TO START",

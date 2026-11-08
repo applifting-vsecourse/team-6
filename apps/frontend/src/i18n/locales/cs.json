@@ -387,7 +387,7 @@
       "whereTitle": "Kde"
     },
     "step3": {
-      "description": "Poslední dvě. Špatné odpovědi neexistují.",
+      "description": "Už jen kousek. Špatné odpovědi neexistují.",
       "expectations": {
         "learn": "Naučit se něco nového",
         "meet": "Poznat nové lidi",
@@ -453,8 +453,8 @@
       "title": "Domovskou stránku se nepodařilo načíst"
     },
     "forming": {
-      "canVoteDescription": "Začněte ve čtyřech hned, nebo počkejte na dalšího. Kvintet začne, až budou souhlasit všichni čtyři.",
-      "canVoteTitle": "Začít hned, nebo počkat na pátého?",
+      "canVoteDescription": "Začněte hned, nebo počkejte na další lidi. Kvintet začne, až budou souhlasit všichni.",
+      "canVoteTitle": "Začít hned, nebo počkat na další?",
       "heading": "Váš kvintet se skládá",
       "leaveKvintet": "Opustit kvintet",
       "seatsStatus": "{{seats}} Z {{capacity}} MÍST · {{voted}} ZE {{total}} CHCE ZAČÍT",
