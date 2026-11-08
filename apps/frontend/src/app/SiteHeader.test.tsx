@@ -66,7 +66,7 @@ describe("SiteHeader", () => {
     render(<SiteHeader />)
 
     expect(state.appHeaderProps?.navDisabled).toEqual({
-      "/kvintet/feed": "You are already in a kvintet, so you can't browse other proposals.",
+      "/kvintet/feed": "You're already in a kvintet, so you can't browse others.",
     })
     expect(state.appHeaderProps?.chat).toEqual({ unreadCount: 2 })
   })
