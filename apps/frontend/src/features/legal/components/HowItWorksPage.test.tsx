@@ -10,16 +10,17 @@ describe("HowItWorksPage", () => {
     expect(screen.getByRole("heading", { level: 1, name: "How Kvintet works" })).toBeInTheDocument()
     const steps = within(screen.getByRole("list")).getAllByRole("listitem")
     expect(steps).toHaveLength(4)
-    expect(steps[0]).toHaveTextContent("Profile")
+    expect(steps[0]).toHaveTextContent("Create your profile")
     expect(steps[3]).toHaveTextContent("Meeting up")
   })
 
-  it("gives every step a face", () => {
+  it("numbers the steps", () => {
     render(<HowItWorksPage />)
 
     const steps = within(screen.getByRole("list")).getAllByRole("listitem")
-    for (const step of steps) {
-      expect(step.querySelector("svg, img")).not.toBeNull()
-    }
+    steps.forEach((step, i) => {
+      expect(step).toHaveTextContent(String(i + 1))
+      expect(step.querySelector("svg, img")).toBeNull()
+    })
   })
 })

@@ -73,9 +73,7 @@ describe("LandingPage", () => {
       screen.getByText("What you know and what you'd like to learn. 3 minutes."),
     ).toBeInTheDocument()
     expect(screen.getByText("Names stay hidden until it starts.")).toBeInTheDocument()
-    expect(
-      screen.getByText("Choose by topic. Names stay hidden until it starts."),
-    ).toBeInTheDocument()
+    expect(screen.getByText("An algorithm finds the kvintet that fits you.")).toBeInTheDocument()
   })
 
   it("links to the rules", () => {
