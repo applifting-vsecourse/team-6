@@ -1,20 +1,19 @@
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router"
-import type { TFunction } from "i18next"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { ROUTES } from "@/app/routes"
 import { AnonymousBlobatar, Face } from "@/components/AnonymousBlobatar"
 import { GazeBlobatar } from "@/components/GazeBlobatar"
-import { KvintetSeats, type SeatMember } from "@/components/KvintetSeats"
+import { KvintetSeats, SeatTooltip, type SeatMember } from "@/components/KvintetSeats"
 import { Seo } from "@/components/Seo"
 import { StateAlert } from "@/components/StateAlert"
 import { Blobatar } from "@/components/ui/blobatar"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { formatDate, formatDayAndMonth, formatHeaderDate } from "@/lib/date"
+import { formatDate, formatDayAndMonth, formatHeaderDate, formatList } from "@/lib/date"
 import { getErrorMessage } from "@/lib/errorMessage"
 import { cn } from "@/lib/utils"
 
@@ -67,10 +66,12 @@ function seatSeed(
   index: number,
   ownSeed: string,
 ): SeatMember {
-  if (member.isCurrentUser) return { seed: ownSeed }
+  // The server sends a name only for you, or for everyone once the kvintet is active.
+  const tooltip = member.name?.trim() ? member.name : undefined
+  if (member.isCurrentUser) return { seed: ownSeed, tooltip }
   return kvintet.status === "ACTIVE"
-    ? { seed: member.username ?? member.userId }
-    : { seed: `${kvintet.id}-seat-${index}`, anonymous: true }
+    ? { seed: member.username ?? member.userId, tooltip }
+    : { seed: `${kvintet.id}-seat-${index}`, anonymous: true, tooltip }
 }
 
 export const Route = createFileRoute("/_ProtectedPages/overview")({
@@ -84,7 +85,6 @@ export const Route = createFileRoute("/_ProtectedPages/overview")({
 function OverviewPage() {
   const { t } = useTranslation()
   const { user } = useSession()
-  const label = useSlugLabel()
 
   const profileQuery = useQuery(profileQueryOptions(user?.id))
   const profile = profileQuery.data
@@ -368,6 +368,8 @@ function OverviewPage() {
                     </p>
                   </div>
 
+                  <CommonTime kvintet={kvintet} />
+
                   <div className="flex flex-col items-start gap-6 lg:flex-row">
                     {/* Left Card: Vote & Table */}
                     <div className="flex w-full flex-1 flex-col items-center gap-9 rounded-lg border border-border bg-card p-8 md:flex-row">
@@ -453,45 +455,10 @@ function OverviewPage() {
                       </div>
 
                       <div className="flex flex-col divide-y divide-border">
-                        {youFirst(kvintet.members).map((member, idx) => {
-                          const { seed, anonymous: isAnonymous } = seatSeed(
-                            kvintet,
-                            member,
-                            idx,
-                            ownSeed,
-                          )
-                          return (
-                            <div
-                              key={member.userId}
-                              className="flex items-center gap-3 py-2 first:pt-2"
-                            >
-                              {isAnonymous ? (
-                                <AnonymousBlobatar
-                                  seed={seed}
-                                  motion="hover"
-                                  className="size-8 shrink-0"
-                                />
-                              ) : (
-                                <Face
-                                  seed={seed}
-                                  motion="hover"
-                                  className="size-8 shrink-0"
-                                />
-                              )}
-                              <div className="flex min-w-0 flex-col">
-                                <p className="truncate text-compact font-medium text-foreground">
-                                  {(member.role ? roleLabel(member.role, label) : null) ??
-                                    member.name ??
-                                    t("kvintet.members.openSeat")}
-                                  {member.isCurrentUser ? ` ${t("kvintet.members.you")}` : ""}
-                                </p>
-                                <p className="truncate text-small text-muted-foreground">
-                                  {describeMemberSummary(member, t, label)}
-                                </p>
-                              </div>
-                            </div>
-                          )
-                        })}
+                        <MemberRows
+                          kvintet={kvintet}
+                          ownSeed={ownSeed}
+                        />
                       </div>
 
                       <button
@@ -542,6 +509,8 @@ function OverviewPage() {
                       })}
                     </p>
                   </div>
+
+                  <CommonTime kvintet={kvintet} />
 
                   <div className="flex flex-col items-start gap-6 lg:flex-row">
                     {/* Left Card: Group */}
@@ -599,6 +568,16 @@ function OverviewPage() {
                             </p>
                           </div>
                         </div>
+                      </div>
+
+                      <div className="flex flex-col gap-3 border-t border-border pt-6">
+                        <h3 className="text-h3 font-semibold text-foreground">
+                          {t("overview.active.membersHeading")}
+                        </h3>
+                        <MemberRows
+                          kvintet={kvintet}
+                          ownSeed={ownSeed}
+                        />
                       </div>
                     </div>
 
@@ -808,24 +787,88 @@ function roleLabel(role: string, label: SlugLabel) {
     .join(", ")
 }
 
-function describeMemberSummary(member: KvintetMember, t: TFunction, label: SlugLabel): string {
-  const teaches = member.teachTags
-    .map((s) => label("tags", s))
-    .slice(0, 2)
-    .join(", ")
-  const wants = member.learnTags
-    .map((s) => label("tags", s))
-    .slice(0, 2)
-    .join(", ")
+/** The days and parts of the day that suit every member, never a place. */
+function CommonTime({ kvintet }: { kvintet: KvintetDetails }) {
+  const { t } = useTranslation()
+  const prefs = kvintet.commonPreferences
+  const when = prefs
+    ? formatSharedPreferences(
+        { commonAvailability: prefs, meetingFrequency: prefs.meetingFrequency },
+        t,
+      )
+    : ""
+  if (!when) return null
+  return (
+    <p className="rounded-lg border border-border bg-card px-5 py-3.5 text-compact text-muted-foreground">
+      {t("overview.commonTime")} <span className="font-medium text-foreground">{when}</span>
+    </p>
+  )
+}
 
-  if (teaches && wants) {
-    return t("overview.forming.teachesWants", { offers: teaches, seeks: wants })
-  }
-  if (teaches) {
-    return t("overview.forming.teachesWantsFallback", { role: teaches })
-  }
-  if (member.role) {
-    return label("roles", member.role)
-  }
-  return "—"
+/** Who is in the kvintet, with what each person teaches, wants to learn and is interested in. */
+function MemberRows({ kvintet, ownSeed }: { kvintet: KvintetDetails; ownSeed: string }) {
+  const { t } = useTranslation()
+  const label = useSlugLabel()
+
+  return (
+    <div className="flex flex-col divide-y divide-border">
+      {youFirst(kvintet.members).map((member, idx) => {
+        const { seed, anonymous: isAnonymous, tooltip } = seatSeed(kvintet, member, idx, ownSeed)
+        const role = member.role ? roleLabel(member.role, label) : null
+        const name = member.name?.trim() ? member.name : null
+        // Names are hidden while the kvintet forms, so the role leads; once it is active the name does.
+        const title =
+          (kvintet.status === "ACTIVE" ? (name ?? role) : (role ?? name)) ??
+          t("kvintet.members.openSeat")
+        const lines = [
+          { heading: t("kvintet.members.teaches"), slugs: member.teachTags },
+          { heading: t("kvintet.members.wantsToLearn"), slugs: member.learnTags },
+          { heading: t("kvintet.members.interests"), slugs: member.interestTags },
+        ].filter((line) => line.slugs.length > 0)
+
+        return (
+          <div
+            key={member.userId}
+            className="flex items-start gap-3 py-2 first:pt-2"
+          >
+            <span className="size-8 shrink-0">
+              <SeatTooltip text={tooltip}>
+                {isAnonymous ? (
+                  <AnonymousBlobatar
+                    seed={seed}
+                    motion="hover"
+                    className="size-full"
+                  />
+                ) : (
+                  <Face
+                    seed={seed}
+                    motion="hover"
+                    className="size-full"
+                  />
+                )}
+              </SeatTooltip>
+            </span>
+            <div className="flex min-w-0 flex-col">
+              <p className="text-compact font-medium text-foreground">
+                {title}
+                {member.isCurrentUser ? ` ${t("kvintet.members.you")}` : ""}
+                {name && role && kvintet.status === "ACTIVE" ? (
+                  <span className="font-normal text-muted-foreground"> · {role}</span>
+                ) : null}
+              </p>
+              {lines.map(({ heading, slugs }) => (
+                <p
+                  key={heading}
+                  className="text-small text-muted-foreground"
+                >
+                  <span className="font-medium text-foreground">{heading} </span>
+                  {formatList(slugs.map((slug) => label("tags", slug)))}
+                </p>
+              ))}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
 }

@@ -1,9 +1,12 @@
+import type { ReactNode } from "react"
+
 import {
   AnonymousBlobatar,
   Face,
   FreeSeat,
   type BlobatarMotion,
 } from "@/components/AnonymousBlobatar"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
 const SEATS = 5
@@ -21,6 +24,23 @@ export type SeatMember = {
   anonymous?: boolean
   /** Written under the seat, e.g. the first name. Leave out where names are not known. */
   label?: string
+  /** Shown on hover, e.g. the name; leave out where the name is not known. */
+  tooltip?: string
+}
+
+/** Names a blobatar on hover. Without text it is the blobatar itself, untouched. */
+export function SeatTooltip({ text, children }: { text?: string; children: ReactNode }) {
+  if (!text) return children
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="block size-full">{children}</span>
+        </TooltipTrigger>
+        <TooltipContent>{text}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
 }
 
 type KvintetSeatsProps = {
@@ -76,18 +96,22 @@ export function KvintetSeats({
               <span className="grid size-9 place-items-center">
                 {!member ? (
                   <FreeSeat className="size-7" />
-                ) : member.anonymous ? (
-                  <AnonymousBlobatar
-                    seed={member.seed}
-                    motion={motion}
-                    className="size-9"
-                  />
                 ) : (
-                  <Face
-                    seed={member.seed}
-                    motion={motion}
-                    className="size-9"
-                  />
+                  <SeatTooltip text={member.tooltip}>
+                    {member.anonymous ? (
+                      <AnonymousBlobatar
+                        seed={member.seed}
+                        motion={motion}
+                        className="size-9"
+                      />
+                    ) : (
+                      <Face
+                        seed={member.seed}
+                        motion={motion}
+                        className="size-9"
+                      />
+                    )}
+                  </SeatTooltip>
                 )}
               </span>
               <span className="max-w-16 truncate">{member ? member.label : freeLabel}</span>
@@ -131,18 +155,22 @@ export function KvintetSeats({
           >
             {!member ? (
               <FreeSeat className="size-full" />
-            ) : member.anonymous ? (
-              <AnonymousBlobatar
-                seed={member.seed}
-                motion={motion}
-                className="size-full"
-              />
             ) : (
-              <Face
-                seed={member.seed}
-                motion={motion}
-                className="size-full"
-              />
+              <SeatTooltip text={member.tooltip}>
+                {member.anonymous ? (
+                  <AnonymousBlobatar
+                    seed={member.seed}
+                    motion={motion}
+                    className="size-full"
+                  />
+                ) : (
+                  <Face
+                    seed={member.seed}
+                    motion={motion}
+                    className="size-full"
+                  />
+                )}
+              </SeatTooltip>
             )}
             {member?.label ? (
               <span className="absolute top-full left-1/2 -translate-x-1/2 text-small whitespace-nowrap text-foreground md:text-label md:font-medium">

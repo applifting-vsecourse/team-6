@@ -436,6 +436,32 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(api.post).toHaveBeenCalledWith("kvintets/mine/vote")
     })
 
+    it("shows when everyone can meet and what each member teaches and wants to learn", async () => {
+      myKvintetData = {
+        ...formingKvintet,
+        commonPreferences: {
+          city: null,
+          meetingFrequency: "WEEKLY",
+          weekdays: true,
+          weekends: false,
+          mornings: false,
+          afternoons: false,
+          evenings: true,
+        },
+      }
+
+      renderWithClient(<OverviewPage />)
+      await screen.findByRole("heading", { name: /Your kvintet is forming/i })
+
+      expect(screen.getByText("Times that suit everyone:").parentElement).toHaveTextContent(
+        "Times that suit everyone: evenings · weekdays · every week",
+      )
+      expect(screen.getByText("Teaches").parentElement).toHaveTextContent(/Teaches\s*react/i)
+      expect(screen.getByText("Wants to learn").parentElement).toHaveTextContent(
+        /Wants to learn\s*python/i,
+      )
+    })
+
     it("draws only you in colour, the others grey, and writes (you) once", async () => {
       myKvintetData = formingKvintet
 
@@ -585,6 +611,48 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       const chatLink = screen.getByRole("link", { name: "Open chat" })
       expect(chatLink).toHaveAttribute("href", "/kvintet/messages")
+    })
+
+    it("lists the members with what they teach, and when everyone can meet", async () => {
+      myKvintetData = {
+        ...activeKvintet,
+        commonPreferences: {
+          city: null,
+          meetingFrequency: "WEEKLY",
+          weekdays: true,
+          weekends: false,
+          mornings: false,
+          afternoons: false,
+          evenings: true,
+        },
+        members: activeKvintet.members.map((m) =>
+          m.isCurrentUser ? { ...m, teachTags: ["react"], learnTags: ["python"] } : m,
+        ),
+      }
+
+      renderWithClient(<OverviewPage />)
+
+      expect(await screen.findByRole("heading", { name: "Members" })).toBeInTheDocument()
+      expect(screen.getByText("Times that suit everyone:").parentElement).toHaveTextContent(
+        "Times that suit everyone: evenings · weekdays · every week",
+      )
+      expect(screen.getByText("Teaches").parentElement).toHaveTextContent(/Teaches\s*react/i)
+      expect(screen.getByText("Wants to learn").parentElement).toHaveTextContent(
+        /Wants to learn\s*python/i,
+      )
+    })
+
+    it("names each member's blobatar on hover and shows their role next to the name", async () => {
+      myKvintetData = activeKvintet
+
+      const { container } = renderWithClient(<OverviewPage />)
+      await screen.findByRole("heading", { name: "Members" })
+
+      expect(screen.getByText(/· Designer/)).toBeInTheDocument()
+
+      const seats = container.querySelectorAll('[data-seat="member"] > span')
+      await userEvent.hover(seats[1] as HTMLElement)
+      expect(await screen.findByRole("tooltip")).toHaveTextContent("Petr")
     })
 
     it("sends a member who has not seen the 'Kvintet begins' page there first", async () => {

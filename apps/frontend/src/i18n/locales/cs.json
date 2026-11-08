@@ -234,7 +234,10 @@
     "loading": "Hledáme kvintety, které vám sednou…",
     "member": "Člen",
     "members": {
+      "interests": "Zájmy",
       "openSeat": "Volné místo",
+      "teaches": "Poradí s",
+      "wantsToLearn": "Chce se naučit",
       "you": "(vy)"
     },
     "preferences": {
@@ -249,7 +252,7 @@
       "frequency": "Stejná frekvence setkávání",
       "interest": "Společný zájem: {{tag}}",
       "label": "Proč vám sedí:",
-      "learn": "Někdo tu učí {{tag}}",
+      "learn": "Někdo tu poradí s {{tag}}",
       "roleMix": "Jiné role než vaše",
       "teach": "Někdo se tu chce naučit {{tag}}",
       "topic": "Vaše téma: {{category}}"
@@ -423,6 +426,7 @@
         "sentToast": "Otázka byla odeslána do chatu"
       },
       "leaveHint": "Ostatní budou pokračovat bez vás.",
+      "membersHeading": "Členové",
       "nextMeeting": {
         "body": "Zatím bez termínu. Navrhněte termín v chatu.",
         "label": "Další setkání"
@@ -435,6 +439,7 @@
         "label": "Tip pro skupinu"
       }
     },
+    "commonTime": "Všem vyhovuje:",
     "error": {
       "text": "Na naší straně se něco pokazilo. Váš kvintet je v bezpečí.",
       "title": "Váš přehled se nepodařilo načíst"
@@ -445,8 +450,6 @@
       "heading": "Váš kvintet se skládá",
       "leaveKvintet": "Opustit kvintet",
       "seatsStatus": "{{seats}} Z {{capacity}} MÍST · {{voted}} ZE {{total}} CHCE ZAČÍT",
-      "teachesWants": "učí {{offers}} · chce {{seeks}}",
-      "teachesWantsFallback": "učí {{role}}",
       "voteButton": "Začít hned",
       "voteHint": "Ostatní uvidí jen to, že jste hlasovali.",
       "votedDescription": "Hlasovali jste pro spuštění. Čeká se na ostatní.",

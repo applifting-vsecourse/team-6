@@ -230,7 +230,10 @@
     "loading": "Looking for kvintets that suit you…",
     "member": "Member",
     "members": {
+      "interests": "Interests",
       "openSeat": "Open seat",
+      "teaches": "Teaches",
+      "wantsToLearn": "Wants to learn",
       "you": "(you)"
     },
     "preferences": {
@@ -417,6 +420,7 @@
         "sentToast": "Question sent to chat"
       },
       "leaveHint": "The others carry on without you.",
+      "membersHeading": "Members",
       "nextMeeting": {
         "body": "No date yet. Suggest one in the chat.",
         "label": "Next meeting"
@@ -429,6 +433,7 @@
         "label": "Tip for the group"
       }
     },
+    "commonTime": "Times that suit everyone:",
     "error": {
       "text": "Something broke on our side. Your kvintet is safe.",
       "title": "We couldn't load your home page"
@@ -439,8 +444,6 @@
       "heading": "Your kvintet is forming",
       "leaveKvintet": "Leave kvintet",
       "seatsStatus": "{{seats}} OF {{capacity}} SEATS · {{voted}} OF {{total}} WANT TO START",
-      "teachesWants": "teaches {{offers}} · wants {{seeks}}",
-      "teachesWantsFallback": "teaches {{role}}",
       "voteButton": "Start now",
       "voteHint": "Others will only see that you voted.",
       "votedDescription": "You voted to start. Waiting for the others.",
