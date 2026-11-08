@@ -43,10 +43,7 @@ describe("LandingPage", () => {
     session.user = { id: "u1" }
     render(<LandingPage />)
 
-    expect(screen.getByRole("link", { name: "Go to Home" })).toHaveAttribute(
-      "href",
-      "/overview",
-    )
+    expect(screen.getByRole("link", { name: "Go to Home" })).toHaveAttribute("href", "/overview")
     expect(screen.queryByRole("link", { name: "Create account" })).not.toBeInTheDocument()
     expect(screen.queryByRole("link", { name: "Sign in" })).not.toBeInTheDocument()
   })
