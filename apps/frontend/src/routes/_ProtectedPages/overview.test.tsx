@@ -655,6 +655,55 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(await screen.findByRole("tooltip")).toHaveTextContent("Petr")
     })
 
+    it("previews the latest message from a member, never a system line", async () => {
+      myKvintetData = activeKvintet
+      messagesData = [
+        {
+          id: 1,
+          kind: "USER",
+          authorId: "u2",
+          authorName: "Petr",
+          authorUsername: "petr",
+          body: "Looking forward to our first meeting!",
+          createdAt: "2026-10-22T13:00:00Z",
+        },
+        {
+          id: 2,
+          kind: "SYSTEM",
+          authorId: null,
+          authorName: null,
+          authorUsername: null,
+          body: "kvintet_started",
+          createdAt: "2026-10-22T14:00:00Z",
+        },
+      ]
+
+      renderWithClient(<OverviewPage />)
+
+      expect(await screen.findByText("Looking forward to our first meeting!")).toBeInTheDocument()
+      expect(screen.queryByText("kvintet_started")).not.toBeInTheDocument()
+    })
+
+    it("shows the plain chat hint when the chat holds only system lines", async () => {
+      myKvintetData = activeKvintet
+      messagesData = [
+        {
+          id: 1,
+          kind: "SYSTEM",
+          authorId: null,
+          authorName: null,
+          authorUsername: null,
+          body: "kvintet_started",
+          createdAt: "2026-10-22T14:00:00Z",
+        },
+      ]
+
+      renderWithClient(<OverviewPage />)
+
+      expect(await screen.findByText("Plan your next meeting together.")).toBeInTheDocument()
+      expect(screen.queryByText("kvintet_started")).not.toBeInTheDocument()
+    })
+
     it("sends a member who has not seen the 'Kvintet begins' page there first", async () => {
       myKvintetData = { ...activeKvintet, beginsSeen: false }
 

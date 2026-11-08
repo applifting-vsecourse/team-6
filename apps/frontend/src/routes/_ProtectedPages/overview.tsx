@@ -104,6 +104,9 @@ function OverviewPage() {
     refetchInterval: false,
   })
 
+  // System lines ("kvintet_started", "Eva left") belong in the chat, not in this preview.
+  const lastMessage = messagesQuery.data?.messages.findLast((m) => m.kind === "USER")
+
   const joinKvintet = useJoinKvintet()
   const sendMessageMutation = useSendMessage(kvintet?.id ?? "")
 
@@ -528,21 +531,18 @@ function OverviewPage() {
                             {t("overview.active.chatHeading")}
                           </h3>
 
-                          {messagesQuery.data?.messages.length ? (
+                          {lastMessage ? (
                             <div className="flex w-full flex-col gap-1 rounded-md bg-secondary p-3 text-small">
                               <div className="flex items-baseline justify-between gap-2">
                                 <span className="font-medium text-foreground">
-                                  {messagesQuery.data.messages.at(-1)?.authorName ??
-                                    t("chat.deletedMember")}
+                                  {lastMessage.authorName ?? t("chat.deletedMember")}
                                 </span>
                                 <span className="text-meta text-muted-foreground">
-                                  {formatDate(
-                                    new Date(messagesQuery.data.messages.at(-1)!.createdAt),
-                                  )}
+                                  {formatDate(new Date(lastMessage.createdAt))}
                                 </span>
                               </div>
                               <p className="line-clamp-2 text-small text-muted-foreground">
-                                {messagesQuery.data.messages.at(-1)?.body}
+                                {lastMessage.body}
                               </p>
                             </div>
                           ) : (
