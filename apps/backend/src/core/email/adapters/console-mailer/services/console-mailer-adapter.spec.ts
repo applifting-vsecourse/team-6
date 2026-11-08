@@ -23,15 +23,15 @@ describe('ConsoleMailerAdapter', () => {
     process.env.NODE_ENV = 'development';
     await adapter.sendEmail(
       'alice@example.com',
-      'Password reset',
-      '<p>Click <a href="https://example.com/reset?token=secret12345">here</a></p>',
+      'Verify your email address',
+      '<p>Click <a href="https://example.com/verify?token=secret12345">here</a></p>',
     );
 
     expect(logSpy).toHaveBeenCalledTimes(1);
     const logged = logSpy.mock.calls[0][0];
     expect(logged).toContain('alice@example.com');
     expect(logged).toContain('token=secret12345');
-    expect(logged).toContain('Password reset');
+    expect(logged).toContain('Verify your email address');
     expect(warnSpy).not.toHaveBeenCalled();
   });
 
@@ -69,17 +69,17 @@ describe('ConsoleMailerAdapter', () => {
   it('preserves full HTML content in production fallback', async () => {
     process.env.NODE_ENV = 'production';
     const htmlContent =
-      '<div>Reset link: https://app.kvinted.cz/reset?token=xyz123</div>';
+      '<div>Verification link: https://app.kvinted.cz/verify?token=xyz123</div>';
     await adapter.sendEmail(
       'john.doe@kvintet.cz',
-      'Kvintet Password Reset',
+      'Verify your email address',
       htmlContent,
     );
 
     expect(logSpy).toHaveBeenCalledTimes(1);
     const logged = logSpy.mock.calls[0][0];
     expect(logged).toContain('john.doe@kvintet.cz');
-    expect(logged).toContain('Kvintet Password Reset');
+    expect(logged).toContain('Verify your email address');
     expect(logged).toContain('token=xyz123');
   });
 });

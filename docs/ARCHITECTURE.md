@@ -60,8 +60,6 @@ Abuse prevention and DoS mitigation operate on two coordinated layers:
    - **Credential endpoints (`customRules`):** Tight limits on sensitive mutation routes to block brute-force attacks:
      - `/sign-in/email`: 10 req / 60s
      - `/sign-up/email`: 5 req / 60s
-     - `/forget-password`: 5 req / 60s
-     - `/reset-password`: 5 req / 60s
 
 3. **Reverse Proxy & Client IP Resolution (`trust proxy`):**
    - Express is configured with `appInstance.set('trust proxy', trustProxyValue)` where `trustProxyValue` defaults to `1` (or the `TRUST_PROXY` environment variable).

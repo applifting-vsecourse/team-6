@@ -19,14 +19,6 @@ export const betterAuthCoreConfig: BetterAuthOptions = {
         window: 60,
         max: 5,
       },
-      '/forget-password': {
-        window: 60,
-        max: 5,
-      },
-      '/reset-password': {
-        window: 60,
-        max: 5,
-      },
     },
   },
   emailAndPassword: {

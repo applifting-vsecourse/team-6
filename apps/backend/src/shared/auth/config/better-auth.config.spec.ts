@@ -14,8 +14,6 @@ describe('betterAuthCoreConfig', () => {
     expect(rules).toBeDefined();
     expect(rules?.['/sign-in/email']).toEqual({ window: 60, max: 10 });
     expect(rules?.['/sign-up/email']).toEqual({ window: 60, max: 5 });
-    expect(rules?.['/forget-password']).toEqual({ window: 60, max: 5 });
-    expect(rules?.['/reset-password']).toEqual({ window: 60, max: 5 });
   });
 
   describe('resolveBetterAuthPlugins', () => {
