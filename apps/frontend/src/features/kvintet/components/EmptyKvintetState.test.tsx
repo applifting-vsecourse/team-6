@@ -4,6 +4,9 @@ import { describe, expect, it, vi } from "vitest"
 
 import { EmptyKvintetState } from "./EmptyKvintetState"
 
+// The grey blobatars use the gaze driver, which needs browser APIs jsdom lacks.
+vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
+
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ children, to, className }: { children?: ReactNode; to: string; className?: string }) => (
     <a

@@ -284,7 +284,7 @@ describe("ProfilePage", () => {
 
     expect(screen.getByText("Couldn't load profile")).toBeInTheDocument()
     expect(screen.getByText("An unexpected error occurred.")).toBeInTheDocument()
-    const retryBtn = screen.getByRole("button", { name: "Retry" })
+    const retryBtn = screen.getByRole("button", { name: "Try again" })
     await userEvent.click(retryBtn)
     expect(mockRefetch).toHaveBeenCalledOnce()
   })

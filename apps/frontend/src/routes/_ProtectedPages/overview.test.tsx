@@ -567,11 +567,19 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
   })
 
   describe("Loading and Error states", () => {
-    it("renders loading skeleton while query is loading", () => {
+    const callsTo = (path: string) =>
+      vi.mocked(api.get).mock.calls.filter(([url]) => (url as string).includes(path)).length
+    const profileCalls = () => callsTo("me/profile")
+    const kvintetCalls = () => callsTo("kvintets/mine")
+
+    it("renders loading skeleton under the greeting while query is loading", () => {
       // Mock never-resolving promise
       vi.mocked(api.get).mockReturnValue(new Promise(() => undefined) as never)
 
       const { container } = renderWithClient(<OverviewPage />)
+
+      expect(screen.getByRole("heading", { name: "Hi, Jana" })).toBeInTheDocument()
+      expect(screen.getByRole("status")).toHaveTextContent("Getting your home ready…")
       expect(container.querySelector(".animate-pulse")).toBeInTheDocument()
     })
 
@@ -585,12 +593,13 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       renderWithClient(<OverviewPage />)
 
-      const retryBtn = await screen.findByRole("button", { name: "Retry" })
-      expect(retryBtn).toBeInTheDocument()
+      expect(await screen.findByText("We couldn't load your home page")).toBeInTheDocument()
+      expect(screen.getByRole("heading", { name: "Hi, Jana" })).toBeInTheDocument()
+      const before = profileCalls()
 
-      // When retrying, it triggers a refetch
-      await userEvent.click(retryBtn)
-      expect(api.get).toHaveBeenCalledWith("me/profile")
+      // Retrying loads the profile again
+      await userEvent.click(screen.getByRole("button", { name: "Try again" }))
+      await waitFor(() => expect(profileCalls()).toBeGreaterThan(before))
     })
 
     it("renders error state with retry button when myKvintet query fails with 500 error", async () => {
@@ -607,11 +616,34 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       renderWithClient(<OverviewPage />)
 
-      const retryBtn = await screen.findByRole("button", { name: "Retry" })
-      expect(retryBtn).toBeInTheDocument()
+      expect(await screen.findByText("We couldn't load your home page")).toBeInTheDocument()
+      const profileBefore = profileCalls()
+      const kvintetBefore = kvintetCalls()
 
-      await userEvent.click(retryBtn)
-      expect(api.get).toHaveBeenCalledWith("kvintets/mine")
+      // Only the query that failed is loaded again
+      await userEvent.click(screen.getByRole("button", { name: "Try again" }))
+      await waitFor(() => expect(kvintetCalls()).toBeGreaterThan(kvintetBefore))
+      expect(profileCalls()).toBe(profileBefore)
+    })
+
+    it("loads both again with one retry when both queries failed", async () => {
+      vi.mocked(api.get).mockImplementation((path: unknown) => {
+        const p = String(path)
+        if (p.includes("me/profile") || p.includes("kvintets/mine")) {
+          return createErrorResponseMock(apiError(500, "internal_server_error")) as never
+        }
+        return createResponseMock({}) as never
+      })
+
+      renderWithClient(<OverviewPage />)
+
+      expect(await screen.findByText("We couldn't load your home page")).toBeInTheDocument()
+      const profileBefore = profileCalls()
+      const kvintetBefore = kvintetCalls()
+
+      await userEvent.click(screen.getByRole("button", { name: "Try again" }))
+      await waitFor(() => expect(profileCalls()).toBeGreaterThan(profileBefore))
+      await waitFor(() => expect(kvintetCalls()).toBeGreaterThan(kvintetBefore))
     })
   })
 })

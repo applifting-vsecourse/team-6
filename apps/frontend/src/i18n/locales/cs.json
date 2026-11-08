@@ -99,8 +99,9 @@
     "continue": "Pokračovat",
     "edit": "Upravit",
     "finish": "Hotovo",
-    "goHome": "Na úvodní stránku",
+    "goHome": "Zpět domů",
     "language": "Jazyk",
+    "loadingApp": "Načítáme…",
     "reload": "Načíst znovu",
     "retry": "Zkusit znovu",
     "saving": "Ukládání…",
@@ -138,8 +139,8 @@
     "kvintet_not_active": "Chat se otevře, jakmile bude kvintet aktivní.",
     "kvintet_not_open": "Tento návrh je plný nebo už není otevřený.",
     "not_found": "Nepodařilo se najít, co hledáte.",
-    "pageNotFound": "Stránka nenalezena",
-    "pageNotFoundDescription": "Stránka, kterou hledáte, neexistuje nebo byla přesunuta.",
+    "pageNotFound": "Tahle stránka neexistuje",
+    "pageNotFoundDescription": "Tenhle odkaz nikam nevede.",
     "signInFailed": "Přihlášení se nezdařilo",
     "signUpFailed": "Registrace se nezdařila",
     "somethingWentWrong": "Něco se pokazilo",
@@ -220,13 +221,14 @@
       "topicHint": "Stručně a konkrétně – podle toho vás lidé najdou."
     },
     "empty": {
-      "text": "Tady se objeví kvintety, které odpovídají vašemu profilu.",
-      "title": "Zatím pro vás nemáme žádný kvintet"
+      "text": "Buďte první – ostatní se přidají.",
+      "title": "Zatím tu nic není"
     },
     "emptyFiltered": {
-      "showAll": "Zrušit filtry",
-      "text": "Zkuste jiné filtry, nebo založte vlastní kvintet.",
-      "title": "Těmto filtrům zatím nic neodpovídá"
+      "showAll": "Zrušit filtr",
+      "text": "Zkuste jiné téma – nebo nějaké založte.",
+      "title": "V kategorii {{filter}} nic není",
+      "titleMany": "Pro tyto filtry nic nemáme"
     },
     "emptyState": {
       "description": "Vaše skupina se tu objeví, až se přidáte k návrhu.",
@@ -235,7 +237,7 @@
     },
     "error": {
       "retry": "Zkusit znovu",
-      "text": "Na naší straně se něco pokazilo. Zkuste to prosím znovu.",
+      "text": "Na naší straně se něco pokazilo.",
       "title": "Kvintety se nepodařilo načíst"
     },
     "fallback": "Vašemu profilu zatím žádný kvintet přesně neodpovídá, proto ukazujeme všechny otevřené, nejbližší první.",
@@ -251,7 +253,7 @@
     },
     "join": "Přidat se",
     "joined": "Přidali jste se k návrhu.",
-    "loading": "Načítáme kvintety…",
+    "loading": "Hledáme kvintety, které vám sednou…",
     "member": "Člen",
     "members": {
       "capacity": "{{count}} z 5",
@@ -493,6 +495,10 @@
         "label": "Tip pro skupinu"
       }
     },
+    "error": {
+      "text": "Na naší straně se něco pokazilo. Váš kvintet je v bezpečí.",
+      "title": "Váš přehled se nepodařilo načíst"
+    },
     "forming": {
       "canVoteDescription": "Začněte ve čtyřech hned, nebo počkejte na dalšího. Začne se, až budou souhlasit všichni čtyři.",
       "canVoteTitle": "Začít hned, nebo počkat na pátého?",
@@ -514,6 +520,7 @@
     },
     "greeting": "Ahoj, {{name}}",
     "greetingAnonymous": "Ahoj",
+    "loading": "Připravujeme váš přehled…",
     "nextStep": {
       "badge": "VÁŠ DALŠÍ KROK",
       "button": "Zobrazit návrhy",
