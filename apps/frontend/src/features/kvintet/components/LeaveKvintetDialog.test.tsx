@@ -22,7 +22,7 @@ describe("LeaveKvintetDialog", () => {
     expect(
       screen.getByRole("heading", { name: "Are you sure you want to leave?" }),
     ).toBeInTheDocument()
-    expect(screen.getByText(/You will leave this proposal/i)).toBeInTheDocument()
+    expect(screen.getByText(/You'll leave this kvintet/i)).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Leave" })).toBeInTheDocument()
     expect(document.body.querySelector("[data-slot=avatar]")).toBeInTheDocument()
