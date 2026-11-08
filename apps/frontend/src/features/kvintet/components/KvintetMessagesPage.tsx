@@ -24,7 +24,7 @@ export function KvintetMessagesPage({ renderChat }: KvintetMessagesPageProps) {
   if (!isLoading && !isError && kvintet?.status !== "ACTIVE") {
     return (
       <Navigate
-        to={ROUTES.myKvintet}
+        to={ROUTES.overview}
         replace
       />
     )
@@ -57,14 +57,14 @@ export function KvintetMessagesPage({ renderChat }: KvintetMessagesPageProps) {
             <header className="flex flex-col gap-1.5 border-b border-border px-4 py-3 md:flex-row md:items-center md:gap-4 md:border-b-0 md:p-0">
               <div className="flex min-w-0 flex-1 flex-col gap-1">
                 <Link
-                  to={ROUTES.myKvintet}
+                  to={ROUTES.overview}
                   className="inline-flex w-fit items-center gap-1 text-label font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
                 >
                   <ArrowLeft
                     className="size-4"
                     aria-hidden="true"
                   />
-                  {t("nav.myKvintet")}
+                  {t("nav.overview")}
                 </Link>
                 <h1 className="text-h3 md:text-h1">{kvintet.title}</h1>
                 <p className="hidden text-lead text-muted-foreground md:block">

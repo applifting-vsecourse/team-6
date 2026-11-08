@@ -55,7 +55,10 @@ describe("Step1Profile", () => {
     await userEvent.click(await screen.findByRole("button", { name: "Marketing & sales" }))
 
     await userEvent.click(screen.getByRole("button", { name: "Select role Marketing Specialist" }))
-    await userEvent.click(screen.getByRole("button", { name: "Add tag Excel" }))
+    // Every card suggests Excel while it has room; the first card is "What I can teach".
+    const [excelInTeach] = screen.getAllByRole("button", { name: "Add tag Excel" })
+    if (!excelInTeach) throw new Error("Excel suggestion missing")
+    await userEvent.click(excelInTeach)
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
 
     expect(onContinue).toHaveBeenCalledWith({

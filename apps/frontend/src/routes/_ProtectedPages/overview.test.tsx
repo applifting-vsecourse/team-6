@@ -42,6 +42,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
     ...actual,
     useNavigate: () => navigateMock,
     Link: ({ children, to }: { children?: ReactNode; to: string }) => <a href={to}>{children}</a>,
+    Navigate: ({ to }: { to: string }) => <p data-testid="navigate">{to}</p>,
   }
 })
 
@@ -68,6 +69,14 @@ const createErrorResponseMock = (error: Error) => {
     text: () => Promise.reject(error),
     json: () => Promise.reject(error),
   }
+}
+
+const commonAvailability = {
+  weekdays: false,
+  weekends: false,
+  mornings: false,
+  afternoons: false,
+  evenings: false,
 }
 
 const defaultProfile = {
@@ -219,6 +228,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
             capacity: 5,
             memberCount: 3,
             meetingFrequency: "BIWEEKLY",
+            commonAvailability,
             members: [
               { position: "Dev", teach: [], learn: [], interests: [] },
               { position: "PM", teach: [], learn: [], interests: [] },
@@ -233,6 +243,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
             capacity: 5,
             memberCount: 2,
             meetingFrequency: "WEEKLY",
+            commonAvailability,
             members: [
               { position: "Analyst", teach: [], learn: [], interests: [] },
               { position: "Dev", teach: [], learn: [], interests: [] },
@@ -260,6 +271,35 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(api.post).toHaveBeenCalledWith("kvintets/k-1/members")
     })
 
+    it("shows what every member shares and a labelled free seat on each card", async () => {
+      feedData = {
+        fallback: false,
+        items: [
+          {
+            id: "k-1",
+            title: "AI at work",
+            categories: ["software-development", "business"],
+            capacity: 5,
+            memberCount: 2,
+            meetingFrequency: "BIWEEKLY",
+            commonAvailability: { ...commonAvailability, evenings: true, weekdays: true },
+            members: [
+              { position: "Dev", teach: [], learn: [], interests: [] },
+              { position: "PM", teach: [], learn: [], interests: [] },
+            ],
+            reasons: [],
+          },
+        ],
+      }
+
+      renderWithClient(<OverviewPage />)
+
+      expect(await screen.findByText("evenings · weekdays · every 14 days")).toBeInTheDocument()
+      expect(screen.getByText("Software development")).toBeInTheDocument()
+      expect(screen.getByText("Business")).toBeInTheDocument()
+      expect(screen.getAllByText("Free")).toHaveLength(3)
+    })
+
     it("handles join failure by showing error toast and invalidating the feed", async () => {
       feedData = {
         fallback: false,
@@ -271,6 +311,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
             capacity: 5,
             memberCount: 4,
             meetingFrequency: null,
+            commonAvailability,
             members: [],
             reasons: [],
           },
@@ -395,6 +436,20 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(api.post).toHaveBeenCalledWith("kvintets/mine/vote")
     })
 
+    it("draws only you in colour, the others grey, and writes (you) once", async () => {
+      myKvintetData = formingKvintet
+
+      const { container } = renderWithClient(<OverviewPage />)
+      await screen.findByRole("heading", { name: /Your kvintet is forming/i })
+
+      const ring = [...container.querySelectorAll('[data-seat="member"]')]
+      const greyMembers = ring.filter((seat) => /ced4de/i.test(seat.innerHTML))
+      expect(ring.length).toBeGreaterThan(1)
+      expect(greyMembers).toHaveLength(ring.length - 1)
+      expect(screen.getByText(/\(you\)/)).toBeInTheDocument()
+      expect(screen.queryByText(/\(\(you\)\)/)).not.toBeInTheDocument()
+    })
+
     it("shows waiting variant when there are fewer than 3 members", async () => {
       myKvintetData = {
         ...formingKvintet,
@@ -439,7 +494,10 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       renderWithClient(<OverviewPage />)
 
-      const leaveButton = await screen.findByRole("button", { name: "Leave kvintet" })
+      // Two buttons, one per layout (beside "Who's here" on desktop, under the card on a phone);
+      // jsdom applies no CSS, so both exist here.
+      const [leaveButton] = await screen.findAllByRole("button", { name: "Leave kvintet" })
+      if (!leaveButton) throw new Error("Leave button missing")
       await userEvent.click(leaveButton)
 
       // Dialog opens
@@ -527,6 +585,15 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       const chatLink = screen.getByRole("link", { name: "Open chat" })
       expect(chatLink).toHaveAttribute("href", "/kvintet/messages")
+    })
+
+    it("sends a member who has not seen the 'Kvintet begins' page there first", async () => {
+      myKvintetData = { ...activeKvintet, beginsSeen: false }
+
+      renderWithClient(<OverviewPage />)
+
+      expect(await screen.findByTestId("navigate")).toHaveTextContent("/kvintet/begins")
+      expect(screen.queryByRole("heading", { name: "Your kvintet" })).not.toBeInTheDocument()
     })
 
     it("sends icebreaker question to chat when clicking 'Send to chat'", async () => {

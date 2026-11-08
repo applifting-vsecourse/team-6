@@ -12,39 +12,38 @@
   },
   "auth": {
     "acceptCodeOfConduct": "I agree to the <coc>community rules</coc>",
-    "confirmPassword": "Confirm password",
     "createAccount": "Create account",
     "editProfile": "Edit profile",
     "email": "Email",
     "emailPlaceholder": "e.g. jana@company.com",
     "haveAccount": "Already have an account?",
     "name": "Name",
+    "nameHint": "Others see it only once your kvintet starts.",
     "noAccountYet": "Don't have an account yet?",
     "password": "Password",
     "passwordHint_one": "At least {{count}} character",
     "passwordHint_other": "At least {{count}} characters",
     "preview": {
-      "caption": "Each blobatar is unique.",
-      "title": "That's you!"
+      "caption": "That's you! New username, new blobatar.",
+      "title": "This is how others will see you"
     },
     "signIn": "Sign in",
     "signInDescription": "Sign in with your email and password.",
     "signInTitle": "Welcome back",
     "signOut": "Sign out",
     "signUp": "Sign up",
+    "signUpDescription": "Then we'll find your kvintet.",
     "signUpTitle": "Create your account",
     "username": "Username",
-    "usernameHint": "Your blobatar is made from it. Others only see the blobatar.",
+    "usernameHint": "Your blobatar (avatar) is made from it. Others only see the blobatar.",
     "validation": {
       "codeOfConductRequired": "Please agree to the rules first.",
       "emailInvalid": "Invalid email",
       "emailRequired": "Email is required",
       "nameRequired": "Name is required",
-      "passwordConfirmationRequired": "Password confirmation is required",
       "passwordMin_one": "Password must be at least {{count}} character",
       "passwordMin_other": "Password must be at least {{count}} characters",
       "passwordRequired": "Password is required",
-      "passwordsMatch": "Passwords must match",
       "usernameRequired": "Username is required"
     }
   },
@@ -159,16 +158,6 @@
     "title": "How Kvintet works"
   },
   "kvintet": {
-    "actions": {
-      "leaveKvintet": "Leave kvintet",
-      "leaveKvintetHint": "If fewer than three members remain, the kvintet will be disbanded.",
-      "leaveProposal": "Leave proposal",
-      "leaveProposalHint": "You can only be in one proposal at a time. When someone joins or leaves, everyone's votes are reset.",
-      "reportIssue": "Report an issue",
-      "reportIssueHint": "Opens an email to support. Reports are confidential."
-    },
-    "activeSubtitle": "FORMED ON {{date}} · {{count}} MEMBERS",
-    "activeSubtitleWithPreferences": "FORMED ON {{date}} · {{count}} MEMBERS · SUITS EVERYONE: {{preferences}}",
     "alreadyMember": "You are already in a proposal.",
     "begins": {
       "dateAt": "{{date}} at {{time}}",
@@ -183,11 +172,6 @@
         "other": "The kvintet begins.",
         "three": "There are three of you. The kvintet begins."
       }
-    },
-    "chat": {
-      "description": "Arrange your first meeting in the group chat.",
-      "heading": "Group chat",
-      "openMessages": "Open messages"
     },
     "count_one": "{{formatted}} kvintet · best match first",
     "count_other": "{{formatted}} kvintets · best match first",
@@ -226,11 +210,6 @@
       "title": "Nothing in {{filter}}",
       "titleMany": "Nothing for these filters"
     },
-    "emptyState": {
-      "description": "Your group will appear here once you join a proposal.",
-      "title": "You are not in any kvintet yet",
-      "viewProposals": "Browse proposals"
-    },
     "error": {
       "retry": "Try again",
       "text": "Something broke on our side.",
@@ -252,25 +231,8 @@
     "loading": "Looking for kvintets that suit you…",
     "member": "Member",
     "members": {
-      "capacity": "{{count}} of 5",
-      "heading": "Members",
-      "interests": "Interests",
-      "namesHiddenHint": "You will see names once the kvintet is formed.",
-      "notVoted": "Not voted",
       "openSeat": "Open seat",
-      "teaches": "Teaches",
-      "votedYes": "For",
-      "waitingForFifth": "Waiting for the fifth member.",
-      "waitingForMember": "Waiting for another member.",
-      "wantsToLearn": "Wants to learn",
       "you": "(you)"
-    },
-    "myKvintetTitle": "My kvintet",
-    "nextSteps": {
-      "heading": "What happens next",
-      "step1": "With 3 or 4 members, the kvintet can start right away if everyone votes yes.",
-      "step2": "With 5 members, the kvintet forms automatically without voting.",
-      "step3": "Then you'll see each other's names and the group chat opens."
     },
     "preferences": {
       "afternoons": "Afternoons",
@@ -279,7 +241,6 @@
       "weekdays": "Weekdays",
       "weekends": "Weekends"
     },
-    "proposalSubtitle": "SUITS EVERYONE: {{preferences}}",
     "reasons": {
       "availability": "Same time options",
       "frequency": "Same meeting frequency",
@@ -291,19 +252,11 @@
       "topic": "Your topic: {{category}}"
     },
     "seatCount": "{{filled}} / {{total}}",
-    "seats": "{{filled}} of {{total}}",
     "startOwn": {
       "button": "Start a kvintet"
     },
     "started": "Your proposal is open. Others can join it now.",
-    "statusActive": "Active kvintet",
-    "statusProposal": "Proposal · {{count}} of 5",
     "subtitle": "Pick a kvintet by topic.",
-    "suitsAll": "Suits everyone: {{value}}",
-    "table": {
-      "description": "Arrange your first meeting in the group chat. You run the kvintet yourselves – no facilitator, no ratings.",
-      "title": "Five people, <em className=\"italic\">one table.</em>"
-    },
     "title": "Kvintets",
     "vacancy": "Free",
     "validation": {
@@ -313,15 +266,7 @@
       "titleTooLong": "The topic can be at most {{max}} characters"
     },
     "vote": {
-      "button": "Yes, start now",
-      "countText": "{{voted}} of {{total}} members want to start now.",
-      "hint": "Cast your vote too – or wait for the fifth member, then the kvintet forms automatically.",
-      "notStartedHint": "Voting opens when 3 members join (currently {{count}} of 5). With 3 or 4 members, a kvintet can start early if everyone agrees. With 5 members, it forms automatically.",
-      "notStartedTitle": "Early start voting",
-      "requirement": "The kvintet starts immediately once all members vote yes ({{remaining}} needed). With 5 members, it forms automatically.",
-      "title": "Start now?",
       "voted": "Voted",
-      "votedHint": "Your vote has been recorded. Waiting for other members or a fifth member to join. If anyone joins or leaves, votes reset and everyone votes again.",
       "voting": "Submitting…"
     }
   },
@@ -372,17 +317,16 @@
     "WEEKLY": "every week"
   },
   "nav": {
-    "kvintetFeed": "Proposals",
+    "kvintetFeed": "Kvintets",
     "kvintetFeedDisabled": "You are already in a kvintet, so you can't browse other proposals.",
-    "myKvintet": "My kvintet",
-    "overview": "Overview",
+    "overview": "Home",
     "profile": "Profile"
   },
   "onboarding": {
     "step1": {
       "addRole": "Select role {{name}}",
       "addTag": "Add tag {{name}}",
-      "description": "We'll suggest groups based on your profile. Others will see your role and tags – never a photo.",
+      "description": "Others see your role and tags. Your name only once the kvintet starts.",
       "fields": {
         "data": "Data & AI",
         "design": "Design",
@@ -403,11 +347,9 @@
       "searchAllRoles": "Not here? Search all roles",
       "searchRoleAria": "Search role",
       "searchRolePlaceholder": "Search role…",
-      "searchTagsAria": "Search tags in {{section}}",
-      "searchTagsPlaceholder": "Search tags…",
       "teachHint": "Pick any number of tags.",
       "teachTitle": "What I can teach",
-      "title": "Tell us about yourself"
+      "title": "Tell us about you"
     },
     "step2": {
       "afternoons": "Afternoons",

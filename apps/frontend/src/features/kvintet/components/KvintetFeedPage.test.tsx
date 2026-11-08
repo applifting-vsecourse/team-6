@@ -28,6 +28,14 @@ const reference = {
   ],
 }
 
+const commonAvailability = {
+  weekdays: false,
+  weekends: false,
+  mornings: false,
+  afternoons: false,
+  evenings: false,
+}
+
 const kvintet = (id: string, title: string, overrides: Partial<FeedKvintet> = {}): FeedKvintet => ({
   id,
   title,
@@ -35,6 +43,7 @@ const kvintet = (id: string, title: string, overrides: Partial<FeedKvintet> = {}
   capacity: 5,
   memberCount: 1,
   meetingFrequency: null,
+  commonAvailability,
   members: [{ position: "Accountant", teach: ["excel"], learn: [], interests: [] }],
   reasons: [],
   ...overrides,
@@ -140,14 +149,14 @@ describe("KvintetFeedPage", () => {
     expect(screen.queryByText("We couldn't load the kvintets")).not.toBeInTheDocument()
   })
 
-  it("joins a kvintet, confirms and leaves for My kvintet", async () => {
+  it("joins a kvintet, confirms and leaves for Home", async () => {
     serve(() => Promise.resolve([kvintet("k1", "From Excel to Python")]))
     renderPage()
 
     await userEvent.click(await screen.findByRole("button", { name: "Join" }))
 
     expect(api.post).toHaveBeenCalledWith("kvintets/k1/members")
-    await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/kvintet" }))
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/overview" }))
     expect(toast.success).toHaveBeenCalledWith("You joined the proposal.")
   })
 
@@ -295,7 +304,7 @@ describe("starting a kvintet", () => {
     expect(api.post).not.toHaveBeenCalled()
   })
 
-  it("creates the kvintet and leaves for My kvintet", async () => {
+  it("creates the kvintet and leaves for Home", async () => {
     const dialog = await openDialog()
 
     await userEvent.type(
@@ -310,7 +319,7 @@ describe("starting a kvintet", () => {
         json: { title: "How to use AI in a small firm", categorySlugs: ["business"] },
       }),
     )
-    await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/kvintet" }))
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/overview" }))
     expect(toast.success).toHaveBeenCalledWith("Your proposal is open. Others can join it now.")
   })
 

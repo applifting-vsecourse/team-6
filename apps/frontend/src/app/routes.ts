@@ -7,7 +7,6 @@ export const ROUTES = {
   overview: "/overview",
   profile: "/profile",
   kvintetFeed: "/kvintet/feed",
-  myKvintet: "/kvintet",
   kvintetMessages: "/kvintet/messages",
   kvintetBegins: "/kvintet/begins",
   onboarding: "/onboarding",

@@ -5,6 +5,14 @@ import { describe, expect, it, vi } from "vitest"
 import type { FeedKvintet } from "@/features/kvintet/api/kvintetFeedQueryOptions"
 import { KvintetCard } from "@/features/kvintet/components/KvintetCard"
 
+const commonAvailability = {
+  weekdays: false,
+  weekends: false,
+  mornings: false,
+  afternoons: false,
+  evenings: false,
+}
+
 const kvintet: FeedKvintet = {
   id: "k1",
   title: "Using AI at work",
@@ -12,6 +20,7 @@ const kvintet: FeedKvintet = {
   capacity: 5,
   memberCount: 2,
   meetingFrequency: "BIWEEKLY",
+  commonAvailability,
   members: [
     {
       position: "Backend developer",

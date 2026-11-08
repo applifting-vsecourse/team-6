@@ -73,7 +73,7 @@ export function KvintetBeginsPage() {
   if (!kvintet || !isActive) {
     return (
       <Navigate
-        to={ROUTES.myKvintet}
+        to={ROUTES.overview}
         replace
       />
     )
@@ -126,7 +126,7 @@ export function KvintetBeginsPage() {
             asChild
             variant="outline"
           >
-            <Link to={ROUTES.myKvintet}>{t("kvintet.begins.seeMembers")}</Link>
+            <Link to={ROUTES.overview}>{t("kvintet.begins.seeMembers")}</Link>
           </Button>
         </div>
       </div>

@@ -34,9 +34,8 @@ describe("MobileMenu", () => {
 
     const nav = within(menu.getByRole("navigation", { name: "Main navigation" }))
     expect(nav.getAllByRole("link").map((link) => link.textContent)).toEqual([
-      "Overview",
-      "Proposals",
-      "My kvintet",
+      "Home",
+      "Kvintets",
       "Group chat3 unread messages3",
     ])
     expect(nav.getByText("3 unread messages")).toBeInTheDocument()
@@ -68,7 +67,7 @@ describe("MobileMenu", () => {
       />,
     )
 
-    expect(menu.getByRole("link", { name: "Proposals" })).toHaveAttribute("aria-disabled", "true")
+    expect(menu.getByRole("link", { name: "Kvintets" })).toHaveAttribute("aria-disabled", "true")
   })
 
   it("has language, theme and the footer links for everyone", async () => {

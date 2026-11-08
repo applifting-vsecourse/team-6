@@ -74,6 +74,13 @@ export class KvintetService {
           memberCount: kvintet.members.length,
           // Only when every member agrees; null otherwise.
           meetingFrequency: frequencies.size === 1 ? [...frequencies][0] : null,
+          commonAvailability: {
+            weekdays: kvintet.members.every(({ match }) => match.weekdays),
+            weekends: kvintet.members.every(({ match }) => match.weekends),
+            mornings: kvintet.members.every(({ match }) => match.mornings),
+            afternoons: kvintet.members.every(({ match }) => match.afternoons),
+            evenings: kvintet.members.every(({ match }) => match.evenings),
+          },
           members: kvintet.members.map((member) => ({
             position: member.position,
             teach: member.teach,
