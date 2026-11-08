@@ -12,6 +12,7 @@
   },
   "auth": {
     "acceptCodeOfConduct": "Souhlasím s <coc>pravidly komunity</coc>",
+    "confirmPassword": "Potvrzení hesla",
     "createAccount": "Vytvořit účet",
     "editProfile": "Upravit profil",
     "email": "E-mail",
@@ -41,10 +42,12 @@
       "emailInvalid": "Neplatný e-mail",
       "emailRequired": "Zadejte e-mail",
       "nameRequired": "Zadejte jméno",
+      "passwordConfirmationRequired": "Potvrďte heslo",
       "passwordMin_few": "Heslo musí mít alespoň {{count}} znaky",
       "passwordMin_one": "Heslo musí mít alespoň {{count}} znak",
       "passwordMin_other": "Heslo musí mít alespoň {{count}} znaků",
       "passwordRequired": "Zadejte heslo",
+      "passwordsMatch": "Hesla se musí shodovat",
       "usernameRequired": "Zadejte uživatelské jméno"
     }
   },

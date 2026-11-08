@@ -12,6 +12,7 @@
   },
   "auth": {
     "acceptCodeOfConduct": "I agree to the <coc>community rules</coc>",
+    "confirmPassword": "Confirm password",
     "createAccount": "Create account",
     "editProfile": "Edit profile",
     "email": "Email",
@@ -40,9 +41,11 @@
       "emailInvalid": "Invalid email",
       "emailRequired": "Email is required",
       "nameRequired": "Name is required",
+      "passwordConfirmationRequired": "Password confirmation is required",
       "passwordMin_one": "Password must be at least {{count}} character",
       "passwordMin_other": "Password must be at least {{count}} characters",
       "passwordRequired": "Password is required",
+      "passwordsMatch": "Passwords must match",
       "usernameRequired": "Username is required"
     }
   },

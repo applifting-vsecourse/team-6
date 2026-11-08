@@ -45,6 +45,7 @@ async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Username"), "jan")
   await user.type(screen.getByLabelText("Email"), "jan@novak.cz")
   await user.type(screen.getByLabelText("Password"), "password1")
+  await user.type(screen.getByLabelText("Confirm password"), "password1")
 }
 
 describe("SignUpForm code of conduct consent", () => {
@@ -82,12 +83,28 @@ describe("SignUpForm code of conduct consent", () => {
 })
 
 describe("SignUpForm password rules", () => {
+  it("rejects passwords that do not match", async () => {
+    const user = userEvent.setup()
+    const onSubmit = await renderForm()
+    await fillRequiredFields(user)
+    await user.clear(screen.getByLabelText("Confirm password"))
+    await user.type(screen.getByLabelText("Confirm password"), "different1")
+    await user.click(screen.getByRole("checkbox"))
+
+    await user.click(screen.getByRole("button", { name: "Create account" }))
+
+    expect(await screen.findByText("Passwords must match")).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
   it("rejects passwords shorter than 8 characters", async () => {
     const user = userEvent.setup()
     const onSubmit = await renderForm()
     await fillRequiredFields(user)
     await user.clear(screen.getByLabelText("Password"))
+    await user.clear(screen.getByLabelText("Confirm password"))
     await user.type(screen.getByLabelText("Password"), "short")
+    await user.type(screen.getByLabelText("Confirm password"), "short")
     await user.click(screen.getByRole("checkbox"))
 
     await user.click(screen.getByRole("button", { name: "Create account" }))
