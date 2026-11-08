@@ -70,11 +70,15 @@
     "deletedMember": "Smazaný člen",
     "empty": "Zatím žádné zprávy. Pozdravte svůj kvintet.",
     "error": "Zprávy se nepodařilo načíst.",
+    "members": "Členové kvintetu",
     "newMessages": "Nové zprávy",
     "pageTitle": "Zprávy",
     "retry": "Zkusit znovu",
     "showEarlier": "Zobrazit starší zprávy",
-    "subtitle": "{{names}} · zprávy čtou jen členové",
+    "subtitle": "Zprávy čtou jen členové skupiny.",
+    "system": {
+      "kvintetStarted": "Kvintet začal. Pozdravte se!"
+    },
     "you": "Vy"
   },
   "codeOfConduct": {

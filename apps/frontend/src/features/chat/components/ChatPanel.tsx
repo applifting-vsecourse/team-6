@@ -36,12 +36,13 @@ export function ChatPanel({ kvintetId, currentUserId }: ChatPanelProps) {
   }
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-lg border border-border">
+    <div className="flex flex-col overflow-hidden md:rounded-lg md:border md:border-border md:bg-card">
       <div className="relative">
+        {/* flex column: a short list sits at the bottom, next to the composer (mt-auto on the list). */}
         <div
           ref={scrollerRef}
           onScroll={scroll.onScroll}
-          className="h-[60dvh] min-h-80 overflow-y-auto px-4 py-6 sm:px-6"
+          className="flex h-[65dvh] min-h-80 flex-col overflow-y-auto px-4 py-4 md:h-[60dvh] md:px-7 md:py-6"
         >
           {chat.isLoading ? (
             <div
@@ -87,7 +88,7 @@ export function ChatPanel({ kvintetId, currentUserId }: ChatPanelProps) {
                   ) : null}
                 </div>
               )}
-              <ul className="flex flex-col gap-5">
+              <ul className="mt-auto flex flex-col gap-3.5 md:gap-4.5">
                 {messages?.map((message, index) => {
                   const previous = messages[index - 1]
                   return (

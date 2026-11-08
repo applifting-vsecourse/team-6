@@ -6,6 +6,9 @@ export const MESSAGE_PAGE_SIZE = 50;
 /** Upper bound of a page after `after=<id>`, so `after=0` cannot return the whole history. */
 export const MESSAGE_POLL_LIMIT = 100;
 
+/** Body of the SYSTEM line posted when a kvintet starts. A code, not text: the client translates it. */
+export const KVINTET_STARTED = 'kvintet_started';
+
 export type ChatMessage = {
   id: number;
   kind: MessageKind;
