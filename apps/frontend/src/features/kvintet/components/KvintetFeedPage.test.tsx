@@ -331,8 +331,6 @@ describe("starting a kvintet", () => {
     await pickCategory("Software development")
     await userEvent.click(within(dialog).getByRole("button", { name: "Start a kvintet" }))
 
-    expect(
-      await screen.findByText("You are already in a kvintet."),
-    ).toBeInTheDocument()
+    expect(await screen.findByText("You are already in a kvintet.")).toBeInTheDocument()
   })
 })
