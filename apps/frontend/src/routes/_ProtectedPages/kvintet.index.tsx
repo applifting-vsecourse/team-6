@@ -1,7 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, redirect } from "@tanstack/react-router"
 
-import { MyKvintetPage } from "@/features/kvintet/components/MyKvintetPage"
+import { ROUTES } from "@/app/routes"
 
+// Figma has no page for it: Home (H3, H4) shows the kvintet, so the old address leads there.
 export const Route = createFileRoute("/_ProtectedPages/kvintet/")({
-  component: MyKvintetPage,
+  beforeLoad: () => {
+    throw redirect({ to: ROUTES.overview, replace: true })
+  },
 })

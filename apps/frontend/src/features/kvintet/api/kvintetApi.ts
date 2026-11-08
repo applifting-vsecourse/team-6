@@ -53,6 +53,8 @@ export const kvintetDetailsSchema = z.object({
   openSeatsCount: z.number(),
   members: z.array(kvintetMemberSchema),
   voteStatus: kvintetVoteStatusSchema,
+  // The caller has opened the "Kvintet begins" page; /kvintet sends them there until then.
+  beginsSeen: z.boolean(),
 })
 
 export type KvintetDetails = z.infer<typeof kvintetDetailsSchema>
@@ -79,6 +81,10 @@ export const myKvintetQueryOptions = () =>
 export async function voteToStartKvintet(): Promise<KvintetDetails> {
   const json = await api.post("kvintets/mine/vote").json<unknown>()
   return kvintetDetailsSchema.parse(json)
+}
+
+export async function markBeginsSeen(): Promise<void> {
+  await api.post("kvintets/mine/begins-seen")
 }
 
 export async function leaveKvintet(): Promise<{ success: boolean }> {

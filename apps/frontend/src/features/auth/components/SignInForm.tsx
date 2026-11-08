@@ -51,13 +51,13 @@ export function SignInForm({ isLoading, errorMessage, onSubmit }: SignInFormProp
       <form
         noValidate
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-5"
+        className="flex flex-col gap-5 md:gap-4.5"
       >
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="gap-1.5">
               <FormLabel>{t("auth.email")}</FormLabel>
               <FormControl>
                 <Input
@@ -76,7 +76,7 @@ export function SignInForm({ isLoading, errorMessage, onSubmit }: SignInFormProp
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="gap-1.5">
               <FormLabel>{t("auth.password")}</FormLabel>
               <FormControl>
                 <Input

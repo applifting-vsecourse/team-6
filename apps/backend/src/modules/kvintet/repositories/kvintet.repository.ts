@@ -8,6 +8,7 @@ import {
   type MeetingFrequency,
   type ProfileTagKind,
 } from '@/generated/prisma/client';
+import { KVINTET_STARTED } from '@/modules/chat/domain/message';
 import {
   CommonPreferences,
   JoinOutcome,
@@ -212,6 +213,20 @@ export class KvintetRepository {
     }
   }
 
+  /** Opens the chat: the status flips and the chat's first line is posted in the same transaction. */
+  private async activateInTransaction(
+    tx: TransactionClient,
+    kvintetId: string,
+  ): Promise<void> {
+    await tx.kvintet.update({
+      where: { id: kvintetId },
+      data: { status: 'ACTIVE', activatedAt: new Date() },
+    });
+    await tx.message.create({
+      data: { kvintetId, kind: 'SYSTEM', body: KVINTET_STARTED },
+    });
+  }
+
   /** Locks the kvintet row so two requests cannot both take the last seat. */
   async join(userId: string, kvintetId: string): Promise<JoinOutcome> {
     try {
@@ -228,10 +243,7 @@ export class KvintetRepository {
         await tx.kvintetVote.deleteMany({ where: { kvintetId } });
         await tx.kvintetMember.create({ data: { kvintetId, userId } });
         if (members + 1 === KVINTET_CAPACITY) {
-          await tx.kvintet.update({
-            where: { id: kvintetId },
-            data: { status: 'ACTIVE', activatedAt: new Date() },
-          });
+          await this.activateInTransaction(tx, kvintetId);
         }
         return 'joined';
       });
@@ -413,7 +425,20 @@ export class KvintetRepository {
         votedCount,
         totalCount,
       },
+      beginsSeen: membership.beginsSeenAt !== null,
     };
+  }
+
+  /**
+   * Records that the caller has seen the "Kvintet begins" page. Only an ACTIVE kvintet counts, so
+   * a call while it is still forming cannot skip the page, and the first mark wins when called
+   * again. Matching no row (not a member) is not an error.
+   */
+  async markBeginsSeen(userId: string): Promise<void> {
+    await this.prisma.kvintetMember.updateMany({
+      where: { userId, beginsSeenAt: null, kvintet: { status: 'ACTIVE' } },
+      data: { beginsSeenAt: new Date() },
+    });
   }
 
   async vote(kvintetId: string, userId: string): Promise<void> {
@@ -490,13 +515,7 @@ export class KvintetRepository {
 
       const updatedVotesCount = kvintet.votes.length + 1;
       if (updatedVotesCount >= memberCount) {
-        await tx.kvintet.update({
-          where: { id: kvintetId },
-          data: {
-            status: 'ACTIVE',
-            activatedAt: new Date(),
-          },
-        });
+        await this.activateInTransaction(tx, kvintetId);
       }
     });
   }

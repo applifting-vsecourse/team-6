@@ -127,6 +127,20 @@ export class KvintetController {
     };
   }
 
+  @Post('mine/begins-seen')
+  @UseGuards(MemberGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Mark the "Kvintet begins" page as seen',
+    description:
+      'Records that the caller has opened the page. Does nothing while the kvintet is still forming and when it is already marked.',
+  })
+  @ApiUnauthorizedResponse({ description: 'Not signed in' })
+  @ApiForbiddenResponse({ description: 'Not a member of any kvintet' })
+  markBeginsSeen(@User() user: Identity): Promise<void> {
+    return this.service.markBeginsSeen(user.id);
+  }
+
   @Delete('mine/membership')
   @UseGuards(MemberGuard)
   @HttpCode(HttpStatus.OK)

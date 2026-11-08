@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Link } from "@tanstack/react-router"
 import type { TFunction } from "i18next"
@@ -8,7 +8,6 @@ import { Trans, useTranslation } from "react-i18next"
 import { z } from "zod"
 
 import { ROUTES } from "@/app/routes"
-import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -26,31 +25,22 @@ import { Input } from "@/components/ui/input"
 const PASSWORD_MIN_LENGTH = 8
 
 const createSchema = (t: TFunction) =>
-  z
-    .object({
-      email: z
-        .string()
-        .trim()
-        .min(1, t("auth.validation.emailRequired"))
-        .email(t("auth.validation.emailInvalid")),
-      name: z.string().trim().min(1, t("auth.validation.nameRequired")),
-      username: z.string().trim().min(1, t("auth.validation.usernameRequired")),
-      password: z
-        .string()
-        .trim()
-        .min(PASSWORD_MIN_LENGTH, t("auth.validation.passwordMin", { count: PASSWORD_MIN_LENGTH })),
-      passwordConfirmation: z
-        .string()
-        .trim()
-        .min(1, t("auth.validation.passwordConfirmationRequired")),
-      acceptCodeOfConduct: z.boolean().refine((isAccepted) => isAccepted, {
-        message: t("auth.validation.codeOfConductRequired"),
-      }),
-    })
-    .refine((values) => values.password === values.passwordConfirmation, {
-      message: t("auth.validation.passwordsMatch"),
-      path: ["passwordConfirmation"],
-    })
+  z.object({
+    email: z
+      .string()
+      .trim()
+      .min(1, t("auth.validation.emailRequired"))
+      .email(t("auth.validation.emailInvalid")),
+    name: z.string().trim().min(1, t("auth.validation.nameRequired")),
+    username: z.string().trim().min(1, t("auth.validation.usernameRequired")),
+    password: z
+      .string()
+      .trim()
+      .min(PASSWORD_MIN_LENGTH, t("auth.validation.passwordMin", { count: PASSWORD_MIN_LENGTH })),
+    acceptCodeOfConduct: z.boolean().refine((isAccepted) => isAccepted, {
+      message: t("auth.validation.codeOfConductRequired"),
+    }),
+  })
 
 type FormValues = z.infer<ReturnType<typeof createSchema>>
 
@@ -59,23 +49,37 @@ const defaultValues: FormValues = {
   name: "",
   username: "",
   password: "",
-  passwordConfirmation: "",
   acceptCodeOfConduct: false,
 }
 
 type SignUpFormProps = {
   isLoading: boolean
   errorMessage?: string | null
+  /** Server rejected the e-mail (already taken): shown under the field, not in the alert. */
+  emailError?: string | null
+  /** Lets the page draw the live avatar preview from what is being typed. */
+  onUsernameChange?: (value: string) => void
   onSubmit: (values: FormValues) => void | Promise<void>
 }
 
-export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProps) {
+export function SignUpForm({
+  isLoading,
+  errorMessage,
+  emailError,
+  onUsernameChange,
+  onSubmit,
+}: SignUpFormProps) {
   const { t } = useTranslation()
   const schema = useMemo(() => createSchema(t), [t])
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues,
   })
+  const { setError } = form
+
+  useEffect(() => {
+    if (emailError) setError("email", { message: emailError })
+  }, [emailError, setError])
 
   return (
     <Form {...form}>
@@ -96,6 +100,7 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
                   {...field}
                 />
               </FormControl>
+              <FormDescription>{t("auth.nameHint")}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -107,18 +112,16 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t("auth.username")}</FormLabel>
-              <div className="flex items-center gap-3">
-                <FormControl>
-                  <Input
-                    autoComplete="username"
-                    {...field}
-                  />
-                </FormControl>
-                <GazeBlobatar
-                  name={field.value.trim()}
-                  className="size-16"
+              <FormControl>
+                <Input
+                  autoComplete="username"
+                  {...field}
+                  onChange={(event) => {
+                    field.onChange(event)
+                    onUsernameChange?.(event.target.value)
+                  }}
                 />
-              </div>
+              </FormControl>
               <FormDescription>{t("auth.usernameHint")}</FormDescription>
               <FormMessage />
             </FormItem>
@@ -160,24 +163,6 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
               <FormDescription>
                 {t("auth.passwordHint", { count: PASSWORD_MIN_LENGTH })}
               </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="passwordConfirmation"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("auth.confirmPassword")}</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  autoComplete="new-password"
-                  {...field}
-                />
-              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -232,7 +217,7 @@ export function SignUpForm({ isLoading, errorMessage, onSubmit }: SignUpFormProp
           disabled={isLoading}
         >
           {isLoading ? <Loader2 className="size-4 animate-spin" /> : null}
-          {t("auth.signUp")}
+          {t("auth.createAccount")}
         </Button>
       </form>
     </Form>

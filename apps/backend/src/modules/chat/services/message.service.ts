@@ -1,4 +1,8 @@
-import { ChatCursor, ChatMessage } from '@/modules/chat/domain/message';
+import {
+  ChatCursor,
+  ChatMessage,
+  UnreadState,
+} from '@/modules/chat/domain/message';
 import { MessageRepository } from '@/modules/chat/repositories/message.repository';
 import { ValidationFailedException } from '@/shared/errors/validation.pipe';
 import {
@@ -33,6 +37,24 @@ export class MessageService {
     if (!access) throw notMember();
     if (!access.active) throw notActive();
     return this.repository.list(access.kvintetId, cursor);
+  }
+
+  /** A forming kvintet is `active: false`, not an error, so the header can poll this without 409s. */
+  async unread(userId: string): Promise<UnreadState> {
+    const access = await this.repository.findAccess(userId);
+    if (!access) throw notMember();
+    if (!access.active) return { active: false, count: 0 };
+    return {
+      active: true,
+      count: await this.repository.countUnread(userId, access.kvintetId),
+    };
+  }
+
+  async markRead(userId: string, lastMessageId: number): Promise<void> {
+    const access = await this.repository.findAccess(userId);
+    if (!access) throw notMember();
+    if (!access.active) throw notActive();
+    await this.repository.markRead(userId, access.kvintetId, lastMessageId);
   }
 
   async send(userId: string, body: string): Promise<ChatMessage> {

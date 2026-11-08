@@ -30,11 +30,18 @@ describe("ThemeSwitcher", () => {
     const user = userEvent.setup()
     render(<ThemeSwitcher variant="pills" />)
 
-    expect(screen.getByRole("button", { name: "Light" })).toHaveAttribute("aria-pressed", "true")
+    expect(screen.getByRole("radiogroup", { name: "Theme" })).toBeInTheDocument()
+    expect(screen.getByRole("radio", { name: "Light" })).toBeChecked()
 
-    await user.click(screen.getByRole("button", { name: "Dark" }))
+    await user.click(screen.getByRole("radio", { name: "Dark" }))
 
-    expect(screen.getByRole("button", { name: "Dark" })).toHaveAttribute("aria-pressed", "true")
-    expect(screen.getByRole("button", { name: "Light" })).toHaveAttribute("aria-pressed", "false")
+    expect(screen.getByRole("radio", { name: "Dark" })).toBeChecked()
+    expect(screen.getByRole("radio", { name: "Light" })).not.toBeChecked()
+    expect(document.documentElement).toHaveClass("dark")
+
+    // Clicking the selected one again must not leave the app without a theme.
+    await user.click(screen.getByRole("radio", { name: "Dark" }))
+
+    expect(screen.getByRole("radio", { name: "Dark" })).toBeChecked()
   })
 })

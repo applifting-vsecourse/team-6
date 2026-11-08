@@ -9,7 +9,10 @@ import { chatKeys } from "./chatKeys"
 export const MESSAGE_PAGE_SIZE = 50
 export const MESSAGE_POLL_LIMIT = 100
 export const MESSAGE_MAX_LENGTH = 1000
+/** Body of the SYSTEM line the backend posts when a kvintet starts: a code, translated here. */
+export const KVINTET_STARTED = "kvintet_started"
 const POLL_INTERVAL_MS = 5_000
+const UNREAD_POLL_INTERVAL_MS = 10_000
 
 export const messageSchema = z.object({
   id: z.number(),
@@ -67,3 +70,26 @@ export const messagesQueryOptions = (kvintetId: string) =>
     refetchInterval: POLL_INTERVAL_MS,
     refetchIntervalInBackground: false,
   })
+
+const unreadSchema = z.object({
+  // False while the kvintet is still forming: there is no chat to have unread messages in.
+  active: z.boolean(),
+  count: z.number(),
+})
+
+export type UnreadState = z.infer<typeof unreadSchema>
+
+/** For the app header, which only needs the number and whether the chat exists yet. */
+export const unreadQueryOptions = () =>
+  queryOptions({
+    queryKey: chatKeys.unread(),
+    queryFn: async () =>
+      unreadSchema.parse(await api.get("kvintets/mine/messages/unread").json<unknown>()),
+    refetchInterval: UNREAD_POLL_INTERVAL_MS,
+    refetchIntervalInBackground: false,
+  })
+
+/** Tells the server the newest message the reader has seen. No response body (204). */
+export const markMessagesRead = async (lastMessageId: number) => {
+  await api.post("kvintets/mine/messages/read", { json: { lastMessageId } })
+}

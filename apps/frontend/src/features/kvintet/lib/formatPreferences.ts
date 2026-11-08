@@ -1,39 +1,20 @@
 import type { TFunction } from "i18next"
 
-import type { CommonPreferences } from "@/features/kvintet/api/kvintetApi"
+import type { FeedKvintet } from "@/features/kvintet/api/kvintetFeedQueryOptions"
 
-export function formatCommonPreferences(
-  preferences: CommonPreferences | null | undefined,
+const AVAILABILITY = ["mornings", "afternoons", "evenings", "weekdays", "weekends"] as const
+
+/** What every member has in common, e.g. "evenings · weekdays · every 14 days". Never a place. */
+export function formatSharedPreferences(
+  kvintet: Pick<FeedKvintet, "commonAvailability" | "meetingFrequency">,
   t: TFunction,
-): string | null {
-  if (!preferences) return null
-
-  const parts: string[] = []
-
-  if (preferences.city) {
-    parts.push(preferences.city.toUpperCase())
-  }
-
-  if (preferences.mornings) {
-    parts.push(String(t("kvintet.preferences.mornings")).toUpperCase())
-  }
-  if (preferences.afternoons) {
-    parts.push(String(t("kvintet.preferences.afternoons")).toUpperCase())
-  }
-  if (preferences.evenings) {
-    parts.push(String(t("kvintet.preferences.evenings")).toUpperCase())
-  }
-
-  if (preferences.weekdays) {
-    parts.push(String(t("kvintet.preferences.weekdays")).toUpperCase())
-  }
-  if (preferences.weekends) {
-    parts.push(String(t("kvintet.preferences.weekends")).toUpperCase())
-  }
-
-  if (preferences.meetingFrequency) {
-    parts.push(String(t(`meetingFrequency.${preferences.meetingFrequency}`)).toUpperCase())
-  }
-
-  return parts.length > 0 ? parts.join(" · ") : null
+): string {
+  return [
+    ...AVAILABILITY.filter((key) => kvintet.commonAvailability[key]).map((key) =>
+      String(t(`kvintet.preferences.${key}`)).toLowerCase(),
+    ),
+    kvintet.meetingFrequency ? String(t(`meetingFrequency.${kvintet.meetingFrequency}`)) : null,
+  ]
+    .filter(Boolean)
+    .join(" · ")
 }

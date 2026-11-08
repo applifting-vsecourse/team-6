@@ -1,10 +1,14 @@
 import { useCallback, useMemo, useState } from "react"
+import { Check } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { cn } from "@/lib/utils"
 
+import { OnboardingCard } from "@/features/profile/components/OnboardingCard"
 import { TagBadge } from "@/features/profile/components/TagBadge"
+import { fieldOfRole, ROLE_FIELDS, type RoleFieldId } from "@/features/profile/lib/roleFields"
 
 export const PREDEFINED_ROLES = [
   { id: "software-engineer", slug: "software-engineer" },
@@ -76,12 +80,19 @@ export function RoleSelector({
 }: RoleSelectorProps) {
   const { t } = useTranslation()
   const [search, setSearch] = useState("")
+  const [isSearching, setIsSearching] = useState(false)
 
   const activeRoles = useMemo(() => {
     if (selectedRoles) return selectedRoles
     if (selectedRole) return [selectedRole]
     return []
   }, [selectedRole, selectedRoles])
+
+  // Opens on the field of the first chosen role, otherwise on none until a field is picked.
+  const [fieldId, setFieldId] = useState<RoleFieldId | undefined>(() =>
+    activeRoles[0] ? fieldOfRole(activeRoles[0]) : undefined,
+  )
+  const field = ROLE_FIELDS.find((item) => item.id === fieldId)
 
   const getRoleLabel = useCallback(
     (roleSlugOrId: string): string => {
@@ -94,21 +105,24 @@ export function RoleSelector({
     [t],
   )
 
-  const suggestedRoles = useMemo(() => {
+  const searchResults = useMemo(() => {
     const lowerSearch = search.trim().toLowerCase()
 
-    if (lowerSearch !== "") {
-      return PREDEFINED_ROLES.filter((role) => {
-        if (activeRoles.includes(role.id) || activeRoles.includes(role.slug)) return false
-        const label = getRoleLabel(role.slug).toLowerCase()
-        return label.includes(lowerSearch) || role.slug.toLowerCase().includes(lowerSearch)
-      })
-    }
+    // Nothing until the person types, so opening the search does not dump all roles.
+    if (lowerSearch === "") return []
 
-    return PREDEFINED_ROLES.filter(
-      (role) => !activeRoles.includes(role.id) && !activeRoles.includes(role.slug),
-    )
+    return PREDEFINED_ROLES.filter((role) => {
+      if (activeRoles.includes(role.id) || activeRoles.includes(role.slug)) return false
+      return (
+        getRoleLabel(role.slug).toLowerCase().includes(lowerSearch) ||
+        role.slug.toLowerCase().includes(lowerSearch)
+      )
+    })
   }, [activeRoles, getRoleLabel, search])
+
+  // Chosen roles that the open field does not show, so none of them is ever hidden.
+  const fieldRoles: readonly string[] = field?.roles ?? []
+  const otherRoles = activeRoles.filter((role) => !fieldRoles.includes(role))
 
   const handleRemove = (roleSlug: string) => {
     if (onRemoveRole) {
@@ -119,71 +133,135 @@ export function RoleSelector({
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-0.5">
-        <Label
-          htmlFor="search-role"
-          className="text-label font-semibold text-foreground"
-        >
-          {t("onboarding.step1.role")}
-        </Label>
-        <p className="text-sm text-muted-foreground">{t("onboarding.step1.roleHint")}</p>
+    <OnboardingCard
+      title={t("onboarding.step1.role")}
+      hint={t("onboarding.step1.roleHint")}
+      isInvalid={Boolean(error)}
+      className="gap-3.5"
+    >
+      <div className="flex flex-wrap gap-2">
+        {ROLE_FIELDS.map((item) => (
+          <Button
+            key={item.id}
+            type="button"
+            variant={item.id === fieldId ? "default" : "outline"}
+            aria-pressed={item.id === fieldId}
+            onClick={() => setFieldId(item.id)}
+            className={cn("h-auto px-3 py-2.5", item.id !== fieldId && "bg-card")}
+          >
+            {t(item.labelKey)}
+          </Button>
+        ))}
       </div>
 
-      {activeRoles.length > 0 && (
-        <div className="flex flex-wrap gap-2 pt-1">
-          {activeRoles.map((roleSlug) => {
-            const label = getRoleLabel(roleSlug)
-            return (
-              <TagBadge
-                key={roleSlug}
-                label={label}
-                variant="selected"
-                onAction={() => handleRemove(roleSlug)}
-                actionAriaLabel={t("onboarding.step1.removeRole", { name: label })}
-              />
-            )
-          })}
-        </div>
-      )}
+      {(field !== undefined || otherRoles.length > 0 || isSearching) && (
+        <div className="flex flex-col gap-2.5 border-t border-border pt-3.5">
+          {field && (
+            <>
+              <p className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
+                {t(field.labelKey)}
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {field.roles.map((slug) => {
+                  const label = getRoleLabel(slug)
+                  const isSelected = activeRoles.includes(slug)
+                  return (
+                    <Button
+                      key={slug}
+                      type="button"
+                      variant="outline"
+                      aria-pressed={isSelected}
+                      aria-label={
+                        isSelected
+                          ? t("onboarding.step1.removeRole", { name: label })
+                          : t("onboarding.step1.addRole", { name: label })
+                      }
+                      onClick={() => {
+                        if (isSelected) handleRemove(slug)
+                        else onSelectRole(slug)
+                      }}
+                      className={cn(
+                        "h-auto gap-1 rounded-full px-3 py-1.5 text-small font-normal",
+                        isSelected
+                          ? "border-highlight bg-highlight-soft text-highlight hover:bg-highlight-soft hover:text-highlight"
+                          : "bg-card",
+                      )}
+                    >
+                      {isSelected ? <Check className="size-3 stroke-[2.5]" /> : null}
+                      {label}
+                    </Button>
+                  )
+                })}
+              </div>
+            </>
+          )}
 
-      <div>
-        <Input
-          id="search-role"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") e.preventDefault()
-          }}
-          placeholder={t("onboarding.step1.searchRolePlaceholder")}
-          aria-label={t("onboarding.step1.searchRoleAria")}
-          className="h-10 text-sm"
-        />
-      </div>
+          {otherRoles.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {otherRoles.map((slug) => (
+                <TagBadge
+                  key={slug}
+                  label={getRoleLabel(slug)}
+                  variant="selected"
+                  onAction={() => handleRemove(slug)}
+                  actionAriaLabel={t("onboarding.step1.removeRole", { name: getRoleLabel(slug) })}
+                />
+              ))}
+            </div>
+          )}
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
-
-      {suggestedRoles.length > 0 && (
-        <div className="flex flex-col gap-2 pt-1">
-          <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
-            {t("onboarding.step1.recommendedRoles")}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {suggestedRoles.map((role) => (
-              <TagBadge
-                key={role.id}
-                label={getRoleLabel(role.slug)}
-                variant="suggested"
-                onAction={() => {
-                  onSelectRole(role.slug)
-                  setSearch("")
+          {isSearching ? (
+            <>
+              <Input
+                id="search-role"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") e.preventDefault()
                 }}
-                actionAriaLabel={t("onboarding.step1.addRole", { name: getRoleLabel(role.slug) })}
+                placeholder={t("onboarding.step1.searchRolePlaceholder")}
+                aria-label={t("onboarding.step1.searchRoleAria")}
               />
-            ))}
-          </div>
+              <div className="flex flex-wrap gap-1.5">
+                {searchResults.map((role) => (
+                  <TagBadge
+                    key={role.id}
+                    label={getRoleLabel(role.slug)}
+                    variant="suggested"
+                    onAction={() => {
+                      onSelectRole(role.slug)
+                      setSearch("")
+                    }}
+                    actionAriaLabel={t("onboarding.step1.addRole", {
+                      name: getRoleLabel(role.slug),
+                    })}
+                  />
+                ))}
+              </div>
+            </>
+          ) : null}
         </div>
       )}
-    </div>
+
+      {!isSearching && (
+        <Button
+          type="button"
+          variant="link"
+          onClick={() => setIsSearching(true)}
+          className="h-auto w-fit p-0 text-small font-normal text-highlight underline"
+        >
+          {t("onboarding.step1.searchAllRoles")}
+        </Button>
+      )}
+
+      {error && (
+        <p
+          role="alert"
+          className="text-small text-destructive"
+        >
+          {error}
+        </p>
+      )}
+    </OnboardingCard>
   )
 }

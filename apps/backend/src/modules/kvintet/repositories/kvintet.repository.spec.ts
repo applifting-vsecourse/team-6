@@ -1,4 +1,5 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
+import { KVINTET_STARTED } from '@/modules/chat/domain/message';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
 import { emptyMatchProfile } from '@/modules/matching/matching';
 import { BadRequestException, ConflictException } from '@nestjs/common';
@@ -59,6 +60,15 @@ describe('KvintetRepository (Postgres)', () => {
     return kvintet.id;
   };
 
+  /** Bodies of the SYSTEM lines in a kvintet's chat. */
+  const startedLines = async (kvintetId: string): Promise<string[]> =>
+    (
+      await prisma.message.findMany({
+        where: { kvintetId, kind: 'SYSTEM' },
+        select: { body: true },
+      })
+    ).map((message) => message.body);
+
   beforeAll(async () => {
     await prisma.$connect();
     categoryId = (
@@ -92,6 +102,7 @@ describe('KvintetRepository (Postgres)', () => {
     expect(kvintet.status).toBe('ACTIVE');
     expect(kvintet.activatedAt).not.toBeNull();
     expect(kvintet._count.members).toBe(5);
+    await expect(startedLines(kvintetId)).resolves.toEqual([KVINTET_STARTED]);
   });
 
   it('keeps a kvintet FORMING until the fifth member joins', async () => {
@@ -104,6 +115,7 @@ describe('KvintetRepository (Postgres)', () => {
       where: { id: kvintetId },
     });
     expect(kvintet.status).toBe('FORMING');
+    await expect(startedLines(kvintetId)).resolves.toEqual([]);
   });
 
   it('refuses a user who is already in a kvintet, in this one or another', async () => {
@@ -316,6 +328,7 @@ describe('KvintetRepository (Postgres)', () => {
     expect(afterVote0?.voteStatus.votedCount).toBe(1);
     expect(afterVote0?.voteStatus.userHasVoted).toBe(true);
     expect(afterVote0?.status).toBe('FORMING');
+    await expect(startedLines(kvintetId)).resolves.toEqual([]);
 
     // Vote user 1
     await repository.vote(kvintetId, users[1]);
@@ -325,6 +338,7 @@ describe('KvintetRepository (Postgres)', () => {
     const afterVoteAll = await repository.findKvintetDetailsByUserId(users[0]);
     expect(afterVoteAll?.status).toBe('ACTIVE');
     expect(afterVoteAll?.activatedAt).not.toBeNull();
+    await expect(startedLines(kvintetId)).resolves.toEqual([KVINTET_STARTED]);
 
     // Leave user 0
     await repository.leave(kvintetId, users[0]);
@@ -449,5 +463,46 @@ describe('KvintetRepository (Postgres)', () => {
     expect(active?.members.map((m) => m.username).sort()).toEqual(
       [...users].sort(),
     );
+  });
+
+  it('marks the begins page as seen only once the kvintet is ACTIVE, and keeps the first mark', async () => {
+    const users = await createUsers(3, 'begins');
+    const kvintetId = await createKvintet(users);
+
+    // Still forming: the mark is refused silently, so the page cannot be skipped.
+    await repository.markBeginsSeen(users[0]);
+    expect(
+      (await repository.findKvintetDetailsByUserId(users[0]))?.beginsSeen,
+    ).toBe(false);
+
+    for (const user of users) await repository.vote(kvintetId, user);
+    expect(
+      (await repository.findKvintetDetailsByUserId(users[0]))?.beginsSeen,
+    ).toBe(false);
+
+    await repository.markBeginsSeen(users[0]);
+    const first = await prisma.kvintetMember.findUniqueOrThrow({
+      where: { userId: users[0] },
+    });
+    await repository.markBeginsSeen(users[0]);
+    const again = await prisma.kvintetMember.findUniqueOrThrow({
+      where: { userId: users[0] },
+    });
+
+    expect(first.beginsSeenAt).not.toBeNull();
+    expect(again.beginsSeenAt).toEqual(first.beginsSeenAt);
+    // The mark is per member: the others still have to see it.
+    expect(
+      (await repository.findKvintetDetailsByUserId(users[0]))?.beginsSeen,
+    ).toBe(true);
+    expect(
+      (await repository.findKvintetDetailsByUserId(users[1]))?.beginsSeen,
+    ).toBe(false);
+  });
+
+  it('does not fail for a user who is in no kvintet', async () => {
+    const [user] = await createUsers(1, 'begins-none');
+
+    await expect(repository.markBeginsSeen(user)).resolves.toBeUndefined();
   });
 });

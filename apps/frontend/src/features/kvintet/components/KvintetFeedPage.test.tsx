@@ -9,9 +9,12 @@ import { api } from "@/lib/api-client"
 
 import type { FeedKvintet } from "@/features/kvintet/api/kvintetFeedQueryOptions"
 import { KvintetFeedPage } from "@/features/kvintet/components/KvintetFeedPage"
+import type { Frequency } from "@/features/kvintet/lib/frequencies"
 
 const navigate = vi.fn()
 
+// The grey blobatars use the gaze driver, which needs browser APIs jsdom lacks.
+vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
 vi.mock("@tanstack/react-router", () => ({ useNavigate: () => navigate }))
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }))
 vi.mock("@/lib/api-client", () => ({ api: { get: vi.fn(), post: vi.fn() } }))
@@ -25,15 +28,25 @@ const reference = {
   ],
 }
 
-const kvintet = (id: string, title: string): FeedKvintet => ({
+const commonAvailability = {
+  weekdays: false,
+  weekends: false,
+  mornings: false,
+  afternoons: false,
+  evenings: false,
+}
+
+const kvintet = (id: string, title: string, overrides: Partial<FeedKvintet> = {}): FeedKvintet => ({
   id,
   title,
   categories: ["software-development"],
   capacity: 5,
   memberCount: 1,
   meetingFrequency: null,
+  commonAvailability,
   members: [{ position: "Accountant", teach: ["excel"], learn: [], interests: [] }],
   reasons: [],
+  ...overrides,
 })
 
 const apiError = (status: number, code: string) =>
@@ -57,15 +70,18 @@ const serve = (feed: () => Promise<unknown>, isFallback = false) =>
   )
 
 const onCategoryChange = vi.fn()
+const onFrequencyChange = vi.fn()
 
-const renderPage = (category?: string) =>
+const renderPage = (filters: { category?: string[]; frequency?: Frequency[] } = {}) =>
   render(
     <QueryClientProvider
       client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
     >
       <KvintetFeedPage
-        category={category}
+        category={filters.category ?? []}
+        frequency={filters.frequency ?? []}
         onCategoryChange={onCategoryChange}
+        onFrequencyChange={onFrequencyChange}
       />
     </QueryClientProvider>,
   )
@@ -80,37 +96,37 @@ describe("KvintetFeedPage", () => {
     serve(() => new Promise(() => undefined))
     renderPage()
 
-    expect(screen.getByText("Loading proposals…")).toBeInTheDocument()
+    expect(screen.getByText("Looking for kvintets that suit you…")).toBeInTheDocument()
   })
 
-  it("lists the open proposals with their count", async () => {
+  it("lists the open kvintets with their count", async () => {
     serve(() => Promise.resolve([kvintet("k1", "From Excel to Python"), kvintet("k2", "Spanish")]))
     renderPage()
 
     expect(await screen.findByRole("heading", { name: "From Excel to Python" })).toBeInTheDocument()
     expect(screen.getByRole("heading", { name: "Spanish" })).toBeInTheDocument()
-    expect(screen.getByText("2 proposals")).toBeInTheDocument()
+    expect(screen.getByText("2 kvintets · best match first")).toBeInTheDocument()
     expect(screen.queryByText(/Nothing fits your profile closely/)).not.toBeInTheDocument()
   })
 
-  it("says so when nothing fits closely and it lists every open proposal instead", async () => {
+  it("says so when nothing fits closely and it lists every open kvintet instead", async () => {
     serve(() => Promise.resolve([kvintet("k1", "From Excel to Python")]), true)
     renderPage()
 
     expect(
       await screen.findByText(
-        "Nothing fits your profile closely yet, so here are all open proposals, closest first.",
+        "Nothing fits your profile closely yet, so here are all open kvintets, closest first.",
       ),
     ).toBeInTheDocument()
     expect(screen.getByRole("heading", { name: "From Excel to Python" })).toBeInTheDocument()
   })
 
-  it("shows an empty state that offers to start a proposal", async () => {
+  it("shows an empty state that offers to start a kvintet", async () => {
     serve(() => Promise.resolve([]))
     renderPage()
 
-    expect(await screen.findByText("No proposals for you yet")).toBeInTheDocument()
-    expect(screen.getAllByRole("button", { name: "Start a new proposal" })).toHaveLength(2)
+    expect(await screen.findByText("Nothing here yet")).toBeInTheDocument()
+    expect(screen.getAllByRole("button", { name: "Start a kvintet" })).toHaveLength(2)
   })
 
   it("shows an error with a retry that loads the feed again", async () => {
@@ -118,38 +134,38 @@ describe("KvintetFeedPage", () => {
     serve(() => (attempts++ === 0 ? Promise.reject(new Error("boom")) : Promise.resolve([])))
     renderPage()
 
-    expect(await screen.findByText("Couldn't load proposals")).toBeInTheDocument()
+    expect(await screen.findByText("We couldn't load the kvintets")).toBeInTheDocument()
     await userEvent.click(screen.getByRole("button", { name: "Try again" }))
 
-    expect(await screen.findByText("No proposals for you yet")).toBeInTheDocument()
+    expect(await screen.findByText("Nothing here yet")).toBeInTheDocument()
   })
 
-  it("sends someone who is already in a proposal to Overview", async () => {
+  it("sends someone who is already in a kvintet to Overview", async () => {
     serve(() => Promise.reject(apiError(409, "already_in_kvintet")))
     renderPage()
 
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/overview", replace: true }))
     expect(toast.info).toHaveBeenCalledWith("You are already in a proposal.")
-    expect(screen.queryByText("Couldn't load proposals")).not.toBeInTheDocument()
+    expect(screen.queryByText("We couldn't load the kvintets")).not.toBeInTheDocument()
   })
 
-  it("joins a proposal, confirms and leaves for My kvintet", async () => {
+  it("joins a kvintet, confirms and leaves for Home", async () => {
     serve(() => Promise.resolve([kvintet("k1", "From Excel to Python")]))
     renderPage()
 
-    await userEvent.click(await screen.findByRole("button", { name: "Join this proposal" }))
+    await userEvent.click(await screen.findByRole("button", { name: "Join" }))
 
     expect(api.post).toHaveBeenCalledWith("kvintets/k1/members")
-    await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/kvintet" }))
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/overview" }))
     expect(toast.success).toHaveBeenCalledWith("You joined the proposal.")
   })
 
-  it("explains when the proposal filled up meanwhile", async () => {
+  it("explains when the kvintet filled up meanwhile", async () => {
     serve(() => Promise.resolve([kvintet("k1", "From Excel to Python")]))
     vi.mocked(api.post).mockRejectedValue(apiError(409, "kvintet_not_open"))
     renderPage()
 
-    await userEvent.click(await screen.findByRole("button", { name: "Join this proposal" }))
+    await userEvent.click(await screen.findByRole("button", { name: "Join" }))
 
     await waitFor(() =>
       expect(toast.error).toHaveBeenCalledWith("This proposal is full or no longer open."),
@@ -158,141 +174,162 @@ describe("KvintetFeedPage", () => {
   })
 })
 
-describe("category filter", () => {
-  const feedRequests = () =>
-    vi.mocked(api.get).mock.calls.filter(([path]) => path === "kvintets/feed")
+describe("filters", () => {
+  const feed = () =>
+    Promise.resolve([
+      kvintet("k1", "Spanish", { categories: ["languages"], meetingFrequency: "WEEKLY" }),
+      kvintet("k2", "Excel to Python", {
+        categories: ["software-development", "business"],
+        meetingFrequency: "BIWEEKLY",
+      }),
+      kvintet("k3", "Sketching", { categories: ["leisure"], meetingFrequency: null }),
+    ])
+  const titles = () => screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent)
 
-  it("offers every category after All, with All selected by default", async () => {
-    serve(() => Promise.resolve([kvintet("k1", "From Excel to Python")]))
+  it("fetches the whole feed once, whatever the filters", async () => {
+    serve(feed)
+    renderPage({ category: ["languages"] })
+
+    await screen.findByRole("heading", { name: "Spanish" })
+
+    expect(vi.mocked(api.get).mock.calls.filter(([path]) => path === "kvintets/feed")).toEqual([
+      ["kvintets/feed"],
+    ])
+  })
+
+  it("shows everything without filters", async () => {
+    serve(feed)
     renderPage()
 
-    expect(await screen.findByRole("radio", { name: "All" })).toHaveAttribute("data-state", "on")
-    expect(screen.getByRole("radio", { name: "Software development" })).toHaveAttribute(
-      "data-state",
-      "off",
-    )
-    expect(screen.getByRole("radio", { name: "Languages" })).toHaveAttribute("data-state", "off")
+    await screen.findByRole("heading", { name: "Spanish" })
+
+    expect(titles()).toEqual(["Spanish", "Excel to Python", "Sketching"])
+    expect(screen.getByText("3 kvintets · best match first")).toBeInTheDocument()
   })
 
-  it("asks the server for the selected category", async () => {
-    serve(() => Promise.resolve([kvintet("k1", "Spanish")]))
-    renderPage("languages")
+  it("keeps kvintets with any of the picked categories", async () => {
+    serve(feed)
+    renderPage({ category: ["business", "leisure"] })
 
-    expect(await screen.findByRole("heading", { name: "Spanish" })).toBeInTheDocument()
-    expect(screen.getByRole("radio", { name: "Languages" })).toHaveAttribute("data-state", "on")
-    expect(feedRequests()).toEqual([["kvintets/feed", { searchParams: { category: "languages" } }]])
+    await screen.findByRole("heading", { name: "Sketching" })
+
+    expect(titles()).toEqual(["Excel to Python", "Sketching"])
+    expect(screen.getByText("2 kvintets · best match first")).toBeInTheDocument()
   })
 
-  it("reports the chosen chip, and undefined for All", async () => {
-    serve(() => Promise.resolve([kvintet("k1", "Spanish")]))
-    renderPage("languages")
+  it("keeps kvintets with any of the picked frequencies, and hides those without one", async () => {
+    serve(feed)
+    renderPage({ frequency: ["WEEKLY", "BIWEEKLY"] })
 
-    await userEvent.click(await screen.findByRole("radio", { name: "Software development" }))
-    expect(onCategoryChange).toHaveBeenLastCalledWith("software-development")
+    await screen.findByRole("heading", { name: "Spanish" })
 
-    await userEvent.click(screen.getByRole("radio", { name: "All" }))
-    expect(onCategoryChange).toHaveBeenLastCalledWith(undefined)
+    expect(titles()).toEqual(["Spanish", "Excel to Python"])
   })
 
-  it("keeps the selection when the selected chip is pressed again", async () => {
-    serve(() => Promise.resolve([kvintet("k1", "Spanish")]))
-    renderPage("languages")
+  it("needs both a category and a frequency to match", async () => {
+    serve(feed)
+    renderPage({ category: ["languages"], frequency: ["BIWEEKLY"] })
 
-    await userEvent.click(await screen.findByRole("radio", { name: "Languages" }))
-
-    expect(onCategoryChange).not.toHaveBeenCalled()
+    expect(await screen.findByText("Nothing for these filters")).toBeInTheDocument()
   })
 
-  it("treats an unknown category from the URL as All and never sends it", async () => {
-    serve(() => Promise.resolve([kvintet("k1", "Spanish")]))
-    renderPage("bogus")
+  it("ignores a category from the URL that does not exist", async () => {
+    serve(feed)
+    renderPage({ category: ["bogus"] })
 
-    expect(await screen.findByRole("heading", { name: "Spanish" })).toBeInTheDocument()
-    expect(screen.getByRole("radio", { name: "All" })).toHaveAttribute("data-state", "on")
-    expect(feedRequests()).toEqual([["kvintets/feed", { searchParams: undefined }]])
+    await screen.findByRole("heading", { name: "Spanish" })
+
+    expect(titles()).toEqual(["Spanish", "Excel to Python", "Sketching"])
   })
 
-  it("says so when nothing is in the category, and lets the user clear the filter", async () => {
-    serve(() => Promise.resolve([]))
-    renderPage("languages")
+  it("reports the picked chip and the picked frequency", async () => {
+    serve(feed)
+    renderPage({ category: ["languages"] })
 
-    expect(await screen.findByText("No proposals in Languages yet")).toBeInTheDocument()
-    expect(screen.queryByText("Nothing fits?")).not.toBeInTheDocument()
+    const topic = await screen.findByRole("group", { name: "Topic" })
+    await userEvent.click(within(topic).getByRole("button", { name: "Business" }))
+    expect(onCategoryChange).toHaveBeenLastCalledWith(["languages", "business"])
 
+    await userEvent.click(screen.getByRole("button", { name: "Once a month" }))
+    expect(onFrequencyChange).toHaveBeenLastCalledWith(["MONTHLY"])
+  })
+
+  it("says so when the filters leave nothing, and clears both of them", async () => {
+    serve(feed)
+    renderPage({ category: ["leisure"], frequency: ["WEEKLY"] })
+
+    expect(await screen.findByText("Nothing for these filters")).toBeInTheDocument()
     await userEvent.click(screen.getByRole("button", { name: "Clear filter" }))
-    expect(onCategoryChange).toHaveBeenCalledWith(undefined)
+
+    expect(onCategoryChange).toHaveBeenCalledWith([])
+    expect(onFrequencyChange).toHaveBeenCalledWith([])
   })
 
-  it("starts a proposal without preselecting the filtered category", async () => {
+  it("names the topic when one is picked and nothing is in it", async () => {
+    serve(() => Promise.resolve([kvintet("k1", "Spanish", { categories: ["languages"] })]))
+    renderPage({ category: ["leisure"] })
+
+    expect(await screen.findByText("Nothing in Leisure")).toBeInTheDocument()
+  })
+
+  it("does not call an empty feed a filtered one", async () => {
     serve(() => Promise.resolve([]))
-    renderPage("languages")
+    renderPage({ category: ["languages"] })
 
-    // The "nothing fits?" box is on screen while loading, so wait for the empty state first.
-    await screen.findByText("No proposals in Languages yet")
-    await userEvent.click(screen.getByRole("button", { name: "Start a new proposal" }))
-
-    const dialog = await screen.findByRole("dialog")
-    const group = within(dialog).getByRole("group", { name: "Categories" })
-    expect(await within(group).findByRole("button", { name: "Languages" })).toHaveAttribute(
-      "aria-pressed",
-      "false",
-    )
+    expect(await screen.findByText("Nothing here yet")).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "Clear filter" })).not.toBeInTheDocument()
   })
 })
 
-describe("starting a proposal", () => {
+describe("starting a kvintet", () => {
   const openDialog = async () => {
     serve(() => Promise.resolve([kvintet("k1", "From Excel to Python")]))
     renderPage()
-    await userEvent.click(await screen.findByRole("button", { name: "Start a new proposal" }))
+    await userEvent.click(await screen.findByRole("button", { name: "Start a kvintet" }))
     return screen.findByRole("dialog")
   }
 
-  it("shows what is missing instead of disabling the button", async () => {
-    await openDialog()
+  const pickCategory = async (name: string) => {
+    await userEvent.click(screen.getByRole("combobox", { name: "Category" }))
+    await userEvent.click(await screen.findByRole("option", { name }))
+  }
 
-    await userEvent.click(screen.getByRole("button", { name: "Start proposal" }))
+  it("shows what is missing instead of disabling the button", async () => {
+    const dialog = await openDialog()
+
+    await userEvent.click(within(dialog).getByRole("button", { name: "Start a kvintet" }))
 
     expect(await screen.findByText("Enter a topic")).toBeInTheDocument()
     expect(screen.getByText("Choose a category")).toBeInTheDocument()
     expect(api.post).not.toHaveBeenCalled()
   })
 
-  it("creates the proposal and leaves for My kvintet", async () => {
-    await openDialog()
+  it("creates the kvintet and leaves for Home", async () => {
+    const dialog = await openDialog()
 
     await userEvent.type(
-      screen.getByLabelText("Topic or problem"),
+      screen.getByLabelText("What do you want to talk about"),
       "  How to use AI in a small firm ",
     )
-    const group = screen.getByRole("group", { name: "Categories" })
-    await userEvent.click(within(group).getByRole("button", { name: "Software development" }))
-    await userEvent.click(within(group).getByRole("button", { name: "Business" }))
-    await userEvent.click(screen.getByRole("button", { name: "Start proposal" }))
+    await pickCategory("Business")
+    await userEvent.click(within(dialog).getByRole("button", { name: "Start a kvintet" }))
 
     await waitFor(() =>
       expect(api.post).toHaveBeenCalledWith("kvintets", {
-        json: {
-          title: "How to use AI in a small firm",
-          categorySlugs: ["software-development", "business"],
-        },
+        json: { title: "How to use AI in a small firm", categorySlugs: ["business"] },
       }),
     )
-    await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/kvintet" }))
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/overview" }))
     expect(toast.success).toHaveBeenCalledWith("Your proposal is open. Others can join it now.")
   })
 
   it("shows the server's reason inside the dialog", async () => {
-    await openDialog()
+    const dialog = await openDialog()
     vi.mocked(api.post).mockRejectedValue(apiError(409, "already_in_kvintet"))
 
-    await userEvent.type(screen.getByLabelText("Topic or problem"), "Topic")
-    await userEvent.click(
-      within(screen.getByRole("group", { name: "Categories" })).getByRole("button", {
-        name: "Software development",
-      }),
-    )
-    await userEvent.click(screen.getByRole("button", { name: "Start proposal" }))
+    await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
+    await pickCategory("Software development")
+    await userEvent.click(within(dialog).getByRole("button", { name: "Start a kvintet" }))
 
     expect(
       await screen.findByText("You are already in a proposal or a kvintet."),

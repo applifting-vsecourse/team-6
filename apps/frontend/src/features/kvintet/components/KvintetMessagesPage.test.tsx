@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import { render, screen } from "@testing-library/react"
+import { render, screen, within } from "@testing-library/react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import type { KvintetDetails } from "@/features/kvintet/api/kvintetApi"
@@ -8,6 +8,9 @@ import type { useMyKvintet } from "@/features/kvintet/hooks/useMyKvintet"
 import { KvintetMessagesPage } from "./KvintetMessagesPage"
 
 const mockUseMyKvintet = vi.fn<() => ReturnType<typeof useMyKvintet>>()
+const mockUseGaze = vi.hoisted(() => vi.fn(() => ({ ref: vi.fn() })))
+
+vi.mock("@blobatar/react/gaze", () => ({ useGaze: mockUseGaze }))
 
 vi.mock("@/features/kvintet/hooks/useMyKvintet", () => ({
   useMyKvintet: () => mockUseMyKvintet(),
@@ -25,10 +28,15 @@ vi.mock("@tanstack/react-router", () => ({
   Navigate: ({ to }: { to: string }) => <p>navigated to {to}</p>,
 }))
 
-const member = (userId: string, name: string, isCurrentUser = false) => ({
+const member = (
+  userId: string,
+  name: string,
+  isCurrentUser = false,
+  username: string | null = null,
+) => ({
   userId,
   name,
-  username: null,
+  username,
   role: null,
   teachTags: [],
   learnTags: [],
@@ -46,8 +54,9 @@ const kvintet = (status: "ACTIVE" | "FORMING"): KvintetDetails => ({
   commonPreferences: null,
   capacity: 5,
   openSeatsCount: 0,
-  members: [member("u1", "Jana Nováková", true), member("u2", "Petr Svoboda")],
+  members: [member("u1", "Jana Nováková", true, "jana"), member("u2", "Petr Svoboda")],
   voteStatus: { canVote: false, userHasVoted: true, votedCount: 2, totalCount: 2 },
+  beginsSeen: true,
 })
 
 const state = (overrides: Partial<ReturnType<typeof useMyKvintet>>) =>
@@ -85,22 +94,33 @@ describe("KvintetMessagesPage", () => {
     expect(
       screen.getByRole("heading", { name: "AI v práci – co opravdu funguje" }),
     ).toBeInTheDocument()
-    expect(screen.getByRole("link", { name: "My kvintet" })).toHaveAttribute("href", "/kvintet")
-    expect(
-      screen.getByText("Jana Nováková, Petr Svoboda · only members can read the messages"),
-    ).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("href", "/overview")
+    expect(screen.getByText("Only group members can read the messages.")).toBeInTheDocument()
     expect(screen.getByText("chat k1 for u1")).toBeInTheDocument()
+  })
+
+  it("shows the members as blobatars, each named for screen readers", () => {
+    state({ data: kvintet("ACTIVE") })
+
+    render(<KvintetMessagesPage renderChat={() => <p>chat</p>} />)
+
+    const row = screen.getByRole("list", { name: "Members of the kvintet" })
+    expect(within(row).getAllByRole("listitem")).toHaveLength(2)
+    expect(within(row).getByText("Jana Nováková")).toBeInTheDocument()
+    expect(within(row).getByText("Petr Svoboda")).toBeInTheDocument()
+    // Each face follows the cursor, so the header drives a gaze that looks at the pointer.
+    expect(mockUseGaze).toHaveBeenCalledWith(expect.objectContaining({ lookAt: "pointer" }))
   })
 
   it.each([
     ["a kvintet that is still forming", { data: kvintet("FORMING") }],
     ["no kvintet at all", { data: null }],
-  ])("sends the user back to My kvintet for %s", (_name, overrides) => {
+  ])("sends the user back to Home for %s", (_name, overrides) => {
     state(overrides)
 
     render(<KvintetMessagesPage renderChat={() => <p>chat</p>} />)
 
-    expect(screen.getByText("navigated to /kvintet")).toBeInTheDocument()
+    expect(screen.getByText("navigated to /overview")).toBeInTheDocument()
     expect(screen.queryByText("chat")).not.toBeInTheDocument()
   })
 

@@ -4,6 +4,8 @@ import { describe, expect, it, vi } from "vitest"
 
 import { DeleteAccountDialog } from "./DeleteAccountDialog"
 
+vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
+
 describe("DeleteAccountDialog", () => {
   it("renders title, description and action buttons when open", () => {
     render(
@@ -99,5 +101,21 @@ describe("DeleteAccountDialog", () => {
     await userEvent.keyboard("{Escape}")
 
     expect(handleOpenChange).not.toHaveBeenCalled()
+  })
+
+  it("renders user blobatar when avatarSeed is provided", () => {
+    render(
+      <DeleteAccountDialog
+        isOpen={true}
+        onOpenChange={vi.fn()}
+        onConfirm={vi.fn()}
+        isDeleting={false}
+        avatarSeed="jana"
+      />,
+    )
+
+    expect(document.body.querySelector("[data-slot=avatar]")).toBeInTheDocument()
+    const deleteButton = screen.getByRole("button", { name: "Delete account" })
+    expect(deleteButton).toHaveClass("bg-destructive")
   })
 })

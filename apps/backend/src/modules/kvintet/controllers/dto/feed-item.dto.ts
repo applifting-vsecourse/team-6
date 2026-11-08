@@ -18,6 +18,15 @@ export class FeedReasonDto {
   category?: string;
 }
 
+/** What every member of the kvintet picked: days and parts of the day, never a place. */
+export class CommonAvailabilityDto {
+  weekdays!: boolean;
+  weekends!: boolean;
+  mornings!: boolean;
+  afternoons!: boolean;
+  evenings!: boolean;
+}
+
 export class FeedItemDto {
   id!: string;
   title!: string;
@@ -27,6 +36,7 @@ export class FeedItemDto {
   memberCount!: number;
   /** Set only when every member picked the same meeting frequency. */
   meetingFrequency!: MeetingFrequency | null;
+  commonAvailability!: CommonAvailabilityDto;
   members!: FeedMemberDto[];
   /** Up to three, strongest first. */
   reasons!: FeedReasonDto[];
