@@ -5,7 +5,25 @@ export const betterAuthCoreConfig: BetterAuthOptions = {
   rateLimit: {
     enabled: true,
     window: 60,
-    max: 20,
+    max: 100,
+    customRules: {
+      '/sign-in/email': {
+        window: 60,
+        max: 10,
+      },
+      '/sign-up/email': {
+        window: 60,
+        max: 5,
+      },
+      '/forget-password': {
+        window: 60,
+        max: 5,
+      },
+      '/reset-password': {
+        window: 60,
+        max: 5,
+      },
+    },
   },
   emailAndPassword: {
     enabled: true,

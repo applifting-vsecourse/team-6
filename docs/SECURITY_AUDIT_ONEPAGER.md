@@ -42,8 +42,8 @@ The audit identified **8 security risk items** across sensitive logging, authent
 
 ### SEC-01: Redaction of Credentials and Private Data in Application Logs
 
-- **What was fixed:** In local development, auth tokens in URLs are masked (`?token=[REDACTED]`), and recipient email addresses are obfuscated (`j***a@domain.com`). In production mode, email bodies are suppressed entirely, logging only an event timestamp and status.
-- **Verification:** Backed by 8 automated unit tests in `console-mailer-adapter.spec.ts`.
+- **What was fixed:** In local development, recipient email addresses are obfuscated (`j***a@domain.com`) while clickable verification links and reset tokens are preserved in developer terminals to enable complete local end-to-end testing. In production mode, email bodies are suppressed entirely (`[body redacted for privacy]`), never outputting credentials or PII.
+- **Verification:** Backed by automated unit tests in `console-mailer-adapter.spec.ts`.
 
 ### SEC-02: Restoration of Password Reset Dispatch & Secret Integrity
 
@@ -57,8 +57,8 @@ The audit identified **8 security risk items** across sensitive logging, authent
 
 ### SEC-04: Multi-Layered Rate Limiting & Abuse Prevention
 
-- **What was fixed:** Configured `@nestjs/throttler` with a 300 request/minute global budget per IP (calibrated for campus NAT networks where multiple students share an IP address), skipped throttling on high-frequency background polling endpoints (`/messages` list, `/messages/unread`, `/kvintets/mine`, `/health`), and added a strict `@Throttle(20 msg/min)` on group chat message dispatch. Enabled BetterAuth built-in rate limiting and configured `trust proxy: 1` so client IPs are accurately isolated behind Docker/Coolify reverse proxies.
-- **Verification:** Automated test suite (`throttler.spec.ts` and `errors.spec.ts`) verifies that request quotas trigger standardized `429 Too Many Requests` responses (`code: 'too_many_requests'`), route exemptions (`@SkipThrottle()`) protect polling/health probes, and the frontend translates rate limits into user-friendly localized messages.
+- **What was fixed:** Configured `@nestjs/throttler` with a 300 request/minute global budget per IP (calibrated for campus NAT networks where multiple students share an IP address), skipped throttling on high-frequency background polling endpoints (`/messages` list, `/messages/unread`, `/kvintets/mine`, `/health`), and added a strict `@Throttle(20 msg/min)` on group chat message dispatch. In BetterAuth, enabled rate limiting with a generous ceiling (100 req/min) for session checks while enforcing strict `customRules` on sensitive endpoints: `/sign-in/email` (10/min), `/sign-up/email` (5/min), and `/forget-password` (5/min). Configured `trust proxy: 1` so client IPs are accurately isolated behind reverse proxies.
+- **Verification:** Automated test suites (`throttler.spec.ts`, `errors.spec.ts`, and `better-auth.config.spec.ts`) verify that request quotas trigger standardized `429 Too Many Requests` responses (`code: 'too_many_requests'`), route exemptions (`@SkipThrottle()`) protect polling/health probes, and the frontend translates rate limits into user-friendly localized messages.
 
 ### SEC-05: Invariant Enforcement on Profile Onboarding
 
@@ -72,8 +72,8 @@ The audit identified **8 security risk items** across sensitive logging, authent
 
 ### SEC-07: Hardened Production Documentation Endpoints
 
-- **What was fixed:** Swagger documentation at `/api/docs` and BetterAuth reference documentation plugins are now conditionally disabled in production environments (`NODE_ENV === 'production'`).
-- **Verification:** Documentation endpoints return 404 in production mode.
+- **What was fixed:** Swagger documentation at `/api/docs` and BetterAuth reference documentation plugins are now conditionally disabled in production environments (`NODE_ENV === 'production'`). Welcome endpoint dynamically omits documentation links in production.
+- **Verification:** Verified by unit tests in `welcome.controller.spec.ts` and `better-auth.config.spec.ts`.
 
 ---
 

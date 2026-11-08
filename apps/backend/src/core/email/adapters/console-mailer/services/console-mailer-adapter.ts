@@ -17,17 +17,14 @@ export class ConsoleMailerAdapter implements EmailService {
       return;
     }
 
-    // In local development, sanitize email and token links to avoid accidental token leaks.
-    const sanitizedHtml = html
-      .replace(/([?&]token=)[a-zA-Z0-9_-]+/gi, '$1[REDACTED]')
-      .replace(/([?&]code=)[a-zA-Z0-9_-]+/gi, '$1[REDACTED]');
-
+    // In local development, preserve full HTML so developers can click/copy
+    // magic links and verification tokens from their terminal output.
     this.logger.debug(`
       ====== Email Sent (Local Dev Simulation) ======
       To: ${maskedTo}
       Subject: ${subject}
       html:
-      ${sanitizedHtml}
+      ${html}
       ===============================================
     `);
   }
