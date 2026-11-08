@@ -254,7 +254,7 @@
       "label": "Why it suits you:",
       "learn": "Someone here teaches {{tag}}",
       "roleMix": "Roles different from yours",
-      "teach": "Someone here wants to learn: {{tag}}",
+      "teach": "Someone here wants to learn {{tag}}",
       "topic": "Your topic: {{category}}"
     },
     "seatCount": "{{filled}} / {{total}}",
