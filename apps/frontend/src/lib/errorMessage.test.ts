@@ -52,36 +52,36 @@ describe("getErrorMessage", () => {
 
   it("translates profile and reference error codes in both English and Czech", async () => {
     expect(getErrorMessage(httpError({ code: "PROFILE_ROLE_REQUIRED" }))).toBe(
-      "At least one role is required.",
+      "Pick at least one role.",
     )
     expect(getErrorMessage(httpError({ code: "PROFILE_LOCATION_REQUIRED" }))).toBe(
-      "Location coordinates or city is required.",
+      "Choose a place on the map.",
     )
     expect(getErrorMessage(httpError({ code: "PROFILE_AVAILABILITY_REQUIRED" }))).toBe(
-      "At least one availability slot is required.",
+      "Pick at least one day and time of day.",
     )
     expect(getErrorMessage(httpError({ code: "CITY_NOT_FOUND" }))).toBe(
-      "Selected city was not found.",
+      "We couldn't find this city.",
     )
     expect(getErrorMessage(httpError({ code: "TAGS_NOT_FOUND" }))).toBe(
-      "One or more selected tags do not exist.",
+      "Some of the selected tags no longer exist. Please pick them again.",
     )
 
     await i18n.changeLanguage("cs")
     expect(getErrorMessage(httpError({ code: "PROFILE_ROLE_REQUIRED" }))).toBe(
-      "Je vyžadována alespoň jedna role.",
+      "Vyberte alespoň jednu roli.",
     )
     expect(getErrorMessage(httpError({ code: "PROFILE_LOCATION_REQUIRED" }))).toBe(
-      "Je vyžadována poloha (souřadnice nebo město).",
+      "Zvolte místo na mapě.",
     )
     expect(getErrorMessage(httpError({ code: "PROFILE_AVAILABILITY_REQUIRED" }))).toBe(
-      "Je vyžadován alespoň jeden časový slot.",
+      "Vyberte alespoň jeden den a denní dobu.",
     )
     expect(getErrorMessage(httpError({ code: "CITY_NOT_FOUND" }))).toBe(
-      "Vybrané město nebylo nalezeno.",
+      "Toto město jsme nenašli.",
     )
     expect(getErrorMessage(httpError({ code: "TAGS_NOT_FOUND" }))).toBe(
-      "Jeden nebo více vybraných štítků neexistuje.",
+      "Některé vybrané štítky už neexistují. Vyberte je prosím znovu.",
     )
   })
 
