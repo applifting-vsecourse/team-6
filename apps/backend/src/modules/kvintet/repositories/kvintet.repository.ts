@@ -1,3 +1,4 @@
+import { createHmac } from 'crypto';
 import {
   PrismaService,
   type TransactionClient,
@@ -337,8 +338,14 @@ export class KvintetRepository {
           ? profile.roles.join(', ')
           : null);
 
+      // Mask other members' permanent userId while FORMING to preserve anonymity across proposals
+      const memberUserId =
+        isKvintetActive || isCurrentUser
+          ? m.userId
+          : `anon-${createHmac('sha256', kvintet.id).update(m.userId).digest('hex').slice(0, 12)}`;
+
       return {
-        userId: m.userId,
+        userId: memberUserId,
         name,
         username,
         role,

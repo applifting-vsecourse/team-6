@@ -442,7 +442,7 @@ describe('KvintetRepository (Postgres)', () => {
     expect(details?.voteStatus.votedCount).toBe(1);
   });
 
-  it("hides other members' names while FORMING and shows them once ACTIVE", async () => {
+  it("hides other members' names and masks userIds while FORMING and reveals them once ACTIVE", async () => {
     const users = await createUsers(3, 'names');
     const kvintetId = await createKvintet(users);
 
@@ -451,6 +451,13 @@ describe('KvintetRepository (Postgres)', () => {
     for (const member of forming?.members ?? []) {
       expect(member.name).toBe(member.isCurrentUser ? users[0] : null);
       expect(member.username).toBeNull();
+      if (!member.isCurrentUser) {
+        expect(member.userId).toMatch(/^anon-/);
+        expect(member.userId).not.toBe(users[1]);
+        expect(member.userId).not.toBe(users[2]);
+      } else {
+        expect(member.userId).toBe(users[0]);
+      }
     }
 
     for (const user of users) await repository.vote(kvintetId, user);
@@ -461,6 +468,9 @@ describe('KvintetRepository (Postgres)', () => {
       [...users].sort(),
     );
     expect(active?.members.map((m) => m.username).sort()).toEqual(
+      [...users].sort(),
+    );
+    expect(active?.members.map((m) => m.userId).sort()).toEqual(
       [...users].sort(),
     );
   });

@@ -56,7 +56,7 @@ export class ProfileService {
       data.cityId !== undefined ? data.cityId : existing?.cityId;
     const hasLocation =
       (effectiveLat != null && effectiveLng != null) ||
-      Boolean(effectiveCityId);
+      Boolean(effectiveCityId?.trim());
     if (!hasLocation) {
       throw new BadRequestException({
         code: 'PROFILE_LOCATION_REQUIRED',

@@ -29,6 +29,9 @@ describe("getErrorMessage", () => {
 
   it("translates plain backend codes and uses the fallback for unknown ones", () => {
     expect(getErrorMessage(httpError({ code: "unauthorized" }))).toBe("You need to sign in first.")
+    expect(getErrorMessage(httpError({ code: "too_many_requests" }))).toBe(
+      "Too many requests. Please slow down and try again later.",
+    )
     expect(getErrorMessage(httpError({ code: "brand_new" }), "errors.signInFailed")).toBe(
       "Sign in failed",
     )

@@ -23,6 +23,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { ListMessagesQueryDto } from './dto/list-messages-query.dto';
 import { MarkReadDto } from './dto/mark-read.dto';
 import { MessageDto } from './dto/message.dto';
@@ -41,6 +42,7 @@ const toDto = (message: ChatMessage): MessageDto => ({
 export class MessageController {
   constructor(private readonly service: MessageService) {}
 
+  @SkipThrottle()
   @Get()
   @ApiOperation({
     summary: 'Messages of my kvintet',
@@ -58,6 +60,7 @@ export class MessageController {
     return messages.map(toDto);
   }
 
+  @SkipThrottle()
   @Get('unread')
   @ApiOperation({
     summary: 'Unread messages in my kvintet',
@@ -88,6 +91,7 @@ export class MessageController {
     await this.service.markRead(user.id, dto.lastMessageId);
   }
 
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   @Post()
   @ApiOperation({
     summary: 'Send a message to my kvintet',
