@@ -522,7 +522,6 @@
     "error": {
       "title": "Couldn't load profile"
     },
-    "newUsernameHint": "New username, new blobatar.",
     "sections": {
       "interests": "I'm interested in",
       "learn": "I want to learn",

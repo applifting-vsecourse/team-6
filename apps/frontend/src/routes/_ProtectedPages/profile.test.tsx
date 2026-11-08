@@ -132,14 +132,13 @@ describe("ProfilePage", () => {
     expect(avatar?.querySelector("title")).toHaveTextContent("Jana Nováková")
   })
 
-  it("renders user identity details and desktop hint", () => {
+  it("renders user identity details", () => {
     mockUseProfile.mockReturnValue(mockProfileData())
 
     render(<ProfilePage user={defaultUser} />)
 
     expect(screen.getByRole("heading", { name: "Jana Nováková" })).toBeInTheDocument()
     expect(screen.getByText(/@jana.novakova · Marketing specialist/)).toBeInTheDocument()
-    expect(screen.getByText("New username, new blobatar.")).toBeInTheDocument()
   })
 
   it("renders teach, learn and interest tag sections with edit links to step 1", () => {

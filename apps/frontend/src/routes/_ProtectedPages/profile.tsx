@@ -207,9 +207,6 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
           {subtitle ? (
             <p className="text-compact text-muted-foreground md:text-lead">{subtitle}</p>
           ) : null}
-          <p className="hidden text-small text-muted-foreground md:block">
-            {t("profile.newUsernameHint")}
-          </p>
         </div>
       </section>
 
