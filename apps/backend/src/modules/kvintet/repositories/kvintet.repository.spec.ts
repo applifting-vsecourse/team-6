@@ -1,4 +1,5 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
+import { KVINTET_STARTED } from '@/modules/chat/domain/message';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
 import { emptyMatchProfile } from '@/modules/matching/matching';
 import { BadRequestException, ConflictException } from '@nestjs/common';
@@ -59,6 +60,15 @@ describe('KvintetRepository (Postgres)', () => {
     return kvintet.id;
   };
 
+  /** Bodies of the SYSTEM lines in a kvintet's chat. */
+  const startedLines = async (kvintetId: string): Promise<string[]> =>
+    (
+      await prisma.message.findMany({
+        where: { kvintetId, kind: 'SYSTEM' },
+        select: { body: true },
+      })
+    ).map((message) => message.body);
+
   beforeAll(async () => {
     await prisma.$connect();
     categoryId = (
@@ -92,6 +102,7 @@ describe('KvintetRepository (Postgres)', () => {
     expect(kvintet.status).toBe('ACTIVE');
     expect(kvintet.activatedAt).not.toBeNull();
     expect(kvintet._count.members).toBe(5);
+    await expect(startedLines(kvintetId)).resolves.toEqual([KVINTET_STARTED]);
   });
 
   it('keeps a kvintet FORMING until the fifth member joins', async () => {
@@ -104,6 +115,7 @@ describe('KvintetRepository (Postgres)', () => {
       where: { id: kvintetId },
     });
     expect(kvintet.status).toBe('FORMING');
+    await expect(startedLines(kvintetId)).resolves.toEqual([]);
   });
 
   it('refuses a user who is already in a kvintet, in this one or another', async () => {
@@ -316,6 +328,7 @@ describe('KvintetRepository (Postgres)', () => {
     expect(afterVote0?.voteStatus.votedCount).toBe(1);
     expect(afterVote0?.voteStatus.userHasVoted).toBe(true);
     expect(afterVote0?.status).toBe('FORMING');
+    await expect(startedLines(kvintetId)).resolves.toEqual([]);
 
     // Vote user 1
     await repository.vote(kvintetId, users[1]);
@@ -325,6 +338,7 @@ describe('KvintetRepository (Postgres)', () => {
     const afterVoteAll = await repository.findKvintetDetailsByUserId(users[0]);
     expect(afterVoteAll?.status).toBe('ACTIVE');
     expect(afterVoteAll?.activatedAt).not.toBeNull();
+    await expect(startedLines(kvintetId)).resolves.toEqual([KVINTET_STARTED]);
 
     // Leave user 0
     await repository.leave(kvintetId, users[0]);

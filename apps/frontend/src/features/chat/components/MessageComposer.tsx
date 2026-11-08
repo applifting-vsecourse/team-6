@@ -51,7 +51,7 @@ export function MessageComposer({ onSend, isSending, error }: MessageComposerPro
   return (
     <form
       onSubmit={onSubmit}
-      className="flex flex-col gap-2 border-t border-border bg-secondary p-3"
+      className="flex flex-col gap-2 border-t border-border bg-secondary px-4 pt-3 pb-6 md:px-5 md:py-3.5"
     >
       <div className="flex items-end gap-3">
         <div className="flex-1">
@@ -70,7 +70,7 @@ export function MessageComposer({ onSend, isSending, error }: MessageComposerPro
             rows={1}
             placeholder={t("chat.composer.placeholder")}
             aria-invalid={error ? true : undefined}
-            className="max-h-32 min-h-11 resize-none"
+            className="max-h-32 min-h-11 resize-none bg-card"
           />
         </div>
         <Button

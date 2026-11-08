@@ -9,6 +9,8 @@ import { chatKeys } from "./chatKeys"
 export const MESSAGE_PAGE_SIZE = 50
 export const MESSAGE_POLL_LIMIT = 100
 export const MESSAGE_MAX_LENGTH = 1000
+/** Body of the SYSTEM line the backend posts when a kvintet starts: a code, translated here. */
+export const KVINTET_STARTED = "kvintet_started"
 const POLL_INTERVAL_MS = 5_000
 const UNREAD_POLL_INTERVAL_MS = 10_000
 

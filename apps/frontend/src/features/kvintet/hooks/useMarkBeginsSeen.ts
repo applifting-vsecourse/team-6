@@ -6,7 +6,7 @@ import { kvintetKeys } from "@/features/kvintet/api/kvintetKeys"
 /**
  * Tells the server the "Kvintet begins" page has been seen. The cache is updated at once, so
  * "See members" on the page does not bounce back here while the request is on its way; if it
- * fails, the next poll of "My kvintet" brings the page back and it asks again.
+ * fails, the next poll of the kvintet on Home brings the page back and it asks again.
  */
 export function useMarkBeginsSeen() {
   const queryClient = useQueryClient()

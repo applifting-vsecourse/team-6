@@ -67,11 +67,15 @@
     "deletedMember": "Deleted member",
     "empty": "No messages yet. Say hello to your kvintet.",
     "error": "We couldn't load the messages.",
+    "members": "Members of the kvintet",
     "newMessages": "New messages",
     "pageTitle": "Messages",
     "retry": "Try again",
     "showEarlier": "Show earlier messages",
-    "subtitle": "{{names}} · only members can read the messages",
+    "subtitle": "Only group members can read the messages.",
+    "system": {
+      "kvintetStarted": "The kvintet has started. Say hello!"
+    },
     "you": "You"
   },
   "codeOfConduct": {

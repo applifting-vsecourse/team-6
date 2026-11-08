@@ -1,5 +1,6 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
 import { MeetingFrequency } from '@/generated/prisma/client';
+import { KVINTET_STARTED } from '@/modules/chat/domain/message';
 
 export type DemoMember = {
   userId: string;
@@ -121,6 +122,17 @@ export async function createDemoKvintets(
         },
       },
     });
+
+    if (kvintet.active) {
+      await prisma.message.create({
+        data: {
+          kvintetId: created.id,
+          kind: 'SYSTEM',
+          body: KVINTET_STARTED,
+          createdAt: created.activatedAt ?? undefined,
+        },
+      });
+    }
 
     await prisma.kvintetVote.createMany({
       data: kvintet.members
