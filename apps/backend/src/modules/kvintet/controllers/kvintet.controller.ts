@@ -25,7 +25,8 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { FeedItemDto } from './dto/feed-item.dto';
+import { SkipThrottle } from '@nestjs/throttler';
+import { FeedDto } from './dto/feed-item.dto';
 import { FeedQueryDto } from './dto/feed-query.dto';
 import { KvintetDetailsDto } from './dto/kvintet-details.dto';
 import { MembershipDto } from './dto/membership.dto';
@@ -38,6 +39,7 @@ import { StartedKvintetDto, StartKvintetDto } from './dto/start-kvintet.dto';
 export class KvintetController {
   constructor(private readonly service: KvintetService) {}
 
+  @SkipThrottle()
   @Get('membership')
   @ApiOperation({
     summary: 'Is the caller in a kvintet?',
@@ -52,12 +54,9 @@ export class KvintetController {
   @ApiOperation({
     summary: 'Open kvintets',
     description:
-      'Kvintets that still have a free seat, newest first, optionally only one category. Members appear by role and interests only. 400 for an unknown category, 409 if the caller is already in a kvintet.',
+      'Kvintets that still have a free seat, ranked by how well they suit the caller and cut at the match threshold (all of them, flagged `fallback`, when none reach it), optionally only those in one category. Each lists up to three reasons; the score is never sent. Members appear by role and interests only. 400 for an unknown category, 409 if the caller is already in a kvintet.',
   })
-  feed(
-    @User() user: Identity,
-    @Query() query: FeedQueryDto,
-  ): Promise<FeedItemDto[]> {
+  feed(@User() user: Identity, @Query() query: FeedQueryDto): Promise<FeedDto> {
     return this.service.feed(user.id, query.category);
   }
 
@@ -72,7 +71,7 @@ export class KvintetController {
   ): Promise<StartedKvintetDto> {
     return this.service.start(user.id, {
       title: dto.title,
-      categorySlug: dto.categorySlug,
+      categorySlugs: dto.categorySlugs,
       description: dto.description || null,
     });
   }
@@ -87,6 +86,7 @@ export class KvintetController {
     return this.service.join(user.id, id);
   }
 
+  @SkipThrottle()
   @Get('mine')
   @UseGuards(MemberGuard)
   @ApiOperation({
@@ -128,6 +128,20 @@ export class KvintetController {
         ? details.activatedAt.toISOString()
         : null,
     };
+  }
+
+  @Post('mine/begins-seen')
+  @UseGuards(MemberGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Mark the "Kvintet begins" page as seen',
+    description:
+      'Records that the caller has opened the page. Does nothing while the kvintet is still forming and when it is already marked.',
+  })
+  @ApiUnauthorizedResponse({ description: 'Not signed in' })
+  @ApiForbiddenResponse({ description: 'Not a member of any kvintet' })
+  markBeginsSeen(@User() user: Identity): Promise<void> {
+    return this.service.markBeginsSeen(user.id);
   }
 
   @Delete('mine/membership')

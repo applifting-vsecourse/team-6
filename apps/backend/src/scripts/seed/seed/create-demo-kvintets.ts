@@ -1,5 +1,6 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
 import { MeetingFrequency } from '@/generated/prisma/client';
+import { KVINTET_STARTED } from '@/modules/chat/domain/message';
 
 export type DemoMember = {
   userId: string;
@@ -10,16 +11,37 @@ export type DemoMember = {
   teach: string[];
   learn: string[];
   interests: string[];
+  // Where and when they can meet, so the feed ranking differs between accounts.
+  // Defaults: Praha, 25 km, weekday evenings, wants to learn something new.
+  place?: keyof typeof PLACES;
+  radiusKm?: number;
+  availability?: Partial<
+    Record<
+      'weekdays' | 'weekends' | 'mornings' | 'afternoons' | 'evenings',
+      boolean
+    >
+  >;
+  expectations?: string[];
+};
+
+const PLACES = {
+  praha: { latitude: 50.0755, longitude: 14.4378 },
+  brno: { latitude: 49.1951, longitude: 16.6068 },
 };
 
 type DemoKvintet = {
   title: string;
-  category: string;
+  categories: string[];
   members: DemoMember[];
   // Full and agreed on.
   active?: boolean;
   // How many of the first members have already voted to start.
   votes?: number;
+  // What the group has written so far, oldest first. `from` is an index into `members`.
+  chat?: { from: number; body: string; minutesAgo: number }[];
+  // How many chat lines each member (by index) has read; everyone else has read all of them.
+  // The rest count as unread for them, except their own.
+  readCounts?: Record<number, number>;
 };
 
 const minutesAgo = (minutes: number): Date =>
@@ -50,8 +72,10 @@ export async function createDemoProfiles(
         position: member.position,
         roles: member.roles ?? [],
         meetingFrequency: member.meetingFrequency,
-        weekdays: true,
-        evenings: true,
+        ...PLACES[member.place ?? 'praha'],
+        radiusKm: member.radiusKm ?? 25,
+        ...(member.availability ?? { weekdays: true, evenings: true }),
+        expectations: JSON.stringify(member.expectations ?? ['learn_new']),
         tags: {
           create: [
             ...member.teach.map((slug) => ({
@@ -78,16 +102,22 @@ export async function createDemoKvintets(
   kvintets: DemoKvintet[],
 ): Promise<void> {
   for (const kvintet of kvintets) {
-    const category = await prisma.category.findUniqueOrThrow({
-      where: { slug: kvintet.category },
-    });
+    const categoryIds = await Promise.all(
+      kvintet.categories.map(
+        async (slug) =>
+          (await prisma.category.findUniqueOrThrow({ where: { slug } })).id,
+      ),
+    );
 
     await createDemoProfiles(prisma, kvintet.members);
 
     const created = await prisma.kvintet.create({
       data: {
         title: kvintet.title,
-        categoryId: category.id,
+        categoryId: categoryIds[0],
+        categories: {
+          create: categoryIds.map((categoryId) => ({ categoryId })),
+        },
         status: kvintet.active ? 'ACTIVE' : 'FORMING',
         activatedAt: kvintet.active ? minutesAgo(2 * 24 * 60) : null,
         members: {
@@ -97,6 +127,48 @@ export async function createDemoKvintets(
         },
       },
     });
+
+    let startedId = 0;
+    if (kvintet.active) {
+      startedId = (
+        await prisma.message.create({
+          data: {
+            kvintetId: created.id,
+            kind: 'SYSTEM',
+            body: KVINTET_STARTED,
+            createdAt: created.activatedAt ?? undefined,
+          },
+        })
+      ).id;
+    }
+
+    const chat = kvintet.chat ?? [];
+    const chatIds: number[] = [];
+    for (const line of chat) {
+      const message = await prisma.message.create({
+        data: {
+          kvintetId: created.id,
+          authorId: kvintet.members[line.from].userId,
+          kind: 'USER',
+          body: line.body,
+          createdAt: minutesAgo(line.minutesAgo),
+        },
+      });
+      chatIds.push(message.id);
+    }
+
+    // The read mark is the id of the newest line a member has seen.
+    for (const [index, member] of kvintet.members.entries()) {
+      const readCount = kvintet.readCounts?.[index] ?? chat.length;
+      await prisma.kvintetMember.update({
+        where: {
+          kvintetId_userId: { kvintetId: created.id, userId: member.userId },
+        },
+        data: {
+          lastReadMessageId: readCount > 0 ? chatIds[readCount - 1] : startedId,
+        },
+      });
+    }
 
     await prisma.kvintetVote.createMany({
       data: kvintet.members

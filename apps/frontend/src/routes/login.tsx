@@ -63,16 +63,16 @@ function LoginPage() {
       <Seo title={t("auth.signIn")} />
       <AuthLayout
         header={<AppHeader hasAccount={false} />}
-        title={t("auth.signIn")}
+        title={t("auth.signInTitle")}
         description={t("auth.signInDescription")}
         footer={
           <>
-            {t("auth.noAccount")}{" "}
+            {t("auth.noAccountYet")}
             <Link
               to={ROUTES.signup}
-              className="font-medium text-foreground underline underline-offset-4"
+              className="text-foreground underline underline-offset-auto"
             >
-              {t("auth.signUp")}
+              {t("auth.createAccount")}
             </Link>
           </>
         }

@@ -1,10 +1,9 @@
 import { ROUTES } from "@/app/routes"
 
-// Only routes that exist. My kvintet joins when its story adds the page.
+// Only routes that exist. The kvintet itself lives on Home.
 export const NAV_ITEMS = [
   { to: ROUTES.overview, labelKey: "nav.overview" },
   { to: ROUTES.kvintetFeed, labelKey: "nav.kvintetFeed" },
-  { to: ROUTES.myKvintet, labelKey: "nav.myKvintet" },
 ] as const
 
 /** Nav items that are shown but cannot be used, mapped to the reason shown in a tooltip. */

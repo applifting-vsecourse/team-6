@@ -1,6 +1,6 @@
-@import "@fontsource-variable/newsreader/wght.css";
-@import "@fontsource-variable/newsreader/wght-italic.css";
-@import "@fontsource-variable/source-sans-3/wght.css";
+@import "@fontsource-variable/inter/wght.css";
+@import "@fontsource-variable/inter/wght-italic.css";
+@import "@fontsource-variable/bricolage-grotesque/opsz.css";
 @import "@fontsource/ibm-plex-mono/500.css";
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
@@ -26,14 +26,19 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-highlight-soft: var(--highlight-soft);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-track: var(--track);
+  --color-overlay: var(--overlay);
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
-  --font-serif: var(--font-serif);
+  --font-brand: var(--font-brand);
 
   --shadow-2xs: var(--shadow-2xs);
   --shadow-xs: var(--shadow-xs);
@@ -44,64 +49,114 @@
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
 
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: calc(var(--radius) + 4px);
+  --radius-md: var(--radius);
   --radius-sm: calc(var(--radius) - 2px);
 }
 
 /* Type scale from the Figma text styles that Tailwind's defaults do not cover. */
 @theme {
-  --text-display: 4rem;
-  --text-display--line-height: 1.05;
-  --text-display--letter-spacing: -0.01em;
+  /* Figma C/display (52 px) and its 36 px phone size on the landing page. */
+  --text-display: 3.25rem;
+  --text-display--line-height: 1.08;
+  --text-display--letter-spacing: -0.02em;
+  --text-display-mobile: 2.25rem;
+  --text-display-mobile--line-height: 1.08;
+  --text-display-mobile--letter-spacing: -0.02em;
   --text-title: 2.5rem;
   --text-title--line-height: 2.875rem;
   --text-heading: 1.75rem;
   --text-heading--line-height: 2.125rem;
   --text-subheading: 1.3125rem;
   --text-subheading--line-height: 1.75rem;
-  --text-label: 0.9375rem;
-  --text-label--line-height: 1.25rem;
-  --tracking-meta: 0.06em;
+  --text-label: 0.875rem;
+  --text-label--line-height: 1.4;
+  /* Figma C/h1 (page title of forms and reading pages), C/h1m on a phone, C/lead and C/h3.
+     The 15px C/body is `compact` below. */
+  --text-h1: 2rem;
+  --text-h1--line-height: 1.2;
+  --text-h1--letter-spacing: -0.01em;
+  --text-h1-mobile: 1.6875rem;
+  --text-h1-mobile--line-height: 1.22;
+  --text-h1-mobile--letter-spacing: -0.01em;
+  --text-lead: 1.0625rem;
+  --text-lead--line-height: 1.5;
+  --text-h2: 1.375rem;
+  --text-h2--line-height: 1.3;
+  --text-h2--letter-spacing: -0.005em;
+  --text-h3: 1.0625rem;
+  --text-h3--line-height: 1.35;
+  /* Figma C/small, C/mono and the wordmark. */
+  --text-compact: 0.9375rem;
+  --text-compact--line-height: 1.5;
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.45;
+  --text-meta: 0.6875rem;
+  --text-meta--line-height: 1.4;
+  --text-logo: 1.375rem;
+  --text-logo--line-height: 1.35;
+  /* Figma C/display at 52px (page title of "Kvintet begins"), its 34px phone size, and C/h2. */
+  --text-hero: 3.25rem;
+  --text-hero--line-height: 1.08;
+  --text-hero--letter-spacing: -0.02em;
+  --text-hero-mobile: 2.125rem;
+  --text-hero-mobile--line-height: 1.08;
+  --text-hero-mobile--letter-spacing: -0.02em;
+  --text-h2: 1.375rem;
+  --text-h2--line-height: 1.3;
+  --text-h2--letter-spacing: -0.005em;
+  --tracking-meta: 0.08em;
 }
 
-/* Kvintet palette (Figma Design_MVP variables). Light here, dark in `.dark` below. */
+/* Kvintet palette (Figma Design_MVP variables: bg, surface, surface-2, line, line-strong, primary,
+   muted, accent, danger). Light here, dark in `.dark` below. */
 :root {
   color-scheme: light;
-  --font-sans: "Source Sans 3 Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Newsreader Variable", Georgia, serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  /* Wordmark only (Figma logo variant C). */
+  --font-brand:
+    "Bricolage Grotesque Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* paper-50 */
-  --background: #fbf8f2;
-  /* ink-900 */
-  --foreground: #1c2b4a;
-  /* ink-700: body copy */
-  --body: #2f4673;
-  --card: #fbf8f2;
-  --card-foreground: #1c2b4a;
-  --popover: #fbf8f2;
-  --popover-foreground: #1c2b4a;
-  --primary: #1c2b4a;
-  --primary-foreground: #fbf8f2;
-  /* paper-100 */
-  --secondary: #f4eee3;
-  --secondary-foreground: #1c2b4a;
-  --muted: #f4eee3;
-  /* ink-500 */
-  --muted-foreground: #56688c;
-  /* ink-100 */
-  --accent: #e4e8f0;
-  --accent-foreground: #1c2b4a;
+  /* bg: the paper of every page */
+  --background: #eef0fa;
+  /* text */
+  --foreground: #10172a;
+  /* body copy; between text and muted (Figma has no separate style) */
+  --body: #2b3450;
+  /* surface */
+  --card: #ffffff;
+  --card-foreground: #10172a;
+  --popover: #ffffff;
+  --popover-foreground: #10172a;
+  --primary: #10172a;
+  /* on-primary */
+  --primary-foreground: #ffffff;
+  /* surface-2 */
+  --secondary: #eef1f7;
+  --secondary-foreground: #10172a;
+  --muted: #eef1f7;
+  --muted-foreground: #5b6582;
+  /* surface-2: hover and active surface, not a brand colour */
+  --accent: #eef1f7;
+  --accent-foreground: #10172a;
   /* danger */
-  --destructive: #a23b3b;
-  --destructive-foreground: #fbf8f2;
+  --destructive: #c93b3b;
+  --destructive-foreground: #ffffff;
+  /* danger-soft: fill of an error alert */
+  --destructive-soft: #fbe3e3;
+  /* Figma `accent`: small blue highlights (unread badge, active dot, links). Not for actions. */
+  --highlight: #2f5bd3;
+  --highlight-foreground: #ffffff;
+  /* accent-soft: fill of a selected chip */
+  --highlight-soft: #e3ebff;
   /* line */
-  --border: #d6ccba;
+  --border: #dde2ec;
   /* line-strong */
-  --input: #8c8170;
-  --ring: #1c2b4a;
-  --radius: 4px;
+  --input: #b8c0d3;
+  --ring: #10172a;
+  /* Figma: buttons and inputs 8px (md), cards 12px (lg), nav items and checkbox ~6px (sm). */
+  --radius: 8px;
   --shadow-2xs: 0px 2px 10px 0px hsl(0 0% 0% / 0.05);
   --shadow-xs: 0px 2px 10px 0px hsl(0 0% 0% / 0.05);
   --shadow-sm: 0px 2px 10px 0px hsl(0 0% 0% / 0.1), 0px 1px 2px -1px hsl(0 0% 0% / 0.1);
@@ -110,45 +165,52 @@
   --shadow-lg: 0px 2px 10px 0px hsl(0 0% 0% / 0.1), 0px 4px 6px -1px hsl(0 0% 0% / 0.1);
   --shadow-xl: 0px 2px 10px 0px hsl(0 0% 0% / 0.1), 0px 8px 10px -1px hsl(0 0% 0% / 0.1);
   --shadow-2xl: 0px 2px 10px 0px hsl(0 0% 0% / 0.25);
-  /* paper-200: empty progress track */
-  --track: #e9e1d2;
+  /* line: empty progress track */
+  --track: #dde2ec;
+  /* Figma `overlay`: the scrim behind a dialog, used at 60% */
+  --overlay: #10172a;
 }
 
-/* Dark palette (Figma `[Tmavý]` frames). Only colours change; type, radius and shadows are shared. */
+/* Dark palette (Figma dark frames). Only colours change; type, radius and shadows are shared. */
 .dark {
   color-scheme: dark;
 
-  /* paper-50 */
-  --background: #141f36;
-  /* ink-900 */
-  --foreground: #f4eee3;
-  /* ink-700: body copy */
-  --body: #dcd4c5;
-  /* paper-100 */
-  --card: #1c2b4a;
-  --card-foreground: #f4eee3;
-  --popover: #1c2b4a;
-  --popover-foreground: #f4eee3;
-  --primary: #f4eee3;
-  /* on-ink */
-  --primary-foreground: #141f36;
-  --secondary: #1c2b4a;
-  --secondary-foreground: #f4eee3;
-  --muted: #1c2b4a;
-  /* ink-500 */
-  --muted-foreground: #a9b5cc;
-  /* paper-200 */
-  --accent: #26375a;
-  --accent-foreground: #f4eee3;
+  /* bg */
+  --background: #0d1220;
+  /* text */
+  --foreground: #eaeef8;
+  /* body copy; between text and muted */
+  --body: #c9d0e3;
+  /* surface */
+  --card: #131a2b;
+  --card-foreground: #eaeef8;
+  --popover: #131a2b;
+  --popover-foreground: #eaeef8;
+  --primary: #eaeef8;
+  /* on-primary */
+  --primary-foreground: #0d1220;
+  /* surface-2 */
+  --secondary: #1a2238;
+  --secondary-foreground: #eaeef8;
+  --muted: #1a2238;
+  --muted-foreground: #8d97b2;
+  --accent: #1a2238;
+  --accent-foreground: #eaeef8;
   /* danger */
-  --destructive: #e88484;
-  --destructive-foreground: #141f36;
+  --destructive: #ff8a8a;
+  --destructive-foreground: #0d1220;
+  --destructive-soft: #3a1c22;
+  /* accent */
+  --highlight: #8db4ff;
+  --highlight-foreground: #0d1220;
+  --highlight-soft: #1c2a4a;
   /* line */
-  --border: #33456b;
+  --border: #27304a;
   /* line-strong */
-  --input: #7385a8;
-  --ring: #f4eee3;
-  --track: #26375a;
+  --input: #3a4566;
+  --ring: #eaeef8;
+  --track: #27304a;
+  --overlay: #05080f;
 }
 
 @layer base {
@@ -159,10 +221,8 @@
     @apply bg-background text-body antialiased;
   }
   h1,
-  h2 {
-    @apply font-serif font-medium text-foreground;
-  }
+  h2,
   h3 {
-    @apply font-serif font-semibold text-foreground;
+    @apply font-semibold text-foreground;
   }
 }

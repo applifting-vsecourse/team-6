@@ -5,13 +5,22 @@ import { describe, expect, it, vi } from "vitest"
 import type { FeedKvintet } from "@/features/kvintet/api/kvintetFeedQueryOptions"
 import { KvintetCard } from "@/features/kvintet/components/KvintetCard"
 
+const commonAvailability = {
+  weekdays: false,
+  weekends: false,
+  mornings: false,
+  afternoons: false,
+  evenings: false,
+}
+
 const kvintet: FeedKvintet = {
   id: "k1",
   title: "Using AI at work",
-  category: "technology",
+  categories: ["software-development", "business"],
   capacity: 5,
   memberCount: 2,
   meetingFrequency: "BIWEEKLY",
+  commonAvailability,
   members: [
     {
       position: "Backend developer",
@@ -20,6 +29,11 @@ const kvintet: FeedKvintet = {
       interests: ["startups"],
     },
     { position: null, teach: [], learn: [], interests: [] },
+  ],
+  reasons: [
+    { code: "learn", tag: "python" },
+    { code: "topic", category: "data-ai" },
+    { code: "frequency" },
   ],
 }
 
@@ -36,34 +50,45 @@ const renderCard = (overrides: Partial<FeedKvintet> = {}, onJoin = vi.fn()) => {
 }
 
 describe("KvintetCard", () => {
-  it("shows the topic, category and seats", () => {
+  it("shows the topic, every category and how many seats are taken", () => {
     renderCard()
 
     expect(screen.getByRole("heading", { name: "Using AI at work" })).toBeInTheDocument()
-    expect(screen.getByText("Technology")).toBeInTheDocument()
-    expect(screen.getByText("2 of 5")).toBeInTheDocument()
+    expect(screen.getByText("Software development")).toBeInTheDocument()
+    expect(screen.getByText("Business")).toBeInTheDocument()
+    expect(screen.getByText("2 / 5")).toBeInTheDocument()
   })
 
-  it("describes each member by role and tags and marks the free seats", () => {
+  it("says why the kvintet suits the user, in one line with translated tags and categories", () => {
     renderCard()
 
-    const [first, second] = screen.getAllByRole("listitem")
-    if (!first || !second) throw new Error("expected a row per member")
-    expect(within(first).getByText("Backend developer")).toBeInTheDocument()
     expect(
-      within(first).getByText(
-        "Teaches: Python and SQL · Wants to learn: UX design · Interests: Startups",
+      screen.getByText(
+        "Someone here teaches Python · Your topic: Data & AI · Same meeting frequency",
       ),
     ).toBeInTheDocument()
-    // A member without a role yet still gets a row, never a name.
-    expect(within(second).getByText("Member")).toBeInTheDocument()
-    expect(screen.getAllByText("Free seat")).toHaveLength(3)
   })
 
-  it("says the names stay hidden until the kvintet forms", () => {
+  it("shows no reasons when there are none", () => {
+    renderCard({ reasons: [] })
+
+    expect(screen.queryByText("Why it suits you:")).not.toBeInTheDocument()
+  })
+
+  it("shows each member by role only, then the free seats, five in total", () => {
     renderCard()
 
-    expect(screen.getByText("You will see the names once the kvintet forms.")).toBeInTheDocument()
+    const seats = within(screen.getByRole("list")).getAllByRole("listitem")
+    expect(seats.map((seat) => seat.textContent)).toEqual([
+      "Backend developer",
+      // A member without a role yet still gets a seat, never a name.
+      "Member",
+      "Free",
+      "Free",
+      "Free",
+    ])
+    // A member's tags are not on the card.
+    expect(screen.queryByText(/Teaches/)).not.toBeInTheDocument()
   })
 
   it("shows the shared meeting frequency only when there is one", () => {
@@ -75,17 +100,17 @@ describe("KvintetCard", () => {
         onJoin={vi.fn()}
       />,
     )
-    expect(screen.getByText("Suits everyone: every 14 days")).toBeInTheDocument()
+    expect(screen.getByText("Every two weeks")).toBeInTheDocument()
     unmount()
 
     renderCard({ meetingFrequency: null })
-    expect(screen.queryByText(/Suits everyone/)).not.toBeInTheDocument()
+    expect(screen.queryByText("Every two weeks")).not.toBeInTheDocument()
   })
 
-  it("joins with the proposal id", async () => {
+  it("joins with the kvintet id", async () => {
     const onJoin = renderCard()
 
-    await userEvent.click(screen.getByRole("button", { name: "Join this proposal" }))
+    await userEvent.click(screen.getByRole("button", { name: "Join" }))
 
     expect(onJoin).toHaveBeenCalledWith("k1")
   })
@@ -100,6 +125,6 @@ describe("KvintetCard", () => {
       />,
     )
 
-    expect(screen.getByRole("button", { name: "Join this proposal" })).toBeDisabled()
+    expect(screen.getByRole("button", { name: "Join" })).toBeDisabled()
   })
 })

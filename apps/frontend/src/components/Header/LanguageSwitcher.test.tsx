@@ -21,4 +21,20 @@ describe("LanguageSwitcher", () => {
     expect(screen.getByRole("group", { name: "Jazyk" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Čeština" })).toHaveAttribute("aria-pressed", "true")
   })
+
+  it("is a segmented switch in the mobile menu and always keeps one language", async () => {
+    const user = userEvent.setup()
+    render(<LanguageSwitcher variant="pills" />)
+
+    expect(screen.getByRole("radiogroup", { name: "Language" })).toBeInTheDocument()
+    expect(screen.getByRole("radio", { name: "English" })).toBeChecked()
+
+    await user.click(screen.getByRole("radio", { name: "Čeština" }))
+
+    expect(i18n.resolvedLanguage).toBe("cs")
+
+    await user.click(screen.getByRole("radio", { name: "Čeština" }))
+
+    expect(i18n.resolvedLanguage).toBe("cs")
+  })
 })

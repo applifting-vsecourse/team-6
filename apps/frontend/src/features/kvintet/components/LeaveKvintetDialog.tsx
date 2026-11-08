@@ -1,7 +1,9 @@
 import { useTranslation } from "react-i18next"
 
+import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Button } from "@/components/ui/button"
 import {
+  bottomSheetDialogContentClassName,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -16,6 +18,7 @@ type LeaveKvintetDialogProps = {
   onConfirm: () => void
   isLeaving: boolean
   isActiveKvintet: boolean
+  avatarSeed?: string
 }
 
 export function LeaveKvintetDialog({
@@ -24,37 +27,68 @@ export function LeaveKvintetDialog({
   onConfirm,
   isLeaving,
   isActiveKvintet,
+  avatarSeed,
 }: LeaveKvintetDialogProps) {
   const { t } = useTranslation()
+
+  const title = isActiveKvintet
+    ? t("kvintet.dialog.leaveActiveTitle")
+    : t("kvintet.dialog.leaveTitle")
+
+  const description = isActiveKvintet
+    ? t("kvintet.dialog.leaveActiveDescription")
+    : t("kvintet.dialog.leaveProposalConfirm")
 
   return (
     <Dialog
       open={isOpen}
       onOpenChange={onOpenChange}
     >
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{t("kvintet.dialog.leaveTitle")}</DialogTitle>
-          <DialogDescription>
-            {isActiveKvintet
-              ? t("kvintet.dialog.leaveActiveConfirm")
-              : t("kvintet.dialog.leaveProposalConfirm")}
+      <DialogContent className={bottomSheetDialogContentClassName}>
+        <span
+          aria-hidden
+          className="mx-auto h-1 w-10 rounded-full bg-input sm:hidden"
+        />
+        {avatarSeed ? (
+          <GazeBlobatar
+            name={avatarSeed}
+            animate="always"
+            className="mx-auto size-14 sm:mx-0 sm:size-16"
+          />
+        ) : null}
+        <DialogHeader className="gap-2 text-center sm:text-left">
+          <DialogTitle className="text-h2 font-semibold text-foreground">{title}</DialogTitle>
+          <DialogDescription className="text-compact text-muted-foreground sm:text-body">
+            {description}
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter className="mt-4 gap-2 sm:gap-0">
+
+        {isActiveKvintet ? (
+          <div className="rounded-lg bg-destructive-soft px-3 py-2.5 text-small font-medium text-destructive">
+            {t("kvintet.dialog.leaveActiveNotice")}
+          </div>
+        ) : null}
+
+        <DialogFooter className="mt-2 flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isLeaving}
+            className="w-full sm:w-auto"
           >
-            {t("kvintet.dialog.cancel")}
+            {isActiveKvintet ? t("kvintet.dialog.stay") : t("kvintet.dialog.cancel")}
           </Button>
           <Button
             variant="destructive"
             onClick={onConfirm}
             disabled={isLeaving}
+            className="w-full sm:w-auto"
           >
-            {t("kvintet.dialog.confirmLeave")}
+            {isLeaving
+              ? t("kvintet.dialog.leaving")
+              : isActiveKvintet
+                ? t("kvintet.dialog.confirmLeaveActive")
+                : t("kvintet.dialog.confirmLeave")}
           </Button>
         </DialogFooter>
       </DialogContent>

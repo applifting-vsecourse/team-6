@@ -7,6 +7,7 @@ import {
   UnauthorizedException,
   type ValidationPipe,
 } from '@nestjs/common';
+import { ThrottlerException } from '@nestjs/throttler';
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { AllExceptionsFilter } from './all-exceptions.filter';
 import {
@@ -71,6 +72,7 @@ describe('AllExceptionsFilter', () => {
     [new UnauthorizedException(), 401, 'unauthorized'],
     [new NotFoundException(), 404, 'not_found'],
     [new BadRequestException('nope'), 400, 'bad_request'],
+    [new ThrottlerException(), 429, 'too_many_requests'],
   ])('maps %p to a stable code', (exception, status, code) => {
     expect(run(exception)).toMatchObject({
       status,

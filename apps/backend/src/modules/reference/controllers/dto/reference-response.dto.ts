@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CategoryDto {
-  @ApiProperty({ example: 'technology' })
+  @ApiProperty({ example: 'software-development' })
   slug!: string;
 }
 

@@ -1,5 +1,7 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
+import { KVINTET_STARTED } from '@/modules/chat/domain/message';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
+import { emptyMatchProfile } from '@/modules/matching/matching';
 import { BadRequestException, ConflictException } from '@nestjs/common';
 import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
@@ -51,11 +53,21 @@ describe('KvintetRepository (Postgres)', () => {
       data: {
         title: `${prefix} kvintet`,
         categoryId,
+        categories: { create: { categoryId } },
         members: { create: memberIds.map((userId) => ({ userId })) },
       },
     });
     return kvintet.id;
   };
+
+  /** Bodies of the SYSTEM lines in a kvintet's chat. */
+  const startedLines = async (kvintetId: string): Promise<string[]> =>
+    (
+      await prisma.message.findMany({
+        where: { kvintetId, kind: 'SYSTEM' },
+        select: { body: true },
+      })
+    ).map((message) => message.body);
 
   beforeAll(async () => {
     await prisma.$connect();
@@ -90,6 +102,7 @@ describe('KvintetRepository (Postgres)', () => {
     expect(kvintet.status).toBe('ACTIVE');
     expect(kvintet.activatedAt).not.toBeNull();
     expect(kvintet._count.members).toBe(5);
+    await expect(startedLines(kvintetId)).resolves.toEqual([KVINTET_STARTED]);
   });
 
   it('keeps a kvintet FORMING until the fifth member joins', async () => {
@@ -102,6 +115,7 @@ describe('KvintetRepository (Postgres)', () => {
       where: { id: kvintetId },
     });
     expect(kvintet.status).toBe('FORMING');
+    await expect(startedLines(kvintetId)).resolves.toEqual([]);
   });
 
   it('refuses a user who is already in a kvintet, in this one or another', async () => {
@@ -116,9 +130,13 @@ describe('KvintetRepository (Postgres)', () => {
     await expect(
       repository.start(owner, {
         title: `${prefix} second`,
-        categorySlug: (
-          await prisma.category.findUniqueOrThrow({ where: { id: categoryId } })
-        ).slug,
+        categorySlugs: [
+          (
+            await prisma.category.findUniqueOrThrow({
+              where: { id: categoryId },
+            })
+          ).slug,
+        ],
         description: null,
       }),
     ).resolves.toEqual({ result: 'already_member' });
@@ -132,26 +150,43 @@ describe('KvintetRepository (Postgres)', () => {
     );
   });
 
-  it('starts a kvintet with the caller as its only member', async () => {
+  it('starts a kvintet with the caller as its only member and every chosen category', async () => {
     const [user] = await createUsers(1, 'starter');
-    const category = await prisma.category.findUniqueOrThrow({
-      where: { id: categoryId },
+    const categories = await prisma.category.findMany({
+      orderBy: { sortOrder: 'asc' },
+      take: 2,
     });
 
     const outcome = await repository.start(user, {
       title: `${prefix} started`,
-      categorySlug: category.slug,
+      // Reverse order: the feed still lists them in reference order.
+      categorySlugs: [categories[1].slug, categories[0].slug],
       description: 'Short description',
     });
 
     expect(outcome.result).toBe('started');
+    const id = outcome.result === 'started' ? outcome.id : '';
+    const open = await repository.findOpenKvintets(categories[1].slug);
+    expect(open.find((p) => p.id === id)?.categories).toEqual([
+      categories[0].slug,
+      categories[1].slug,
+    ]);
+  });
+
+  it('refuses to start a kvintet when any category is unknown', async () => {
+    const [user] = await createUsers(1, 'unknown');
+    const { slug } = await prisma.category.findUniqueOrThrow({
+      where: { id: categoryId },
+    });
+
     await expect(
       repository.start(user, {
         title: `${prefix} nope`,
-        categorySlug: 'does-not-exist',
+        categorySlugs: [slug, 'does-not-exist'],
         description: null,
       }),
     ).resolves.toEqual({ result: 'unknown_category' });
+    await expect(repository.isMember(user)).resolves.toBe(false);
   });
 
   it('lists only the kvintets of the requested category', async () => {
@@ -168,7 +203,7 @@ describe('KvintetRepository (Postgres)', () => {
     const inOther = await repository.findOpenKvintets(other.slug);
 
     expect(inCategory.map((p) => p.id)).toContain(kvintetId);
-    expect(inCategory.every((p) => p.category === slug)).toBe(true);
+    expect(inCategory.every((p) => p.categories.includes(slug))).toBe(true);
     expect(inOther.map((p) => p.id)).not.toContain(kvintetId);
   });
 
@@ -208,7 +243,7 @@ describe('KvintetRepository (Postgres)', () => {
     const open = await repository.findOpenKvintets();
 
     expect(open.find((p) => p.id === kvintetId)).toMatchObject({
-      category: category.slug,
+      categories: [category.slug],
       members: [
         {
           position: 'Accountant',
@@ -219,6 +254,60 @@ describe('KvintetRepository (Postgres)', () => {
         },
       ],
     });
+  });
+
+  it('loads what matching needs, for the caller and for feed members', async () => {
+    const [user, bare] = await createUsers(2, 'matched');
+    await prisma.profile.create({
+      data: {
+        userId: user,
+        roles: ['developer'],
+        weekdays: true,
+        evenings: true,
+        latitude: 50.08,
+        longitude: 14.44,
+        radiusKm: 25,
+        meetingFrequency: 'BIWEEKLY',
+        expectations: JSON.stringify(['learn_new']),
+        tags: {
+          create: [{ kind: 'LEARN', tag: { connect: { slug: 'python' } } }],
+        },
+      },
+    });
+    const kvintetId = await createKvintet([user]);
+
+    const expected = {
+      roles: ['developer'],
+      weekdays: true,
+      weekends: false,
+      evenings: true,
+      latitude: 50.08,
+      longitude: 14.44,
+      radiusKm: 25,
+      meetingFrequency: 'BIWEEKLY',
+      expectations: ['learn_new'],
+      tags: [
+        {
+          slug: 'python',
+          kind: 'LEARN',
+          categories: expect.arrayContaining([
+            'software-development',
+            'data-ai',
+          ]) as unknown,
+        },
+      ],
+    };
+    await expect(repository.findMatchProfile(user)).resolves.toMatchObject(
+      expected,
+    );
+    const open = await repository.findOpenKvintets();
+    expect(
+      open.find((p) => p.id === kvintetId)?.members[0].match,
+    ).toMatchObject(expected);
+    // No profile row at all: every field empty, so matching treats it as neutral.
+    await expect(repository.findMatchProfile(bare)).resolves.toEqual(
+      emptyMatchProfile(),
+    );
   });
 
   it('retrieves kvintet details, votes, and leaves', async () => {
@@ -239,6 +328,7 @@ describe('KvintetRepository (Postgres)', () => {
     expect(afterVote0?.voteStatus.votedCount).toBe(1);
     expect(afterVote0?.voteStatus.userHasVoted).toBe(true);
     expect(afterVote0?.status).toBe('FORMING');
+    await expect(startedLines(kvintetId)).resolves.toEqual([]);
 
     // Vote user 1
     await repository.vote(kvintetId, users[1]);
@@ -248,6 +338,7 @@ describe('KvintetRepository (Postgres)', () => {
     const afterVoteAll = await repository.findKvintetDetailsByUserId(users[0]);
     expect(afterVoteAll?.status).toBe('ACTIVE');
     expect(afterVoteAll?.activatedAt).not.toBeNull();
+    await expect(startedLines(kvintetId)).resolves.toEqual([KVINTET_STARTED]);
 
     // Leave user 0
     await repository.leave(kvintetId, users[0]);
@@ -351,7 +442,7 @@ describe('KvintetRepository (Postgres)', () => {
     expect(details?.voteStatus.votedCount).toBe(1);
   });
 
-  it("hides other members' names while FORMING and shows them once ACTIVE", async () => {
+  it("hides other members' names and masks userIds while FORMING and reveals them once ACTIVE", async () => {
     const users = await createUsers(3, 'names');
     const kvintetId = await createKvintet(users);
 
@@ -360,6 +451,13 @@ describe('KvintetRepository (Postgres)', () => {
     for (const member of forming?.members ?? []) {
       expect(member.name).toBe(member.isCurrentUser ? users[0] : null);
       expect(member.username).toBeNull();
+      if (!member.isCurrentUser) {
+        expect(member.userId).toMatch(/^anon-/);
+        expect(member.userId).not.toBe(users[1]);
+        expect(member.userId).not.toBe(users[2]);
+      } else {
+        expect(member.userId).toBe(users[0]);
+      }
     }
 
     for (const user of users) await repository.vote(kvintetId, user);
@@ -372,5 +470,49 @@ describe('KvintetRepository (Postgres)', () => {
     expect(active?.members.map((m) => m.username).sort()).toEqual(
       [...users].sort(),
     );
+    expect(active?.members.map((m) => m.userId).sort()).toEqual(
+      [...users].sort(),
+    );
+  });
+
+  it('marks the begins page as seen only once the kvintet is ACTIVE, and keeps the first mark', async () => {
+    const users = await createUsers(3, 'begins');
+    const kvintetId = await createKvintet(users);
+
+    // Still forming: the mark is refused silently, so the page cannot be skipped.
+    await repository.markBeginsSeen(users[0]);
+    expect(
+      (await repository.findKvintetDetailsByUserId(users[0]))?.beginsSeen,
+    ).toBe(false);
+
+    for (const user of users) await repository.vote(kvintetId, user);
+    expect(
+      (await repository.findKvintetDetailsByUserId(users[0]))?.beginsSeen,
+    ).toBe(false);
+
+    await repository.markBeginsSeen(users[0]);
+    const first = await prisma.kvintetMember.findUniqueOrThrow({
+      where: { userId: users[0] },
+    });
+    await repository.markBeginsSeen(users[0]);
+    const again = await prisma.kvintetMember.findUniqueOrThrow({
+      where: { userId: users[0] },
+    });
+
+    expect(first.beginsSeenAt).not.toBeNull();
+    expect(again.beginsSeenAt).toEqual(first.beginsSeenAt);
+    // The mark is per member: the others still have to see it.
+    expect(
+      (await repository.findKvintetDetailsByUserId(users[0]))?.beginsSeen,
+    ).toBe(true);
+    expect(
+      (await repository.findKvintetDetailsByUserId(users[1]))?.beginsSeen,
+    ).toBe(false);
+  });
+
+  it('does not fail for a user who is in no kvintet', async () => {
+    const [user] = await createUsers(1, 'begins-none');
+
+    await expect(repository.markBeginsSeen(user)).resolves.toBeUndefined();
   });
 });

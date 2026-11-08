@@ -29,6 +29,9 @@ describe("getErrorMessage", () => {
 
   it("translates plain backend codes and uses the fallback for unknown ones", () => {
     expect(getErrorMessage(httpError({ code: "unauthorized" }))).toBe("You need to sign in first.")
+    expect(getErrorMessage(httpError({ code: "too_many_requests" }))).toBe(
+      "Too many requests. Please slow down and try again later.",
+    )
     expect(getErrorMessage(httpError({ code: "brand_new" }), "errors.signInFailed")).toBe(
       "Sign in failed",
     )
@@ -38,7 +41,7 @@ describe("getErrorMessage", () => {
   it("translates BetterAuth codes", () => {
     const error = toAuthError({ code: "INVALID_EMAIL_OR_PASSWORD", message: "English text" })
     expect(getErrorMessage(error, "errors.signInFailed")).toBe(
-      "Sign in failed. Incorrect email or password.",
+      "Email or password is wrong. Please try again.",
     )
   })
 

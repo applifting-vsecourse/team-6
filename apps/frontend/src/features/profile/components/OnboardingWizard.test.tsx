@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import type * as Router from "@tanstack/react-router"
 import { render, screen } from "@testing-library/react"
@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import type * as ProfileApi from "@/features/profile/api/profileApi"
 
-import { OnboardingWizard } from "./OnboardingWizard"
+import { OnboardingWizard, type OnboardingStep } from "./OnboardingWizard"
 
 vi.mock("@/features/profile/components/LocationMapPicker", () => ({
   DEFAULT_RADIUS_KM: 25,
@@ -71,6 +71,17 @@ const createWrapper = () => {
   }
 }
 
+// The route owns the step (it lives in the URL); this stands in for it.
+function Wizard() {
+  const [step, setStep] = useState<OnboardingStep>(1)
+  return (
+    <OnboardingWizard
+      step={step}
+      onStepChange={setStep}
+    />
+  )
+}
+
 describe("OnboardingWizard", () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -79,10 +90,11 @@ describe("OnboardingWizard", () => {
 
   it("walks through step 1, 2, 3 and submits the complete profile", async () => {
     mockMutateAsync.mockResolvedValue({})
-    render(<OnboardingWizard />, { wrapper: createWrapper() })
+    render(<Wizard />, { wrapper: createWrapper() })
 
     // Step 1
-    expect(await screen.findByText("Tell us about yourself")).toBeInTheDocument()
+    expect(await screen.findByText("Tell us about you")).toBeInTheDocument()
+    await userEvent.click(await screen.findByRole("button", { name: "Tech & dev" }))
     await userEvent.click(screen.getByRole("button", { name: "Select role Software Engineer" }))
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
 
@@ -94,10 +106,10 @@ describe("OnboardingWizard", () => {
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
 
     // Step 3
-    expect(await screen.findByText("What do you expect from a kvintet?")).toBeInTheDocument()
+    expect(await screen.findByText("What do you expect from the group?")).toBeInTheDocument()
     await userEvent.click(screen.getByLabelText("Learn something new"))
     await userEvent.click(screen.getByLabelText("Every week"))
-    await userEvent.click(screen.getByRole("button", { name: "Finish" }))
+    await userEvent.click(screen.getByRole("button", { name: "Done" }))
 
     expect(mockMutateAsync).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -129,14 +141,14 @@ describe("OnboardingWizard", () => {
       meetingFrequency: "WEEKLY",
       expectations: ["learn_new"],
     })
-    render(<OnboardingWizard />, { wrapper: createWrapper() })
+    render(<Wizard />, { wrapper: createWrapper() })
 
-    expect(await screen.findByText("Tell us about yourself")).toBeInTheDocument()
+    expect(await screen.findByText("Tell us about you")).toBeInTheDocument()
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
     expect(await screen.findByText("When and where can you meet?")).toBeInTheDocument()
     await userEvent.click(screen.getByLabelText("Evenings"))
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
-    await userEvent.click(await screen.findByRole("button", { name: "Finish" }))
+    await userEvent.click(await screen.findByRole("button", { name: "Done" }))
 
     expect(mockMutateAsync).toHaveBeenCalledWith(
       expect.objectContaining({ cityId: null, latitude: 49.19, longitude: 16.6, radiusKm: 30 }),
@@ -144,23 +156,57 @@ describe("OnboardingWizard", () => {
   })
 
   it("supports going back to earlier steps", async () => {
-    render(<OnboardingWizard />, { wrapper: createWrapper() })
+    render(<Wizard />, { wrapper: createWrapper() })
 
-    expect(await screen.findByText("Tell us about yourself")).toBeInTheDocument()
+    expect(await screen.findByText("Tell us about you")).toBeInTheDocument()
+    await userEvent.click(await screen.findByRole("button", { name: "Design" }))
     await userEvent.click(screen.getByRole("button", { name: "Select role UX/UI Designer" }))
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
 
     expect(await screen.findByText("When and where can you meet?")).toBeInTheDocument()
     await userEvent.click(screen.getByRole("button", { name: "Back" }))
 
-    expect(await screen.findByText("Tell us about yourself")).toBeInTheDocument()
+    expect(await screen.findByText("Tell us about you")).toBeInTheDocument()
     expect(screen.getByText("UX/UI Designer")).toBeInTheDocument()
+  })
+
+  it("shows the step the route gives it", async () => {
+    render(
+      <OnboardingWizard
+        step={2}
+        onStepChange={vi.fn()}
+      />,
+      { wrapper: createWrapper() },
+    )
+
+    expect(await screen.findByText("When and where can you meet?")).toBeInTheDocument()
+    expect(screen.queryByText("Tell us about you")).not.toBeInTheDocument()
+  })
+
+  it("asks the route to change the step instead of keeping one of its own", async () => {
+    const onStepChange = vi.fn()
+    render(
+      <OnboardingWizard
+        step={1}
+        onStepChange={onStepChange}
+      />,
+      { wrapper: createWrapper() },
+    )
+
+    await userEvent.click(await screen.findByRole("button", { name: "Design" }))
+
+    await userEvent.click(await screen.findByRole("button", { name: "Select role UX/UI Designer" }))
+    await userEvent.click(screen.getByRole("button", { name: "Continue" }))
+
+    expect(onStepChange).toHaveBeenCalledWith(2)
+    // Still step 1 until the route updates the URL and passes the new step back.
+    expect(screen.getByText("Tell us about you")).toBeInTheDocument()
   })
 
   it("renders error alert when profile query fails", async () => {
     mockProfileQueryFn.mockRejectedValueOnce(new Error("Network Error fetching profile"))
 
-    render(<OnboardingWizard />, { wrapper: createWrapper() })
+    render(<Wizard />, { wrapper: createWrapper() })
 
     expect(await screen.findByRole("alert")).toBeInTheDocument()
     expect(screen.getByText("An unexpected error occurred.")).toBeInTheDocument()

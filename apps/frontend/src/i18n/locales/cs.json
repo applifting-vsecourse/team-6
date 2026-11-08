@@ -1,25 +1,44 @@
 {
+  "account": {
+    "deleteAccount": "Smazat účet",
+    "deleteDialog": {
+      "cancel": "Zrušit",
+      "confirm": "Smazat účet",
+      "deleting": "Mazání...",
+      "description": "Opravdu chcete smazat svůj účet? Váš profil, dotazník i místo ve skupině budou trvale smazány. Tuto akci nelze vzít zpět.",
+      "title": "Smazat účet"
+    },
+    "deleteSuccess": "Váš účet byl úspěšně smazán."
+  },
   "auth": {
-    "acceptCodeOfConduct": "Přečetl/a jsem si <coc>kodex chování</coc> a souhlasím s ním",
+    "acceptCodeOfConduct": "Souhlasím s <coc>pravidly komunity</coc>",
     "confirmPassword": "Potvrzení hesla",
+    "createAccount": "Vytvořit účet",
+    "editProfile": "Upravit profil",
     "email": "E-mail",
-    "emailPlaceholder": "např. jan@novak.cz",
+    "emailPlaceholder": "např. jana@firma.cz",
     "haveAccount": "Už máte účet?",
     "name": "Jméno",
-    "noAccount": "Nemáte účet?",
+    "nameHint": "Ostatní ho uvidí, až váš kvintet začne.",
+    "noAccountYet": "Ještě nemáte účet?",
     "password": "Heslo",
     "passwordHint_few": "Alespoň {{count}} znaky",
     "passwordHint_one": "Alespoň {{count}} znak",
     "passwordHint_other": "Alespoň {{count}} znaků",
+    "preview": {
+      "title": "To jste vy!"
+    },
     "signIn": "Přihlásit se",
-    "signInDescription": "Vítejte zpět v Kvintetu.",
+    "signInDescription": "Přihlaste se e-mailem a heslem.",
+    "signInTitle": "Vítejte zpět",
     "signOut": "Odhlásit se",
     "signUp": "Registrovat se",
-    "signUpDescription": "Vytvořte si účet v Kvintetu.",
+    "signUpDescription": "Potom vám najdeme kvintet.",
+    "signUpTitle": "Vytvořte si účet",
     "username": "Uživatelské jméno",
-    "usernameHint": "Váš avatar se vytváří z uživatelského jména.",
+    "usernameHint": "Podle něj se vytvoří váš avatar.",
     "validation": {
-      "codeOfConductRequired": "Musíte souhlasit s kodexem chování",
+      "codeOfConductRequired": "Nejdříve souhlaste s pravidly.",
       "emailInvalid": "Neplatný e-mail",
       "emailRequired": "Zadejte e-mail",
       "nameRequired": "Zadejte jméno",
@@ -34,10 +53,13 @@
   },
   "categories": {
     "business": "Podnikání",
+    "cloud-security": "Cloud a bezpečnost",
+    "data-ai": "Data a AI",
+    "design-product": "Design a produkt",
     "languages": "Jazyky",
     "leisure": "Volný čas",
     "personal-development": "Osobní rozvoj",
-    "technology": "Technologie"
+    "software-development": "Vývoj softwaru"
   },
   "chat": {
     "composer": {
@@ -49,37 +71,40 @@
     "deletedMember": "Smazaný člen",
     "empty": "Zatím žádné zprávy. Pozdravte svůj kvintet.",
     "error": "Zprávy se nepodařilo načíst.",
+    "members": "Členové kvintetu",
     "newMessages": "Nové zprávy",
     "pageTitle": "Zprávy",
     "retry": "Zkusit znovu",
     "showEarlier": "Zobrazit starší zprávy",
-    "subtitle": "{{names}} · zprávy čtou jen členové",
+    "subtitle": "Zprávy čtou jen členové kvintetu.",
+    "system": {
+      "kvintetStarted": "Kvintet začal. Pozdravte se!"
+    },
     "you": "Vy"
   },
   "codeOfConduct": {
-    "intro": "Kvintet je místo pro lidi, kteří se chtějí potkávat a učit se od sebe navzájem. Aby se tu všichni cítili dobře, držíme se několika jednoduchých pravidel.",
-    "reportIntro": "Porušení pravidel nebo problém s konkrétním člověkem nahlaste na <email>{{email}}</email>.",
-    "reportStep1": "Každé hlášení čteme a potvrdíme jeho přijetí.",
-    "reportStep2": "Zjistíme, co se stalo, a podle závažnosti dotyčného upozorníme, nebo mu omezíme přístup do aplikace.",
-    "reportStep3": "Hlášení řešíme důvěrně. Totožnost autora hlášení nesdělujeme.",
-    "reportTitle": "Co se stane po nahlášení",
-    "rule1": "Chovejte se k ostatním s respektem. Žádné urážky, výsměch ani diskriminace.",
-    "rule2": "Buďte upřímní. Uvádějte o sobě pravdivé informace a nevydávejte se za někoho jiného.",
-    "rule3": "Chraňte soukromí ostatních. Nesdílejte cizí osobní údaje ani zprávy ze skupiny bez souhlasu.",
-    "rule4": "Žádný spam a reklama. Nabídky a zprávy mají souviset s komunitou.",
-    "rule5": "Dodržujte domluvy. Pokud nemůžete přijít na schůzku, dejte ostatním včas vědět.",
-    "rulesTitle": "Naše pravidla",
-    "seoTitle": "Kodex chování",
-    "title": "Kodex chování"
+    "reportIntro": "Napište na <email>{{email}}</email>. Zůstane to mezi námi.",
+    "reportTitle": "Něco se děje?",
+    "rule1": "Buďte laskaví. Žádné urážky.",
+    "rule2": "Buďte sami sebou. Žádné falešné profily.",
+    "rule3": "Co se řekne v kvintetu, v kvintetu zůstane.",
+    "rule4": "Žádné reklamy ani spam.",
+    "rule5": "Nemůžete přijít? Dejte ostatním vědět.",
+    "seoTitle": "Pravidla komunity",
+    "subtitle": "Pět jednoduchých pravidel, aby se všichni cítili bezpečně.",
+    "title": "Pravidla komunity"
   },
   "common": {
     "back": "Zpět",
     "close": "Zavřít",
     "continue": "Pokračovat",
-    "finish": "Dokončit",
-    "goHome": "Na úvodní stránku",
+    "edit": "Upravit",
+    "finish": "Hotovo",
+    "goHome": "Zpět domů",
     "language": "Jazyk",
+    "loadingApp": "Načítáme…",
     "reload": "Načíst znovu",
+    "retry": "Zkusit znovu",
     "saving": "Ukládání…",
     "theme": "Motiv",
     "themeDark": "Tmavý",
@@ -98,15 +123,15 @@
       "CODE_OF_CONDUCT_REQUIRED": "Musíte souhlasit s kodexem chování.",
       "EMAIL_NOT_VERIFIED": "Nejdřív ověřte svůj e-mail.",
       "INVALID_EMAIL": "E-mail není platný.",
-      "INVALID_EMAIL_OR_PASSWORD": "Přihlášení se nezdařilo. Nesprávný e-mail nebo heslo.",
+      "INVALID_EMAIL_OR_PASSWORD": "E-mail nebo heslo nesedí. Zkuste to prosím znovu.",
       "INVALID_USERNAME": "Uživatelské jméno není platné.",
       "INVALID_USERNAME_OR_PASSWORD": "Nesprávné uživatelské jméno nebo heslo.",
       "PASSWORD_TOO_LONG": "Heslo je příliš dlouhé.",
       "PASSWORD_TOO_SHORT": "Heslo je příliš krátké.",
       "USERNAME_IS_ALREADY_TAKEN": "Toto uživatelské jméno je již obsazené.",
       "USERNAME_TOO_SHORT": "Uživatelské jméno je příliš krátké.",
-      "USER_ALREADY_EXISTS": "Účet s tímto e-mailem už existuje.",
-      "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "Účet s tímto e-mailem už existuje."
+      "USER_ALREADY_EXISTS": "Účet s tímto e-mailem už máte. Zkuste se přihlásit.",
+      "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "Účet s tímto e-mailem už máte. Zkuste se přihlásit."
     },
     "bad_request": "Požadavek nebyl platný.",
     "conflict": "Tohle je v rozporu s existujícími daty.",
@@ -115,106 +140,109 @@
     "kvintet_not_active": "Chat se otevře, jakmile bude kvintet aktivní.",
     "kvintet_not_open": "Tento návrh je plný nebo už není otevřený.",
     "not_found": "Nepodařilo se najít, co hledáte.",
-    "pageNotFound": "Stránka nenalezena",
-    "pageNotFoundDescription": "Stránka, kterou hledáte, neexistuje nebo byla přesunuta.",
+    "pageNotFound": "Tahle stránka neexistuje",
+    "pageNotFoundDescription": "Tenhle odkaz nikam nevede.",
     "signInFailed": "Přihlášení se nezdařilo",
     "signUpFailed": "Registrace se nezdařila",
     "somethingWentWrong": "Něco se pokazilo",
+    "too_many_requests": "Příliš mnoho požadavků. Zpomalte prosím a zkuste to za chvíli znovu.",
     "unauthorized": "Nejdřív se musíte přihlásit.",
     "unexpected": "Došlo k neočekávané chybě.",
     "validation_failed": "Některé zadané hodnoty nejsou platné."
   },
+  "howItWorks": {
+    "seoTitle": "Jak Kvintet funguje",
+    "step1Text": "Co umíte a co se chcete naučit.",
+    "step1Title": "Vytvořte si profil",
+    "step2Text": "Algoritmus vám najde kvintety přímo pro vás. Stačí si vybrat.",
+    "step2Title": "Výběr kvintetu",
+    "step3Text": "Při pěti lidech kvintet začne automaticky. Při třech nebo čtyřech, když všichni hlasují pro.",
+    "step3Title": "Start skupiny",
+    "step4Text": "Kde a jak často se potkáte, je na vás.",
+    "step4Title": "Setkání",
+    "title": "Jak Kvintet funguje"
+  },
   "kvintet": {
-    "actions": {
-      "leaveKvintet": "Opustit kvintet",
-      "leaveKvintetHint": "Pokud zůstanou méně než tři členové, kvintet zanikne.",
-      "leaveProposal": "Opustit návrh",
-      "leaveProposalHint": "Být můžete vždy jen v jednom návrhu. Když někdo přijde nebo odejde, hlasy všech se vynulují.",
-      "reportIssue": "Nahlásit problém",
-      "reportIssueHint": "Otevře e-mail na podporu. Hlášení jsou důvěrná."
-    },
-    "activeSubtitle": "VZNIKL {{date}} · {{count}} ČLENŮ",
-    "activeSubtitleWithPreferences": "VZNIKL {{date}} · {{count}} ČLENŮ · VŠEM VYHOVUJE: {{preferences}}",
     "alreadyMember": "V návrhu už jste.",
-    "chat": {
-      "description": "Domluvte si první setkání ve skupinovém chatu.",
-      "heading": "Skupinový chat",
-      "openMessages": "Otevřít zprávy"
+    "begins": {
+      "dateAt": "{{date}} v {{time}}",
+      "eyebrowFive": "se přidal pátý",
+      "eyebrowStarted": "kvintet začal",
+      "lead": "Teď uvidíte jména ostatních. Naplánujte první setkání.",
+      "messageGroup": "Napsat skupině",
+      "seeMembers": "Zobrazit členy",
+      "title": {
+        "five": "Je vás pět. Kvintet začíná.",
+        "four": "Jste čtyři. Kvintet začíná.",
+        "other": "Kvintet začíná.",
+        "three": "Jste tři. Kvintet začíná."
+      }
     },
-    "count_few": "{{formatted}} návrhy",
-    "count_many": "{{formatted}} návrhu",
-    "count_one": "{{formatted}} návrh",
-    "count_other": "{{formatted}} návrhů",
+    "count_few": "{{formatted}} kvintety · nejlepší shoda první",
+    "count_many": "{{formatted}} kvintetu · nejlepší shoda první",
+    "count_one": "{{formatted}} kvintet · nejlepší shoda první",
+    "count_other": "{{formatted}} kvintetů · nejlepší shoda první",
     "diagram": {
       "memberNumber": "Člen {{number}}"
     },
     "dialog": {
       "cancel": "Zrušit",
       "category": "Kategorie",
-      "categoryHint": "Podle kategorie návrh najdou ostatní ve filtru.",
-      "categoryPlaceholder": "Vyberte kategorii",
+      "categoryPlaceholder": "Zvolte kategorii",
       "confirmLeave": "Opustit",
-      "description": "Budete jeho prvním členem. Ostatní uvidí téma, vaši roli a štítky – ne vaše jméno.",
-      "details": "Krátký popis (nepovinné)",
+      "confirmLeaveActive": "Opustit kvintet",
+      "description": "Budete v něm první. Další se přidají podle tématu.",
+      "details": "Pár slov navíc (nepovinné)",
       "detailsPlaceholder": "např. Vedu agenturu s 10 lidmi a chci sdílet, co nám funguje.",
-      "leaveActiveConfirm": "Opustíte aktivní kvintet. Pokud ve skupině zůstanou méně než 3 členové, kvintet zanikne.",
+      "leaveActiveDescription": "Ostatní uvidí, že jste odešli. Pak se můžete přidat do jiného kvintetu.",
+      "leaveActiveNotice": "Ostatní pokračují bez vás.",
+      "leaveActiveTitle": "Opustit kvintet?",
       "leaveProposalConfirm": "Opustíte tento návrh. Když někdo přijde nebo odejde, hlasy všech se vynulují.",
       "leaveTitle": "Opravdu chcete odejít?",
-      "submit": "Založit návrh",
-      "title": "Založit nový návrh",
-      "topic": "Téma nebo problém",
-      "topicHint": "O čem se má skupina bavit?"
+      "leaving": "Odcházím…",
+      "note": "Ostatní uvidí téma a vaši roli. Vaše jméno až po zahájení kvintetu.",
+      "stay": "Zůstat",
+      "submit": "Založit kvintet",
+      "title": "Založit kvintet",
+      "topic": "O čem chcete mluvit",
+      "topicHint": "Stručně a konkrétně – podle toho vás lidé najdou."
     },
     "empty": {
-      "text": "Tady se objeví návrhy, které odpovídají vašemu profilu.",
-      "title": "Zatím pro vás nemáme žádný návrh"
+      "text": "Buďte první – ostatní se přidají.",
+      "title": "Zatím tu nic není"
     },
     "emptyFiltered": {
       "showAll": "Zrušit filtr",
-      "text": "Zkuste jinou kategorii, nebo založte vlastní návrh v této kategorii.",
-      "title": "V kategorii {{category}} zatím není žádný návrh"
-    },
-    "emptyState": {
-      "description": "Vaše skupina se tu objeví, až se přidáte k návrhu.",
-      "title": "Zatím nejste v žádném kvintetu",
-      "viewProposals": "Zobrazit návrhy"
+      "text": "Zkuste jiné téma – nebo nějaké založte.",
+      "title": "V kategorii {{filter}} nic není",
+      "titleMany": "Pro tyto filtry nic nemáme"
     },
     "error": {
       "retry": "Zkusit znovu",
-      "text": "Na naší straně se něco pokazilo. Zkuste to prosím znovu.",
-      "title": "Návrhy se nepodařilo načíst"
+      "text": "Na naší straně se něco pokazilo.",
+      "title": "Kvintety se nepodařilo načíst"
     },
+    "fallback": "Vašemu profilu zatím žádný kvintet přesně neodpovídá, proto ukazujeme všechny otevřené, nejbližší první.",
     "filter": {
       "all": "Vše",
-      "label": "Kategorie"
+      "frequency": "Jak často",
+      "topic": "Téma"
     },
-    "interests": "Zájmy: {{tags}}",
-    "join": "Přidat se k návrhu",
+    "frequency": {
+      "BIWEEKLY": "Jednou za 14 dní",
+      "MONTHLY": "Jednou za měsíc",
+      "WEEKLY": "Každý týden"
+    },
+    "join": "Přidat se",
     "joined": "Přidali jste se k návrhu.",
-    "learns": "Chce se naučit: {{tags}}",
-    "loading": "Načítáme návrhy…",
+    "loading": "Hledáme kvintety, které vám sednou…",
     "member": "Člen",
     "members": {
-      "capacity": "{{count}} z 5",
-      "heading": "Členové",
       "interests": "Zájmy",
-      "namesHiddenHint": "Jména uvidíte, až kvintet vznikne.",
-      "notVoted": "Nehlasováno",
       "openSeat": "Volné místo",
-      "teaches": "Učí",
-      "votedYes": "Pro",
-      "waitingForFifth": "Čeká se na pátého člena.",
-      "waitingForMember": "Čeká se na dalšího člena.",
+      "teaches": "Poradí s",
       "wantsToLearn": "Chce se naučit",
       "you": "(vy)"
-    },
-    "myKvintetTitle": "Můj kvintet",
-    "namesHidden": "Jména uvidíte, až kvintet vznikne.",
-    "nextSteps": {
-      "heading": "Co bude dál",
-      "step1": "Se 3 nebo 4 členy může kvintet začít hned, když všichni hlasují pro.",
-      "step2": "S 5 členy kvintet vznikne automaticky bez nutnosti hlasování.",
-      "step3": "Pak uvidíte vzájemná jména a otevře se skupinový chat."
     },
     "preferences": {
       "afternoons": "Odpoledne",
@@ -223,26 +251,24 @@
       "weekdays": "Všední dny",
       "weekends": "Víkendy"
     },
-    "proposalSubtitle": "VŠEM VYHOVUJE: {{preferences}}",
-    "seats": "{{filled}} z {{total}}",
+    "reasons": {
+      "availability": "Stejné časové možnosti",
+      "frequency": "Stejná frekvence setkávání",
+      "interest": "Společný zájem: {{tag}}",
+      "label": "Proč vám sedí:",
+      "learn": "Někdo tu poradí s {{tag}}",
+      "roleMix": "Jiné role než vaše",
+      "teach": "Někdo se tu chce naučit {{tag}}",
+      "topic": "Vaše téma: {{category}}"
+    },
+    "seatCount": "{{filled}} / {{total}}",
     "startOwn": {
-      "button": "Založit nový návrh",
-      "text": "Založte vlastní s tématem, které vás zajímá – ostatní se přidají k vám.",
-      "title": "Nesedí vám žádný návrh?"
+      "button": "Založit kvintet"
     },
     "started": "Váš návrh je otevřený. Ostatní se k němu teď mohou přidat.",
-    "statusActive": "Aktivní kvintet",
-    "statusProposal": "Návrh · {{count}} z 5",
-    "subtitle": "Všechny skupiny, které odpovídají vašemu profilu. Vybírejte podle tématu – být můžete vždy jen v jednom návrhu.",
-    "suitsAll": "Všem vyhovuje: {{value}}",
-    "table": {
-      "description": "Domluvte si první setkání ve skupinovém chatu. Kvintet si řídíte sami – bez facilitátora a bez hodnocení.",
-      "title": "Pět lidí, <em className=\"italic\">jeden stůl.</em>"
-    },
-    "teaches": "Učí: {{tags}}",
-    "title": "Návrhy pro vás",
-    "vacancy": "Volné místo",
-    "vacancyHint": "Můžete to být vy.",
+    "subtitle": "Vyberte si kvintet podle tématu.",
+    "title": "Kvintety",
+    "vacancy": "Volné",
     "validation": {
       "categoryRequired": "Vyberte kategorii",
       "descriptionTooLong": "Popis může mít nejvýše {{max}} znaků",
@@ -250,40 +276,51 @@
       "titleTooLong": "Téma může mít nejvýše {{max}} znaků"
     },
     "vote": {
-      "button": "Ano, začít hned",
-      "countText": "{{voted}} ze {{total}} členů chtějí začít hned.",
-      "hint": "Hlasujte také – nebo počkejte na pátého člena, pak kvintet vznikne sám.",
-      "notStartedHint": "Hlasování o předčasném vzniku začne při 3 členech (nyní {{count}} z 5). Se 3 nebo 4 členy může kvintet začít dříve, pokud budou všichni pro. V 5 členech vznikne automaticky.",
-      "notStartedTitle": "Hlasování o předčasném vzniku",
-      "requirement": "Kvintet začne hned, jakmile budou všichni členové pro (zbývá ještě {{remaining}}). S 5 členy vznikne automaticky.",
-      "title": "Začít hned?",
       "voted": "Hlasováno",
-      "votedHint": "Váš hlas byl zaznamenán. Čeká se na hlasy ostatních členů nebo na příchod 5. člena. Když někdo přijde nebo odejde, hlasy se vynulují a hlasuje se znovu.",
       "voting": "Odesílání…"
     }
   },
   "landing": {
-    "caption": "Žádné fotky, žádná hodnocení – jen lidé a témata.",
     "createAccount": "Vytvořit účet",
     "goToOverview": "Přejít na přehled",
-    "heroText": "Kvintet posadí k jednomu stolu pět lidí, kteří se od sebe můžou něco naučit. Skupinu si vybíráte podle tématu, ne podle toho, koho už znáte.",
-    "heroTitle": "Najděte si svůj <em>kvintet</em>.",
+    "heroText": "Kvintet vás spojí s lidmi, které zajímá stejné téma.",
+    "heroTextShort": "Kvintet vás spojí se čtyřmi lidmi, které zajímá stejné téma. Každý učí, každý se učí.",
+    "heroTitle1": "Pět lidí, jedno téma.",
+    "heroTitle2": "Učíte se jeden od druhého.",
     "howItWorks": "Jak to funguje",
-    "step1Text": "Vaše role, s čím můžete poradit a co se chcete naučit. Štítky, žádné fotky.",
-    "step1Title": "Řekněte nám něco o sobě",
-    "step2Text": "Uvidíte všechny skupiny, které k vám sedí – role a zájmy, jména zůstanou skrytá, dokud skupina nevznikne.",
-    "step2Title": "Vyberte si návrh",
-    "step3Text": "S pěti členy vznikne sám. Se třemi nebo čtyřmi, když všichni hlasují pro. Pak se otevře skupinový chat.",
-    "step3Title": "Založte svůj kvintet"
+    "rulesLead": "Pro všechny platí stejná pravidla.",
+    "rulesLink": "Přečtěte si pravidla",
+    "step1Text": "Co umíte a co se chcete naučit. Zabere to 3 minuty.",
+    "step1TextShort": "Co umíte a co se chcete naučit.",
+    "step1Title": "Řekněte nám o sobě",
+    "step2Text": "Algoritmus vám najde kvintet přímo pro vás.",
+    "step2TextShort": "Jména zůstanou skrytá, dokud kvintet nezačne.",
+    "step2Title": "Vyberte si kvintet",
+    "step3Text": "Jakmile kvintet začne, otevře se skupinový chat.",
+    "step3Title": "Sejděte se"
   },
   "layout": {
     "closeMenu": "Zavřít menu",
+    "communityRules": "Pravidla komunity",
     "contactSupport": "Kontaktovat podporu",
+    "createAccount": "Vytvořit účet",
+    "findYourKvintet": "Najděte svůj kvintet.",
+    "goTo": "Přejít na",
+    "groupChat": "Skupinový chat",
+    "howItWorks": "Jak Kvintet funguje",
+    "learnMore": "Zjistit více",
     "mainNavigation": "Hlavní navigace",
     "menu": "Menu",
     "openMenu": "Otevřít menu",
+    "rules": "Pravidla",
+    "settings": "Nastavení",
+    "support": "Podpora",
     "switchToDark": "Přepnout na tmavý motiv",
-    "switchToLight": "Přepnout na světlý motiv"
+    "switchToLight": "Přepnout na světlý motiv",
+    "unreadMessages_few": "{{count}} nepřečtené zprávy",
+    "unreadMessages_many": "{{count}} nepřečtené zprávy",
+    "unreadMessages_one": "{{count}} nepřečtená zpráva",
+    "unreadMessages_other": "{{count}} nepřečtených zpráv"
   },
   "meetingFrequency": {
     "BIWEEKLY": "jednou za 14 dní",
@@ -291,31 +328,36 @@
     "WEEKLY": "každý týden"
   },
   "nav": {
-    "kvintetFeed": "Návrhy",
+    "kvintetFeed": "Kvintety",
     "kvintetFeedDisabled": "Už jste v kvintetu, proto ostatní návrhy nelze procházet.",
-    "myKvintet": "Můj kvintet",
-    "overview": "Přehled"
+    "overview": "Domů",
+    "profile": "Profil"
   },
   "onboarding": {
     "step1": {
       "addRole": "Vybrat roli {{name}}",
       "addTag": "Přidat štítek {{name}}",
-      "changeLaterNote": "Profil můžete později změnit.",
-      "description": "Podle profilu vám navrhneme skupiny. Ostatní uvidí vaši roli a štítky – nikdy fotku.",
+      "description": "Ostatní uvidí vaši roli a štítky. Jméno až po startu kvintetu.",
+      "fields": {
+        "data": "Data a AI",
+        "design": "Design",
+        "education": "Vzdělávání a ostatní",
+        "marketing": "Marketing a prodej",
+        "people": "Lidé a finance",
+        "product": "Produkt a management",
+        "tech": "Technologie a vývoj"
+      },
       "interestsTitle": "Zájmy",
       "learnTitle": "Co se chci naučit",
-      "recommended": "DOPORUČENÉ",
-      "recommendedRoles": "DOPORUČENÉ ROLE",
       "removeRole": "Odebrat roli {{name}}",
       "removeTag": "Odebrat štítek {{name}}",
-      "role": "Role",
-      "roleHint": "Vyberte jednu nebo více rolí, které nejlépe odpovídají tomu, co děláte.",
+      "role": "Čemu se věnujete?",
+      "roleHint": "Vyberte obor a pak roli.",
       "rolePlaceholder": "např. Softwarový inženýr",
       "roleRequired": "Vyberte alespoň jednu roli",
+      "searchAllRoles": "Není tu? Hledat ve všech rolích",
       "searchRoleAria": "Hledat roli",
       "searchRolePlaceholder": "Hledat roli…",
-      "searchTagsAria": "Hledat štítky v sekci {{section}}",
-      "searchTagsPlaceholder": "Hledat štítky…",
       "teachHint": "Vyberte libovolný počet štítků.",
       "teachTitle": "Co umím naučit",
       "title": "Řekněte nám něco o sobě"
@@ -324,14 +366,13 @@
       "afternoons": "Odpoledne",
       "daysRequired": "Vyberte alespoň jednu možnost (všední dny nebo víkendy).",
       "daysTitle": "Dny",
-      "description": "Vyberte vše, co vám vyhovuje. Pomůže nám to dát dohromady lidi, kteří se opravdu můžou potkat.",
+      "description": "Ať se potkáte s lidmi poblíž.",
       "evenings": "Večer",
       "geolocationDenied": "Přístup k poloze byl zamítnut. Střed můžete zvolit přímo na mapě.",
       "geolocationUnavailable": "Geolokace není v tomto prohlížeči podporována.",
       "locating": "Zjišťuji polohu…",
       "locationRequired": "Zvolte polohu na mapě.",
-      "mapHint": "Přetažením bodu nebo kliknutím na mapu zvolte střed a posuvníkem nastavte rádius oblasti, ve které chcete vidět ostatní Kvintety.",
-      "mapTitle": "Geografická oblast a rádius",
+      "mapHint": "Přetáhněte špendlík. Ostatní uvidí jen vzdálenost.",
       "mornings": "Dopoledne",
       "radius": "Jak daleko můžete dojet?",
       "radiusOption": "Do {{count}} km",
@@ -343,47 +384,98 @@
       "useCurrentLocation": "Moje poloha",
       "weekdays": "Všední dny",
       "weekends": "Víkendy",
-      "whereHint": "Zvolte geografickou oblast a vaši dojezdovou vzdálenost.",
       "whereTitle": "Kde"
     },
     "step3": {
-      "description": "Dvě krátké otázky. Špatné odpovědi neexistují.",
+      "description": "Poslední dvě. Špatné odpovědi neexistují.",
       "expectations": {
         "learn": "Naučit se něco nového",
         "meet": "Poznat nové lidi",
         "share": "Předat, co umím",
         "solve": "Vyřešit konkrétní problém"
       },
-      "expectationsHint": "Vyberte libovolně.",
-      "expectationsTitle": "Co chcete od skupiny?",
-      "finishHint": "Pak uvidíte návrhy, které k vám sedí.",
+      "expectationsHint": "Můžete vybrat více možností.",
+      "expectationsTitle": "Proč se chcete přidat ke kvintetu",
+      "finishHint": "Pak vám ukážeme kvintety, které vám sednou.",
       "frequency": {
         "biweekly": "Jednou za 14 dní",
         "monthly": "Jednou za měsíc",
         "weekly": "Každý týden"
       },
       "frequencyRequired": "Vyberte, jak často se chcete setkávat",
-      "frequencyTitle": "Jak často se chcete potkávat?",
+      "frequencyTitle": "Jak často se chcete potkávat",
       "noteOptional": "Nepovinné.",
       "notePlaceholder": "např. Raději se potkávám v angličtině.",
       "noteTitle": "Má o vás skupina něco vědět?",
-      "title": "Co od kvintetu očekáváte?"
+      "title": "Co očekáváte od skupiny?"
     },
     "stepProgress": "Krok {{current}} ze {{total}}",
+    "stepShort": "{{current}} / {{total}}",
     "title": "Úvodní nastavení"
   },
   "overview": {
-    "greeting": "Vítejte, <em>{{name}}</em>",
-    "greetingAnonymous": "Vítejte",
-    "howItWorks": {
-      "p1": "— Kvintet vznikne sám, když se přidá pět lidí.",
-      "p2": "— Se třemi nebo čtyřmi členy vznikne, když všichni hlasují pro.",
-      "p3": "— Po vzniku uvidíte jména a otevře se skupinový chat."
+    "active": {
+      "beforeMeeting": "PŘED DALŠÍM SETKÁNÍM",
+      "chatDescription": "Naplánujte si společně další setkání.",
+      "chatHeading": "Skupinový chat",
+      "heading": "Váš kvintet",
+      "icebreaker": {
+        "another": "Jiná otázka",
+        "label": "Otázka na prolomení ledů",
+        "q1": "Co nového jste se tento měsíc v práci naučili?",
+        "q2": "Na jaký projekt nebo koníček se teď nejvíc těšíte?",
+        "q3": "Jaký byl váš největší pracovní 'aha' moment za poslední dobu?",
+        "q4": "Kdybyste mohli zautomatizovat jednu otravnou věc v práci, co by to bylo?",
+        "send": "Poslat do chatu",
+        "sentToast": "Otázka byla odeslána do chatu"
+      },
+      "leaveHint": "Ostatní budou pokračovat bez vás.",
+      "membersHeading": "Členové",
+      "nextMeeting": {
+        "body": "Zatím bez termínu. Navrhněte termín v chatu.",
+        "label": "Další setkání"
+      },
+      "noMessages": "Zatím žádné zprávy. Napište první!",
+      "openChat": "Otevřít chat",
+      "openChatUnread_few": "Otevřít chat ({{count}} nové)",
+      "openChatUnread_many": "Otevřít chat ({{count}} nové)",
+      "openChatUnread_one": "Otevřít chat ({{count}} nová)",
+      "openChatUnread_other": "Otevřít chat ({{count}} nových)",
+      "subtitle": "{{title}} · {{count}} lidí · od {{date}}",
+      "tip": {
+        "body": "Každý sdílí jeden cíl na příští 3 měsíce.",
+        "label": "Tip pro skupinu"
+      }
     },
+    "commonTime": "Všem vyhovuje:",
+    "error": {
+      "text": "Na naší straně se něco pokazilo. Váš kvintet je v bezpečí.",
+      "title": "Váš přehled se nepodařilo načíst"
+    },
+    "forming": {
+      "canVoteDescription": "Začněte ve čtyřech hned, nebo počkejte na dalšího. Začne se, až budou souhlasit všichni čtyři.",
+      "canVoteTitle": "Začít hned, nebo počkat na pátého?",
+      "heading": "Váš kvintet se skládá",
+      "leaveKvintet": "Opustit kvintet",
+      "seatsStatus": "{{seats}} Z {{capacity}} MÍST · {{voted}} ZE {{total}} CHCE ZAČÍT",
+      "voteButton": "Začít hned",
+      "voteHint": "Ostatní uvidí jen to, že jste hlasovali.",
+      "votedDescription": "Hlasovali jste pro spuštění. Čeká se na ostatní.",
+      "votedStatus": "Hlasovali jste pro zahájení. Čeká se na ostatní.",
+      "votedTitle": "Čeká se na hlasy ostatních",
+      "waitingDescription": "Ve třech můžete hlasovat o zahájení.",
+      "waitingSeatsStatus": "{{seats}} Z {{capacity}} MÍST · ČEKÁME NA DALŠÍ",
+      "waitingTitle": "Čekáme na další lidi",
+      "whoSubtitle": "Jména se zobrazí, až začnete.",
+      "whoTitle": "Kdo tu je"
+    },
+    "greeting": "Ahoj, {{name}}",
+    "greetingAnonymous": "Ahoj",
+    "loading": "Připravujeme váš přehled…",
     "nextStep": {
       "badge": "VÁŠ DALŠÍ KROK",
       "button": "Zobrazit návrhy",
-      "description": "Našli jsme návrhy, které odpovídají vašemu profilu. Vyberte podle tématu – jména uvidíte, až skupina vznikne.",
+      "description": "Našli jsme návrhy, které odpovídají vašemu profilu. Vyberte podle tématu – jména uvidíte, až kvintet vznikne.",
       "title": "Vyberte si návrh"
     },
     "nextStepMember": {
@@ -391,6 +483,19 @@
       "button": "Přejít na můj kvintet",
       "description": "Podívejte se, kdo je ve vaší skupině a co bude dál.",
       "title": "Jděte do svého kvintetu"
+    },
+    "noKvintet": {
+      "empty": "Zatím tu nejsou žádné návrhy.",
+      "join": "Přidat se",
+      "joining": "Připojování…",
+      "lead": "Vyberte si kvintet – tyhle se k vám hodí nejvíc.",
+      "leadAfterLeave": "Vyberte si nový kvintet – tyhle se k vám hodí nejvíc.",
+      "leftNotice": "Opustili jste „{{title}}“",
+      "leftNoticeHint": "Můžete se kdykoli přidat k jinému kvintetu.",
+      "nothingFits": "Nic nesedí?",
+      "seeAll": "Zobrazit všechny",
+      "startOwn": "Založit vlastní",
+      "startYourOwnHint": "Založte vlastní – ostatní se přidají."
     },
     "profileCard": {
       "badge": "VÁŠ PROFIL",
@@ -408,9 +513,52 @@
       "timeEvenings": "večery",
       "timeMornings": "dopoledne"
     },
+    "profileNotFinished": {
+      "button": "Dokončit profil",
+      "description": "Zbývají dva krátké kroky – asi 2 minuty.",
+      "lead": "Už skoro!",
+      "stepBadge": "1. KROK ZE 3 HOTOVÝ",
+      "title": "Dokončete svůj profil"
+    },
     "subtitle": "Zatím nejste v žádném kvintetu. Začněte výběrem návrhu.",
     "subtitleMember": "Jste v kvintetu. Podívejte se, jak se vaší skupině daří.",
     "title": "Přehled"
+  },
+  "profile": {
+    "dangerZone": {
+      "button": "Smazat účet",
+      "description": "Smaže všechno. Tento krok nelze vzít zpět.",
+      "title": "Smazat účet"
+    },
+    "empty": {
+      "expectations": "Zatím nic nepřidáno",
+      "interests": "Zatím nic nepřidáno",
+      "learn": "Zatím nic nepřidáno",
+      "role": "Zatím bez role",
+      "teach": "Zatím nic nepřidáno",
+      "whenAndWhere": "Zatím nenastaveno"
+    },
+    "error": {
+      "title": "Profil se nepodařilo načíst"
+    },
+    "sections": {
+      "expectations": "Co očekáváte",
+      "interests": "Zajímá mě",
+      "learn": "Chci se naučit",
+      "role": "Moje role",
+      "teach": "Umím naučit",
+      "whenAndWhere": "Kdy a kde"
+    },
+    "title": "Profil",
+    "when": {
+      "afternoons": "odpoledne",
+      "allDays": "Všední dny i víkendy",
+      "evenings": "večer",
+      "mornings": "dopoledne",
+      "weekdays": "Všední dny",
+      "weekends": "Víkendy"
+    },
+    "withinRadius": "v okruhu {{count}} km"
   },
   "roles": {
     "account-manager": "Account manažer",

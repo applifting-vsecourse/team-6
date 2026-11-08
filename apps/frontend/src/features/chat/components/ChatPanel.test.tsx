@@ -14,15 +14,18 @@ vi.mock("@blobatar/react/gaze", () => ({ useGaze }))
 type Params = Record<string, number>
 const apiGet = vi.fn<(path: string, options: { searchParams: Params }) => Promise<ChatMessage[]>>()
 const apiPost = vi.fn<(path: string, options: { json: { body: string } }) => Promise<ChatMessage>>()
+// Every POST, including the read mark, which has no response body and so never calls `.json()`.
+const postCalled = vi.fn<(path: string, options: unknown) => void>()
 
 vi.mock("@/lib/api-client", () => ({
   api: {
     get: (path: string, options: { searchParams: Params }) => ({
       json: () => apiGet(path, options),
     }),
-    post: (path: string, options: { json: { body: string } }) => ({
-      json: () => apiPost(path, options),
-    }),
+    post: (path: string, options: { json: { body: string } }) => {
+      postCalled(path, options)
+      return { json: () => apiPost(path, options) }
+    },
   },
 }))
 
@@ -55,6 +58,7 @@ describe("ChatPanel", () => {
   beforeEach(() => {
     apiGet.mockReset()
     apiPost.mockReset()
+    postCalled.mockReset()
     useGaze.mockClear()
   })
 
@@ -102,6 +106,29 @@ describe("ChatPanel", () => {
     useGaze.mockClear()
     await userEvent.hover(second!)
     expect(useGaze).toHaveBeenCalledTimes(1)
+  })
+
+  it("marks the chat read up to the newest message once it is on screen", async () => {
+    apiGet.mockResolvedValue([message(1), message(2), message(3)])
+
+    renderPanel()
+    await screen.findByText("Message 3")
+
+    await waitFor(() =>
+      expect(postCalled).toHaveBeenCalledWith("kvintets/mine/messages/read", {
+        json: { lastMessageId: 3 },
+      }),
+    )
+    expect(postCalled).toHaveBeenCalledTimes(1)
+  })
+
+  it("has nothing to mark in an empty chat", async () => {
+    apiGet.mockResolvedValue([])
+
+    renderPanel()
+    await screen.findByText(/No messages yet/)
+
+    expect(postCalled).not.toHaveBeenCalled()
   })
 
   it("renders a message body as text, never as HTML", async () => {

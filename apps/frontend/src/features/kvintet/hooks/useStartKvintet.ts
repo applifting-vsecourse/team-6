@@ -7,7 +7,7 @@ import { useEnteredKvintet } from "@/features/kvintet/hooks/useEnteredKvintet"
 
 export type StartKvintetInput = {
   title: string
-  categorySlug: string
+  categorySlugs: string[]
   description?: string
 }
 

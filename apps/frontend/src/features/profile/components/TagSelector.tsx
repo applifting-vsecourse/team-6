@@ -1,9 +1,8 @@
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 
-import { Input } from "@/components/ui/input"
-
 import type { Tag } from "@/features/profile/api/profileApi"
+import { OnboardingCard } from "@/features/profile/components/OnboardingCard"
 import { TagBadge } from "@/features/profile/components/TagBadge"
 
 type TagSelectorProps = {
@@ -16,6 +15,9 @@ type TagSelectorProps = {
   onRemoveTag: (tagId: string) => void
 }
 
+// Figma B1 shows three suggestions per card; picking one brings the next one in.
+const SUGGESTION_COUNT = 3
+
 export function TagSelector({
   title,
   hint,
@@ -26,7 +28,6 @@ export function TagSelector({
   onRemoveTag,
 }: TagSelectorProps) {
   const { t } = useTranslation()
-  const [search, setSearch] = useState("")
 
   const getTagLabel = useCallback(
     (tag: Tag): string => {
@@ -43,36 +44,21 @@ export function TagSelector({
   )
 
   const suggestedTags = useMemo(() => {
-    const lowerSearch = search.trim().toLowerCase()
-
-    if (lowerSearch !== "") {
-      return allTags.filter((tag) => {
-        if (selectedTagIds.includes(tag.id)) return false
-        const label = getTagLabel(tag).toLowerCase()
-        const hasMatchingLabel = label.includes(lowerSearch)
-        const hasMatchingSlug = tag.slug.toLowerCase().includes(lowerSearch)
-        return Boolean(hasMatchingLabel || hasMatchingSlug)
-      })
-    }
-
-    // Default suggestions from defaultSuggestedSlugs, falling back to first available
-    const preferred = allTags.filter(
-      (tag) => defaultSuggestedSlugs.includes(tag.slug) && !selectedTagIds.includes(tag.id),
+    const unselected = allTags.filter((tag) => !selectedTagIds.includes(tag.id))
+    const preferred = unselected.filter((tag) => defaultSuggestedSlugs.includes(tag.slug))
+    return [...preferred, ...unselected.filter((tag) => !preferred.includes(tag))].slice(
+      0,
+      SUGGESTION_COUNT,
     )
-    if (preferred.length > 0) return preferred
-
-    return allTags.filter((tag) => !selectedTagIds.includes(tag.id)).slice(0, 6)
-  }, [allTags, defaultSuggestedSlugs, getTagLabel, search, selectedTagIds])
+  }, [allTags, defaultSuggestedSlugs, selectedTagIds])
 
   return (
-    <div className="flex flex-col gap-3 border-t border-border pt-6">
-      <div className="flex flex-col gap-0.5">
-        <h3 className="font-serif text-subheading font-semibold text-foreground">{title}</h3>
-        {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
-      </div>
-
+    <OnboardingCard
+      title={title}
+      hint={hint}
+    >
       {selectedTags.length > 0 && (
-        <div className="flex flex-wrap gap-2 pt-1">
+        <div className="flex flex-wrap gap-2">
           {selectedTags.map((tag) => (
             <TagBadge
               key={tag.id}
@@ -85,40 +71,19 @@ export function TagSelector({
         </div>
       )}
 
-      <div>
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") e.preventDefault()
-          }}
-          placeholder={t("onboarding.step1.searchTagsPlaceholder")}
-          aria-label={t("onboarding.step1.searchTagsAria", { section: title })}
-          className="h-10 text-sm"
-        />
-      </div>
-
       {suggestedTags.length > 0 && (
-        <div className="flex flex-col gap-2 pt-1">
-          <p className="font-mono text-xs tracking-meta text-muted-foreground uppercase">
-            {t("onboarding.step1.recommended")}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {suggestedTags.map((tag) => (
-              <TagBadge
-                key={tag.id}
-                label={getTagLabel(tag)}
-                variant="suggested"
-                onAction={() => {
-                  onSelectTag(tag.id)
-                  setSearch("")
-                }}
-                actionAriaLabel={t("onboarding.step1.addTag", { name: getTagLabel(tag) })}
-              />
-            ))}
-          </div>
+        <div className="flex flex-wrap gap-2">
+          {suggestedTags.map((tag) => (
+            <TagBadge
+              key={tag.id}
+              label={getTagLabel(tag)}
+              variant="suggested"
+              onAction={() => onSelectTag(tag.id)}
+              actionAriaLabel={t("onboarding.step1.addTag", { name: getTagLabel(tag) })}
+            />
+          ))}
         </div>
       )}
-    </div>
+    </OnboardingCard>
   )
 }

@@ -173,6 +173,8 @@ export const seedDatabase = async (
       teach: ['figma', 'ux-design'],
       learn: ['react'],
       interests: ['photography'],
+      availability: { weekdays: true, mornings: true },
+      expectations: ['share_knowledge', 'meet_people'],
     },
     {
       name: 'Petr Mráček',
@@ -184,6 +186,8 @@ export const seedDatabase = async (
       teach: ['cybersecurity', 'linux'],
       learn: ['public-speaking'],
       interests: ['bouldering'],
+      place: 'brno',
+      availability: { weekends: true, afternoons: true },
     },
     {
       name: 'David Vokurka',
@@ -217,7 +221,7 @@ export const seedDatabase = async (
   await createDemoKvintets(prisma, [
     {
       title: 'Using AI at work – what really works',
-      category: 'technology',
+      categories: ['data-ai'],
       members: [
         {
           userId: jan.id,
@@ -257,7 +261,7 @@ export const seedDatabase = async (
     },
     {
       title: 'From Excel to Python',
-      category: 'technology',
+      categories: ['data-ai', 'software-development', 'business'],
       members: [
         {
           userId: eva.id,
@@ -271,7 +275,7 @@ export const seedDatabase = async (
     },
     {
       title: 'Spanish conversation over lunch',
-      category: 'languages',
+      categories: ['languages'],
       members: [
         {
           userId: lucie.id,
@@ -280,12 +284,14 @@ export const seedDatabase = async (
           teach: ['copywriting'],
           learn: ['spanish'],
           interests: ['travel'],
+          place: 'brno',
+          availability: { weekends: true, mornings: true },
         },
       ],
     },
     {
       title: 'Negotiating your first client deal',
-      category: 'business',
+      categories: ['business'],
       members: [
         {
           userId: martin.id,
@@ -294,12 +300,14 @@ export const seedDatabase = async (
           teach: ['startups'],
           learn: ['negotiation'],
           interests: ['running'],
+          availability: { weekdays: true, mornings: true },
+          expectations: ['solve_problem'],
         },
       ],
     },
     {
       title: 'Cooking together on Sundays',
-      category: 'leisure',
+      categories: ['leisure'],
       members: [
         {
           userId: katerina.id,
@@ -308,14 +316,44 @@ export const seedDatabase = async (
           teach: ['cooking'],
           learn: ['music'],
           interests: ['board-games'],
+          place: 'brno',
+          radiusKm: 60,
+          availability: { weekends: true, afternoons: true },
+          expectations: ['meet_people'],
         },
       ],
     },
     {
       title: 'Frontend craft circle',
-      category: 'technology',
+      categories: ['software-development'],
       active: true,
       votes: 5,
+      // Dana has read the first two lines, so she sees "2 new" next to "Open chat" (and
+      // Filip, who has read four, sees "1 new").
+      chat: [
+        {
+          from: 2,
+          body: 'Hi everyone! Great that there are five of us. When would suit you for the first meeting?',
+          minutesAgo: 1500,
+        },
+        {
+          from: 1,
+          body: 'Thursday evening works for me. How about Café Lajka in Karlín?',
+          minutesAgo: 1440,
+        },
+        {
+          from: 4,
+          body: "Thursday is perfect. I'll book a table for five at 18:30.",
+          minutesAgo: 1380,
+        },
+        { from: 3, body: 'Count me in.', minutesAgo: 1300 },
+        {
+          from: 2,
+          body: "I'll bring a few examples of tools that work for us.",
+          minutesAgo: 10,
+        },
+      ],
+      readCounts: { 3: 2, 4: 4 },
       members: [
         {
           userId: anna.id,

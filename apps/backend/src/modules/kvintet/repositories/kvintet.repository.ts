@@ -1,10 +1,15 @@
-import { PrismaService } from '@/core/prisma/prisma.service';
+import { createHmac } from 'crypto';
+import {
+  PrismaService,
+  type TransactionClient,
+} from '@/core/prisma/prisma.service';
 import {
   Prisma,
   type KvintetStatus,
   type MeetingFrequency,
   type ProfileTagKind,
 } from '@/generated/prisma/client';
+import { KVINTET_STARTED } from '@/modules/chat/domain/message';
 import {
   CommonPreferences,
   JoinOutcome,
@@ -16,6 +21,10 @@ import {
   StartOutcome,
 } from '@/modules/kvintet/domain/kvintet';
 import {
+  emptyMatchProfile,
+  type MatchProfile,
+} from '@/modules/matching/matching';
+import {
   BadRequestException,
   ConflictException,
   Injectable,
@@ -25,6 +34,66 @@ import {
 const isUniqueViolation = (error: unknown): boolean =>
   error instanceof Prisma.PrismaClientKnownRequestError &&
   error.code === 'P2002';
+
+// The profile fields matching scores, for the caller and for every feed member.
+const matchProfileSelect = {
+  roles: true,
+  weekdays: true,
+  weekends: true,
+  mornings: true,
+  afternoons: true,
+  evenings: true,
+  latitude: true,
+  longitude: true,
+  radiusKm: true,
+  meetingFrequency: true,
+  expectations: true,
+  tags: {
+    select: {
+      kind: true,
+      tag: {
+        select: {
+          slug: true,
+          categories: { select: { category: { select: { slug: true } } } },
+        },
+      },
+    },
+  },
+} satisfies Prisma.ProfileSelect;
+
+type MatchProfileRow = Prisma.ProfileGetPayload<{
+  select: typeof matchProfileSelect;
+}>;
+
+// Stored as a JSON string array; same fallback as the profile module for older free text.
+const parseExpectations = (raw: string | null): string[] => {
+  if (!raw) return [];
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.every((e) => typeof e === 'string')
+      ? parsed
+      : [raw];
+  } catch {
+    return [raw];
+  }
+};
+
+const toMatchProfile = (profile: MatchProfileRow | null): MatchProfile =>
+  profile
+    ? {
+        ...profile,
+        tags: profile.tags.map(({ kind, tag }) => ({
+          slug: tag.slug,
+          kind,
+          categories: tag.categories.map(({ category }) => category.slug),
+        })),
+        expectations: parseExpectations(profile.expectations),
+      }
+    : emptyMatchProfile();
+
+export interface LeaveOptions {
+  silentIfNotMember?: boolean;
+}
 
 @Injectable()
 export class KvintetRepository {
@@ -51,27 +120,26 @@ export class KvintetRepository {
       where: {
         status: 'FORMING',
         members: { some: {} },
-        ...(categorySlug ? { category: { slug: categorySlug } } : {}),
+        ...(categorySlug
+          ? { categories: { some: { category: { slug: categorySlug } } } }
+          : {}),
       },
       orderBy: { createdAt: 'desc' },
       // Select only what the feed shows: never the user's name, e-mail or id.
       select: {
         id: true,
         title: true,
-        category: { select: { slug: true } },
+        categories: {
+          orderBy: { category: { sortOrder: 'asc' } },
+          select: { category: { select: { slug: true } } },
+        },
         members: {
           orderBy: { joinedAt: 'asc' },
           select: {
             user: {
               select: {
                 profile: {
-                  select: {
-                    position: true,
-                    meetingFrequency: true,
-                    tags: {
-                      select: { kind: true, tag: { select: { slug: true } } },
-                    },
-                  },
+                  select: { position: true, ...matchProfileSelect },
                 },
               },
             },
@@ -83,7 +151,7 @@ export class KvintetRepository {
     return kvintets.map((kvintet) => ({
       id: kvintet.id,
       title: kvintet.title,
-      category: kvintet.category.slug,
+      categories: kvintet.categories.map(({ category }) => category.slug),
       members: kvintet.members.map(({ user: { profile } }) => {
         const slugsOf = (kind: ProfileTagKind): string[] =>
           (profile?.tags ?? [])
@@ -95,18 +163,34 @@ export class KvintetRepository {
           teach: slugsOf('TEACH'),
           learn: slugsOf('LEARN'),
           interests: slugsOf('INTEREST'),
+          // Used only for ranking; the service never sends it to the client.
+          match: toMatchProfile(profile),
         };
       }),
     }));
   }
 
+  /** What matching needs about the caller; an empty profile when there is none. */
+  async findMatchProfile(userId: string): Promise<MatchProfile> {
+    const profile = await this.prisma.profile.findUnique({
+      where: { userId },
+      select: matchProfileSelect,
+    });
+    return toMatchProfile(profile);
+  }
+
   /** Starts a new kvintet (status FORMING) with the caller as its first member. */
   async start(userId: string, input: NewKvintet): Promise<StartOutcome> {
-    const category = await this.prisma.category.findUnique({
-      where: { slug: input.categorySlug },
-      select: { id: true },
+    const categories = await this.prisma.category.findMany({
+      where: { slug: { in: input.categorySlugs } },
+      select: { id: true, slug: true },
     });
-    if (!category) return { result: 'unknown_category' };
+    if (categories.length !== input.categorySlugs.length) {
+      return { result: 'unknown_category' };
+    }
+    const categoryIds = input.categorySlugs.map(
+      (slug) => categories.find((category) => category.slug === slug)!.id,
+    );
 
     try {
       // A nested create is one transaction; the unique userId rejects a second kvintet.
@@ -114,7 +198,11 @@ export class KvintetRepository {
         data: {
           title: input.title,
           description: input.description,
-          categoryId: category.id,
+          // Deprecated column, kept until it is dropped: the first chosen category.
+          categoryId: categoryIds[0],
+          categories: {
+            create: categoryIds.map((categoryId) => ({ categoryId })),
+          },
           members: { create: { userId } },
         },
         select: { id: true },
@@ -124,6 +212,20 @@ export class KvintetRepository {
       if (isUniqueViolation(error)) return { result: 'already_member' };
       throw error;
     }
+  }
+
+  /** Opens the chat: the status flips and the chat's first line is posted in the same transaction. */
+  private async activateInTransaction(
+    tx: TransactionClient,
+    kvintetId: string,
+  ): Promise<void> {
+    await tx.kvintet.update({
+      where: { id: kvintetId },
+      data: { status: 'ACTIVE', activatedAt: new Date() },
+    });
+    await tx.message.create({
+      data: { kvintetId, kind: 'SYSTEM', body: KVINTET_STARTED },
+    });
   }
 
   /** Locks the kvintet row so two requests cannot both take the last seat. */
@@ -142,10 +244,7 @@ export class KvintetRepository {
         await tx.kvintetVote.deleteMany({ where: { kvintetId } });
         await tx.kvintetMember.create({ data: { kvintetId, userId } });
         if (members + 1 === KVINTET_CAPACITY) {
-          await tx.kvintet.update({
-            where: { id: kvintetId },
-            data: { status: 'ACTIVE', activatedAt: new Date() },
-          });
+          await this.activateInTransaction(tx, kvintetId);
         }
         return 'joined';
       });
@@ -239,8 +338,14 @@ export class KvintetRepository {
           ? profile.roles.join(', ')
           : null);
 
+      // Mask other members' permanent userId while FORMING to preserve anonymity across proposals
+      const memberUserId =
+        isKvintetActive || isCurrentUser
+          ? m.userId
+          : `anon-${createHmac('sha256', kvintet.id).update(m.userId).digest('hex').slice(0, 12)}`;
+
       return {
-        userId: m.userId,
+        userId: memberUserId,
         name,
         username,
         role,
@@ -327,7 +432,20 @@ export class KvintetRepository {
         votedCount,
         totalCount,
       },
+      beginsSeen: membership.beginsSeenAt !== null,
     };
+  }
+
+  /**
+   * Records that the caller has seen the "Kvintet begins" page. Only an ACTIVE kvintet counts, so
+   * a call while it is still forming cannot skip the page, and the first mark wins when called
+   * again. Matching no row (not a member) is not an error.
+   */
+  async markBeginsSeen(userId: string): Promise<void> {
+    await this.prisma.kvintetMember.updateMany({
+      where: { userId, beginsSeenAt: null, kvintet: { status: 'ACTIVE' } },
+      data: { beginsSeenAt: new Date() },
+    });
   }
 
   async vote(kvintetId: string, userId: string): Promise<void> {
@@ -404,77 +522,90 @@ export class KvintetRepository {
 
       const updatedVotesCount = kvintet.votes.length + 1;
       if (updatedVotesCount >= memberCount) {
-        await tx.kvintet.update({
-          where: { id: kvintetId },
-          data: {
-            status: 'ACTIVE',
-            activatedAt: new Date(),
-          },
-        });
+        await this.activateInTransaction(tx, kvintetId);
       }
     });
   }
 
-  async leave(kvintetId: string, userId: string): Promise<void> {
-    await this.prisma.$transaction(async (tx) => {
-      const locked = await tx.$queryRaw<Array<{ id: string }>>`
-        SELECT id FROM "kvintet" WHERE id = ${kvintetId}::uuid FOR UPDATE
-      `;
+  async leaveInTransaction(
+    tx: TransactionClient,
+    kvintetId: string,
+    userId: string,
+    options: LeaveOptions = {},
+  ): Promise<void> {
+    const locked = await tx.$queryRaw<Array<{ id: string }>>`
+      SELECT id FROM "kvintet" WHERE id = ${kvintetId}::uuid FOR UPDATE
+    `;
 
-      if (!locked || locked.length === 0) {
-        throw new NotFoundException({
-          statusCode: 404,
-          code: 'not_found',
-          message: 'Kvintet not found',
-        });
-      }
-
-      const kvintet = await tx.kvintet.findUnique({
-        where: { id: kvintetId },
-        include: {
-          members: true,
-          votes: true,
-        },
+    if (!locked || locked.length === 0) {
+      if (options.silentIfNotMember) return;
+      throw new NotFoundException({
+        statusCode: 404,
+        code: 'not_found',
+        message: 'Kvintet not found',
       });
+    }
 
-      if (!kvintet) {
-        throw new NotFoundException({
-          statusCode: 404,
-          code: 'not_found',
-          message: 'Kvintet not found',
-        });
-      }
-
-      const isMember = kvintet.members.some((m) => m.userId === userId);
-      if (!isMember) {
-        throw new BadRequestException({
-          statusCode: 400,
-          code: 'bad_request',
-          message: 'Caller is not a member of this kvintet',
-        });
-      }
-
-      await tx.kvintetMember.delete({
-        where: {
-          kvintetId_userId: {
-            kvintetId,
-            userId,
-          },
-        },
-      });
-
-      const remainingMembers = kvintet.members.filter(
-        (m) => m.userId !== userId,
-      );
-
-      if (remainingMembers.length === 0) {
-        await tx.kvintet.delete({
-          where: { id: kvintetId },
-        });
-      } else if (kvintet.status === 'FORMING') {
-        // Votes agreed to the old roster; the rest must vote again.
-        await tx.kvintetVote.deleteMany({ where: { kvintetId } });
-      }
+    const kvintet = await tx.kvintet.findUnique({
+      where: { id: kvintetId },
+      include: {
+        members: true,
+        votes: true,
+      },
     });
+
+    if (!kvintet) {
+      if (options.silentIfNotMember) return;
+      throw new NotFoundException({
+        statusCode: 404,
+        code: 'not_found',
+        message: 'Kvintet not found',
+      });
+    }
+
+    const isMember = kvintet.members.some((m) => m.userId === userId);
+    if (!isMember) {
+      if (options.silentIfNotMember) return;
+      throw new BadRequestException({
+        statusCode: 400,
+        code: 'bad_request',
+        message: 'Caller is not a member of this kvintet',
+      });
+    }
+
+    await tx.kvintetMember.delete({
+      where: {
+        kvintetId_userId: {
+          kvintetId,
+          userId,
+        },
+      },
+    });
+
+    const remainingMembers = kvintet.members.filter((m) => m.userId !== userId);
+
+    if (remainingMembers.length === 0) {
+      await tx.kvintet.delete({
+        where: { id: kvintetId },
+      });
+    } else if (kvintet.status === 'FORMING') {
+      // Votes agreed to the old roster; the rest must vote again.
+      await tx.kvintetVote.deleteMany({ where: { kvintetId } });
+    }
+  }
+
+  async leave(
+    kvintetId: string,
+    userId: string,
+    tx?: TransactionClient,
+    options?: LeaveOptions,
+  ): Promise<void> {
+    if (tx) {
+      await this.leaveInTransaction(tx, kvintetId, userId, options);
+    } else {
+      await this.prisma.$transaction((innerTx) =>
+        this.leaveInTransaction(innerTx, kvintetId, userId, options),
+      );
+    }
   }
 }
