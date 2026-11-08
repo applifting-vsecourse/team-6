@@ -25,6 +25,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
 import { FeedDto } from './dto/feed-item.dto';
 import { FeedQueryDto } from './dto/feed-query.dto';
 import { KvintetDetailsDto } from './dto/kvintet-details.dto';
@@ -38,6 +39,7 @@ import { StartedKvintetDto, StartKvintetDto } from './dto/start-kvintet.dto';
 export class KvintetController {
   constructor(private readonly service: KvintetService) {}
 
+  @SkipThrottle()
   @Get('membership')
   @ApiOperation({
     summary: 'Is the caller in a kvintet?',
@@ -84,6 +86,7 @@ export class KvintetController {
     return this.service.join(user.id, id);
   }
 
+  @SkipThrottle()
   @Get('mine')
   @UseGuards(MemberGuard)
   @ApiOperation({

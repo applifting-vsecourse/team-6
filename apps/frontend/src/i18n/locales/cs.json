@@ -143,6 +143,7 @@
     "signInFailed": "Přihlášení se nezdařilo",
     "signUpFailed": "Registrace se nezdařila",
     "somethingWentWrong": "Něco se pokazilo",
+    "too_many_requests": "Příliš mnoho požadavků. Zpomalte prosím a zkuste to za chvíli znovu.",
     "unauthorized": "Nejdřív se musíte přihlásit.",
     "unexpected": "Došlo k neočekávané chybě.",
     "validation_failed": "Některé zadané hodnoty nejsou platné."

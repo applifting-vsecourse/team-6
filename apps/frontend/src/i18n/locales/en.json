@@ -141,6 +141,7 @@
     "signInFailed": "Sign in failed",
     "signUpFailed": "Sign up failed",
     "somethingWentWrong": "Something went wrong",
+    "too_many_requests": "Too many requests. Please slow down and try again later.",
     "unauthorized": "You need to sign in first.",
     "unexpected": "An unexpected error occurred.",
     "validation_failed": "Some of the entered values are not valid."

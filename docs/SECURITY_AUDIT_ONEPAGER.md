@@ -52,13 +52,13 @@ The audit identified **8 security risk items** across sensitive logging, authent
 
 ### SEC-03: Clickjacking Defense & HTTP Security Headers
 
-- **What was fixed:** Deployed `helmet` on the NestJS backend to eliminate server signature leaks (`X-Powered-By`) and enforce `X-Content-Type-Options: nosniff`. Added `X-Frame-Options: SAMEORIGIN` and strict referrer policies to the Nginx frontend web server.
-- **Verification:** Verified headers in HTTP responses; iframing across third-party domains is blocked by browser policy.
+- **What was fixed:** Deployed `helmet` on the NestJS backend to eliminate server signature leaks (`X-Powered-By`) and enforce `X-Content-Type-Options: nosniff`. Added `X-Frame-Options: SAMEORIGIN`, `Permissions-Policy`, and strict referrer policies across all Nginx frontend location blocks.
+- **Verification:** Verified headers across all HTTP responses; iframing across third-party domains is blocked by browser policy.
 
 ### SEC-04: Multi-Layered Rate Limiting & Abuse Prevention
 
-- **What was fixed:** Configured `@nestjs/throttler` with a 100 request/minute global budget per IP, and added a strict `@Throttle(20 msg/min)` on group chat message dispatch. Enabled BetterAuth built-in rate limiting and configured `trust proxy: 1` so client IPs are accurately isolated behind Docker/Coolify reverse proxies.
-- **Verification:** Automated tests verify that request quotas trigger standardized `429 Too Many Requests` responses.
+- **What was fixed:** Configured `@nestjs/throttler` with a 300 request/minute global budget per IP (calibrated for campus NAT networks where multiple students share an IP address), skipped throttling on high-frequency background polling endpoints (`/messages` list, `/messages/unread`, `/kvintets/mine`, `/health`), and added a strict `@Throttle(20 msg/min)` on group chat message dispatch. Enabled BetterAuth built-in rate limiting and configured `trust proxy: 1` so client IPs are accurately isolated behind Docker/Coolify reverse proxies.
+- **Verification:** Automated test suite (`throttler.spec.ts` and `errors.spec.ts`) verifies that request quotas trigger standardized `429 Too Many Requests` responses (`code: 'too_many_requests'`), route exemptions (`@SkipThrottle()`) protect polling/health probes, and the frontend translates rate limits into user-friendly localized messages.
 
 ### SEC-05: Invariant Enforcement on Profile Onboarding
 
