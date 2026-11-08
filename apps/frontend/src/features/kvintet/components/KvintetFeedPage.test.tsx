@@ -13,6 +13,8 @@ import type { Frequency } from "@/features/kvintet/lib/frequencies"
 
 const navigate = vi.fn()
 
+// The grey blobatars use the gaze driver, which needs browser APIs jsdom lacks.
+vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
 vi.mock("@tanstack/react-router", () => ({ useNavigate: () => navigate }))
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }))
 vi.mock("@/lib/api-client", () => ({ api: { get: vi.fn(), post: vi.fn() } }))
@@ -94,7 +96,7 @@ describe("KvintetFeedPage", () => {
     serve(() => new Promise(() => undefined))
     renderPage()
 
-    expect(screen.getByText("Loading kvintets…")).toBeInTheDocument()
+    expect(screen.getByText("Looking for kvintets that suit you…")).toBeInTheDocument()
   })
 
   it("lists the open kvintets with their count", async () => {
@@ -123,7 +125,7 @@ describe("KvintetFeedPage", () => {
     serve(() => Promise.resolve([]))
     renderPage()
 
-    expect(await screen.findByText("No kvintets for you yet")).toBeInTheDocument()
+    expect(await screen.findByText("Nothing here yet")).toBeInTheDocument()
     expect(screen.getAllByRole("button", { name: "Start a kvintet" })).toHaveLength(2)
   })
 
@@ -132,10 +134,10 @@ describe("KvintetFeedPage", () => {
     serve(() => (attempts++ === 0 ? Promise.reject(new Error("boom")) : Promise.resolve([])))
     renderPage()
 
-    expect(await screen.findByText("Couldn't load kvintets")).toBeInTheDocument()
+    expect(await screen.findByText("We couldn't load the kvintets")).toBeInTheDocument()
     await userEvent.click(screen.getByRole("button", { name: "Try again" }))
 
-    expect(await screen.findByText("No kvintets for you yet")).toBeInTheDocument()
+    expect(await screen.findByText("Nothing here yet")).toBeInTheDocument()
   })
 
   it("sends someone who is already in a kvintet to Overview", async () => {
@@ -144,7 +146,7 @@ describe("KvintetFeedPage", () => {
 
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/overview", replace: true }))
     expect(toast.info).toHaveBeenCalledWith("You are already in a proposal.")
-    expect(screen.queryByText("Couldn't load kvintets")).not.toBeInTheDocument()
+    expect(screen.queryByText("We couldn't load the kvintets")).not.toBeInTheDocument()
   })
 
   it("joins a kvintet, confirms and leaves for Home", async () => {
@@ -228,7 +230,7 @@ describe("filters", () => {
     serve(feed)
     renderPage({ category: ["languages"], frequency: ["BIWEEKLY"] })
 
-    expect(await screen.findByText("No kvintets match these filters")).toBeInTheDocument()
+    expect(await screen.findByText("Nothing for these filters")).toBeInTheDocument()
   })
 
   it("ignores a category from the URL that does not exist", async () => {
@@ -256,19 +258,26 @@ describe("filters", () => {
     serve(feed)
     renderPage({ category: ["leisure"], frequency: ["WEEKLY"] })
 
-    expect(await screen.findByText("No kvintets match these filters")).toBeInTheDocument()
-    await userEvent.click(screen.getByRole("button", { name: "Clear filters" }))
+    expect(await screen.findByText("Nothing for these filters")).toBeInTheDocument()
+    await userEvent.click(screen.getByRole("button", { name: "Clear filter" }))
 
     expect(onCategoryChange).toHaveBeenCalledWith([])
     expect(onFrequencyChange).toHaveBeenCalledWith([])
+  })
+
+  it("names the topic when one is picked and nothing is in it", async () => {
+    serve(() => Promise.resolve([kvintet("k1", "Spanish", { categories: ["languages"] })]))
+    renderPage({ category: ["leisure"] })
+
+    expect(await screen.findByText("Nothing in Leisure")).toBeInTheDocument()
   })
 
   it("does not call an empty feed a filtered one", async () => {
     serve(() => Promise.resolve([]))
     renderPage({ category: ["languages"] })
 
-    expect(await screen.findByText("No kvintets for you yet")).toBeInTheDocument()
-    expect(screen.queryByRole("button", { name: "Clear filters" })).not.toBeInTheDocument()
+    expect(await screen.findByText("Nothing here yet")).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "Clear filter" })).not.toBeInTheDocument()
   })
 })
 
