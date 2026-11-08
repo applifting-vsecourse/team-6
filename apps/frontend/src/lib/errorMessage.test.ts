@@ -77,9 +77,7 @@ describe("getErrorMessage", () => {
     expect(getErrorMessage(httpError({ code: "PROFILE_AVAILABILITY_REQUIRED" }))).toBe(
       "Vyberte alespoň jeden den a denní dobu.",
     )
-    expect(getErrorMessage(httpError({ code: "CITY_NOT_FOUND" }))).toBe(
-      "Toto město jsme nenašli.",
-    )
+    expect(getErrorMessage(httpError({ code: "CITY_NOT_FOUND" }))).toBe("Toto město jsme nenašli.")
     expect(getErrorMessage(httpError({ code: "TAGS_NOT_FOUND" }))).toBe(
       "Některé vybrané štítky už neexistují. Vyberte je prosím znovu.",
     )
