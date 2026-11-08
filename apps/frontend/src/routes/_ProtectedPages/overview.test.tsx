@@ -462,6 +462,25 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       )
     })
 
+    it("names only you on hover while the kvintet forms, never the others", async () => {
+      myKvintetData = {
+        ...formingKvintet,
+        members: formingKvintet.members.map((m) => (m.isCurrentUser ? m : { ...m, name: null })),
+      }
+
+      const { container } = renderWithClient(<OverviewPage />)
+      await screen.findByRole("heading", { name: /Your kvintet is forming/i })
+
+      const seats = container.querySelectorAll('[data-seat="member"]')
+      expect(seats[1]?.querySelector("[tabindex]")).toBeNull()
+      await userEvent.hover(seats[1]!.firstElementChild as HTMLElement)
+      expect(screen.queryByRole("tooltip")).not.toBeInTheDocument()
+
+      const own = seats[0]!.querySelector<HTMLElement>("[tabindex]")!
+      await userEvent.hover(own)
+      expect(await screen.findByRole("tooltip")).toHaveTextContent("Jana")
+    })
+
     it("draws only you in colour, the others grey, and writes (you) once", async () => {
       myKvintetData = formingKvintet
 

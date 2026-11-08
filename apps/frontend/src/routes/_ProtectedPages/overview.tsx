@@ -13,6 +13,7 @@ import { StateAlert } from "@/components/StateAlert"
 import { Blobatar } from "@/components/ui/blobatar"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { formatDate, formatDayAndMonth, formatHeaderDate, formatList } from "@/lib/date"
 import { getErrorMessage } from "@/lib/errorMessage"
 import { cn } from "@/lib/utils"
@@ -811,64 +812,66 @@ function MemberRows({ kvintet, ownSeed }: { kvintet: KvintetDetails; ownSeed: st
   const label = useSlugLabel()
 
   return (
-    <div className="flex flex-col divide-y divide-border">
-      {youFirst(kvintet.members).map((member, idx) => {
-        const { seed, anonymous: isAnonymous, tooltip } = seatSeed(kvintet, member, idx, ownSeed)
-        const role = member.role ? roleLabel(member.role, label) : null
-        const name = member.name?.trim() ? member.name : null
-        // Names are hidden while the kvintet forms, so the role leads; once it is active the name does.
-        const title =
-          (kvintet.status === "ACTIVE" ? (name ?? role) : (role ?? name)) ??
-          t("kvintet.members.openSeat")
-        const lines = [
-          { heading: t("kvintet.members.teaches"), slugs: member.teachTags },
-          { heading: t("kvintet.members.wantsToLearn"), slugs: member.learnTags },
-          { heading: t("kvintet.members.interests"), slugs: member.interestTags },
-        ].filter((line) => line.slugs.length > 0)
+    <TooltipProvider>
+      <div className="flex flex-col divide-y divide-border">
+        {youFirst(kvintet.members).map((member, idx) => {
+          const { seed, anonymous: isAnonymous, tooltip } = seatSeed(kvintet, member, idx, ownSeed)
+          const role = member.role ? roleLabel(member.role, label) : null
+          const name = member.name?.trim() ? member.name : null
+          // Names are hidden while the kvintet forms, so the role leads; once it is active the name does.
+          const title =
+            (kvintet.status === "ACTIVE" ? (name ?? role) : (role ?? name)) ??
+            t("kvintet.members.openSeat")
+          const lines = [
+            { heading: t("kvintet.members.teaches"), slugs: member.teachTags },
+            { heading: t("kvintet.members.wantsToLearn"), slugs: member.learnTags },
+            { heading: t("kvintet.members.interests"), slugs: member.interestTags },
+          ].filter((line) => line.slugs.length > 0)
 
-        return (
-          <div
-            key={member.userId}
-            className="flex items-start gap-3 py-2 first:pt-2"
-          >
-            <span className="size-8 shrink-0">
-              <SeatTooltip text={tooltip}>
-                {isAnonymous ? (
-                  <AnonymousBlobatar
-                    seed={seed}
-                    motion="hover"
-                    className="size-full"
-                  />
-                ) : (
-                  <Face
-                    seed={seed}
-                    motion="hover"
-                    className="size-full"
-                  />
-                )}
-              </SeatTooltip>
-            </span>
-            <div className="flex min-w-0 flex-col">
-              <p className="text-compact font-medium text-foreground">
-                {title}
-                {member.isCurrentUser ? ` ${t("kvintet.members.you")}` : ""}
-                {name && role && kvintet.status === "ACTIVE" ? (
-                  <span className="font-normal text-muted-foreground"> · {role}</span>
-                ) : null}
-              </p>
-              {lines.map(({ heading, slugs }) => (
-                <p
-                  key={heading}
-                  className="text-small text-muted-foreground"
-                >
-                  <span className="font-medium text-foreground">{heading} </span>
-                  {formatList(slugs.map((slug) => label("tags", slug)))}
+          return (
+            <div
+              key={member.userId}
+              className="flex items-start gap-3 py-2 first:pt-2"
+            >
+              <span className="size-8 shrink-0">
+                <SeatTooltip text={tooltip}>
+                  {isAnonymous ? (
+                    <AnonymousBlobatar
+                      seed={seed}
+                      motion="hover"
+                      className="size-full"
+                    />
+                  ) : (
+                    <Face
+                      seed={seed}
+                      motion="hover"
+                      className="size-full"
+                    />
+                  )}
+                </SeatTooltip>
+              </span>
+              <div className="flex min-w-0 flex-col">
+                <p className="text-compact font-medium text-foreground">
+                  {title}
+                  {member.isCurrentUser ? ` ${t("kvintet.members.you")}` : ""}
+                  {name && role && kvintet.status === "ACTIVE" ? (
+                    <span className="font-normal text-muted-foreground"> · {role}</span>
+                  ) : null}
                 </p>
-              ))}
+                {lines.map(({ heading, slugs }) => (
+                  <p
+                    key={heading}
+                    className="text-small text-muted-foreground"
+                  >
+                    <span className="font-medium text-foreground">{heading} </span>
+                    {formatList(slugs.map((slug) => label("tags", slug)))}
+                  </p>
+                ))}
+              </div>
             </div>
-          </div>
-        )
-      })}
-    </div>
+          )
+        })}
+      </div>
+    </TooltipProvider>
   )
 }
