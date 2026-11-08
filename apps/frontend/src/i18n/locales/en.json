@@ -91,6 +91,7 @@
     "back": "Back",
     "close": "Close",
     "continue": "Continue",
+    "edit": "Edit",
     "finish": "Done",
     "goHome": "Back home",
     "language": "Language",
@@ -194,13 +195,18 @@
       "category": "Category",
       "categoryPlaceholder": "Pick a category",
       "confirmLeave": "Leave",
+      "confirmLeaveActive": "Leave kvintet",
       "description": "You'll be its first member. Others join by topic.",
       "details": "A few more words (optional)",
       "detailsPlaceholder": "e.g. I run a 10-person agency and want to share what works for us.",
-      "leaveActiveConfirm": "You will leave the active kvintet. If fewer than 3 members remain, the kvintet will be disbanded.",
+      "leaveActiveDescription": "Others will see that you left. Then you can join another kvintet.",
+      "leaveActiveNotice": "The others carry on without you.",
+      "leaveActiveTitle": "Leave the kvintet?",
       "leaveProposalConfirm": "You will leave this proposal. When someone joins or leaves, everyone's votes are reset.",
       "leaveTitle": "Are you sure you want to leave?",
+      "leaving": "Leaving…",
       "note": "Others will see the topic and your role. Your name only once the group starts.",
+      "stay": "Stay",
       "submit": "Start a kvintet",
       "title": "Start a kvintet",
       "topic": "What do you want to talk about",
@@ -365,7 +371,8 @@
     "kvintetFeed": "Proposals",
     "kvintetFeedDisabled": "You are already in a kvintet, so you can't browse other proposals.",
     "myKvintet": "My kvintet",
-    "overview": "Overview"
+    "overview": "Overview",
+    "profile": "Profile"
   },
   "onboarding": {
     "step1": {
@@ -555,6 +562,39 @@
     "subtitle": "You are not in a kvintet yet. Start by picking a proposal.",
     "subtitleMember": "You are in a kvintet. See how your group is doing.",
     "title": "Overview"
+  },
+  "profile": {
+    "dangerZone": {
+      "button": "Delete account",
+      "description": "Removes everything. Can't be undone.",
+      "title": "Delete account"
+    },
+    "empty": {
+      "interests": "Nothing added yet",
+      "learn": "Nothing added yet",
+      "teach": "Nothing added yet",
+      "whenAndWhere": "No preferences set yet"
+    },
+    "error": {
+      "title": "Couldn't load profile"
+    },
+    "newUsernameHint": "New username, new blobatar.",
+    "sections": {
+      "interests": "I'm interested in",
+      "learn": "I want to learn",
+      "teach": "I can teach",
+      "whenAndWhere": "When and where"
+    },
+    "title": "Profile",
+    "when": {
+      "afternoons": "afternoons",
+      "allDays": "Weekdays and weekends",
+      "evenings": "evenings",
+      "mornings": "mornings",
+      "weekdays": "Weekday",
+      "weekends": "Weekend"
+    },
+    "withinRadius": "within {{count}} km"
   },
   "roles": {
     "account-manager": "Account Manager",

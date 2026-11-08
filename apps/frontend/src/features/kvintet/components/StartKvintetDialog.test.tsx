@@ -7,6 +7,7 @@ import { api } from "@/lib/api-client"
 
 import { StartKvintetDialog } from "@/features/kvintet/components/StartKvintetDialog"
 
+vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
 vi.mock("@tanstack/react-router", () => ({ useNavigate: () => vi.fn() }))
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }))
 vi.mock("@/lib/api-client", () => ({ api: { get: vi.fn(), post: vi.fn() } }))

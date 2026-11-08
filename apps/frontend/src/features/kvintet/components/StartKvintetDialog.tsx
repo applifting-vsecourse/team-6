@@ -7,8 +7,8 @@ import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
+import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Blobatar } from "@/components/ui/blobatar"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -110,8 +110,9 @@ export function StartKvintetDialog({ isOpen, onOpenChange, avatarSeed }: StartKv
         <div className="flex items-center gap-3.5">
           {avatarSeed ? (
             // You are in colour; the grey faces are everyone you have not met yet.
-            <Blobatar
+            <GazeBlobatar
               name={avatarSeed}
+              animate="always"
               className="size-11 shrink-0 max-sm:hidden"
             />
           ) : null}

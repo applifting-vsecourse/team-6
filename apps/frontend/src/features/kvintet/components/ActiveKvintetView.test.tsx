@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import { render, screen } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 
 import type { KvintetDetails } from "@/features/kvintet/api/kvintetApi"
@@ -145,5 +146,35 @@ describe("ActiveKvintetView", () => {
 
     // Leave kvintet
     expect(screen.getByRole("button", { name: "Leave kvintet" })).toBeInTheDocument()
+  })
+
+  it("uses userId as avatarSeed in leave dialog when currentMember username is empty string", async () => {
+    const handleLeave = vi.fn()
+    const kvintetWithEmptyUsername: KvintetDetails = {
+      ...mockActiveKvintet,
+      members: [
+        {
+          ...mockActiveKvintet.members[0]!,
+          username: "",
+          userId: "fallback-active-user-id",
+          isCurrentUser: true,
+        },
+        ...mockActiveKvintet.members.slice(1),
+      ],
+    }
+
+    render(
+      <ActiveKvintetView
+        kvintet={kvintetWithEmptyUsername}
+        onLeave={handleLeave}
+        isLeaving={false}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole("button", { name: "Leave kvintet" }))
+    const dialog = screen.getByRole("dialog")
+    expect(dialog).toBeInTheDocument()
+    const avatar = dialog.querySelector("[data-slot=avatar]")
+    expect(avatar).toBeInTheDocument()
   })
 })

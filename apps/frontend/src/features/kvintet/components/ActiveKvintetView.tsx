@@ -29,6 +29,7 @@ export function ActiveKvintetView({ kvintet, onLeave, isLeaving }: ActiveKvintet
     : formatDate(new Date(kvintet.createdAt))
 
   const formattedPreferences = formatCommonPreferences(kvintet.commonPreferences, t)
+  const currentMember = kvintet.members.find((m) => m.isCurrentUser)
 
   return (
     <div className="flex flex-col gap-8">
@@ -124,6 +125,8 @@ export function ActiveKvintetView({ kvintet, onLeave, isLeaving }: ActiveKvintet
         }}
         isLeaving={isLeaving}
         isActiveKvintet={true}
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+        avatarSeed={currentMember ? currentMember.username || currentMember.userId : undefined}
       />
     </div>
   )
