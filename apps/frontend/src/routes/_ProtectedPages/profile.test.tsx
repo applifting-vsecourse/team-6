@@ -139,7 +139,6 @@ describe("ProfilePage", () => {
 
     expect(screen.getByRole("heading", { name: "Jana Nováková" })).toBeInTheDocument()
     expect(screen.getByText(/@jana.novakova · Marketing specialist/)).toBeInTheDocument()
-    expect(screen.getByText("Change your username to get a new blobatar.")).toBeInTheDocument()
   })
 
   it("shows the role and the expectations, each with an edit link to its onboarding step", () => {

@@ -2,13 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
+import { SiteHeader } from "@/app/SiteHeader"
 import { KvintetSeats } from "@/components/KvintetSeats"
 import { PageLayout } from "@/components/PageLayout"
 import { Seo } from "@/components/Seo"
 import { StepBlobatar } from "@/components/StepBlobatar"
 import { Button } from "@/components/ui/button"
 
-import { AppHeader } from "@/features/auth/components/AppHeader"
 import { useSession } from "@/features/auth/hooks/useSession"
 
 export const Route = createFileRoute("/")({
@@ -32,7 +32,7 @@ function LandingPage() {
   return (
     <>
       <Seo />
-      <PageLayout header={<AppHeader />}>
+      <PageLayout header={<SiteHeader />}>
         <div className="px-4">
           <div className="mx-auto flex w-full max-w-300 flex-col gap-5 pt-7 pb-10 md:gap-18 md:pt-18 md:pb-22">
             <section className="flex flex-col gap-5 md:flex-row md:items-center md:gap-16">

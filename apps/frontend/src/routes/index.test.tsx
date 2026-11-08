@@ -11,7 +11,7 @@ const session = vi.hoisted(() => ({ user: null as { id: string } | null }))
 
 vi.mock("@/features/auth/hooks/useSession", () => ({ useSession: () => session }))
 // The header has its own tests; this page only needs its content and links.
-vi.mock("@/features/auth/components/AppHeader", () => ({ AppHeader: () => null }))
+vi.mock("@/app/SiteHeader", () => ({ SiteHeader: () => null }))
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ children, to, className }: { children?: ReactNode; to: string; className?: string }) => (
     <a

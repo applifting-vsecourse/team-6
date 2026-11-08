@@ -1,12 +1,11 @@
 import { createRouter } from "@tanstack/react-router"
 
+import { SiteHeader } from "@/app/SiteHeader"
 import { AppLoadingScreen } from "@/components/AppLoadingScreen"
 import { NotFound } from "@/components/Error/NotFound"
 import { RootErrorBoundary } from "@/components/Error/RootErrorBoundary"
 import { queryClient } from "@/config/react-query"
 import { routeTree } from "@/routeTree.gen"
-
-import { AppHeader } from "@/features/auth/components/AppHeader"
 
 export const router = createRouter({
   routeTree,
@@ -14,7 +13,7 @@ export const router = createRouter({
   defaultPreload: "intent",
   defaultPreloadStaleTime: 0,
   scrollRestoration: true,
-  defaultNotFoundComponent: () => <NotFound header={<AppHeader />} />,
+  defaultNotFoundComponent: () => <NotFound header={<SiteHeader />} />,
   defaultErrorComponent: ({ error }) => <RootErrorBoundary error={error} />,
   defaultPendingComponent: AppLoadingScreen,
 })

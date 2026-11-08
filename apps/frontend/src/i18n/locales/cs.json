@@ -462,7 +462,7 @@
       "votedDescription": "Hlasovali jste pro spuštění. Čeká se na ostatní.",
       "votedStatus": "Hlasovali jste pro zahájení. Čeká se na ostatní.",
       "votedTitle": "Čeká se na hlasy ostatních",
-      "waitingDescription": "Ve třech můžete hlasovat o zahájení. Uvidíte to tady.",
+      "waitingDescription": "Ve třech můžete hlasovat o zahájení.",
       "waitingSeatsStatus": "{{seats}} Z {{capacity}} MÍST · ČEKÁME NA DALŠÍ",
       "waitingTitle": "Čekáme na další lidi",
       "whoSubtitle": "Jména se zobrazí, až začnete.",
@@ -549,7 +549,6 @@
       "whenAndWhere": "Kdy a kde"
     },
     "title": "Profil",
-    "usernameHint": "Změňte uživatelské jméno a získáte nový blobatar.",
     "when": {
       "afternoons": "odpoledne",
       "allDays": "Všední dny i víkendy",

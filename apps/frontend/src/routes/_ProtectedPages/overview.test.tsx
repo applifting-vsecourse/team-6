@@ -520,9 +520,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(
         await screen.findByRole("heading", { name: "Waiting for more people" }),
       ).toBeInTheDocument()
-      expect(
-        screen.getByText("At three you can vote to start. You'll see it here."),
-      ).toBeInTheDocument()
+      expect(screen.getByText("At three people, you can vote to start.")).toBeInTheDocument()
       expect(screen.queryByRole("button", { name: "Start now" })).not.toBeInTheDocument()
     })
 

@@ -454,7 +454,7 @@
       "votedDescription": "You voted to start. Waiting for the others.",
       "votedStatus": "You voted to start. Waiting for the others.",
       "votedTitle": "Waiting for others to vote",
-      "waitingDescription": "At three you can vote to start. You'll see it here.",
+      "waitingDescription": "At three people, you can vote to start.",
       "waitingSeatsStatus": "{{seats}} OF {{capacity}} SEATS · WAITING FOR MORE",
       "waitingTitle": "Waiting for more people",
       "whoSubtitle": "Names appear once you start.",
@@ -541,7 +541,6 @@
       "whenAndWhere": "When and where"
     },
     "title": "Profile",
-    "usernameHint": "Change your username to get a new blobatar.",
     "when": {
       "afternoons": "afternoons",
       "allDays": "Weekdays and weekends",
