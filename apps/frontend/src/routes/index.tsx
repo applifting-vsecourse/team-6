@@ -45,9 +45,6 @@ function LandingPage() {
               </div>
 
               <div className="flex flex-col items-start gap-5 md:flex-1 md:gap-5.5">
-                <p className="font-mono text-meta tracking-meta text-highlight uppercase">
-                  {t("landing.eyebrow")}
-                </p>
                 <h1 className="text-display-mobile md:text-display">
                   <span className="md:block">{t("landing.heroTitle1")}</span>{" "}
                   <span className="md:block">{t("landing.heroTitle2")}</span>
