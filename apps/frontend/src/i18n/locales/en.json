@@ -5,7 +5,7 @@
       "cancel": "Cancel",
       "confirm": "Delete account",
       "deleting": "Deleting...",
-      "description": "Are you sure you want to delete your account? Your profile, questionnaire answers, and spot in a kvintet will be permanently deleted. This action cannot be undone.",
+      "description": "Are you sure you want to delete your account? Your profile, questionnaire answers, and your seat in a kvintet will be permanently deleted. This action cannot be undone.",
       "title": "Delete account"
     },
     "deleteSuccess": "Your account has been deleted successfully."
@@ -109,16 +109,16 @@
     "themeLight": "Light"
   },
   "errors": {
-    "CITY_NOT_FOUND": "Selected city was not found.",
-    "ONBOARDING_REQUIRED": "Please complete onboarding before accessing this resource.",
-    "PROFILE_AVAILABILITY_REQUIRED": "At least one availability slot is required.",
-    "PROFILE_FREQUENCY_REQUIRED": "Meeting frequency is required.",
-    "PROFILE_LOCATION_REQUIRED": "Location coordinates or city is required.",
-    "PROFILE_ROLE_REQUIRED": "At least one role is required.",
-    "TAGS_NOT_FOUND": "One or more selected tags do not exist.",
-    "already_in_kvintet": "You are already in a proposal or a kvintet.",
+    "CITY_NOT_FOUND": "We couldn't find this city.",
+    "ONBOARDING_REQUIRED": "Finish your profile first.",
+    "PROFILE_AVAILABILITY_REQUIRED": "Pick at least one day and time of day.",
+    "PROFILE_FREQUENCY_REQUIRED": "Choose how often you want to meet.",
+    "PROFILE_LOCATION_REQUIRED": "Choose a place on the map.",
+    "PROFILE_ROLE_REQUIRED": "Pick at least one role.",
+    "TAGS_NOT_FOUND": "Some of the selected tags no longer exist. Please pick them again.",
+    "already_in_kvintet": "You are already in a kvintet.",
     "auth": {
-      "CODE_OF_CONDUCT_REQUIRED": "You must accept the code of conduct.",
+      "CODE_OF_CONDUCT_REQUIRED": "Please agree to the community rules.",
       "EMAIL_NOT_VERIFIED": "Verify your email first.",
       "INVALID_EMAIL": "This email is not valid.",
       "INVALID_EMAIL_OR_PASSWORD": "Email or password is wrong. Please try again.",
@@ -135,8 +135,8 @@
     "conflict": "This conflicts with existing data.",
     "forbidden": "You don't have access to this.",
     "internal_error": "Something went wrong on our side. Please try again.",
-    "kvintet_not_active": "This kvintet's chat opens once the kvintet is active.",
-    "kvintet_not_open": "This proposal is full or no longer open.",
+    "kvintet_not_active": "The chat opens once the kvintet starts.",
+    "kvintet_not_open": "This kvintet is full or has already started.",
     "not_found": "We couldn't find what you were looking for.",
     "pageNotFound": "This page doesn't exist",
     "pageNotFoundDescription": "This link leads nowhere.",
@@ -155,13 +155,13 @@
     "step2Text": "An algorithm finds possible kvintets for you, and you pick one.",
     "step2Title": "Picking a kvintet",
     "step3Text": "With five people, the kvintet starts automatically. With three or four, when everyone votes yes.",
-    "step3Title": "Group start",
+    "step3Title": "The kvintet starts",
     "step4Text": "Where and how often is up to you.",
     "step4Title": "Meeting up",
     "title": "How Kvintet works"
   },
   "kvintet": {
-    "alreadyMember": "You are already in a proposal.",
+    "alreadyMember": "You are already in a kvintet.",
     "begins": {
       "dateAt": "{{date}} at {{time}}",
       "eyebrowFive": "The fifth person joined",
@@ -193,7 +193,7 @@
       "leaveActiveDescription": "Others will see that you left. Then you can join another kvintet.",
       "leaveActiveNotice": "The others carry on without you.",
       "leaveActiveTitle": "Leave the kvintet?",
-      "leaveProposalConfirm": "You will leave this proposal. When someone joins or leaves, everyone's votes are reset.",
+      "leaveProposalConfirm": "You'll leave this kvintet. When someone joins or leaves, everyone's votes are reset.",
       "leaveTitle": "Are you sure you want to leave?",
       "leaving": "Leaving…",
       "note": "Others will see the topic and your role. Your name only once the kvintet starts.",
@@ -209,7 +209,7 @@
     },
     "emptyFiltered": {
       "showAll": "Clear filter",
-      "text": "Try another topic – or start one.",
+      "text": "Try another topic – or start a kvintet.",
       "title": "Nothing in {{filter}}",
       "titleMany": "Nothing for these filters"
     },
@@ -230,7 +230,7 @@
       "WEEKLY": "Every week"
     },
     "join": "Join",
-    "joined": "You joined the proposal.",
+    "joined": "You joined the kvintet.",
     "loading": "Looking for kvintets that suit you…",
     "member": "Member",
     "members": {
@@ -254,14 +254,14 @@
       "label": "Why it suits you:",
       "learn": "Someone here teaches {{tag}}",
       "roleMix": "Roles different from yours",
-      "teach": "Someone here wants to learn {{tag}}",
+      "teach": "Someone here wants to learn: {{tag}}",
       "topic": "Your topic: {{category}}"
     },
     "seatCount": "{{filled}} / {{total}}",
     "startOwn": {
       "button": "Start a kvintet"
     },
-    "started": "Your proposal is open. Others can join it now.",
+    "started": "Your kvintet is open. Others can join it now.",
     "subtitle": "Pick a kvintet by topic.",
     "title": "Kvintets",
     "vacancy": "Free",
@@ -278,7 +278,7 @@
   },
   "landing": {
     "createAccount": "Create account",
-    "goToOverview": "Go to overview",
+    "goToOverview": "Go to Home",
     "heroText": "Kvintet connects you with people who care about the same topic.",
     "heroTextShort": "Meet four people who care about the same topic. Everyone teaches, everyone learns.",
     "heroTitle1": "Five people. One kvintet.",
@@ -317,13 +317,13 @@
     "unreadMessages_other": "{{count}} unread messages"
   },
   "meetingFrequency": {
-    "BIWEEKLY": "every 14 days",
+    "BIWEEKLY": "every two weeks",
     "MONTHLY": "once a month",
     "WEEKLY": "every week"
   },
   "nav": {
     "kvintetFeed": "Kvintets",
-    "kvintetFeedDisabled": "You are already in a kvintet, so you can't browse other proposals.",
+    "kvintetFeedDisabled": "You're already in a kvintet, so you can't browse others.",
     "overview": "Home",
     "profile": "Profile"
   },
@@ -405,7 +405,7 @@
     },
     "stepProgress": "Step {{current}} of {{total}}",
     "stepShort": "{{current}} / {{total}}",
-    "title": "Onboarding"
+    "title": "Profile setup"
   },
   "overview": {
     "active": {
@@ -455,10 +455,10 @@
       "votedDescription": "You voted to start. Waiting for the others.",
       "votedStatus": "You voted to start. Waiting for the others.",
       "votedTitle": "Waiting for others to vote",
-      "waitingDescription": "At three people, you can vote to start.",
+      "waitingDescription": "With three people, you can vote to start.",
       "waitingSeatsStatus": "{{seats}} OF {{capacity}} SEATS · WAITING FOR MORE",
       "waitingTitle": "Waiting for more people",
-      "whoSubtitle": "Names appear once you start.",
+      "whoSubtitle": "Names appear once the kvintet starts.",
       "whoTitle": "Who's here"
     },
     "greeting": "Hi, {{name}}",
@@ -466,18 +466,18 @@
     "loading": "Getting your home ready…",
     "nextStep": {
       "badge": "YOUR NEXT STEP",
-      "button": "See proposals",
-      "description": "We found proposals that match your profile. Pick by topic – you'll see names once the kvintet forms.",
-      "title": "Pick a proposal"
+      "button": "See kvintets",
+      "description": "We found kvintets that match your profile. Pick by topic – you'll see names once the kvintet starts.",
+      "title": "Pick a kvintet"
     },
     "nextStepMember": {
       "badge": "YOUR KVINTET",
       "button": "Go to my kvintet",
-      "description": "See who's in your group and what happens next.",
+      "description": "See who's in your kvintet and what happens next.",
       "title": "Head to your kvintet"
     },
     "noKvintet": {
-      "empty": "No proposals available right now.",
+      "empty": "No kvintets to join right now.",
       "join": "Join",
       "joining": "Joining…",
       "lead": "Pick a kvintet – these fit you best.",
@@ -512,9 +512,9 @@
       "stepBadge": "STEP 1 OF 3 DONE",
       "title": "Finish your profile"
     },
-    "subtitle": "You are not in a kvintet yet. Start by picking a proposal.",
-    "subtitleMember": "You are in a kvintet. See how your group is doing.",
-    "title": "Overview"
+    "subtitle": "You are not in a kvintet yet. Start by picking one.",
+    "subtitleMember": "You are in a kvintet. See how it's going.",
+    "title": "Home"
   },
   "profile": {
     "dangerZone": {
