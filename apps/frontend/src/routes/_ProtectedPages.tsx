@@ -1,16 +1,13 @@
 import { createFileRoute, Outlet, redirect, useMatch } from "@tanstack/react-router"
-import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
+import { SiteHeader } from "@/app/SiteHeader"
 import { NotFoundContent } from "@/components/Error/NotFound"
 import { PageLayout } from "@/components/PageLayout"
 import { Seo } from "@/components/Seo"
 
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
-import { AppHeader } from "@/features/auth/components/AppHeader"
 import { encodeRedirectUri } from "@/features/auth/lib/redirect"
-import { useUnreadMessages } from "@/features/chat/hooks/useUnread"
-import { useKvintetMembership } from "@/features/kvintet/hooks/useKvintetMembership"
 import { ONBOARDING_TOTAL_STEPS } from "@/features/profile/components/OnboardingWizard"
 
 export const Route = createFileRoute("/_ProtectedPages")({
@@ -29,12 +26,6 @@ export const Route = createFileRoute("/_ProtectedPages")({
 })
 
 function Layout() {
-  const { t } = useTranslation()
-  const { isMember } = useKvintetMembership()
-  // Members can't browse other kvintets; say so instead of letting the page bounce them.
-  const navDisabled = isMember ? { [ROUTES.kvintetFeed]: t("nav.kvintetFeedDisabled") } : undefined
-  // Only members have a chat; the same poll says whether it has opened yet.
-  const { isChatActive, unreadCount } = useUnreadMessages(isMember)
   // The onboarding page owns its step (in the URL); the header shows it.
   const onboarding = useMatch({ from: "/_ProtectedPages/onboarding", shouldThrow: false })
 
@@ -43,9 +34,7 @@ function Layout() {
       <Seo />
       <PageLayout
         header={
-          <AppHeader
-            navDisabled={navDisabled}
-            chat={isChatActive ? { unreadCount } : undefined}
+          <SiteHeader
             onboardingStep={
               onboarding
                 ? { current: onboarding.search.step, total: ONBOARDING_TOTAL_STEPS }

@@ -33,6 +33,7 @@ async function submitForm() {
   await user.type(screen.getByLabelText("Username"), "jan")
   await user.type(screen.getByLabelText("Email"), "jan@novak.cz")
   await user.type(screen.getByLabelText("Password"), "password1")
+  await user.type(screen.getByLabelText("Confirm password"), "password1")
   await user.click(screen.getByRole("checkbox"))
   await user.click(screen.getByRole("button", { name: "Create account" }))
 }

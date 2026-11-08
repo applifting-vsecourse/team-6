@@ -25,22 +25,31 @@ import { Input } from "@/components/ui/input"
 const PASSWORD_MIN_LENGTH = 8
 
 const createSchema = (t: TFunction) =>
-  z.object({
-    email: z
-      .string()
-      .trim()
-      .min(1, t("auth.validation.emailRequired"))
-      .email(t("auth.validation.emailInvalid")),
-    name: z.string().trim().min(1, t("auth.validation.nameRequired")),
-    username: z.string().trim().min(1, t("auth.validation.usernameRequired")),
-    password: z
-      .string()
-      .trim()
-      .min(PASSWORD_MIN_LENGTH, t("auth.validation.passwordMin", { count: PASSWORD_MIN_LENGTH })),
-    acceptCodeOfConduct: z.boolean().refine((isAccepted) => isAccepted, {
-      message: t("auth.validation.codeOfConductRequired"),
-    }),
-  })
+  z
+    .object({
+      email: z
+        .string()
+        .trim()
+        .min(1, t("auth.validation.emailRequired"))
+        .email(t("auth.validation.emailInvalid")),
+      name: z.string().trim().min(1, t("auth.validation.nameRequired")),
+      username: z.string().trim().min(1, t("auth.validation.usernameRequired")),
+      password: z
+        .string()
+        .trim()
+        .min(PASSWORD_MIN_LENGTH, t("auth.validation.passwordMin", { count: PASSWORD_MIN_LENGTH })),
+      passwordConfirmation: z
+        .string()
+        .trim()
+        .min(1, t("auth.validation.passwordConfirmationRequired")),
+      acceptCodeOfConduct: z.boolean().refine((isAccepted) => isAccepted, {
+        message: t("auth.validation.codeOfConductRequired"),
+      }),
+    })
+    .refine((values) => values.password === values.passwordConfirmation, {
+      message: t("auth.validation.passwordsMatch"),
+      path: ["passwordConfirmation"],
+    })
 
 type FormValues = z.infer<ReturnType<typeof createSchema>>
 
@@ -49,6 +58,7 @@ const defaultValues: FormValues = {
   name: "",
   username: "",
   password: "",
+  passwordConfirmation: "",
   acceptCodeOfConduct: false,
 }
 
@@ -163,6 +173,24 @@ export function SignUpForm({
               <FormDescription>
                 {t("auth.passwordHint", { count: PASSWORD_MIN_LENGTH })}
               </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="passwordConfirmation"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("auth.confirmPassword")}</FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  {...field}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

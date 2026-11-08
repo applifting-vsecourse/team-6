@@ -95,7 +95,7 @@ describe("KvintetMessagesPage", () => {
       screen.getByRole("heading", { name: "AI v práci – co opravdu funguje" }),
     ).toBeInTheDocument()
     expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("href", "/overview")
-    expect(screen.getByText("Only group members can read the messages.")).toBeInTheDocument()
+    expect(screen.getByText("Only kvintet members can read the messages.")).toBeInTheDocument()
     expect(screen.getByText("chat k1 for u1")).toBeInTheDocument()
   })
 

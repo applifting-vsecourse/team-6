@@ -1,9 +1,12 @@
+import type { ReactNode } from "react"
+
 import {
   AnonymousBlobatar,
   Face,
   FreeSeat,
   type BlobatarMotion,
 } from "@/components/AnonymousBlobatar"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
 const SEATS = 5
@@ -21,6 +24,33 @@ export type SeatMember = {
   anonymous?: boolean
   /** Written under the seat, e.g. the first name. Leave out where names are not known. */
   label?: string
+  /** Shown on hover, e.g. the name; leave out where the name is not known. */
+  tooltip?: string
+}
+
+/**
+ * Names a blobatar on hover and on keyboard focus. Without text it is the blobatar itself,
+ * untouched. It needs a `TooltipProvider` above it (`KvintetSeats` mounts one).
+ */
+export function SeatTooltip({ text, children }: { text?: string; children: ReactNode }) {
+  if (!text) return children
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        {/* Focusable on purpose: the name must be reachable by keyboard, as in DisabledNavItem. */}
+        <span
+          role="img"
+          aria-label={text}
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+          tabIndex={0}
+          className="block size-full rounded-full"
+        >
+          {children}
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>{text}</TooltipContent>
+    </Tooltip>
+  )
 }
 
 type KvintetSeatsProps = {
@@ -57,101 +87,115 @@ export function KvintetSeats({
 }: KvintetSeatsProps) {
   if (layout === "row") {
     return (
-      <ul
-        role={label ? "img" : undefined}
-        aria-label={label}
-        className={cn("flex flex-wrap gap-x-3.5 gap-y-3", className)}
-      >
-        {Array.from({ length: SEATS }, (_, i) => {
-          const member = members[i]
-          return (
-            <li
-              key={i}
-              data-seat={member ? "member" : "free"}
-              className={cn(
-                "flex flex-col items-center gap-1.5 text-small",
-                member ? "text-foreground" : "text-muted-foreground",
-              )}
-            >
-              <span className="grid size-9 place-items-center">
-                {!member ? (
-                  <FreeSeat className="size-7" />
-                ) : member.anonymous ? (
-                  <AnonymousBlobatar
-                    seed={member.seed}
-                    motion={motion}
-                    className="size-9"
-                  />
-                ) : (
-                  <Face
-                    seed={member.seed}
-                    motion={motion}
-                    className="size-9"
-                  />
+      <TooltipProvider>
+        <ul
+          role={label ? "img" : undefined}
+          aria-label={label}
+          className={cn("flex flex-wrap gap-x-3.5 gap-y-3", className)}
+        >
+          {Array.from({ length: SEATS }, (_, i) => {
+            const member = members[i]
+            return (
+              <li
+                key={i}
+                data-seat={member ? "member" : "free"}
+                className={cn(
+                  "flex flex-col items-center gap-1.5 text-small",
+                  member ? "text-foreground" : "text-muted-foreground",
                 )}
-              </span>
-              <span className="max-w-16 truncate">{member ? member.label : freeLabel}</span>
-            </li>
-          )
-        })}
-      </ul>
+              >
+                <span className="grid size-9 place-items-center">
+                  {!member ? (
+                    <FreeSeat className="size-7" />
+                  ) : (
+                    <SeatTooltip text={member.tooltip}>
+                      {member.anonymous ? (
+                        <AnonymousBlobatar
+                          seed={member.seed}
+                          motion={motion}
+                          className="size-9"
+                        />
+                      ) : (
+                        <Face
+                          seed={member.seed}
+                          motion={motion}
+                          className="size-9"
+                        />
+                      )}
+                    </SeatTooltip>
+                  )}
+                </span>
+                <span className="line-clamp-2 max-w-16 text-center break-words">
+                  {member ? member.label : freeLabel}
+                </span>
+              </li>
+            )
+          })}
+        </ul>
+      </TooltipProvider>
     )
   }
 
   return (
-    <div
-      role={label ? "img" : undefined}
-      aria-label={label}
-      className={cn(
-        "relative aspect-square w-full [--seat-radius:34%] [--seat:23.1%] md:[--seat-radius:36%] md:[--seat:22.1%]",
-        className,
-      )}
-    >
-      {hasGuide ? (
-        <span
-          aria-hidden="true"
-          className="absolute rounded-full border border-dashed border-input"
-          style={{
-            inset: "calc(50% - var(--seat-radius))",
-          }}
-        />
-      ) : null}
-      {POSITIONS.map((position, i) => {
-        const member = members[i]
-        return (
+    <TooltipProvider>
+      <div
+        role={label ? "img" : undefined}
+        aria-label={label}
+        className={cn(
+          "relative aspect-square w-full [--seat-radius:34%] [--seat:23.1%] md:[--seat-radius:36%] md:[--seat:22.1%]",
+          className,
+        )}
+      >
+        {hasGuide ? (
           <span
-            key={i}
-            data-seat={member ? "member" : "free"}
-            className="absolute aspect-square"
+            aria-hidden="true"
+            className="absolute rounded-full border border-dashed border-input"
             style={{
-              width: "var(--seat)",
-              left: `calc(50% + ${position.x} * var(--seat-radius) - var(--seat) / 2)`,
-              top: `calc(50% + ${position.y} * var(--seat-radius) - var(--seat) / 2)`,
+              inset: "calc(50% - var(--seat-radius))",
             }}
-          >
-            {!member ? (
-              <FreeSeat className="size-full" />
-            ) : member.anonymous ? (
-              <AnonymousBlobatar
-                seed={member.seed}
-                motion={motion}
-                className="size-full"
-              />
-            ) : (
-              <Face
-                seed={member.seed}
-                motion={motion}
-                className="size-full"
-              />
-            )}
-            {member?.label ? (
-              <span className="absolute top-full left-1/2 -translate-x-1/2 text-small whitespace-nowrap text-foreground md:text-label md:font-medium">
-                {member.label}
-              </span>
-            ) : null}
-          </span>
-        )
-      })}
-    </div>
+          />
+        ) : null}
+        {POSITIONS.map((position, i) => {
+          const member = members[i]
+          return (
+            <span
+              key={i}
+              data-seat={member ? "member" : "free"}
+              className="absolute aspect-square"
+              style={{
+                width: "var(--seat)",
+                left: `calc(50% + ${position.x} * var(--seat-radius) - var(--seat) / 2)`,
+                top: `calc(50% + ${position.y} * var(--seat-radius) - var(--seat) / 2)`,
+              }}
+            >
+              {!member ? (
+                <FreeSeat className="size-full" />
+              ) : (
+                <SeatTooltip text={member.tooltip}>
+                  {member.anonymous ? (
+                    <AnonymousBlobatar
+                      seed={member.seed}
+                      motion={motion}
+                      className="size-full"
+                    />
+                  ) : (
+                    <Face
+                      seed={member.seed}
+                      motion={motion}
+                      className="size-full"
+                    />
+                  )}
+                </SeatTooltip>
+              )}
+              {member?.label ? (
+                <span className="absolute top-full left-1/2 -translate-x-1/2 text-small whitespace-nowrap text-foreground md:text-label md:font-medium">
+                  {member.label}
+                </span>
+              ) : null}
+            </span>
+          )
+        })}
+      </div>
+    </TooltipProvider>
   )
 }

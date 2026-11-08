@@ -121,6 +121,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
   let profileData: typeof defaultProfile | null
   let myKvintetData: KvintetDetails | null
   let feedData: { items: FeedKvintet[]; fallback: boolean }
+  let unreadCount: number
   let messagesData: {
     id: number
     kind: "USER" | "SYSTEM"
@@ -137,12 +138,16 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
     myKvintetData = null
     feedData = { items: [], fallback: false }
     messagesData = []
+    unreadCount = 0
 
     vi.mocked(api.get).mockImplementation((path: unknown) => {
       const p = String(path)
       if (p.includes("me/profile")) {
         if (!profileData) return createResponseMock(null, 204) as never
         return createResponseMock(profileData, 200) as never
+      }
+      if (p.includes("kvintets/mine/messages/unread")) {
+        return createResponseMock({ active: true, count: unreadCount }, 200) as never
       }
       if (p.includes("kvintets/mine/messages")) {
         return createResponseMock(messagesData, 200) as never
@@ -213,6 +218,8 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
         expect.stringContaining("kvintets/feed"),
         expect.anything(),
       )
+      // So must the kvintet query: the API answers 403 until the profile is finished
+      expect(vi.mocked(api.get).mock.calls.map(([url]) => url)).not.toContain("kvintets/mine")
     })
   })
 
@@ -436,6 +443,51 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(api.post).toHaveBeenCalledWith("kvintets/mine/vote")
     })
 
+    it("shows when everyone can meet and what each member teaches and wants to learn", async () => {
+      myKvintetData = {
+        ...formingKvintet,
+        commonPreferences: {
+          city: null,
+          meetingFrequency: "WEEKLY",
+          weekdays: true,
+          weekends: false,
+          mornings: false,
+          afternoons: false,
+          evenings: true,
+        },
+      }
+
+      renderWithClient(<OverviewPage />)
+      await screen.findByRole("heading", { name: /Your kvintet is forming/i })
+
+      expect(screen.getByText("Times that suit everyone:").parentElement).toHaveTextContent(
+        "Times that suit everyone: evenings · weekdays · every week",
+      )
+      expect(screen.getByText("Teaches").parentElement).toHaveTextContent(/Teaches\s*react/i)
+      expect(screen.getByText("Wants to learn").parentElement).toHaveTextContent(
+        /Wants to learn\s*python/i,
+      )
+    })
+
+    it("names only you on hover while the kvintet forms, never the others", async () => {
+      myKvintetData = {
+        ...formingKvintet,
+        members: formingKvintet.members.map((m) => (m.isCurrentUser ? m : { ...m, name: null })),
+      }
+
+      const { container } = renderWithClient(<OverviewPage />)
+      await screen.findByRole("heading", { name: /Your kvintet is forming/i })
+
+      const seats = container.querySelectorAll('[data-seat="member"]')
+      expect(seats[1]?.querySelector("[tabindex]")).toBeNull()
+      await userEvent.hover(seats[1]!.firstElementChild as HTMLElement)
+      expect(screen.queryByRole("tooltip")).not.toBeInTheDocument()
+
+      const own = seats[0]!.querySelector<HTMLElement>("[tabindex]")!
+      await userEvent.hover(own)
+      expect(await screen.findByRole("tooltip")).toHaveTextContent("Jana")
+    })
+
     it("draws only you in colour, the others grey, and writes (you) once", async () => {
       myKvintetData = formingKvintet
 
@@ -468,9 +520,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(
         await screen.findByRole("heading", { name: "Waiting for more people" }),
       ).toBeInTheDocument()
-      expect(
-        screen.getByText("At three you can vote to start. We'll let you know."),
-      ).toBeInTheDocument()
+      expect(screen.getByText("At three people, you can vote to start.")).toBeInTheDocument()
       expect(screen.queryByRole("button", { name: "Start now" })).not.toBeInTheDocument()
     })
 
@@ -587,6 +637,117 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(chatLink).toHaveAttribute("href", "/kvintet/messages")
     })
 
+    it("lists the members with what they teach, and when everyone can meet", async () => {
+      myKvintetData = {
+        ...activeKvintet,
+        commonPreferences: {
+          city: null,
+          meetingFrequency: "WEEKLY",
+          weekdays: true,
+          weekends: false,
+          mornings: false,
+          afternoons: false,
+          evenings: true,
+        },
+        members: activeKvintet.members.map((m) =>
+          m.isCurrentUser ? { ...m, teachTags: ["react"], learnTags: ["python"] } : m,
+        ),
+      }
+
+      renderWithClient(<OverviewPage />)
+
+      expect(await screen.findByRole("heading", { name: "Members" })).toBeInTheDocument()
+      expect(screen.getByText("Times that suit everyone:").parentElement).toHaveTextContent(
+        "Times that suit everyone: evenings · weekdays · every week",
+      )
+      expect(screen.getByText("Teaches").parentElement).toHaveTextContent(/Teaches\s*react/i)
+      expect(screen.getByText("Wants to learn").parentElement).toHaveTextContent(
+        /Wants to learn\s*python/i,
+      )
+    })
+
+    it("names each member's blobatar on hover and shows their role next to the name", async () => {
+      myKvintetData = activeKvintet
+
+      const { container } = renderWithClient(<OverviewPage />)
+      await screen.findByRole("heading", { name: "Members" })
+
+      expect(screen.getByText(/· Designer/)).toBeInTheDocument()
+
+      const seats = container.querySelectorAll('[data-seat="member"] > span')
+      await userEvent.hover(seats[1] as HTMLElement)
+      expect(await screen.findByRole("tooltip")).toHaveTextContent("Petr")
+    })
+
+    it("counts the unread messages on the button that opens the chat", async () => {
+      myKvintetData = activeKvintet
+      unreadCount = 2
+
+      renderWithClient(<OverviewPage />)
+
+      expect(await screen.findByRole("link", { name: "Open chat (2 new)" })).toHaveAttribute(
+        "href",
+        "/kvintet/messages",
+      )
+    })
+
+    it("writes plain 'Open chat' when nothing is unread", async () => {
+      myKvintetData = activeKvintet
+
+      renderWithClient(<OverviewPage />)
+
+      expect(await screen.findByRole("link", { name: "Open chat" })).toBeInTheDocument()
+    })
+
+    it("previews the latest message from a member, never a system line", async () => {
+      myKvintetData = activeKvintet
+      messagesData = [
+        {
+          id: 1,
+          kind: "USER",
+          authorId: "u2",
+          authorName: "Petr",
+          authorUsername: "petr",
+          body: "Looking forward to our first meeting!",
+          createdAt: "2026-10-22T13:00:00Z",
+        },
+        {
+          id: 2,
+          kind: "SYSTEM",
+          authorId: null,
+          authorName: null,
+          authorUsername: null,
+          body: "kvintet_started",
+          createdAt: "2026-10-22T14:00:00Z",
+        },
+      ]
+
+      renderWithClient(<OverviewPage />)
+
+      expect(await screen.findByText("Looking forward to our first meeting!")).toBeInTheDocument()
+      expect(screen.queryByText("kvintet_started")).not.toBeInTheDocument()
+    })
+
+    it("shows the plain chat hint when the chat holds only system lines", async () => {
+      myKvintetData = activeKvintet
+      messagesData = [
+        {
+          id: 1,
+          kind: "SYSTEM",
+          authorId: null,
+          authorName: null,
+          authorUsername: null,
+          body: "kvintet_started",
+          createdAt: "2026-10-22T14:00:00Z",
+        },
+      ]
+
+      renderWithClient(<OverviewPage />)
+
+      expect(await screen.findByText("Plan your next meeting together.")).toBeInTheDocument()
+      expect(screen.queryByText("kvintet_started")).not.toBeInTheDocument()
+    })
+
     it("sends a member who has not seen the 'Kvintet begins' page there first", async () => {
       myKvintetData = { ...activeKvintet, beginsSeen: false }
 
@@ -693,10 +854,10 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(profileCalls()).toBe(profileBefore)
     })
 
-    it("loads both again with one retry when both queries failed", async () => {
+    it("loads the profile again when it failed, without asking for a kvintet yet", async () => {
       vi.mocked(api.get).mockImplementation((path: unknown) => {
         const p = String(path)
-        if (p.includes("me/profile") || p.includes("kvintets/mine")) {
+        if (p.includes("me/profile")) {
           return createErrorResponseMock(apiError(500, "internal_server_error")) as never
         }
         return createResponseMock({}) as never
@@ -706,11 +867,11 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       expect(await screen.findByText("We couldn't load your home page")).toBeInTheDocument()
       const profileBefore = profileCalls()
-      const kvintetBefore = kvintetCalls()
 
       await userEvent.click(screen.getByRole("button", { name: "Try again" }))
       await waitFor(() => expect(profileCalls()).toBeGreaterThan(profileBefore))
-      await waitFor(() => expect(kvintetCalls()).toBeGreaterThan(kvintetBefore))
+      // The API answers 403 for a kvintet until the profile is finished, so it is not asked.
+      expect(kvintetCalls()).toBe(0)
     })
   })
 })

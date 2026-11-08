@@ -11,7 +11,7 @@ const session = vi.hoisted(() => ({ user: null as { id: string } | null }))
 
 vi.mock("@/features/auth/hooks/useSession", () => ({ useSession: () => session }))
 // The header has its own tests; this page only needs its content and links.
-vi.mock("@/features/auth/components/AppHeader", () => ({ AppHeader: () => null }))
+vi.mock("@/app/SiteHeader", () => ({ SiteHeader: () => null }))
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ children, to, className }: { children?: ReactNode; to: string; className?: string }) => (
     <a
@@ -73,9 +73,7 @@ describe("LandingPage", () => {
       screen.getByText("What you know and what you'd like to learn. 3 minutes."),
     ).toBeInTheDocument()
     expect(screen.getByText("Names stay hidden until it starts.")).toBeInTheDocument()
-    expect(
-      screen.getByText("Choose by topic. Names stay hidden until it starts."),
-    ).toBeInTheDocument()
+    expect(screen.getByText("An algorithm finds the kvintet that fits you.")).toBeInTheDocument()
   })
 
   it("links to the rules", () => {
