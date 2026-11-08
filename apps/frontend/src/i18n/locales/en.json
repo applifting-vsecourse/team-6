@@ -24,8 +24,7 @@
     "passwordHint_one": "At least {{count}} character",
     "passwordHint_other": "At least {{count}} characters",
     "preview": {
-      "caption": "That's you! New username, new blobatar.",
-      "title": "This is how others will see you"
+      "title": "That's you!"
     },
     "signIn": "Sign in",
     "signInDescription": "Sign in with your email and password.",
@@ -35,7 +34,7 @@
     "signUpDescription": "Then we'll find your kvintet.",
     "signUpTitle": "Create your account",
     "username": "Username",
-    "usernameHint": "Your blobatar (avatar) is made from it. Others only see the blobatar.",
+    "usernameHint": "Your avatar is made from it.",
     "validation": {
       "codeOfConductRequired": "Please agree to the rules first.",
       "emailInvalid": "Invalid email",

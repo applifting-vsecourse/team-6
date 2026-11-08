@@ -40,7 +40,6 @@ export function SignUpPreview({ username, variant }: SignUpPreviewProps) {
         className="size-40"
       />
       <h2 className="text-subheading">{t("auth.preview.title")}</h2>
-      <p className="text-muted-foreground">{t("auth.preview.caption")}</p>
     </div>
   )
 }

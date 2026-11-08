@@ -25,8 +25,7 @@
     "passwordHint_one": "Alespoň {{count}} znak",
     "passwordHint_other": "Alespoň {{count}} znaků",
     "preview": {
-      "caption": "To jste vy! Nové uživatelské jméno, nový blobatar.",
-      "title": "Takhle vás uvidí ostatní"
+      "title": "To jste vy!"
     },
     "signIn": "Přihlásit se",
     "signInDescription": "Přihlaste se e-mailem a heslem.",
@@ -36,7 +35,7 @@
     "signUpDescription": "Potom vám najdeme kvintet.",
     "signUpTitle": "Vytvořte si účet",
     "username": "Uživatelské jméno",
-    "usernameHint": "Podle něj se vytvoří váš blobatar (avatar). Ostatní uvidí jen blobatar.",
+    "usernameHint": "Podle něj se vytvoří váš avatar.",
     "validation": {
       "codeOfConductRequired": "Nejdříve souhlaste s pravidly.",
       "emailInvalid": "Neplatný e-mail",
