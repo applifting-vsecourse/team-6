@@ -29,4 +29,7 @@ yarn-error.log*
 # Custom skills and agents
 .agents
 Skill.md
+SKILL.md
 skills-lock.json
+*.pptx
+

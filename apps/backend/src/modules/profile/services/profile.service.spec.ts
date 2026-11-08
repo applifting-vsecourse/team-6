@@ -374,6 +374,33 @@ describe('ProfileService', () => {
     }
   });
 
+  it('throws BadRequestException when completing onboarding with blank whitespace city and no coordinates', async (): Promise<void> => {
+    try {
+      await service.saveProfile('u1', {
+        position: 'Engineer',
+        roles: ['software-engineer'],
+        teachTagIds: [],
+        learnTagIds: [],
+        interestTagIds: [],
+        weekdays: true,
+        weekends: false,
+        mornings: false,
+        afternoons: false,
+        evenings: false,
+        cityId: '   ',
+        latitude: null,
+        longitude: null,
+        completeOnboarding: true,
+      });
+      fail('Expected BadRequestException');
+    } catch (err) {
+      expect(err).toBeInstanceOf(BadRequestException);
+      expect((err as BadRequestException).getResponse()).toEqual(
+        expect.objectContaining({ code: 'PROFILE_LOCATION_REQUIRED' }),
+      );
+    }
+  });
+
   it('throws BadRequestException when completing onboarding without any availability slot', async (): Promise<void> => {
     try {
       await service.saveProfile('u1', {

@@ -23,6 +23,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { ListMessagesQueryDto } from './dto/list-messages-query.dto';
 import { MarkReadDto } from './dto/mark-read.dto';
 import { MessageDto } from './dto/message.dto';
@@ -88,6 +89,7 @@ export class MessageController {
     await this.service.markRead(user.id, dto.lastMessageId);
   }
 
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   @Post()
   @ApiOperation({
     summary: 'Send a message to my kvintet',

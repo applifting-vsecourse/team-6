@@ -14,6 +14,7 @@ export class WelcomeController {
       'Welcome message including name, description, version and useful links',
   })
   async getWelcomeMessage(): Promise<WelcomeDto> {
+    const isDev = this.config.nodeEnv !== 'production';
     return {
       message: `Welcome to ${this.config.name}`,
       name: this.config.name,
@@ -21,8 +22,8 @@ export class WelcomeController {
       version: this.config.version,
       healthCheck: '/api/health',
       restApi: '/api',
-      swaggerDocs: '/api/docs',
-      authEndpointsDocs: '/api/auth/reference',
+      swaggerDocs: isDev ? '/api/docs' : undefined,
+      authEndpointsDocs: isDev ? '/api/auth/reference' : undefined,
     };
   }
 

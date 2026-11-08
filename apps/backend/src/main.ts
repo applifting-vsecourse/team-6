@@ -3,6 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { toNodeHandler } from 'better-auth/node';
 import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { BetterAuth } from './shared/auth/providers/better-auth.provider';
 import { Config } from './shared/config/config.service';
@@ -19,6 +20,14 @@ async function main(): Promise<void> {
   // Get configuration service
   const config = app.get(Config);
 
+  // Use Helmet for secure HTTP headers (X-Frame-Options, X-Content-Type-Options, etc.)
+  app.use(
+    helmet({
+      contentSecurityPolicy: false, // APIs return JSON; CSP configured on web frontends
+      crossOriginEmbedderPolicy: false,
+    }),
+  );
+
   // Configure CORS - Allows cross-origin requests from specific origins
   app.enableCors({
     origin: [config.backendUrl, config.frontendUrl],
@@ -29,6 +38,11 @@ async function main(): Promise<void> {
   app.use(cookieParser());
 
   const appInstance = app.getHttpAdapter().getInstance();
+
+  // Enable trust proxy for reverse-proxy environments (Coolify, Nginx, Docker)
+  // Ensures req.ip reflects the real client IP for rate limiting instead of the proxy container IP
+  appInstance.set('trust proxy', 1);
+
   const betterAuth = app.get<BetterAuth>('BetterAuth');
   // Express 5 (via NestJS 11) requires named wildcards — a bare `*` throws.
   appInstance.all('/api/auth/*splat', toNodeHandler(betterAuth));
@@ -40,17 +54,19 @@ async function main(): Promise<void> {
   // Validation errors carry field + constraint codes the frontend translates
   app.useGlobalPipes(createValidationPipe());
 
-  // Setup Swagger API documentation at /api/docs
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle(config.name)
-    .setDescription(config.description)
-    .setVersion(config.version)
-    .addServer('/api')
-    .addCookieAuth('better-auth.session_token')
-    .build();
+  // Setup Swagger API documentation at /api/docs (non-production only)
+  if (config.nodeEnv !== 'production') {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle(config.name)
+      .setDescription(config.description)
+      .setVersion(config.version)
+      .addServer('/api')
+      .addCookieAuth('better-auth.session_token')
+      .build();
 
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api/docs', app, document);
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api/docs', app, document);
+  }
 
   // Print debug information for development purposes
   if (config.nodeEnv !== 'production') {

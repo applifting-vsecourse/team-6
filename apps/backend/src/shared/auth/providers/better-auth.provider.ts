@@ -17,6 +17,9 @@ const createAuth = (
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 ) =>
   betterAuth({
+    ...betterAuthCoreConfig,
+    // Explicitly pass secret from config rather than relying on ambient process environment
+    secret: config.betterAuthSecret,
     // Without this better-auth can only guess its own URL from the request,
     // which breaks callbacks and links built outside a request (e.g. the seed).
     baseURL: config.backendUrl,
@@ -24,6 +27,7 @@ const createAuth = (
       provider: 'postgresql',
     }),
     emailAndPassword: {
+      ...betterAuthCoreConfig.emailAndPassword,
       enabled: true,
       sendResetPassword: async ({ user, token }) => {
         const passwordResetUrl = `${config.frontendUrl}/${config.frontendResetPasswordUrl}?token=${token}`;
@@ -35,7 +39,9 @@ const createAuth = (
       },
     },
     user: {
+      ...betterAuthCoreConfig.user,
       additionalFields: {
+        ...betterAuthCoreConfig.user?.additionalFields,
         role: {
           type: 'string',
           required: true,
@@ -57,9 +63,9 @@ const createAuth = (
       },
       sendOnSignUp: true,
     },
-    // If change (setup) affects database, must be in core config, in order to be able to run migrations
-    ...betterAuthCoreConfig,
-    plugins: [...(betterAuthCoreConfig.plugins ?? [])],
+    plugins: (betterAuthCoreConfig.plugins ?? []).filter(
+      (plugin) => config.nodeEnv !== 'production' || plugin.id !== 'open-api',
+    ),
   });
 
 export type BetterAuth = ReturnType<typeof createAuth>;

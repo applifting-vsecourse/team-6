@@ -2,6 +2,11 @@ import { openAPI, username } from 'better-auth/plugins';
 import { BetterAuthOptions } from 'better-auth/types';
 
 export const betterAuthCoreConfig: BetterAuthOptions = {
+  rateLimit: {
+    enabled: true,
+    window: 60,
+    max: 20,
+  },
   emailAndPassword: {
     enabled: true,
   },
