@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
+import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
@@ -65,9 +66,11 @@ const defaultValues: FormValues = { title: "", categorySlug: "", description: ""
 type StartKvintetDialogProps = {
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
+  /** Seed of the signed-in person's blobatar; without it the dialog shows no avatar. */
+  avatarSeed?: string
 }
 
-export function StartKvintetDialog({ isOpen, onOpenChange }: StartKvintetDialogProps) {
+export function StartKvintetDialog({ isOpen, onOpenChange, avatarSeed }: StartKvintetDialogProps) {
   const { t } = useTranslation()
   const label = useSlugLabel()
   const schema = useMemo(() => createSchema(t), [t])
@@ -86,7 +89,7 @@ export function StartKvintetDialog({ isOpen, onOpenChange }: StartKvintetDialogP
   const handleSubmit = (values: FormValues) =>
     start.mutate({
       title: values.title,
-      categorySlug: values.categorySlug,
+      categorySlugs: [values.categorySlug],
       description: values.description || undefined,
     })
 
@@ -98,22 +101,36 @@ export function StartKvintetDialog({ isOpen, onOpenChange }: StartKvintetDialogP
       {/* Below `sm` the dialog sits at the bottom like the mobile design's sheet. */}
       <DialogContent
         showCloseButton={false}
-        className="gap-5 p-8 max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:max-w-full max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-b-none max-sm:data-[state=closed]:slide-out-to-bottom max-sm:data-[state=closed]:zoom-out-100 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=open]:zoom-in-100 sm:max-w-140"
+        className="gap-4.5 bg-card p-7 max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:max-w-full max-sm:translate-x-0 max-sm:translate-y-0 max-sm:gap-4 max-sm:rounded-b-none max-sm:p-4 max-sm:pt-3 max-sm:data-[state=closed]:slide-out-to-bottom max-sm:data-[state=closed]:zoom-out-100 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=open]:zoom-in-100 sm:max-w-130"
       >
-        <DialogHeader className="gap-5 text-left">
-          <DialogTitle className="font-serif text-heading font-medium">
-            {t("kvintet.dialog.title")}
-          </DialogTitle>
-          <DialogDescription className="text-base text-body">
-            {t("kvintet.dialog.description")}
-          </DialogDescription>
-        </DialogHeader>
+        <span
+          aria-hidden
+          className="mx-auto h-1 w-10 rounded-full bg-border sm:hidden"
+        />
+        <div className="flex items-center gap-3.5">
+          {avatarSeed ? (
+            // You are in colour; the grey faces are everyone you have not met yet.
+            <GazeBlobatar
+              name={avatarSeed}
+              animate="always"
+              className="size-11 shrink-0 max-sm:hidden"
+            />
+          ) : null}
+          <DialogHeader className="gap-0.5 text-left">
+            <DialogTitle className="text-subheading leading-tight font-semibold">
+              {t("kvintet.dialog.title")}
+            </DialogTitle>
+            <DialogDescription className="text-small text-muted-foreground">
+              {t("kvintet.dialog.description")}
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
         <Form {...form}>
           <form
             noValidate
             onSubmit={form.handleSubmit(handleSubmit)}
-            className="flex flex-col gap-5"
+            className="flex flex-col gap-4.5"
           >
             <FormField
               control={form.control}
@@ -123,6 +140,7 @@ export function StartKvintetDialog({ isOpen, onOpenChange }: StartKvintetDialogP
                   <FormLabel>{t("kvintet.dialog.topic")}</FormLabel>
                   <FormControl>
                     <Input
+                      className="bg-card"
                       autoComplete="off"
                       {...field}
                     />
@@ -144,7 +162,10 @@ export function StartKvintetDialog({ isOpen, onOpenChange }: StartKvintetDialogP
                     onValueChange={field.onChange}
                   >
                     <FormControl>
-                      <SelectTrigger onBlur={field.onBlur}>
+                      <SelectTrigger
+                        className="bg-card"
+                        onBlur={field.onBlur}
+                      >
                         <SelectValue placeholder={t("kvintet.dialog.categoryPlaceholder")} />
                       </SelectTrigger>
                     </FormControl>
@@ -159,7 +180,6 @@ export function StartKvintetDialog({ isOpen, onOpenChange }: StartKvintetDialogP
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormDescription>{t("kvintet.dialog.categoryHint")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -173,7 +193,7 @@ export function StartKvintetDialog({ isOpen, onOpenChange }: StartKvintetDialogP
                   <FormLabel>{t("kvintet.dialog.details")}</FormLabel>
                   <FormControl>
                     <Textarea
-                      className="min-h-26"
+                      className="resize-none bg-card"
                       placeholder={t("kvintet.dialog.detailsPlaceholder")}
                       {...field}
                     />
@@ -183,16 +203,18 @@ export function StartKvintetDialog({ isOpen, onOpenChange }: StartKvintetDialogP
               )}
             />
 
+            <p className="text-small text-muted-foreground">{t("kvintet.dialog.note")}</p>
+
             {start.isError ? (
               <Alert variant="destructive">
                 <AlertDescription>{getErrorMessage(start.error)}</AlertDescription>
               </Alert>
             ) : null}
 
-            <div className="grid grid-cols-2 gap-3 sm:flex sm:justify-end">
+            <div className="flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end">
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 onClick={() => handleOpenChange(false)}
               >
                 {t("kvintet.dialog.cancel")}

@@ -5,7 +5,9 @@ import {
   Logger,
   NotFoundException,
   UnauthorizedException,
+  type ValidationPipe,
 } from '@nestjs/common';
+import { ThrottlerException } from '@nestjs/throttler';
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { AllExceptionsFilter } from './all-exceptions.filter';
 import {
@@ -24,7 +26,7 @@ function run(exception: unknown): { status: number; body: unknown } {
   const json = jest.fn();
   const status = jest.fn().mockReturnValue({ json });
   const host = {
-    switchToHttp: () => ({ getResponse: () => ({ status }) }),
+    switchToHttp: () => ({ getResponse: (): unknown => ({ status }) }),
   } as never;
   jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
   new AllExceptionsFilter().catch(exception, host);
@@ -32,7 +34,7 @@ function run(exception: unknown): { status: number; body: unknown } {
 }
 
 describe('createValidationPipe', () => {
-  const transform = (value: unknown) =>
+  const transform = (value: unknown): ReturnType<ValidationPipe['transform']> =>
     createValidationPipe().transform(value, {
       type: 'body',
       metatype: TestDto,
@@ -70,6 +72,7 @@ describe('AllExceptionsFilter', () => {
     [new UnauthorizedException(), 401, 'unauthorized'],
     [new NotFoundException(), 404, 'not_found'],
     [new BadRequestException('nope'), 400, 'bad_request'],
+    [new ThrottlerException(), 429, 'too_many_requests'],
   ])('maps %p to a stable code', (exception, status, code) => {
     expect(run(exception)).toMatchObject({
       status,

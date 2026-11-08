@@ -10,6 +10,7 @@ import { getErrorMessage } from "@/lib/errorMessage"
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
 import { AppHeader } from "@/features/auth/components/AppHeader"
 import { SignUpForm } from "@/features/auth/components/SignUpForm"
+import { SignUpPreview } from "@/features/auth/components/SignUpPreview"
 import { useSignUp } from "@/features/auth/hooks/useSignUp"
 
 export const Route = createFileRoute("/signup")({
@@ -21,11 +22,15 @@ export const Route = createFileRoute("/signup")({
   },
 })
 
+const EMAIL_TAKEN_CODES = ["USER_ALREADY_EXISTS", "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL"]
+
 function SignUpPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const signUp = useSignUp()
+  const [username, setUsername] = useState("")
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [emailError, setEmailError] = useState<string | null>(null)
 
   const handleSubmit = async (values: {
     email: string
@@ -35,6 +40,7 @@ function SignUpPage() {
     acceptCodeOfConduct: boolean
   }) => {
     setErrorMessage(null)
+    setEmailError(null)
     try {
       await signUp.mutateAsync({
         email: values.email,
@@ -43,9 +49,14 @@ function SignUpPage() {
         username: values.username,
         acceptCodeOfConduct: values.acceptCodeOfConduct,
       })
-      await navigate({ to: ROUTES.overview })
+      await navigate({ to: ROUTES.onboarding })
     } catch (error) {
-      setErrorMessage(getErrorMessage(error, "errors.signUpFailed"))
+      const message = getErrorMessage(error, "errors.signUpFailed")
+      // Same read as getErrorMessage: a thrown null or primitive has no code.
+      const code = (error as { code?: unknown } | null)?.code
+      // A taken e-mail belongs under the e-mail field (Figma A2b), anything else in the alert.
+      if (typeof code === "string" && EMAIL_TAKEN_CODES.includes(code)) setEmailError(message)
+      else setErrorMessage(message)
     }
   }
 
@@ -54,8 +65,20 @@ function SignUpPage() {
       <Seo title={t("auth.signUp")} />
       <AuthLayout
         header={<AppHeader />}
-        title={t("auth.signUp")}
+        title={t("auth.signUpTitle")}
         description={t("auth.signUpDescription")}
+        titleAccessory={
+          <SignUpPreview
+            username={username}
+            variant="inline"
+          />
+        }
+        aside={
+          <SignUpPreview
+            username={username}
+            variant="panel"
+          />
+        }
         footer={
           <>
             {t("auth.haveAccount")}{" "}
@@ -71,6 +94,8 @@ function SignUpPage() {
         <SignUpForm
           isLoading={signUp.isPending}
           errorMessage={errorMessage}
+          emailError={emailError}
+          onUsernameChange={setUsername}
           onSubmit={handleSubmit}
         />
       </AuthLayout>

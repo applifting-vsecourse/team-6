@@ -4,9 +4,31 @@ import { describe, expect, it } from "vitest"
 import {
   decodeRedirectUri,
   encodeRedirectUri,
+  isOnboarded,
   postSignInLocation,
   postSignInPath,
 } from "./redirect"
+
+describe("isOnboarded", () => {
+  it("treats undefined profile (fetch failed/omitted) as onboarded to avoid disrupting login flow", () => {
+    expect(isOnboarded(undefined)).toBe(true)
+    expect(isOnboarded()).toBe(true)
+  })
+
+  it("treats null profile (user has no profile record) as not onboarded", () => {
+    expect(isOnboarded(null)).toBe(false)
+  })
+
+  it("treats profile without onboardingCompletedAt as not onboarded", () => {
+    expect(isOnboarded({ onboardingCompletedAt: null })).toBe(false)
+    expect(isOnboarded({ onboardingCompletedAt: undefined })).toBe(false)
+  })
+
+  it("treats profile with onboardingCompletedAt timestamp as onboarded", () => {
+    expect(isOnboarded({ onboardingCompletedAt: "2026-10-21T10:00:00Z" })).toBe(true)
+    expect(isOnboarded({ onboardingCompletedAt: new Date() })).toBe(true)
+  })
+})
 
 describe("redirect uri", () => {
   it("round-trips a location with a query string", () => {
@@ -33,6 +55,17 @@ describe("postSignInPath", () => {
 
   it("sends users who have not finished onboarding to onboarding, even with a deep link", () => {
     expect(postSignInPath(encoded("/profile"), false)).toBe("/onboarding")
+    expect(postSignInPath(encoded("/profile?tab=2"), false)).toBe("/onboarding")
+  })
+
+  it("keeps overview or onboarding deep links with query or hash for users who have not finished onboarding", () => {
+    expect(postSignInPath(encoded("/overview?x=1"), false)).toBe("/overview?x=1")
+    expect(postSignInPath(encoded("/overview#top"), false)).toBe("/overview#top")
+    expect(postSignInPath(encoded("/onboarding?step=2"), false)).toBe("/onboarding?step=2")
+  })
+
+  it("sends users who have not finished onboarding to Overview when there is no deep link", () => {
+    expect(postSignInPath(undefined, false)).toBe("/overview")
   })
 
   it("ignores redirect targets that leave the app", () => {

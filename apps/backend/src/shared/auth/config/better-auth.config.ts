@@ -1,7 +1,26 @@
 import { openAPI, username } from 'better-auth/plugins';
-import { BetterAuthOptions } from 'better-auth/types';
+import { BetterAuthOptions, BetterAuthPlugin } from 'better-auth/types';
+
+export function resolveBetterAuthPlugins(nodeEnv?: string): BetterAuthPlugin[] {
+  return [...(nodeEnv === 'production' ? [] : [openAPI()]), username()];
+}
 
 export const betterAuthCoreConfig: BetterAuthOptions = {
+  rateLimit: {
+    enabled: true,
+    window: 60,
+    max: 100,
+    customRules: {
+      '/sign-in/email': {
+        window: 60,
+        max: 10,
+      },
+      '/sign-up/email': {
+        window: 60,
+        max: 5,
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
   },
@@ -26,5 +45,5 @@ export const betterAuthCoreConfig: BetterAuthOptions = {
       },
     },
   },
-  plugins: [openAPI(), username()],
+  plugins: resolveBetterAuthPlugins(process.env.NODE_ENV),
 };

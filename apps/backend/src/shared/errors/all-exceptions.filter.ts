@@ -16,6 +16,7 @@ const STATUS_CODES: Record<number, string> = {
   [HttpStatus.FORBIDDEN]: 'forbidden',
   [HttpStatus.NOT_FOUND]: 'not_found',
   [HttpStatus.CONFLICT]: 'conflict',
+  [HttpStatus.TOO_MANY_REQUESTS]: 'too_many_requests',
 };
 
 // A thrown exception can carry its own stable code, e.g.

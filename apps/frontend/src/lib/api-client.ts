@@ -21,6 +21,7 @@ export const api = ky.create({
     afterResponse: [
       ({ response }) => {
         if (response.status === 401) {
+          queryClient.clear()
           void queryClient.invalidateQueries({ queryKey: authKeys.session() })
         }
       },

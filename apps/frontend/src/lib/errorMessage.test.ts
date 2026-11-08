@@ -29,6 +29,9 @@ describe("getErrorMessage", () => {
 
   it("translates plain backend codes and uses the fallback for unknown ones", () => {
     expect(getErrorMessage(httpError({ code: "unauthorized" }))).toBe("You need to sign in first.")
+    expect(getErrorMessage(httpError({ code: "too_many_requests" }))).toBe(
+      "Too many requests. Please slow down and try again later.",
+    )
     expect(getErrorMessage(httpError({ code: "brand_new" }), "errors.signInFailed")).toBe(
       "Sign in failed",
     )
@@ -38,13 +41,48 @@ describe("getErrorMessage", () => {
   it("translates BetterAuth codes", () => {
     const error = toAuthError({ code: "INVALID_EMAIL_OR_PASSWORD", message: "English text" })
     expect(getErrorMessage(error, "errors.signInFailed")).toBe(
-      "Sign in failed. Incorrect email or password.",
+      "Email or password is wrong. Please try again.",
     )
   })
 
   it("never shows the server's English message", () => {
     const error = toAuthError({ code: "SOMETHING_NEW", message: "Server English text" })
     expect(getErrorMessage(error, "errors.signUpFailed")).toBe("Sign up failed")
+  })
+
+  it("translates profile and reference error codes in both English and Czech", async () => {
+    expect(getErrorMessage(httpError({ code: "PROFILE_ROLE_REQUIRED" }))).toBe(
+      "At least one role is required.",
+    )
+    expect(getErrorMessage(httpError({ code: "PROFILE_LOCATION_REQUIRED" }))).toBe(
+      "Location coordinates or city is required.",
+    )
+    expect(getErrorMessage(httpError({ code: "PROFILE_AVAILABILITY_REQUIRED" }))).toBe(
+      "At least one availability slot is required.",
+    )
+    expect(getErrorMessage(httpError({ code: "CITY_NOT_FOUND" }))).toBe(
+      "Selected city was not found.",
+    )
+    expect(getErrorMessage(httpError({ code: "TAGS_NOT_FOUND" }))).toBe(
+      "One or more selected tags do not exist.",
+    )
+
+    await i18n.changeLanguage("cs")
+    expect(getErrorMessage(httpError({ code: "PROFILE_ROLE_REQUIRED" }))).toBe(
+      "Je vyžadována alespoň jedna role.",
+    )
+    expect(getErrorMessage(httpError({ code: "PROFILE_LOCATION_REQUIRED" }))).toBe(
+      "Je vyžadována poloha (souřadnice nebo město).",
+    )
+    expect(getErrorMessage(httpError({ code: "PROFILE_AVAILABILITY_REQUIRED" }))).toBe(
+      "Je vyžadován alespoň jeden časový slot.",
+    )
+    expect(getErrorMessage(httpError({ code: "CITY_NOT_FOUND" }))).toBe(
+      "Vybrané město nebylo nalezeno.",
+    )
+    expect(getErrorMessage(httpError({ code: "TAGS_NOT_FOUND" }))).toBe(
+      "Jeden nebo více vybraných štítků neexistuje.",
+    )
   })
 
   it("follows the active language", async () => {

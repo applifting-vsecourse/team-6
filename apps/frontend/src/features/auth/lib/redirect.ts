@@ -12,18 +12,29 @@ export const decodeRedirectUri = (encoded: string) => {
   }
 }
 
-// shortcut: onboarding doesn't exist yet, so everyone counts as onboarded; replace with the profile check in the onboarding story.
-export const isOnboarded = () => true
+export const isOnboarded = (profile?: { onboardingCompletedAt?: string | Date | null } | null) =>
+  profile === undefined ? true : Boolean(profile?.onboardingCompletedAt)
 
 // `from` comes from the URL. The URL parser resolves "//host", "/\host" and "/<tab>/host" to another origin like a browser does.
 const isSameOriginPath = (target: string) =>
   target.startsWith("/") && new URL(target, "http://app.invalid").origin === "http://app.invalid"
 
-// Where to go after signing in: onboarding first, then the page the user was sent away from, else Overview.
+// Where to go after signing in: Overview by default (which handles all user states including incomplete profile),
+// or the page the user was sent away from (sending to onboarding only when a deep-linked page requires it).
 export const postSignInPath = (from?: string, hasOnboarded = isOnboarded()) => {
-  if (!hasOnboarded) return ROUTES.onboarding
   const target = from ? decodeRedirectUri(from) : undefined
-  return target && isSameOriginPath(target) ? target : ROUTES.overview
+  if (target && isSameOriginPath(target)) {
+    const targetUrl = new URL(target, "http://app.invalid")
+    if (
+      !hasOnboarded &&
+      targetUrl.pathname !== ROUTES.overview &&
+      targetUrl.pathname !== ROUTES.onboarding
+    ) {
+      return ROUTES.onboarding
+    }
+    return target
+  }
+  return ROUTES.overview
 }
 
 // The router's `to` takes a pathname only, so a target like "/profile?tab=2" is split into `to`, `search` and `hash`.

@@ -2,28 +2,44 @@ import { KvintetService } from '@/modules/kvintet/services/kvintet.service';
 import { User } from '@/shared/auth/decorators/user.decorator';
 import { Identity } from '@/shared/auth/domain/identity';
 import { AuthenticatedUserGuard } from '@/shared/auth/guards/authenticated-user.guard';
+import { MemberGuard } from '@/shared/auth/guards/member.guard';
+import { OnboardedGuard } from '@/shared/auth/guards/onboarded.guard';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { FeedItemDto } from './dto/feed-item.dto';
+import {
+  ApiCookieAuth,
+  ApiForbiddenResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
+import { FeedDto } from './dto/feed-item.dto';
+import { FeedQueryDto } from './dto/feed-query.dto';
+import { KvintetDetailsDto } from './dto/kvintet-details.dto';
 import { MembershipDto } from './dto/membership.dto';
 import { StartedKvintetDto, StartKvintetDto } from './dto/start-kvintet.dto';
 
 @ApiTags('kvintets')
 @ApiCookieAuth()
-@UseGuards(AuthenticatedUserGuard)
+@UseGuards(AuthenticatedUserGuard, OnboardedGuard)
 @Controller('kvintets')
 export class KvintetController {
   constructor(private readonly service: KvintetService) {}
 
+  @SkipThrottle()
   @Get('membership')
   @ApiOperation({
     summary: 'Is the caller in a kvintet?',
@@ -38,10 +54,10 @@ export class KvintetController {
   @ApiOperation({
     summary: 'Open kvintets',
     description:
-      'Kvintets that still have a free seat, newest first. Members appear by role and interests only. 409 if the caller is already in a kvintet.',
+      'Kvintets that still have a free seat, ranked by how well they suit the caller and cut at the match threshold (all of them, flagged `fallback`, when none reach it), optionally only those in one category. Each lists up to three reasons; the score is never sent. Members appear by role and interests only. 400 for an unknown category, 409 if the caller is already in a kvintet.',
   })
-  feed(@User() user: Identity): Promise<FeedItemDto[]> {
-    return this.service.feed(user.id);
+  feed(@User() user: Identity, @Query() query: FeedQueryDto): Promise<FeedDto> {
+    return this.service.feed(user.id, query.category);
   }
 
   @Post()
@@ -55,7 +71,7 @@ export class KvintetController {
   ): Promise<StartedKvintetDto> {
     return this.service.start(user.id, {
       title: dto.title,
-      categorySlug: dto.categorySlug,
+      categorySlugs: dto.categorySlugs,
       description: dto.description || null,
     });
   }
@@ -68,5 +84,82 @@ export class KvintetController {
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<void> {
     return this.service.join(user.id, id);
+  }
+
+  @SkipThrottle()
+  @Get('mine')
+  @UseGuards(MemberGuard)
+  @ApiOperation({
+    summary: 'Get my kvintet',
+    description:
+      'Returns details of the kvintet or proposal the caller belongs to.',
+  })
+  @ApiOkResponse({ type: KvintetDetailsDto })
+  @ApiUnauthorizedResponse({ description: 'Not signed in' })
+  @ApiForbiddenResponse({ description: 'Not a member of any kvintet' })
+  async getMyKvintet(@User() user: Identity): Promise<KvintetDetailsDto> {
+    const details = await this.service.getMyKvintet(user.id);
+    return {
+      ...details,
+      createdAt: details.createdAt.toISOString(),
+      activatedAt: details.activatedAt
+        ? details.activatedAt.toISOString()
+        : null,
+    };
+  }
+
+  @Post('mine/vote')
+  @UseGuards(MemberGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Vote to start kvintet',
+    description:
+      'Casts a vote to start the kvintet now. Only available in proposals with 3-4 members.',
+  })
+  @ApiOkResponse({ type: KvintetDetailsDto })
+  @ApiUnauthorizedResponse({ description: 'Not signed in' })
+  @ApiForbiddenResponse({ description: 'Not a member of any kvintet' })
+  async vote(@User() user: Identity): Promise<KvintetDetailsDto> {
+    const details = await this.service.vote(user.id);
+    return {
+      ...details,
+      createdAt: details.createdAt.toISOString(),
+      activatedAt: details.activatedAt
+        ? details.activatedAt.toISOString()
+        : null,
+    };
+  }
+
+  @Post('mine/begins-seen')
+  @UseGuards(MemberGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Mark the "Kvintet begins" page as seen',
+    description:
+      'Records that the caller has opened the page. Does nothing while the kvintet is still forming and when it is already marked.',
+  })
+  @ApiUnauthorizedResponse({ description: 'Not signed in' })
+  @ApiForbiddenResponse({ description: 'Not a member of any kvintet' })
+  markBeginsSeen(@User() user: Identity): Promise<void> {
+    return this.service.markBeginsSeen(user.id);
+  }
+
+  @Delete('mine/membership')
+  @UseGuards(MemberGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Leave kvintet',
+    description: 'Leaves the current kvintet or proposal.',
+  })
+  @ApiOkResponse({
+    schema: {
+      type: 'object',
+      properties: { success: { type: 'boolean', example: true } },
+    },
+  })
+  @ApiUnauthorizedResponse({ description: 'Not signed in' })
+  @ApiForbiddenResponse({ description: 'Not a member of any kvintet' })
+  async leave(@User() user: Identity): Promise<{ success: boolean }> {
+    return this.service.leave(user.id);
   }
 }

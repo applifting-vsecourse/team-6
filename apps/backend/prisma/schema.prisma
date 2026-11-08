@@ -71,16 +71,16 @@ model Verification {
 }
 
 model User {
-  id              String    @id
-  name            String
-  email           String
-  emailVerified   Boolean
-  image           String?   @db.Text
-  createdAt       DateTime
-  updatedAt       DateTime
-  sessions        Session[]
-  accounts        Account[]
-  role            UserRole  @default(user)
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean
+  image         String?   @db.Text
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+  role          UserRole  @default(user)
 
   codeOfConductAcceptedAt DateTime?
   codeOfConductVersion    String?
@@ -88,8 +88,9 @@ model User {
   username        String? @db.VarChar(50)
   displayUsername String? @db.VarChar(50)
 
-  profile         Profile?
-  kvintetMember   KvintetMember?
+  profile       Profile?
+  kvintetMember KvintetMember?
+  messages      Message[]
 
   @@unique([email])
   @@unique([username])
@@ -119,41 +120,50 @@ enum MeetingFrequency {
   @@map("meeting_frequency")
 }
 
+model City {
+  id       String    @id @default(cuid())
+  name     String
+  lat      Float
+  lng      Float
+  profiles Profile[]
+
+  @@map("city")
+}
+
 // Reference data: inserted by migrations, never by the seed script.
 model Category {
-  id        Int       @id @default(autoincrement())
-  slug      String    @unique
-  sortOrder Int
-  kvintets  Kvintet[]
+  id                Int               @id @default(autoincrement())
+  slug              String            @unique
+  sortOrder         Int
+  kvintets          Kvintet[]
+  tags              TagCategory[]
+  kvintetCategories KvintetCategory[]
 
   @@map("category")
 }
 
 // Reference data: inserted by migrations, never by the seed script.
-// shortcut: placeholder tag list copied from the Figma mocks, replace it with the real
-// list when the onboarding story (#7) decides it; add a migration, don't edit this one.
 model Tag {
-  id          Int          @id @default(autoincrement())
-  slug        String       @unique
+  id          Int           @id @default(autoincrement())
+  slug        String        @unique
   profileTags ProfileTag[]
+  categories  TagCategory[]
 
   @@map("tag")
 }
 
-// Minimal on purpose: the kvintet feed only reads `position` and `meetingFrequency`.
-// shortcut: stand-in for the profile, the onboarding story (#7) replaces it with the
-// full profile + questionnaire and the screens that write it; nothing writes it yet.
-model Profile {
-  userId           String            @id
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  position         String?
-  meetingFrequency MeetingFrequency?
-  tags             ProfileTag[]
+// Reference data: which categories a tag counts towards. Used to match a user's tags to a kvintet's categories.
+model TagCategory {
+  tagId      Int
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-  @@map("profile")
+  @@id([tagId, categoryId])
+  @@index([categoryId])
+  @@map("tag_category")
 }
 
-// shortcut: written by nothing yet, onboarding (#7) will own how tags are picked and saved.
 model ProfileTag {
   userId  String
   profile Profile        @relation(fields: [userId], references: [userId], onDelete: Cascade)
@@ -165,29 +175,110 @@ model ProfileTag {
   @@map("profile_tag")
 }
 
+model Profile {
+  userId                String            @id
+  user                  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  position              String?
+  roles                 String[]          @default([])
+  latitude              Float?
+  longitude             Float?
+  expectations          String?
+  meetingFrequency      MeetingFrequency?
+  weekdays              Boolean           @default(false)
+  weekends              Boolean           @default(false)
+  mornings              Boolean           @default(false)
+  afternoons            Boolean           @default(false)
+  evenings              Boolean           @default(false)
+  cityId                String?
+  city                  City?             @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  radiusKm              Int?
+  note                  String?           @db.Text
+  onboardingCompletedAt DateTime?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  tags                  ProfileTag[]
+
+  @@map("profile")
+}
+
 // FORMING kvintets are open to new members and listed in the feed. "group" is an SQL reserved word.
 model Kvintet {
-  id          String          @id @default(uuid()) @db.Uuid
-  status      KvintetStatus   @default(FORMING)
+  id          String            @id @default(uuid()) @db.Uuid
+  status      KvintetStatus     @default(FORMING)
   title       String
   description String?
+  // Deprecated: holds the first of `categories`. Kept until a later deploy drops it (additive migrations only).
   categoryId  Int
-  category    Category        @relation(fields: [categoryId], references: [id])
-  createdAt   DateTime        @default(now())
+  category    Category          @relation(fields: [categoryId], references: [id])
+  categories  KvintetCategory[]
+  createdAt   DateTime          @default(now())
   activatedAt DateTime?
   members     KvintetMember[]
+  votes       KvintetVote[]
+  messages    Message[]
 
   @@index([status, createdAt])
   @@map("kvintet")
 }
 
+// A kvintet's 1–3 topics, chosen when it is started.
+model KvintetCategory {
+  kvintetId  String   @db.Uuid
+  kvintet    Kvintet  @relation(fields: [kvintetId], references: [id], onDelete: Cascade)
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([kvintetId, categoryId])
+  @@index([categoryId])
+  @@map("kvintet_category")
+}
+
 model KvintetMember {
-  kvintetId String   @db.Uuid
-  kvintet   Kvintet  @relation(fields: [kvintetId], references: [id], onDelete: Cascade)
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  joinedAt  DateTime @default(now())
+  kvintetId String       @db.Uuid
+  kvintet   Kvintet      @relation(fields: [kvintetId], references: [id], onDelete: Cascade)
+  userId    String       @unique
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt  DateTime     @default(now())
+  // Newest chat message this member has seen; everything after it from others counts as unread.
+  lastReadMessageId Int  @default(0)
+  // When this member first opened the "Kvintet begins" page; null until then. The UI sends
+  // them there once, when the kvintet is ACTIVE and this is still null.
+  beginsSeenAt DateTime?
+  vote      KvintetVote?
 
   @@id([kvintetId, userId])
   @@map("kvintet_member")
+}
+
+model KvintetVote {
+  kvintetId String        @db.Uuid
+  userId    String
+  createdAt DateTime      @default(now())
+  kvintet   Kvintet       @relation(fields: [kvintetId], references: [id], onDelete: Cascade)
+  member    KvintetMember @relation(fields: [kvintetId, userId], references: [kvintetId, userId], onDelete: Cascade)
+
+  @@id([kvintetId, userId])
+  @@map("kvintet_vote")
+}
+
+enum MessageKind {
+  USER
+  SYSTEM
+
+  @@map("message_kind")
+}
+
+// authorId is NULL for SYSTEM lines and for messages whose author deleted their account.
+model Message {
+  id        Int         @id @default(autoincrement())
+  kvintetId String      @db.Uuid
+  kvintet   Kvintet     @relation(fields: [kvintetId], references: [id], onDelete: Cascade)
+  authorId  String?
+  author    User?       @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  kind      MessageKind @default(USER)
+  body      String      @db.Text
+  createdAt DateTime    @default(now())
+
+  @@index([kvintetId, id])
+  @@map("message")
 }

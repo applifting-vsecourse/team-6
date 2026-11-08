@@ -1,5 +1,6 @@
 import { createRouter } from "@tanstack/react-router"
 
+import { SiteHeader } from "@/app/SiteHeader"
 import { AppLoadingScreen } from "@/components/AppLoadingScreen"
 import { NotFound } from "@/components/Error/NotFound"
 import { RootErrorBoundary } from "@/components/Error/RootErrorBoundary"
@@ -12,7 +13,7 @@ export const router = createRouter({
   defaultPreload: "intent",
   defaultPreloadStaleTime: 0,
   scrollRestoration: true,
-  defaultNotFoundComponent: NotFound,
+  defaultNotFoundComponent: () => <NotFound header={<SiteHeader />} />,
   defaultErrorComponent: ({ error }) => <RootErrorBoundary error={error} />,
   defaultPendingComponent: AppLoadingScreen,
 })
