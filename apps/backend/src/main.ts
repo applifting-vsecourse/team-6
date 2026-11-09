@@ -1,13 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { toNodeHandler } from 'better-auth/node';
-import * as cookieParser from 'cookie-parser';
-import * as express from 'express';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
-import { BetterAuth } from './shared/auth/providers/better-auth.provider';
+import { setupApp } from './app.setup';
 import { Config } from './shared/config/config.service';
-import { createValidationPipe } from './shared/errors/validation.pipe';
 
 /**
  * Main application entry point
@@ -34,11 +30,6 @@ async function main(): Promise<void> {
     credentials: true,
   });
 
-  // Setup cookie parser middleware
-  app.use(cookieParser());
-
-  const appInstance = app.getHttpAdapter().getInstance();
-
   // Enable trust proxy for reverse-proxy environments (Coolify Traefik, Docker)
   // Ensures req.ip reflects the real client IP for rate limiting instead of the proxy container IP.
   // Defaults to 1 (single reverse-proxy hop in Coolify). Can be overridden via TRUST_PROXY env var.
@@ -48,18 +39,10 @@ async function main(): Promise<void> {
       ? trustProxyEnv
       : Number(trustProxyEnv)
     : 1;
-  appInstance.set('trust proxy', trustProxyValue);
+  app.getHttpAdapter().getInstance().set('trust proxy', trustProxyValue);
 
-  const betterAuth = app.get<BetterAuth>('BetterAuth');
-  // Express 5 (via NestJS 11) requires named wildcards — a bare `*` throws.
-  appInstance.all('/api/auth/*splat', toNodeHandler(betterAuth));
-  appInstance.use(express.json());
-
-  // Configure API prefix for all routes
-  app.setGlobalPrefix('api');
-
-  // Validation errors carry field + constraint codes the frontend translates
-  app.useGlobalPipes(createValidationPipe());
+  // Cookie parser, BetterAuth handler, body parser, API prefix, validation pipe
+  setupApp(app);
 
   // Setup Swagger API documentation at /api/docs (non-production only)
   if (config.nodeEnv !== 'production') {
