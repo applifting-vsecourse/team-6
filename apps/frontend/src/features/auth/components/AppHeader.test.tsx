@@ -82,7 +82,7 @@ describe("AppHeader", () => {
 
   it("greys out a nav item that is unavailable and explains why in a tooltip", async () => {
     useSession.mockReturnValue({ user: jana })
-    render(<AppHeader navDisabled={{ "/kvintet/feed": "You are already in a proposal." }} />)
+    render(<AppHeader navDisabled={{ "/kvintet/feed": "You are already in a kvintet." }} />)
 
     const item = screen.getByRole("link", { name: "Kvintets" })
     expect(item).toHaveAttribute("aria-disabled", "true")
@@ -91,7 +91,7 @@ describe("AppHeader", () => {
 
     await userEvent.hover(item)
 
-    expect(await screen.findByRole("tooltip")).toHaveTextContent("You are already in a proposal.")
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("You are already in a kvintet.")
   })
 
   it("shows navigation and the mobile menu when signed in", () => {

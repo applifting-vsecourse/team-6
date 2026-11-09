@@ -36,17 +36,14 @@ describe("LandingPage", () => {
 
     expect(screen.getByRole("link", { name: "Create account" })).toHaveAttribute("href", "/signup")
     expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/login")
-    expect(screen.queryByRole("link", { name: "Go to overview" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("link", { name: "Go to Home" })).not.toBeInTheDocument()
   })
 
   it("sends someone signed in to the overview and offers no account", () => {
     session.user = { id: "u1" }
     render(<LandingPage />)
 
-    expect(screen.getByRole("link", { name: "Go to overview" })).toHaveAttribute(
-      "href",
-      "/overview",
-    )
+    expect(screen.getByRole("link", { name: "Go to Home" })).toHaveAttribute("href", "/overview")
     expect(screen.queryByRole("link", { name: "Create account" })).not.toBeInTheDocument()
     expect(screen.queryByRole("link", { name: "Sign in" })).not.toBeInTheDocument()
   })

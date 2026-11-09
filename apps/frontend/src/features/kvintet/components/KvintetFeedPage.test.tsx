@@ -145,7 +145,7 @@ describe("KvintetFeedPage", () => {
     renderPage()
 
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/overview", replace: true }))
-    expect(toast.info).toHaveBeenCalledWith("You are already in a proposal.")
+    expect(toast.info).toHaveBeenCalledWith("You are already in a kvintet.")
     expect(screen.queryByText("We couldn't load the kvintets")).not.toBeInTheDocument()
   })
 
@@ -157,7 +157,7 @@ describe("KvintetFeedPage", () => {
 
     expect(api.post).toHaveBeenCalledWith("kvintets/k1/members")
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/overview" }))
-    expect(toast.success).toHaveBeenCalledWith("You joined the proposal.")
+    expect(toast.success).toHaveBeenCalledWith("You joined the kvintet.")
   })
 
   it("explains when the kvintet filled up meanwhile", async () => {
@@ -168,7 +168,7 @@ describe("KvintetFeedPage", () => {
     await userEvent.click(await screen.findByRole("button", { name: "Join" }))
 
     await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith("This proposal is full or no longer open."),
+      expect(toast.error).toHaveBeenCalledWith("This kvintet is full or has already started."),
     )
     expect(navigate).not.toHaveBeenCalled()
   })
@@ -320,7 +320,7 @@ describe("starting a kvintet", () => {
       }),
     )
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/overview" }))
-    expect(toast.success).toHaveBeenCalledWith("Your proposal is open. Others can join it now.")
+    expect(toast.success).toHaveBeenCalledWith("Your kvintet is open. Others can join it now.")
   })
 
   it("shows the server's reason inside the dialog", async () => {
@@ -331,8 +331,6 @@ describe("starting a kvintet", () => {
     await pickCategory("Software development")
     await userEvent.click(within(dialog).getByRole("button", { name: "Start a kvintet" }))
 
-    expect(
-      await screen.findByText("You are already in a proposal or a kvintet."),
-    ).toBeInTheDocument()
+    expect(await screen.findByText("You are already in a kvintet.")).toBeInTheDocument()
   })
 })
