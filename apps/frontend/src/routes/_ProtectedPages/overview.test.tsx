@@ -301,7 +301,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       renderWithClient(<OverviewPage />)
 
-      expect(await screen.findByText("evenings · weekdays · every 14 days")).toBeInTheDocument()
+      expect(await screen.findByText("evenings · weekdays · every two weeks")).toBeInTheDocument()
       expect(screen.getByText("Software development")).toBeInTheDocument()
       expect(screen.getByText("Business")).toBeInTheDocument()
       expect(screen.getAllByText("Free")).toHaveLength(3)
@@ -348,7 +348,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       renderWithClient(<OverviewPage />)
 
-      expect(await screen.findByText("No proposals available right now.")).toBeInTheDocument()
+      expect(await screen.findByText("No kvintets to join right now.")).toBeInTheDocument()
     })
 
     it("opens start kvintet dialog when clicking 'Start your own'", async () => {
@@ -520,7 +520,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(
         await screen.findByRole("heading", { name: "Waiting for more people" }),
       ).toBeInTheDocument()
-      expect(screen.getByText("At three people, you can vote to start.")).toBeInTheDocument()
+      expect(screen.getByText("With three people, you can vote to start.")).toBeInTheDocument()
       expect(screen.queryByRole("button", { name: "Start now" })).not.toBeInTheDocument()
     })
 

@@ -206,7 +206,7 @@ describe("ProfilePage", () => {
 
     expect(screen.getByRole("heading", { name: "When and where" })).toBeInTheDocument()
     expect(
-      screen.getByText(/Weekday evenings · Prague, within 10 km · every 14 days/i),
+      screen.getByText(/Weekday evenings · Prague, within 10 km · every two weeks/i),
     ).toBeInTheDocument()
   })
 
@@ -377,7 +377,7 @@ describe("formatWhenAndWhere", () => {
       "profile.when.mornings": "mornings",
       "profile.when.afternoons": "afternoons",
       "profile.when.evenings": "evenings",
-      "meetingFrequency.BIWEEKLY": "every 14 days",
+      "meetingFrequency.BIWEEKLY": "every two weeks",
       "meetingFrequency.WEEKLY": "weekly",
     }
     if (key === "profile.withinRadius") {
