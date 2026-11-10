@@ -1,10 +1,11 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react"
 import { happy, unsure } from "blobatar/expression"
-import { MapPin, Mic, Phone, Video } from "lucide-react"
+import { MapPin, Mic, Pause, Phone, Play, Video } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { AnonymousBlobatar, Face } from "@/components/AnonymousBlobatar"
 import { Blobatar } from "@/components/ui/blobatar"
+import { Button } from "@/components/ui/button"
 import type en from "@/i18n/locales/en.json"
 import { useMediaQuery } from "@/lib/useMediaQuery"
 import { cn } from "@/lib/utils"
@@ -126,7 +127,9 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
   const { t } = useTranslation()
   const isDesktop = useMediaQuery("(min-width: 768px)")
   const isReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)")
-  const { flags, count } = useCoreIdeaTimeline(isDesktop, isReducedMotion)
+  // Pausing shows the last meeting scene, the same still frame reduced motion gets (WCAG 2.2.2).
+  const [isPaused, setIsPaused] = useState(false)
+  const { flags, count } = useCoreIdeaTimeline(isDesktop, isReducedMotion || isPaused)
 
   const frameRef = useRef<HTMLDivElement>(null)
   const [fit, setFit] = useState(1)
@@ -383,6 +386,18 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
           </>
         )}
       </div>
+      {isReducedMotion ? null : (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="mt-2"
+          onClick={() => setIsPaused((isPausedNow) => !isPausedNow)}
+        >
+          {isPaused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
+          {text(isPaused ? "play" : "pause")}
+        </Button>
+      )}
     </div>
   )
 }

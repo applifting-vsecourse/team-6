@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 /**
  * The script of the landing animation: a set of state classes on the stage plus the seat count.
@@ -149,6 +149,7 @@ const LOOP_MS = 26300
 /** State classes (without the `ci-` prefix) and the seat count, advancing on a loop. */
 export function useCoreIdeaTimeline(isDesktop: boolean, isStatic: boolean) {
   const [state, setState] = useState<Draft>(START)
+  const hasPlayed = useRef(false)
 
   useEffect(() => {
     if (isStatic) return
@@ -173,7 +174,10 @@ export function useCoreIdeaTimeline(isDesktop: boolean, isStatic: boolean) {
       for (const [ms, apply] of beats(isDesktop)) at(ms + 60, apply)
       timers.push(window.setTimeout(run, (isDesktop ? LOOP_MS + 600 : LOOP_MS) + 60))
     }
-    timers.push(window.setTimeout(run, 300))
+    // The first start waits for the page to settle; playing again after a pause starts at once,
+    // from the beginning, whatever scene the loop stopped on.
+    timers.push(window.setTimeout(run, hasPlayed.current ? 0 : 300))
+    hasPlayed.current = true
 
     return () => timers.forEach((id) => window.clearTimeout(id))
   }, [isDesktop, isStatic])

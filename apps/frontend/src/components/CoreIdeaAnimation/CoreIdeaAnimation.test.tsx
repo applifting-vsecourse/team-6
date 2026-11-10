@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react"
+import { act, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { CoreIdeaAnimation } from "@/components/CoreIdeaAnimation/CoreIdeaAnimation"
@@ -102,5 +102,53 @@ describe("CoreIdeaAnimation", () => {
     expect(stage(container)).toHaveClass("ci-n0", "ci-lonely")
     expect(stage(container)).not.toHaveClass("ci-logo")
     expect(container.querySelector(".ci-count")).toHaveTextContent("0 / 5")
+  })
+
+  it("times the desktop stage: the pointer joins 600 ms later and the loop is 600 ms longer", () => {
+    stubMedia(["min-width"])
+    const { container } = render(<CoreIdeaAnimation />)
+    const at = (ms: number) => act(() => void vi.advanceTimersByTime(ms))
+
+    at(9_900) // the pointer sets off at 10.06 s
+    expect(stage(container)).not.toHaveClass("ci-cursor-go")
+
+    at(300) // 10.2 s: on its way to Join, nobody has joined yet
+    expect(stage(container)).toHaveClass("ci-cursor-go")
+    expect(stage(container)).not.toHaveClass("ci-cursor-done", "ci-landed")
+
+    at(1_500) // 11.7 s: it clicked, the solo blobatar landed and the pointer is gone
+    expect(stage(container)).toHaveClass("ci-cursor-done", "ci-landed")
+
+    // The phone loop restarts at 26.66 s; the desktop one is still on its logo.
+    at(15_000)
+    expect(stage(container)).toHaveClass("ci-logo", "ci-fade")
+
+    at(700) // 27.4 s: restarted
+    expect(stage(container)).toHaveClass("ci-n0", "ci-lonely")
+    expect(stage(container)).not.toHaveClass("ci-logo")
+  })
+
+  it("pauses on the button and plays again from the beginning", () => {
+    stubMedia([])
+    const { container } = render(<CoreIdeaAnimation />)
+
+    act(() => void vi.advanceTimersByTime(5_000))
+    fireEvent.click(screen.getByRole("button", { name: "Pause animation" }))
+
+    act(() => void vi.advanceTimersByTime(60_000))
+    expect(stage(container)).toHaveClass("ci-meet", "ci-landed")
+    expect(container.querySelector(".ci-count")).toHaveTextContent("5 / 5")
+
+    fireEvent.click(screen.getByRole("button", { name: "Play animation" }))
+    act(() => void vi.advanceTimersByTime(200))
+    expect(stage(container)).toHaveClass("ci-n0", "ci-lonely")
+    expect(screen.getByRole("button", { name: "Pause animation" })).toBeInTheDocument()
+  })
+
+  it("offers no pause button when reduced motion already holds a still frame", () => {
+    stubMedia(["reduced-motion"])
+    render(<CoreIdeaAnimation />)
+
+    expect(screen.queryByRole("button")).not.toBeInTheDocument()
   })
 })
