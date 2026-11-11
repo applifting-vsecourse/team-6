@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react"
-import { happy } from "blobatar/expression"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { happy, sleepy } from "blobatar/expression"
 import { animate, AnimatePresence, motion, useMotionValue, useReducedMotion } from "motion/react"
 import { useTranslation } from "react-i18next"
 
@@ -7,6 +7,7 @@ import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Button } from "@/components/ui/button"
 
 import { placeBubble, preferredBubbleWidth } from "./bubblePlacement"
+import { LOOK_AWAY_TRAVEL, lookAwayFromPointer, trackPointer } from "./lookAway"
 import { MascotBubble, type BubbleLayout } from "./MascotBubble"
 import { MASCOT_SEED, useMascotContext } from "./MascotContext"
 import { stickyRect } from "./stickyRect"
@@ -109,6 +110,8 @@ export function MascotOverlay() {
     ],
   )
 
+  useEffect(() => trackPointer(), [])
+
   useEffect(() => {
     if (!anchorId) return
     // Deferred: the page may still be laying itself out, and an effect must not set state itself.
@@ -131,6 +134,16 @@ export function MascotOverlay() {
 
   const seed = stage?.seed
   const bubble = stage?.bubble
+  const isEyesClosed = stage?.isEyesClosed === true
+  // While the eyes are shut they also look the other way from the cursor, away from the password.
+  // `layout` changes when the mascot moves, so the point is worked out again then.
+  const lookAway = useMemo(
+    () =>
+      isEyesClosed ? lookAwayFromPointer(x.get(), y.get(), width.get(), height.get()) : "pointer",
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isEyesClosed, layout, x, y, width, height],
+  )
+  const travel = isEyesClosed ? LOOK_AWAY_TRAVEL : undefined
   const isClosed = bubble?.text === closedText
 
   return (
@@ -165,7 +178,9 @@ export function MascotOverlay() {
               >
                 <GazeBlobatar
                   name={MASCOT_SEED}
-                  expression={happy}
+                  expression={isEyesClosed ? sleepy : happy}
+                  lookAt={lookAway}
+                  travel={travel}
                   className="size-full"
                 />
               </motion.div>
@@ -181,6 +196,9 @@ export function MascotOverlay() {
                   >
                     <GazeBlobatar
                       name={seed}
+                      expression={isEyesClosed ? sleepy : undefined}
+                      lookAt={lookAway}
+                      travel={travel}
                       className="size-full"
                     />
                   </motion.div>

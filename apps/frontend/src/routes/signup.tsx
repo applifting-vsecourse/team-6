@@ -34,6 +34,7 @@ function SignUpPage() {
   const navigate = useNavigate()
   const signUp = useSignUp()
   const [username, setUsername] = useState("")
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [emailError, setEmailError] = useState<string | null>(null)
   // BetterAuth stores usernames lowercase, and the avatar is seeded from the stored value.
@@ -51,9 +52,11 @@ function SignUpPage() {
     () => ({
       anchorId: "signup-avatar",
       seed,
+      // Nobody should see a password, not even the avatar.
+      isEyesClosed: isPasswordFocused,
       bubble: { text: t("auth.mascot.avatar"), slotId: "signup-bubble" },
     }),
-    [seed, t],
+    [seed, isPasswordFocused, t],
   )
   useMascotStage(stage)
 
@@ -127,6 +130,7 @@ function SignUpPage() {
           errorMessage={errorMessage}
           emailError={emailError}
           onUsernameChange={setUsername}
+          onPasswordFocusChange={setIsPasswordFocused}
           onSubmit={handleSubmit}
         />
       </AuthLayout>

@@ -44,6 +44,8 @@ export type MascotStage = {
   anchorId: string
   /** A person's seed: the mascot cross-fades into that avatar. Leave out for the yellow mascot. */
   seed?: string
+  /** The mascot looks away: its eyes shut, e.g. while a password is typed. */
+  isEyesClosed?: boolean
   bubble?: MascotBubble
 }
 

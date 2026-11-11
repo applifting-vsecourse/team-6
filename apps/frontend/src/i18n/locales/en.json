@@ -19,7 +19,7 @@
     "emailPlaceholder": "e.g. jana@company.com",
     "haveAccount": "Already have an account?",
     "mascot": {
-      "avatar": "Hi, I'm your avatar! I'm made from your username, so I change as you type."
+      "avatar": "Hi, I'm your avatar! I'm made from your username."
     },
     "name": "Name",
     "nameHint": "Others see it only once your kvintet starts.",
