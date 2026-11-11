@@ -4,7 +4,7 @@ import { MapPin, Mic, Pause, Phone, Play, Video } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { AnonymousBlobatar, Face } from "@/components/AnonymousBlobatar"
-import { Blobatar } from "@/components/ui/blobatar"
+import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Button } from "@/components/ui/button"
 import type en from "@/i18n/locales/en.json"
 import { useMediaQuery } from "@/lib/useMediaQuery"
@@ -56,6 +56,7 @@ function Seat({
           <Layer kind="g">
             <AnonymousBlobatar
               seed={seat.seed}
+              motion="always"
               className={FACE}
             />
           </Layer>
@@ -68,10 +69,10 @@ function Seat({
           />
         </Layer>
         <Layer kind="h">
-          <Blobatar
+          <GazeBlobatar
             name={seat.seed}
             className={FACE}
-            blobatar={{ expression: happy }}
+            expression={happy}
           />
         </Layer>
       </div>
@@ -189,10 +190,10 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
       <div className="ci-wordmark">Kvintet</div>
       <div className="ci-solo">
         <span className="ci-u">
-          <Blobatar
+          <GazeBlobatar
             name="jana"
             className={FACE}
-            blobatar={{ expression: unsure }}
+            expression={unsure}
           />
         </span>
         <span className="ci-c">
@@ -289,6 +290,7 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
           <span className="ci-face">
             <Face
               seed="eva"
+              motion="always"
               className={FACE}
             />
           </span>
@@ -298,6 +300,7 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
           <span className="ci-face">
             <Face
               seed="jana"
+              motion="always"
               className={FACE}
             />
           </span>
