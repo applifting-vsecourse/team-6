@@ -7,7 +7,9 @@ services:
       POSTGRES_PASSWORD: quacker
       POSTGRES_DB: quacker
     ports:
-      - 5433:5432
+      # Host port of the dev database. Another project on this machine may hold 5433 (they all start
+      # from the same template); then set DB_PORT in apps/backend/.env, and the port in DATABASE_URL.
+      - '${DB_PORT:-5433}:5432'
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U quacker -d quacker']
       interval: 3s
