@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
 import { SiteHeader } from "@/app/SiteHeader"
-import { KvintetSeats } from "@/components/KvintetSeats"
+import { CoreIdeaAnimation } from "@/components/CoreIdeaAnimation/CoreIdeaAnimation"
 import { PageLayout } from "@/components/PageLayout"
 import { Seo } from "@/components/Seo"
 import { StepBlobatar } from "@/components/StepBlobatar"
@@ -14,9 +14,6 @@ import { useSession } from "@/features/auth/hooks/useSession"
 export const Route = createFileRoute("/")({
   component: LandingPage,
 })
-
-// The faces of the Figma frames: an illustration of a full table, not real people.
-const TABLE = ["jana", "petr", "eva", "ondrej", "lucie"].map((seed) => ({ seed }))
 
 // The phone design (M1) has shorter copy for the first two steps.
 const STEPS = [
@@ -34,21 +31,10 @@ function LandingPage() {
       <Seo />
       <PageLayout header={<SiteHeader />}>
         <div className="px-4">
-          <div className="mx-auto flex w-full max-w-300 flex-col gap-5 pt-7 pb-10 md:gap-18 md:pt-18 md:pb-22">
-            <section className="flex flex-col gap-5 md:flex-row md:items-center md:gap-16">
-              {/* Decorative. On a phone the
-                table stands bare above the headline; on desktop it sits in a card. */}
-              <div className="flex flex-col items-center self-center md:order-last md:rounded-lg md:border md:border-border md:bg-card md:p-7">
-                <div className="w-65 md:w-95">
-                  <KvintetSeats members={TABLE} />
-                </div>
-              </div>
-
-              <div className="flex flex-col items-start gap-5 md:flex-1 md:gap-5.5">
-                <h1 className="text-display-mobile md:text-display">
-                  <span className="md:block">{t("landing.heroTitle1")}</span>{" "}
-                  <span className="md:block">{t("landing.heroTitle2")}</span>
-                </h1>
+          <div className="mx-auto flex w-full max-w-335 flex-col gap-5 pt-7 pb-10 md:gap-18 md:pt-18 md:pb-22">
+            <section className="flex flex-col gap-8 xl:flex-row xl:items-center xl:gap-12">
+              <div className="flex flex-col items-start gap-5 md:gap-5.5 xl:w-88 xl:shrink-0">
+                <h1 className="text-display-mobile md:text-display">{t("landing.heroTitle2")}</h1>
                 <p className="text-lead text-muted-foreground">
                   <span className="md:hidden">{t("landing.heroTextShort")}</span>
                   <span className="hidden md:inline">{t("landing.heroText")}</span>
@@ -75,6 +61,10 @@ function LandingPage() {
                   )}
                 </div>
               </div>
+
+              {/* Decorative: the core idea in six scenes, with its own captions. Below the text on
+                a phone and a narrow window; beside it, scaled down, on a wide one. */}
+              <CoreIdeaAnimation className="xl:min-w-0 xl:flex-1" />
             </section>
 
             <section className="flex flex-col gap-4.5 border-t border-border pt-6 md:gap-7 md:pt-12">
