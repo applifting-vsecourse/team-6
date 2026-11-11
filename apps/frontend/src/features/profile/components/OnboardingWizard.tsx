@@ -19,15 +19,14 @@ import { OnboardingProgress } from "@/features/profile/components/OnboardingProg
 import { Step1Profile } from "@/features/profile/components/Step1Profile"
 import { Step2Availability } from "@/features/profile/components/Step2Availability"
 import { Step3Questionnaire } from "@/features/profile/components/Step3Questionnaire"
-import { AvatarSeedContext } from "@/features/profile/lib/avatarSeedContext"
 
 export type OnboardingStep = 1 | 2 | 3
 export const ONBOARDING_TOTAL_STEPS = 3
 
 type OnboardingWizardProps = {
   userId?: string
-  // Seed of the person's own blobatar beside the page title; none hides it.
-  avatarSeed?: string
+  // Seed of the person's own blobatar: during the tour the mascot is that avatar.
+  mascotSeed?: string
   // The step lives in the URL (the app header shows it too), so the route owns it.
   step: OnboardingStep
   onStepChange: (step: OnboardingStep) => void
@@ -35,7 +34,7 @@ type OnboardingWizardProps = {
 
 export function OnboardingWizard({
   userId,
-  avatarSeed,
+  mascotSeed,
   step,
   onStepChange,
 }: OnboardingWizardProps) {
@@ -68,20 +67,20 @@ export function OnboardingWizard({
   const allTags = referenceQuery.data?.tags ?? []
 
   return (
-    <AvatarSeedContext.Provider value={avatarSeed}>
-      <OnboardingWizardForm
-        userId={userId}
-        step={step}
-        onStepChange={onStepChange}
-        profile={profileQuery.data ?? null}
-        allTags={allTags}
-      />
-    </AvatarSeedContext.Provider>
+    <OnboardingWizardForm
+      userId={userId}
+      mascotSeed={mascotSeed}
+      step={step}
+      onStepChange={onStepChange}
+      profile={profileQuery.data ?? null}
+      allTags={allTags}
+    />
   )
 }
 
 type OnboardingWizardFormProps = {
   userId?: string
+  mascotSeed?: string
   step: OnboardingStep
   onStepChange: (step: OnboardingStep) => void
   profile: ProfileResponse
@@ -90,6 +89,7 @@ type OnboardingWizardFormProps = {
 
 function OnboardingWizardForm({
   userId,
+  mascotSeed,
   step: currentStep,
   onStepChange: setCurrentStep,
   profile,
@@ -221,6 +221,7 @@ function OnboardingWizardForm({
         <Step1Profile
           initialData={step1Data}
           allTags={allTags}
+          mascotSeed={mascotSeed}
           onContinue={handleStep1Continue}
         />
       )}
@@ -228,6 +229,7 @@ function OnboardingWizardForm({
       {currentStep === 2 && (
         <Step2Availability
           initialData={step2Data}
+          mascotSeed={mascotSeed}
           onBack={() => {
             setCurrentStep(1)
             window.scrollTo({ top: 0, behavior: "smooth" })
@@ -240,6 +242,7 @@ function OnboardingWizardForm({
         <Step3Questionnaire
           initialData={step3Data}
           isSubmitting={saveProfileMutation.isPending}
+          mascotSeed={mascotSeed}
           onBack={() => {
             setCurrentStep(2)
             window.scrollTo({ top: 0, behavior: "smooth" })

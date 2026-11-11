@@ -8,6 +8,8 @@ import { TagBadge } from "@/features/profile/components/TagBadge"
 type TagSelectorProps = {
   title: string
   hint?: string
+  /** Where the mascot sticks while it explains this card. */
+  mascotId?: string
   selectedTagIds: string[]
   allTags: Tag[]
   defaultSuggestedSlugs?: string[]
@@ -21,6 +23,7 @@ const SUGGESTION_COUNT = 3
 export function TagSelector({
   title,
   hint,
+  mascotId,
   selectedTagIds,
   allTags,
   defaultSuggestedSlugs = [],
@@ -56,6 +59,7 @@ export function TagSelector({
     <OnboardingCard
       title={title}
       hint={hint}
+      mascotId={mascotId}
     >
       {selectedTags.length > 0 && (
         <div className="flex flex-wrap gap-2">

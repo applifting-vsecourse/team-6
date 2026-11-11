@@ -68,6 +68,8 @@ type RoleSelectorProps = {
   onRemoveRole?: (role: string) => void
   onClearRole?: () => void
   error?: string | null
+  /** Where the mascot sticks while it explains this card. */
+  mascotId?: string
 }
 
 export function RoleSelector({
@@ -77,6 +79,7 @@ export function RoleSelector({
   onRemoveRole,
   onClearRole,
   error,
+  mascotId,
 }: RoleSelectorProps) {
   const { t } = useTranslation()
   const [search, setSearch] = useState("")
@@ -137,6 +140,7 @@ export function RoleSelector({
       title={t("onboarding.step1.role")}
       hint={t("onboarding.step1.roleHint")}
       isInvalid={Boolean(error)}
+      mascotId={mascotId}
       className="gap-3.5"
     >
       <div className="flex flex-wrap gap-2">

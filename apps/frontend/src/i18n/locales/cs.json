@@ -18,6 +18,9 @@
     "email": "E-mail",
     "emailPlaceholder": "např. jana@firma.cz",
     "haveAccount": "Už máte účet?",
+    "mascot": {
+      "avatar": "Ahoj, jsem váš avatar! Vznikám z vašeho uživatelského jména, takže se měním, jak píšete."
+    },
     "name": "Jméno",
     "nameHint": "Ostatní ho uvidí, až váš kvintet začne.",
     "noAccountYet": "Ještě nemáte účet?",
@@ -25,9 +28,6 @@
     "passwordHint_few": "Alespoň {{count}} znaky",
     "passwordHint_one": "Alespoň {{count}} znak",
     "passwordHint_other": "Alespoň {{count}} znaků",
-    "preview": {
-      "title": "To jste vy!"
-    },
     "signIn": "Přihlásit se",
     "signInDescription": "Přihlaste se e-mailem a heslem.",
     "signInTitle": "Vítejte zpět",
@@ -336,6 +336,9 @@
     "heroTextShort": "Kvintet vás spojí se čtyřmi lidmi, které zajímá stejné téma. Každý učí, každý se učí.",
     "heroTitle2": "Učte se jeden od druhého.",
     "howItWorks": "Jak to funguje",
+    "mascot": {
+      "getStarted": "Pojďme na to!"
+    },
     "rulesLead": "Pro všechny platí stejná pravidla.",
     "rulesLink": "Přečtěte si pravidla",
     "step1Text": "Co umíte a co se chcete naučit. Zabere to 3 minuty.",
@@ -745,6 +748,31 @@
     "vue": "Vue.js",
     "web-development": "Vývoj webu",
     "yoga": "Jóga"
+  },
+  "tour": {
+    "close": "Zavřít",
+    "done": "Hotovo",
+    "feed": "Tady vidíte kvintety seřazené podle toho, jak moc se k vám hodí. Pokud se vám žádný nezamlouvá, můžete si založit vlastní.",
+    "header": "To je vše! Usadím se u vašeho jména. Z tohoto menu můžete prohlídku kdykoli zopakovat.",
+    "next": "Dál",
+    "onboarding": {
+      "days": "Ve které dny se můžete scházet? Zaškrtněte všechny, které vám sedí.",
+      "expectations": "Co od kvintetu čekáte? Zaškrtněte všechno, co sedí.",
+      "frequency": "Jak často se chcete scházet? Tuhle odpověď potřebujeme.",
+      "interests": "Zájmy mimo práci pomůžou vám pěti najít, o čem si povídat. Vyberte, kolik chcete.",
+      "learn": "A co byste se chtěli naučit? Zase tolik, kolik chcete.",
+      "note": "Chcete skupině ještě něco sdělit? Je to jen na vás.",
+      "place": "Vyberte místo, kde se chcete setkávat, a jak daleko jste ochotni dojet.",
+      "role": "Začněte tady: vyberte obor a pak roli. Můžete jich přidat víc.",
+      "step1Ready": "Profil je hotový. Pokračujte, kdykoli vám přijde v pořádku.",
+      "step2Ready": "Teď víme kdy a kde. Pokračujte posledním krokem.",
+      "step3Ready": "To je vše! Dokončete to a provedu vás aplikací.",
+      "teach": "Co byste mohli naučit ostatní? Vyberte tolik témat, kolik chcete.",
+      "time": "A v jakou denní dobu? Zaškrtněte všechny, které vám sedí."
+    },
+    "overview": "Toto je domovská stránka, teď tu vidíte tři kvintety, které se k vám hodí nejvíce.",
+    "replay": "Zopakovat prohlídku",
+    "showHint": "Zobrazit nápovědu"
   },
   "validation": {
     "invalid": "Neplatná hodnota",

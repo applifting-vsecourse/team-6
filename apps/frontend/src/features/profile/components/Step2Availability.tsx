@@ -1,6 +1,7 @@
 import { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
+import { MascotCorner } from "@/components/Mascot/MascotCorner"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 
@@ -10,6 +11,7 @@ import {
 } from "@/features/profile/components/LocationMapPicker"
 import { OnboardingCard } from "@/features/profile/components/OnboardingCard"
 import { OnboardingTitle } from "@/features/profile/components/OnboardingTitle"
+import { GUIDE_READY_ID, useOnboardingGuide } from "@/features/profile/hooks/useOnboardingGuide"
 import { checkboxClass } from "@/features/profile/lib/optionStyles"
 
 export type Step2Data = {
@@ -25,11 +27,18 @@ export type Step2Data = {
 
 type Step2AvailabilityProps = {
   initialData: Step2Data
+  /** Seed of the person's avatar: while the tour runs, the mascot is that avatar. */
+  mascotSeed?: string
   onBack: () => void
   onContinue: (data: Step2Data) => void
 }
 
-export function Step2Availability({ initialData, onBack, onContinue }: Step2AvailabilityProps) {
+export function Step2Availability({
+  initialData,
+  mascotSeed,
+  onBack,
+  onContinue,
+}: Step2AvailabilityProps) {
   const { t } = useTranslation()
 
   const [hasWeekdays, setHasWeekdays] = useState(initialData.weekdays)
@@ -46,6 +55,33 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
   const [daysError, setDaysError] = useState<string | null>(null)
   const [timeOfDayError, setTimeOfDayError] = useState<string | null>(null)
   const [locationError, setLocationError] = useState<string | null>(null)
+
+  useOnboardingGuide({
+    seed: mascotSeed,
+    readyText: t("tour.onboarding.step2Ready"),
+    cards: [
+      {
+        id: "days",
+        text: t("tour.onboarding.days"),
+        isDone: hasWeekdays || hasWeekends,
+        answer: `${hasWeekdays}|${hasWeekends}`,
+        isManual: true,
+      },
+      {
+        id: "time",
+        text: t("tour.onboarding.time"),
+        isDone: hasMornings || hasAfternoons || hasEvenings,
+        answer: `${hasMornings}|${hasAfternoons}|${hasEvenings}`,
+        isManual: true,
+      },
+      {
+        id: "place",
+        text: t("tour.onboarding.place"),
+        isDone: latitude != null && longitude != null,
+        answer: `${latitude}|${longitude}|${radiusKm}`,
+      },
+    ],
+  })
 
   const daysSectionRef = useRef<HTMLElement | null>(null)
   const timeOfDaySectionRef = useRef<HTMLElement | null>(null)
@@ -120,10 +156,12 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
       <OnboardingTitle
         title={t("onboarding.step2.title")}
         description={t("onboarding.step2.description")}
+        avatarSeed={mascotSeed}
       />
 
       <OnboardingCard
         ref={daysSectionRef}
+        mascotId="onboarding-days"
         title={t("onboarding.step2.daysTitle")}
         isInvalid={Boolean(daysError)}
       >
@@ -149,6 +187,7 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
 
       <OnboardingCard
         ref={timeOfDaySectionRef}
+        mascotId="onboarding-time"
         title={t("onboarding.step2.timeOfDayTitle")}
         isInvalid={Boolean(timeOfDayError)}
       >
@@ -178,6 +217,7 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
 
       <OnboardingCard
         ref={mapSectionRef}
+        mascotId="onboarding-place"
         isInvalid={Boolean(locationError)}
       >
         <LocationMapPicker
@@ -211,12 +251,15 @@ export function Step2Availability({ initialData, onBack, onContinue }: Step2Avai
         >
           {t("common.back")}
         </Button>
-        <Button
-          type="submit"
-          className="flex-1 md:flex-none"
-        >
-          {t("common.continue")}
-        </Button>
+        <div className="relative flex flex-1 md:flex-none">
+          <Button
+            type="submit"
+            className="w-full"
+          >
+            {t("common.continue")}
+          </Button>
+          <MascotCorner id={GUIDE_READY_ID} />
+        </div>
       </div>
     </form>
   )

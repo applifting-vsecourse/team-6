@@ -32,7 +32,7 @@ function OnboardingPage() {
           <OnboardingWizard
             userId={user?.id}
             // Same seed as the header: username, id when there is none. Never the e-mail.
-            avatarSeed={user ? user.username || user.id : undefined}
+            mascotSeed={user ? user.username || user.id : undefined}
             step={step}
             onStepChange={(next) => void navigate({ search: { step: next } })}
           />

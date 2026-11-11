@@ -18,15 +18,15 @@
     "email": "Email",
     "emailPlaceholder": "e.g. jana@company.com",
     "haveAccount": "Already have an account?",
+    "mascot": {
+      "avatar": "Hi, I'm your avatar! I'm made from your username, so I change as you type."
+    },
     "name": "Name",
     "nameHint": "Others see it only once your kvintet starts.",
     "noAccountYet": "Don't have an account yet?",
     "password": "Password",
     "passwordHint_one": "At least {{count}} character",
     "passwordHint_other": "At least {{count}} characters",
-    "preview": {
-      "title": "That's you!"
-    },
     "signIn": "Sign in",
     "signInDescription": "Sign in with your email and password.",
     "signInTitle": "Welcome back",
@@ -332,6 +332,9 @@
     "heroTextShort": "Meet four people who care about the same topic. Everyone teaches, everyone learns.",
     "heroTitle2": "Learn from each other.",
     "howItWorks": "How it works",
+    "mascot": {
+      "getStarted": "Let's get started!"
+    },
     "rulesLead": "The same rules apply to everyone.",
     "rulesLink": "Read the rules",
     "step1Text": "What you know and what you'd like to learn. 3 minutes.",
@@ -737,6 +740,31 @@
     "vue": "Vue.js",
     "web-development": "Web development",
     "yoga": "Yoga"
+  },
+  "tour": {
+    "close": "Close",
+    "done": "Done",
+    "feed": "Here you see kvintets ordered by how well they suit you. If none of them appeals to you, you can start your own.",
+    "header": "That's it! I'm settling in next to your name. Open this menu any time to replay the tour.",
+    "next": "Next",
+    "onboarding": {
+      "days": "Which days could you meet? Tick as many as suit you.",
+      "expectations": "What do you expect from a kvintet? Tick everything that fits.",
+      "frequency": "How often would you like to meet? This one we need.",
+      "interests": "Interests outside work help the five of you find something to talk about. Pick as many as you like.",
+      "learn": "And what would you like to learn? Again, as many as you like.",
+      "note": "Anything else the group should know? That's entirely up to you.",
+      "place": "Pick the place where you'd like to meet, and how far you'd travel.",
+      "role": "Start here: pick your field, then your role. You can add more than one.",
+      "step1Ready": "That's your profile. Continue whenever it looks right to you.",
+      "step2Ready": "Now we know when and where. On to the last step.",
+      "step3Ready": "That's everything! Finish up and I'll show you around.",
+      "teach": "What could you teach the others? Pick as many topics as you like.",
+      "time": "And at what time of day? Tick as many as suit you."
+    },
+    "overview": "This is the home page. Right now you see the three kvintets that suit you best.",
+    "replay": "Replay the tour",
+    "showHint": "Show the tip"
   },
   "validation": {
     "invalid": "Invalid value",

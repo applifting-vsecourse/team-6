@@ -1,7 +1,9 @@
 import type { ComponentType, ReactNode } from "react"
 import { render, screen, within } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
+import { MascotProvider, useMascotContext } from "@/components/Mascot/MascotContext"
 import { Route } from "@/routes/index"
 
 // The gaze driver needs browser APIs jsdom lacks (matchMedia, ResizeObserver).
@@ -26,6 +28,15 @@ vi.mock("@tanstack/react-router", () => ({
 
 const LandingPage = Route.options.component as ComponentType
 
+function MascotProbe() {
+  const stage = useMascotContext()?.stage
+  return (
+    <p data-testid="mascot">
+      {stage ? `${stage.anchorId}: ${stage.bubble?.text ?? "silent"}` : "none"}
+    </p>
+  )
+}
+
 describe("LandingPage", () => {
   beforeEach(() => {
     session.user = null
@@ -37,6 +48,64 @@ describe("LandingPage", () => {
     expect(screen.getByRole("link", { name: "Create account" })).toHaveAttribute("href", "/signup")
     expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/login")
     expect(screen.queryByRole("link", { name: "Go to Home" })).not.toBeInTheDocument()
+  })
+
+  it("puts the yellow mascot on the corner of the button, silent until it is pointed at", () => {
+    render(
+      <MascotProvider>
+        <MascotProbe />
+        <LandingPage />
+      </MascotProvider>,
+    )
+
+    expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: silent")
+  })
+
+  it("greets while the button is hovered and goes quiet when the pointer leaves", async () => {
+    const user = userEvent.setup()
+    render(
+      <MascotProvider>
+        <MascotProbe />
+        <LandingPage />
+      </MascotProvider>,
+    )
+    const button = screen.getByRole("link", { name: "Create account" })
+
+    await user.hover(button)
+    expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: Let's get started!")
+
+    await user.unhover(button)
+    expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: silent")
+  })
+
+  it("greets a keyboard user who focuses the button too", async () => {
+    const user = userEvent.setup()
+    render(
+      <MascotProvider>
+        <MascotProbe />
+        <LandingPage />
+      </MascotProvider>,
+    )
+
+    await user.tab()
+    // The page's first stop may be another control; tab on until the button has focus.
+    for (let i = 0; i < 5 && document.activeElement?.textContent !== "Create account"; i++) {
+      await user.tab()
+    }
+
+    expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: Let's get started!")
+  })
+
+  it("keeps the mascot away from someone who already has an account", () => {
+    session.user = { id: "u1" }
+    render(
+      <MascotProvider>
+        <MascotProbe />
+        <LandingPage />
+      </MascotProvider>,
+    )
+
+    expect(screen.getByTestId("mascot")).toHaveTextContent("none")
   })
 
   it("sends someone signed in to the overview and offers no account", () => {

@@ -48,6 +48,8 @@ export const profileResponseSchema = z
     radiusKm: z.number().nullable().optional(),
     note: z.string().nullable(),
     onboardingCompletedAt: z.string().nullable(),
+    /** Set once the product tour was finished or skipped. */
+    tourCompletedAt: z.string().nullable().optional(),
     teaches: z.array(tagSchema),
     learns: z.array(tagSchema),
     interests: z.array(tagSchema),
@@ -121,4 +123,10 @@ export const useSaveProfile = (userId?: string) => {
       queryClient.setQueryData(profileKeys.me(userId), data)
     },
   })
+}
+
+/** Remembers on the server that the tour is over (finished or skipped), so it never returns. */
+export const markTourCompleted = async (): Promise<ProfileResponse> => {
+  const res = await api.post("me/profile/tour-completed").json()
+  return profileResponseSchema.parse(res)
 }
