@@ -1,6 +1,7 @@
 import { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
+import { MascotCorner } from "@/components/Mascot/MascotCorner"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
@@ -10,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import type { MeetingFrequency } from "@/features/profile/api/profileApi"
 import { OnboardingCard } from "@/features/profile/components/OnboardingCard"
 import { OnboardingTitle } from "@/features/profile/components/OnboardingTitle"
+import { GUIDE_READY_ID, useOnboardingGuide } from "@/features/profile/hooks/useOnboardingGuide"
 import { checkboxClass, radioClass } from "@/features/profile/lib/optionStyles"
 
 type Step3Data = {
@@ -21,6 +23,8 @@ type Step3Data = {
 type Step3QuestionnaireProps = {
   initialData: Step3Data
   isSubmitting?: boolean
+  /** Seed of the person's avatar: while the tour runs, the mascot is that avatar. */
+  mascotSeed?: string
   onBack: () => void
   onFinish: (data: Step3Data) => void
 }
@@ -28,6 +32,7 @@ type Step3QuestionnaireProps = {
 export function Step3Questionnaire({
   initialData,
   isSubmitting = false,
+  mascotSeed,
   onBack,
   onFinish,
 }: Step3QuestionnaireProps) {
@@ -40,6 +45,35 @@ export function Step3Questionnaire({
   const [note, setNote] = useState(initialData.note)
   const [error, setError] = useState<string | null>(null)
   const frequencySectionRef = useRef<HTMLElement | null>(null)
+
+  useOnboardingGuide({
+    seed: mascotSeed,
+    readyText: t("tour.onboarding.step3Ready"),
+    cards: [
+      {
+        id: "expectations",
+        text: t("tour.onboarding.expectations"),
+        isDone: expectations.length > 0,
+        answer: expectations.join("|"),
+        isOptional: true,
+        isManual: true,
+      },
+      {
+        id: "frequency",
+        text: t("tour.onboarding.frequency"),
+        isDone: Boolean(meetingFrequency),
+        answer: meetingFrequency ?? "",
+      },
+      {
+        id: "note",
+        text: t("tour.onboarding.note"),
+        isDone: note.trim().length > 0,
+        answer: note,
+        isOptional: true,
+        isManual: true,
+      },
+    ],
+  })
 
   const expectationOptions: {
     id: string
@@ -96,10 +130,12 @@ export function Step3Questionnaire({
       <OnboardingTitle
         title={t("onboarding.step3.title")}
         description={t("onboarding.step3.description")}
+        avatarSeed={mascotSeed}
       />
 
       <OnboardingCard
         title={t("onboarding.step3.expectationsTitle")}
+        mascotId="onboarding-expectations"
         hint={t("onboarding.step3.expectationsHint")}
       >
         <div className="flex flex-col gap-3">
@@ -121,6 +157,7 @@ export function Step3Questionnaire({
 
       <OnboardingCard
         ref={frequencySectionRef}
+        mascotId="onboarding-frequency"
         title={t("onboarding.step3.frequencyTitle")}
         isInvalid={Boolean(error)}
       >
@@ -159,6 +196,7 @@ export function Step3Questionnaire({
       <OnboardingCard
         title={t("onboarding.step3.noteTitle")}
         hint={t("onboarding.step3.noteOptional")}
+        mascotId="onboarding-note"
       >
         <Label
           htmlFor="onboarding-note"
@@ -188,13 +226,16 @@ export function Step3Questionnaire({
         <p className="hidden text-small text-muted-foreground md:block md:flex-1">
           {t("onboarding.step3.finishHint")}
         </p>
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="flex-1 md:flex-none"
-        >
-          {isSubmitting ? t("common.saving") : t("common.finish")}
-        </Button>
+        <div className="relative flex flex-1 md:flex-none">
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full"
+          >
+            {isSubmitting ? t("common.saving") : t("common.finish")}
+          </Button>
+          <MascotCorner id={GUIDE_READY_ID} />
+        </div>
       </div>
     </form>
   )

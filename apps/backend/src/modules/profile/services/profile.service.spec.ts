@@ -5,7 +5,7 @@ import {
   TagKind,
 } from '@/modules/profile/domain/profile.entity';
 import { ProfileRepository } from '@/modules/profile/repositories/profile.repository';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 
 describe('ProfileService', () => {
@@ -13,12 +13,14 @@ describe('ProfileService', () => {
   let repository: {
     findByUserId: jest.Mock;
     saveProfile: jest.Mock;
+    markTourCompleted: jest.Mock;
   };
 
   beforeEach(() => {
     repository = {
       findByUserId: jest.fn(),
       saveProfile: jest.fn(),
+      markTourCompleted: jest.fn(),
     };
     service = new ProfileService(repository as unknown as ProfileRepository);
   });
@@ -531,5 +533,43 @@ describe('ProfileService', () => {
       'u1',
       expect.objectContaining({ note: 'Just updating the note' }),
     );
+  });
+
+  describe('markTourCompleted', () => {
+    it('returns the profile the repository marked', async (): Promise<void> => {
+      const entity = new ProfileEntity(
+        'u1',
+        null,
+        [],
+        null,
+        false,
+        false,
+        false,
+        false,
+        false,
+        null,
+        null,
+        null,
+        null,
+        null,
+        [],
+        [],
+        null,
+        null,
+        new Date('2026-11-10T12:00:00Z'),
+      );
+      repository.markTourCompleted.mockResolvedValue(entity);
+
+      await expect(service.markTourCompleted('u1')).resolves.toBe(entity);
+      expect(repository.markTourCompleted).toHaveBeenCalledWith('u1');
+    });
+
+    it('throws NotFoundException when the user has no profile', async (): Promise<void> => {
+      repository.markTourCompleted.mockResolvedValue(null);
+
+      await expect(service.markTourCompleted('u1')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
   });
 });

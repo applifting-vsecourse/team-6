@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react"
 
+import { MascotCorner } from "@/components/Mascot/MascotCorner"
 import { cn } from "@/lib/utils"
 
 type OnboardingCardProps = ComponentProps<"section"> & {
@@ -7,6 +8,8 @@ type OnboardingCardProps = ComponentProps<"section"> & {
   hint?: string
   // Marks a card whose answer is missing: the border turns red, the message sits inside.
   isInvalid?: boolean
+  // Where the mascot sticks while it explains this card: its top right corner.
+  mascotId?: string
 }
 
 /** One question of the onboarding: a white surface with a title, an optional hint and the answer. */
@@ -14,6 +17,7 @@ export function OnboardingCard({
   title,
   hint,
   isInvalid,
+  mascotId,
   className,
   children,
   ...props
@@ -21,7 +25,7 @@ export function OnboardingCard({
   return (
     <section
       className={cn(
-        "flex flex-col gap-3 rounded-lg border bg-card p-4 md:p-5",
+        "relative flex flex-col gap-3 rounded-lg border bg-card p-4 md:p-5",
         isInvalid ? "border-destructive" : "border-border",
         className,
       )}
@@ -34,6 +38,7 @@ export function OnboardingCard({
         </div>
       ) : null}
       {children}
+      {mascotId ? <MascotCorner id={mascotId} /> : null}
     </section>
   )
 }

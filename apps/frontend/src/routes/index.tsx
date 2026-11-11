@@ -1,9 +1,11 @@
+import { useMemo, useState } from "react"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
 import { SiteHeader } from "@/app/SiteHeader"
-import { KvintetSeats } from "@/components/KvintetSeats"
+import { CoreIdeaAnimation } from "@/components/CoreIdeaAnimation/CoreIdeaAnimation"
+import { useMascotAnchor, useMascotStage } from "@/components/Mascot/MascotContext"
 import { PageLayout } from "@/components/PageLayout"
 import { Seo } from "@/components/Seo"
 import { StepBlobatar } from "@/components/StepBlobatar"
@@ -15,9 +17,6 @@ export const Route = createFileRoute("/")({
   component: LandingPage,
 })
 
-// The faces of the Figma frames: an illustration of a full table, not real people.
-const TABLE = ["jana", "petr", "eva", "ondrej", "lucie"].map((seed) => ({ seed }))
-
 // The phone design (M1) has shorter copy for the first two steps.
 const STEPS = [
   { seed: "jana", n: 1, hasShort: true },
@@ -28,27 +27,34 @@ const STEPS = [
 function LandingPage() {
   const { t } = useTranslation()
   const { user } = useSession()
+  const [mascotAnchorRef] = useMascotAnchor("landing-cta")
+  // The greeting would cover the sign-in button or the text above, so it speaks only while the
+  // button or the mascot is pointed at (or focused), and never takes a click itself.
+  const [isGreeting, setIsGreeting] = useState(false)
+  // The yellow mascot greets visitors only; someone with an account has no use for it here.
+  const stage = useMemo(
+    () =>
+      user
+        ? null
+        : {
+            anchorId: "landing-cta",
+            bubble: isGreeting
+              ? { text: t("landing.mascot.getStarted"), prefer: "above" as const }
+              : undefined,
+          },
+    [user, isGreeting, t],
+  )
+  useMascotStage(stage)
 
   return (
     <>
       <Seo />
       <PageLayout header={<SiteHeader />}>
         <div className="px-4">
-          <div className="mx-auto flex w-full max-w-300 flex-col gap-5 pt-7 pb-10 md:gap-18 md:pt-18 md:pb-22">
-            <section className="flex flex-col gap-5 md:flex-row md:items-center md:gap-16">
-              {/* Decorative. On a phone the
-                table stands bare above the headline; on desktop it sits in a card. */}
-              <div className="flex flex-col items-center self-center md:order-last md:rounded-lg md:border md:border-border md:bg-card md:p-7">
-                <div className="w-65 md:w-95">
-                  <KvintetSeats members={TABLE} />
-                </div>
-              </div>
-
-              <div className="flex flex-col items-start gap-5 md:flex-1 md:gap-5.5">
-                <h1 className="text-display-mobile md:text-display">
-                  <span className="md:block">{t("landing.heroTitle1")}</span>{" "}
-                  <span className="md:block">{t("landing.heroTitle2")}</span>
-                </h1>
+          <div className="mx-auto flex w-full max-w-335 flex-col gap-5 pt-7 pb-10 md:gap-18 md:pt-18 md:pb-22">
+            <section className="flex flex-col gap-8 xl:flex-row xl:items-center xl:gap-12">
+              <div className="flex flex-col items-start gap-5 md:gap-5.5 xl:w-88 xl:shrink-0">
+                <h1 className="text-display-mobile md:text-display">{t("landing.heroTitle2")}</h1>
                 <p className="text-lead text-muted-foreground">
                   <span className="md:hidden">{t("landing.heroTextShort")}</span>
                   <span className="hidden md:inline">{t("landing.heroText")}</span>
@@ -62,9 +68,26 @@ function LandingPage() {
                     </Button>
                   ) : (
                     <>
-                      <Button asChild>
-                        <Link to={ROUTES.signup}>{t("landing.createAccount")}</Link>
-                      </Button>
+                      <div
+                        className="relative"
+                        onPointerEnter={() => setIsGreeting(true)}
+                        onPointerLeave={() => setIsGreeting(false)}
+                        onFocus={() => setIsGreeting(true)}
+                        onBlur={() => setIsGreeting(false)}
+                      >
+                        <Button
+                          asChild
+                          className="w-full"
+                        >
+                          <Link to={ROUTES.signup}>{t("landing.createAccount")}</Link>
+                        </Button>
+                        {/* Where the mascot sits: on the corner of the button, like a sticker. */}
+                        <span
+                          ref={mascotAnchorRef}
+                          aria-hidden
+                          className="absolute -top-5 right-2 size-12 md:-right-5"
+                        />
+                      </div>
                       <Button
                         asChild
                         variant="outline"
@@ -75,6 +98,10 @@ function LandingPage() {
                   )}
                 </div>
               </div>
+
+              {/* Decorative: the core idea in six scenes, with its own captions. Below the text on
+                a phone and a narrow window; beside it, scaled down, on a wide one. */}
+              <CoreIdeaAnimation className="xl:min-w-0 xl:flex-1" />
             </section>
 
             <section className="flex flex-col gap-4.5 border-t border-border pt-6 md:gap-7 md:pt-12">

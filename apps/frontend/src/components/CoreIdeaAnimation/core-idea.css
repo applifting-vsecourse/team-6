@@ -1,0 +1,2526 @@
+/*
+ * "Core idea" landing animation, in two sizes: `.ci-m` is the phone stage (360x640), `.ci-d` the
+ * desktop stage (960x620, a list of steps beside a card). Every class carries a `ci-` prefix
+ * because `.ring` and friends are Tailwind utilities. Colours come from the tokens in global.css,
+ * except the café, the cup and the logo circles, which are illustration colours with no token
+ * (the same exception as SVGs with baked-in colours in DESIGN.md).
+ */
+
+.ci {
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --table: #d8b48f;
+  --table-edge: #b8916b;
+  --awning-a: #e0826f;
+  --awning-b: #f7efe4;
+  font-family: var(--font-sans);
+  color: var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+.dark .ci {
+  --table: #6b4f3a;
+  --table-edge: #4d3828;
+  --awning-a: #a9503f;
+  --awning-b: #3a3027;
+}
+.ci-stage {
+  margin-inline: auto;
+}
+@keyframes ci-tap {
+  from {
+    opacity: 0.9;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+@keyframes ci-speak {
+  0%,
+  100% {
+    border-color: var(--border);
+  }
+  40%,
+  60% {
+    border-color: var(--highlight);
+  }
+}
+.ci-m .ci-stage {
+  position: relative;
+  width: 360px;
+  height: 640px;
+  overflow: hidden;
+  zoom: var(--fit, 1);
+}
+.ci-m .ci-snap,
+.ci-m .ci-snap * {
+  transition: none !important;
+}
+.ci-m .ci-caps {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 40px;
+  height: 120px;
+}
+.ci-m .ci-cap {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.3s,
+    transform 0.4s var(--spring);
+}
+.ci-m .ci-n1 .ci-cap1,
+.ci-m .ci-n2 .ci-cap2,
+.ci-m .ci-n3 .ci-cap3,
+.ci-m .ci-n4 .ci-cap4 {
+  opacity: 1;
+  transform: none;
+}
+.ci-m .ci-cap .ci-num {
+  font: 500 11px/1.4 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.ci-m .ci-cap h3 {
+  font-size: 21px;
+  line-height: 1.33;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--foreground);
+  margin-top: 6px;
+}
+.ci-m .ci-cap p {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+  margin-top: 4px;
+}
+.ci-m .ci-dots {
+  position: absolute;
+  left: 0;
+  top: 168px;
+  display: flex;
+  gap: 6px;
+}
+.ci-m .ci-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--input);
+  transition:
+    width 0.3s,
+    background 0.3s;
+}
+.ci-m .ci-n1 .ci-d1,
+.ci-m .ci-n2 .ci-d2,
+.ci-m .ci-n3 .ci-d3,
+.ci-m .ci-n4 .ci-d4 {
+  width: 18px;
+  background: var(--highlight);
+}
+.ci-m .ci-ring {
+  position: absolute;
+  left: 30px;
+  top: 190px;
+  width: 300px;
+  height: 300px;
+  transition: opacity 0.5s ease-in-out;
+}
+.ci-m .ci-fade .ci-ring,
+.ci-m .ci-fade .ci-tray {
+  opacity: 0;
+}
+.ci-m .ci-guide {
+  position: absolute;
+  left: 44px;
+  top: 44px;
+  width: 212px;
+  height: 212px;
+  border: 1px solid var(--input);
+  border-radius: 50%;
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring);
+}
+.ci-m .ci-full .ci-guide {
+  border-color: var(--highlight);
+  transform: scale(1.06);
+}
+.ci-m .ci-started .ci-guide {
+  border-color: var(--border);
+  transform: none;
+}
+.ci-m .ci-seat {
+  position: absolute;
+  width: 84px;
+  height: 84px;
+}
+.ci-m .ci-s0 {
+  left: 108px;
+  top: 2px;
+}
+.ci-m .ci-s1 {
+  left: 209px;
+  top: 75px;
+}
+.ci-m .ci-s2 {
+  left: 170px;
+  top: 194px;
+}
+.ci-m .ci-s3 {
+  left: 46px;
+  top: 194px;
+}
+.ci-m .ci-s4 {
+  left: 7px;
+  top: 75px;
+}
+.ci-m .ci-free {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px dashed var(--input);
+  transition: opacity 0.3s;
+}
+.ci-m .ci-faces {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.4);
+  transition:
+    transform 0.2s ease-in,
+    opacity 0.2s,
+    visibility 0s 0.2s;
+}
+.ci-m .ci-on .ci-free {
+  opacity: 0;
+}
+.ci-m .ci-on .ci-faces {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    transform 0.6s var(--spring),
+    opacity 0.3s,
+    visibility 0s;
+}
+.ci-m .ci-faces > span {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.7s ease-in-out;
+}
+.ci-m .ci-faces .ci-c {
+  opacity: 0;
+}
+.ci-m .ci-s0 .ci-faces .ci-c,
+.ci-m .ci-started .ci-faces .ci-c {
+  opacity: 1;
+}
+.ci-m .ci-started .ci-faces .ci-g {
+  opacity: 0;
+}
+.ci-m .ci-lab {
+  position: absolute;
+  top: 87px;
+  left: -13px;
+  width: 110px;
+  text-align: center;
+  display: grid;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--foreground);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.ci-m .ci-on .ci-lab {
+  opacity: 1;
+  transition-delay: 0.25s;
+}
+.ci-m .ci-lab > span {
+  grid-area: 1 / 1;
+  justify-self: center;
+  padding: 0 4px;
+  background: var(--background);
+  transition: opacity 0.4s;
+}
+.ci-m .ci-lab .ci-role {
+  color: var(--muted-foreground);
+}
+.ci-m .ci-lab .ci-name {
+  opacity: 0;
+}
+.ci-m .ci-started .ci-lab .ci-role {
+  opacity: 0;
+}
+.ci-m .ci-started .ci-lab .ci-name {
+  opacity: 1;
+}
+.ci-m .ci-s0 .ci-lab .ci-name {
+  display: none;
+}
+.ci-m .ci-s0 .ci-lab .ci-role {
+  color: var(--foreground);
+}
+.ci-m .ci-s0 .ci-lab .ci-role,
+.ci-m .ci-started .ci-s0 .ci-lab .ci-role {
+  opacity: 1;
+}
+.ci-m .ci-center {
+  position: absolute;
+  left: 90px;
+  top: 110px;
+  width: 120px;
+  height: 80px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.ci-m .ci-count {
+  font: 500 20px/1 var(--font-mono);
+  color: var(--foreground);
+  transition: opacity 0.4s;
+}
+.ci-m .ci-started .ci-count {
+  opacity: 0;
+}
+.ci-m .ci-title {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  font-size: 15px;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.5s 0.4s,
+    transform 0.5s 0.4s var(--spring);
+}
+.ci-m .ci-title span {
+  display: block;
+}
+.ci-m .ci-started .ci-title {
+  opacity: 1;
+  transform: none;
+}
+.ci-m .ci-tray {
+  position: absolute;
+  left: 0;
+  top: 496px;
+  width: 360px;
+  height: 120px;
+  transition: opacity 0.5s ease-in-out;
+}
+.ci-m .ci-tray > div {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s,
+    visibility 0s 0.3s;
+}
+.ci-m .ci-tray-feed .ci-t-feed,
+.ci-m .ci-tray-chat .ci-t-chat {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s,
+    transform 0.5s var(--spring),
+    visibility 0s;
+}
+.ci-m .ci-t-feed {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  padding-top: 0;
+}
+.ci-m .ci-feed-title {
+  font-size: 17px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-top: 8px;
+}
+.ci-m .ci-feed-meta {
+  font: 500 11px/1.4 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  margin-top: 2px;
+}
+.ci-m .ci-join {
+  position: relative;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 15px;
+  font-weight: 600;
+  transition: transform 0.15s;
+  margin-top: 8px;
+}
+.ci-m .ci-clicking .ci-join {
+  transform: scale(0.95);
+}
+.ci-m .ci-tap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border-radius: 50%;
+  border: 2px solid var(--highlight);
+  opacity: 0;
+  pointer-events: none;
+}
+.ci-m .ci-clicking .ci-tap {
+  animation: ci-tap 0.5s ease-out;
+}
+.ci-m .ci-t-chat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+.ci-m .ci-sys {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted-foreground);
+}
+.ci-m .ci-msg {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.4s,
+    transform 0.5s var(--spring);
+}
+.ci-m .ci-chat-msg .ci-msg1,
+.ci-m .ci-chat-msg2 .ci-msg2 {
+  opacity: 1;
+  transform: none;
+}
+.ci-m .ci-msg .ci-face {
+  width: 28px;
+  height: 28px;
+  flex: none;
+}
+.ci-m .ci-bubble {
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.ci-m .ci-seat {
+  transition:
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out;
+}
+.ci-m .ci-guide {
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring),
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out,
+    width 0.9s ease-in-out,
+    height 0.9s ease-in-out,
+    background 0.6s;
+}
+.ci-m .ci-faces .ci-h {
+  opacity: 0;
+}
+.ci-m .ci-meet .ci-faces .ci-h {
+  opacity: 1;
+}
+.ci-m .ci-meet .ci-faces .ci-c {
+  opacity: 0;
+}
+.ci-m .ci-meet .ci-lab {
+  opacity: 0;
+}
+.ci-m .ci-meet .ci-title {
+  opacity: 0;
+  transition-delay: 0s;
+}
+.ci-m .ci-t-meet,
+.ci-m .ci-t-call,
+.ci-m .ci-t-alone,
+.ci-m .ci-t-slogan {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+.ci-m .ci-tray-meet .ci-t-meet {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s 0.5s,
+    transform 0.5s 0.5s var(--spring),
+    visibility 0s;
+}
+.ci-m .ci-msg2 {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+.ci-m .ci-msg2 .ci-bubble {
+  background: var(--highlight-soft);
+}
+.ci-m .ci-n5 .ci-cap5 {
+  opacity: 1;
+  transform: none;
+}
+.ci-m .ci-n5 .ci-d5 {
+  width: 18px;
+  background: var(--highlight);
+}
+.ci-m .ci-meet .ci-s0 {
+  left: 108px;
+  top: 34px;
+}
+.ci-m .ci-meet .ci-s1 {
+  left: 178.4px;
+  top: 85.1px;
+}
+.ci-m .ci-meet .ci-s2 {
+  left: 151.5px;
+  top: 167.9px;
+}
+.ci-m .ci-meet .ci-s3 {
+  left: 64.5px;
+  top: 167.9px;
+}
+.ci-m .ci-meet .ci-s4 {
+  left: 37.6px;
+  top: 85.1px;
+}
+.ci-m .ci-meet .ci-guide {
+  left: 76px;
+  top: 76px;
+  width: 148px;
+  height: 148px;
+  background: var(--card);
+  border-color: var(--border);
+  transform: none;
+}
+.ci-m .ci-guide {
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring),
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out,
+    width 0.9s ease-in-out,
+    height 0.9s ease-in-out,
+    background 0.6s,
+    border-width 0.6s;
+}
+.ci-m .ci-meet .ci-faces {
+  transform: scale(0.85);
+}
+.ci-m .ci-meet .ci-s0 {
+  left: 108px;
+  top: 24px;
+}
+.ci-m .ci-meet .ci-s1 {
+  left: 187.9px;
+  top: 82px;
+}
+.ci-m .ci-meet .ci-s2 {
+  left: 157.4px;
+  top: 176px;
+}
+.ci-m .ci-meet .ci-s3 {
+  left: 58.6px;
+  top: 176px;
+}
+.ci-m .ci-meet .ci-s4 {
+  left: 28.1px;
+  top: 82px;
+}
+.ci-m .ci-meet .ci-guide {
+  left: 56px;
+  top: 56px;
+  width: 188px;
+  height: 188px;
+  background: var(--table);
+  border: 3px solid var(--table-edge);
+}
+.ci-m .ci-cup {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.ci-m .ci-cup::before {
+  content: "";
+  position: absolute;
+  inset: 3.5px;
+  border-radius: 50%;
+  background: #6b4a35;
+}
+.ci-m .ci-cup::after {
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: 6px;
+  width: 7px;
+  height: 5px;
+  border-radius: 3px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+.ci-m .ci-meet .ci-cup {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.4s,
+    transform 0.5s var(--spring);
+}
+.ci-m .ci-meet .ci-cp0 {
+  transition-delay: 1s;
+}
+.ci-m .ci-meet .ci-cp1 {
+  transition-delay: 1.1s;
+}
+.ci-m .ci-meet .ci-cp2 {
+  transition-delay: 1.2s;
+}
+.ci-m .ci-meet .ci-cp3 {
+  transition-delay: 1.3s;
+}
+.ci-m .ci-meet .ci-cp4 {
+  transition-delay: 1.4s;
+}
+.ci-m .ci-cp0 {
+  left: 141px;
+  top: 93px;
+}
+.ci-m .ci-cp1 {
+  left: 186.6px;
+  top: 126.2px;
+}
+.ci-m .ci-cp2 {
+  left: 169.2px;
+  top: 179.8px;
+}
+.ci-m .ci-cp3 {
+  left: 112.8px;
+  top: 179.8px;
+}
+.ci-m .ci-cp4 {
+  left: 95.4px;
+  top: 126.2px;
+}
+.ci-m .ci-awning {
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  top: -8px;
+  border-radius: 8px 8px 0 0;
+  height: 26px;
+  background: repeating-linear-gradient(90deg, var(--awning-a) 0 24px, var(--awning-b) 24px 48px);
+  transform: translateY(-140%);
+  opacity: 0;
+  transition:
+    transform 0.6s var(--spring),
+    opacity 0.3s;
+  z-index: 2;
+}
+.ci-m .ci-awning::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 12px;
+  background:
+    radial-gradient(circle at 12px 0, var(--awning-a) 11.5px, transparent 12px) 0 0 / 48px 12px
+      repeat-x,
+    radial-gradient(circle at 36px 0, var(--awning-b) 11.5px, transparent 12px) 0 0 / 48px 12px
+      repeat-x;
+}
+.ci-m .ci-meet .ci-awning {
+  transform: none;
+  opacity: 1;
+  transition-delay: 0.15s;
+}
+.ci-m .ci-t-meet .ci-feed-title,
+.ci-m .ci-t-call .ci-feed-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ci-m .ci-pin {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  fill: none;
+  stroke: var(--highlight);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.ci-m .ci-guide {
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring),
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out,
+    width 0.9s ease-in-out,
+    height 0.9s ease-in-out,
+    background 0.6s,
+    border-width 0.6s,
+    opacity 0.4s;
+}
+.ci-m .ci-tile {
+  position: absolute;
+  width: 94px;
+  height: 112px;
+  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity 0.3s,
+    transform 0.3s,
+    border-color 0.4s;
+}
+.ci-m .ci-call .ci-tile {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.4s,
+    transform 0.5s var(--spring),
+    border-color 0.4s;
+}
+.ci-m .ci-call .ci-tl1 {
+  transition-delay: 0.3s;
+}
+.ci-m .ci-call .ci-tl2 {
+  transition-delay: 0.4s;
+}
+.ci-m .ci-call .ci-tl3 {
+  transition-delay: 0.5s;
+}
+.ci-m .ci-call .ci-tl4 {
+  transition-delay: 0.6s;
+}
+.ci-m .ci-call .ci-tl0 {
+  transition-delay: 0.7s;
+}
+.ci-m .ci-tl1 {
+  left: 0;
+  top: 8px;
+}
+.ci-m .ci-tl2 {
+  left: 102px;
+  top: 8px;
+}
+.ci-m .ci-tl3 {
+  left: 204px;
+  top: 8px;
+}
+.ci-m .ci-tl4 {
+  left: 52px;
+  top: 128px;
+}
+.ci-m .ci-tl0 {
+  left: 154px;
+  top: 128px;
+}
+.ci-m .ci-call .ci-tl2 {
+  animation: ci-speak 2.4s ease-in-out 1.2s infinite;
+}
+.ci-m .ci-call .ci-guide {
+  opacity: 0;
+}
+.ci-m .ci-call .ci-cup.ci-cup {
+  opacity: 0;
+  transform: scale(0.4);
+  transition-delay: 0s;
+}
+.ci-m .ci-call .ci-awning {
+  transform: translateY(-140%);
+  opacity: 0;
+  transition-delay: 0s;
+}
+.ci-m .ci-call .ci-faces {
+  transform: none;
+}
+.ci-m .ci-call .ci-s1 {
+  left: 5px;
+  top: 14px;
+}
+.ci-m .ci-call .ci-s2 {
+  left: 107px;
+  top: 14px;
+}
+.ci-m .ci-call .ci-s3 {
+  left: 209px;
+  top: 14px;
+}
+.ci-m .ci-call .ci-s4 {
+  left: 57px;
+  top: 134px;
+}
+.ci-m .ci-call .ci-s0 {
+  left: 159px;
+  top: 134px;
+}
+.ci-m .ci-call .ci-lab {
+  opacity: 1;
+}
+.ci-m .ci-call .ci-lab > span {
+  background: transparent;
+}
+.ci-m .ci-callbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 252px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.ci-m .ci-call .ci-callbar {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.4s 0.9s,
+    transform 0.5s 0.9s var(--spring);
+}
+.ci-m .ci-cb {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+.ci-m .ci-cb svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--foreground);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ci-m .ci-cb.ci-end {
+  background: var(--destructive);
+  border-color: var(--destructive);
+}
+.ci-m .ci-cb.ci-end svg {
+  stroke: var(--destructive-foreground);
+  transform: rotate(135deg);
+}
+.ci-m .ci-tray-call .ci-t-call {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s 0.5s,
+    transform 0.5s 0.5s var(--spring),
+    visibility 0s;
+}
+.ci-m .ci-lonely .ci-s0 .ci-faces .ci-c {
+  opacity: 0;
+}
+.ci-m .ci-lonely .ci-count {
+  opacity: 0;
+}
+.ci-m .ci-thought {
+  position: absolute;
+  left: 212px;
+  top: 26px;
+  width: 100px;
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  line-height: 1.4;
+  opacity: 0;
+  transform: scale(0.8);
+  transform-origin: 0 100%;
+  transition:
+    opacity 0.3s,
+    transform 0.5s var(--spring);
+}
+.ci-m .ci-thought::before,
+.ci-m .ci-thought::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+.ci-m .ci-thought::before {
+  width: 9px;
+  height: 9px;
+  left: -12px;
+  bottom: 8px;
+}
+.ci-m .ci-thought::after {
+  width: 5px;
+  height: 5px;
+  left: -20px;
+  bottom: 0;
+}
+.ci-m .ci-think .ci-thought {
+  opacity: 1;
+  transform: none;
+}
+.ci-m .ci-tray-alone .ci-t-alone {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s 0.3s,
+    transform 0.5s 0.3s var(--spring),
+    visibility 0s;
+}
+.ci-m .ci-n0 .ci-cap0 {
+  opacity: 1;
+  transform: none;
+}
+.ci-m .ci-n0 .ci-d0 {
+  width: 18px;
+  background: var(--highlight);
+}
+.ci-m .ci-solo {
+  position: absolute;
+  left: 90px;
+  top: 90px;
+  width: 120px;
+  height: 120px;
+  transition:
+    left 0.6s ease-in-out,
+    top 0.6s ease-in-out,
+    width 0.6s ease-in-out,
+    height 0.6s ease-in-out;
+}
+.ci-m .ci-solo > span {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.35s;
+}
+.ci-m .ci-solo .ci-c {
+  opacity: 0;
+}
+.ci-m .ci-go .ci-solo {
+  transition-duration: 0.35s;
+  left: 108px;
+  top: 2px;
+  width: 84px;
+  height: 84px;
+}
+.ci-m .ci-go .ci-solo .ci-u {
+  opacity: 0;
+}
+.ci-m .ci-go .ci-solo .ci-c {
+  opacity: 1;
+}
+.ci-m .ci-landed .ci-solo {
+  opacity: 0;
+  visibility: hidden;
+}
+.ci-m .ci-seat.ci-arrive .ci-faces {
+  transition: none !important;
+}
+.ci-m .ci-lonely .ci-free,
+.ci-m .ci-lonely .ci-guide {
+  opacity: 0;
+}
+.ci-m .ci-waiting .ci-count {
+  opacity: 0;
+}
+.ci-m .ci-t-slogan .ci-accent {
+  color: var(--highlight);
+}
+.ci-m .ci-tray-slogan .ci-t-slogan {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s 0.3s,
+    transform 0.5s 0.3s var(--spring),
+    visibility 0s;
+}
+.ci-m .ci-form {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  visibility: hidden;
+  transition: visibility 0s 0.3s;
+  left: 0;
+  top: 246px;
+  width: 360px;
+}
+.ci-m .ci-onb .ci-form {
+  visibility: visible;
+  transition: visibility 0s;
+}
+.ci-m .ci-fcard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.ci-m .ci-onb .ci-fcard {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.4s 0.3s,
+    transform 0.5s 0.3s var(--spring);
+}
+.ci-m .ci-onb .ci-fc2 {
+  transition-delay: 0.45s, 0.45s;
+}
+.ci-m .ci-onb .ci-fc3 {
+  transition-delay: 0.6s, 0.6s;
+}
+.ci-m .ci-fcard h4 {
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.ci-m .ci-frow {
+  display: flex;
+  gap: 6px;
+  height: 26px;
+}
+.ci-m .ci-fchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px;
+  max-width: 160px;
+  overflow: hidden;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-size: 12px;
+  color: var(--foreground);
+  white-space: nowrap;
+  transition:
+    max-width 0.4s ease-in-out,
+    padding 0.4s,
+    margin 0.4s,
+    opacity 0.3s,
+    border-width 0.4s,
+    transform 0.5s var(--spring);
+}
+.ci-m .ci-fchip.ci-s::before {
+  content: "+";
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+.ci-m .ci-fchip.ci-on {
+  border-color: var(--highlight);
+  background: var(--highlight-soft);
+  color: var(--highlight);
+  max-width: 0;
+  padding: 0;
+  border-width: 0;
+  opacity: 0;
+  transform: scale(0.8);
+}
+.ci-m .ci-fchip.ci-on::after {
+  content: "\00d7";
+  font-weight: 600;
+}
+.ci-m .ci-pick1 .ci-p1,
+.ci-m .ci-pick2 .ci-p2,
+.ci-m .ci-pick3 .ci-p3 {
+  max-width: 160px;
+  padding: 0 10px;
+  border-width: 1px;
+  opacity: 1;
+  transform: none;
+}
+.ci-m .ci-pick1 .ci-p1s,
+.ci-m .ci-pick2 .ci-p2s,
+.ci-m .ci-pick3 .ci-p3s {
+  max-width: 0;
+  padding: 0;
+  margin-left: -6px;
+  border-width: 0;
+  opacity: 0;
+}
+.ci-m .ci-onb .ci-solo {
+  left: 254px;
+  top: -10px;
+  width: 52px;
+  height: 52px;
+}
+.ci-m .ci-onb .ci-free,
+.ci-m .ci-onb .ci-guide {
+  opacity: 0;
+}
+.ci-m .ci-filled .ci-solo .ci-u {
+  opacity: 0;
+}
+.ci-m .ci-filled .ci-solo .ci-c {
+  opacity: 1;
+}
+.ci-m .ci-tray > .ci-where {
+  inset: 10px 0 auto 0;
+  height: 26px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  transform: none;
+}
+.ci-m .ci-tray-meet .ci-where,
+.ci-m .ci-tray-call .ci-where {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.4s 0.5s,
+    visibility 0s;
+}
+.ci-m .ci-wchip {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-size: 12px;
+  color: var(--foreground);
+  white-space: nowrap;
+  transition:
+    background 0.4s,
+    border-color 0.4s,
+    color 0.4s;
+}
+.ci-m .ci-meet:not(.ci-call) .ci-wcafe,
+.ci-m .ci-call .ci-wcall {
+  border-color: var(--highlight);
+  background: var(--highlight-soft);
+  color: var(--highlight);
+}
+.ci-m .ci-t-meet,
+.ci-m .ci-t-call {
+  padding-top: 40px;
+}
+.ci-m .ci-melt {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.5);
+  transition:
+    opacity 0.3s,
+    transform 0.3s,
+    visibility 0s 0.3s;
+}
+.ci-m .ci-s0 .ci-melt {
+  background: #ffcd44;
+}
+.ci-m .ci-s1 .ci-melt {
+  background: #b2d4ff;
+}
+.ci-m .ci-s2 .ci-melt {
+  background: #e5d090;
+}
+.ci-m .ci-s3 .ci-melt {
+  background: #ffc3be;
+}
+.ci-m .ci-s4 .ci-melt {
+  background: #9ae3c4;
+}
+.ci-m .ci-logo .ci-s0 {
+  left: 108px;
+  top: 69.1px;
+}
+.ci-m .ci-logo .ci-s1 {
+  left: 145px;
+  top: 96px;
+}
+.ci-m .ci-logo .ci-s2 {
+  left: 130.8px;
+  top: 139.4px;
+}
+.ci-m .ci-logo .ci-s3 {
+  left: 85.2px;
+  top: 139.4px;
+}
+.ci-m .ci-logo .ci-s4 {
+  left: 71px;
+  top: 96px;
+}
+.ci-m .ci-logo .ci-faces {
+  opacity: 0;
+  transform: scale(0.8);
+}
+.ci-m .ci-logo .ci-melt {
+  opacity: 0.92;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.6s 0.25s,
+    transform 0.7s 0.25s var(--spring),
+    visibility 0s;
+}
+.ci-m .ci-logo .ci-lab,
+.ci-m .ci-logo .ci-tile {
+  opacity: 0;
+  transition-delay: 0s;
+}
+.ci-m .ci-logo .ci-callbar {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.ci-m .ci-logo .ci-tray {
+  opacity: 0;
+}
+.ci-m .ci-wordmark {
+  position: absolute;
+  left: 0px;
+  width: 300px;
+  top: 236px;
+  text-align: center;
+  font: 600 32px/1.35 var(--font-brand);
+  letter-spacing: -0.03em;
+  font-variation-settings: "opsz" 14;
+  color: var(--foreground);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s,
+    visibility 0s 0.3s;
+}
+.ci-m .ci-logo .ci-wordmark {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.6s 0.9s,
+    transform 0.7s 0.9s var(--spring),
+    visibility 0s 0.9s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ci-m .ci-m .ci-clicking .ci-tap {
+    animation: none;
+  }
+  .ci-m * {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}
+.ci-d {
+  overflow: hidden;
+}
+.ci-d .ci-stage {
+  margin-inline: -56px 0;
+  position: relative;
+  width: 1120px;
+  height: 620px;
+  overflow: hidden;
+  zoom: var(--fit, 1);
+}
+.ci-d .ci-snap,
+.ci-d .ci-snap * {
+  transition: none !important;
+}
+.ci-d .ci-steps {
+  position: absolute;
+  left: 56px;
+  top: 56px;
+  width: 570px;
+}
+.ci-d .ci-eyebrow {
+  font: 500 11px/1.4 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  margin-bottom: 20px;
+}
+.ci-d .ci-step {
+  display: flex;
+  gap: 16px;
+  padding-bottom: 18px;
+  opacity: 0.4;
+  transition: opacity 0.4s ease-in-out;
+}
+.ci-d .ci-step .ci-dot {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--secondary);
+  color: var(--foreground);
+  font: 500 15px/1 var(--font-mono);
+  transition:
+    background 0.4s,
+    color 0.4s;
+}
+.ci-d .ci-step h3 {
+  font-size: 17px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-top: 2px;
+}
+.ci-d .ci-step p {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+  margin-top: 2px;
+}
+.ci-d .ci-n1 .ci-step1,
+.ci-d .ci-n2 .ci-step2,
+.ci-d .ci-n3 .ci-step3,
+.ci-d .ci-n4 .ci-step4 {
+  opacity: 1;
+}
+.ci-d .ci-n1 .ci-step1 .ci-dot,
+.ci-d .ci-n2 .ci-step2 .ci-dot,
+.ci-d .ci-n3 .ci-step3 .ci-dot,
+.ci-d .ci-n4 .ci-step4 .ci-dot {
+  background: var(--highlight);
+  color: var(--card);
+}
+.ci-d .ci-card {
+  position: absolute;
+  left: 660px;
+  top: 56px;
+  width: 404px;
+  height: 508px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: opacity 0.5s ease-in-out;
+}
+.ci-d .ci-fade .ci-card {
+  opacity: 0;
+}
+.ci-d .ci-guide {
+  position: absolute;
+  left: 76px;
+  top: 64px;
+  width: 252px;
+  height: 252px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring);
+}
+.ci-d .ci-full .ci-guide {
+  border-color: var(--highlight);
+  transform: scale(1.06);
+}
+.ci-d .ci-started .ci-guide {
+  border-color: var(--border);
+  transform: none;
+}
+.ci-d .ci-seat {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+}
+.ci-d .ci-s0 {
+  left: 154px;
+  top: 16px;
+}
+.ci-d .ci-s1 {
+  left: 274px;
+  top: 103px;
+}
+.ci-d .ci-s2 {
+  left: 228px;
+  top: 244px;
+}
+.ci-d .ci-s3 {
+  left: 80px;
+  top: 244px;
+}
+.ci-d .ci-s4 {
+  left: 34px;
+  top: 103px;
+}
+.ci-d .ci-free {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px dashed var(--input);
+  transition: opacity 0.3s;
+}
+.ci-d .ci-faces {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.4);
+  transition:
+    transform 0.2s ease-in,
+    opacity 0.2s,
+    visibility 0s 0.2s;
+}
+.ci-d .ci-on .ci-free {
+  opacity: 0;
+}
+.ci-d .ci-on .ci-faces {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    transform 0.6s var(--spring),
+    opacity 0.3s,
+    visibility 0s;
+}
+.ci-d .ci-faces > span {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.7s ease-in-out;
+}
+.ci-d .ci-faces .ci-c {
+  opacity: 0;
+}
+.ci-d .ci-s0 .ci-faces .ci-c,
+.ci-d .ci-started .ci-faces .ci-c {
+  opacity: 1;
+}
+.ci-d .ci-started .ci-faces .ci-g {
+  opacity: 0;
+}
+.ci-d .ci-lab {
+  position: absolute;
+  top: 100px;
+  left: -8px;
+  width: 112px;
+  text-align: center;
+  display: grid;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--foreground);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.ci-d .ci-on .ci-lab {
+  opacity: 1;
+  transition-delay: 0.25s;
+}
+.ci-d .ci-lab > span {
+  grid-area: 1 / 1;
+  justify-self: center;
+  padding: 0 4px;
+  background: var(--card);
+  transition: opacity 0.4s;
+}
+.ci-d .ci-lab .ci-role {
+  color: var(--muted-foreground);
+}
+.ci-d .ci-lab .ci-name {
+  opacity: 0;
+}
+.ci-d .ci-s0 .ci-lab .ci-role {
+  color: var(--foreground);
+}
+.ci-d .ci-started .ci-lab .ci-role {
+  opacity: 0;
+}
+.ci-d .ci-started .ci-lab .ci-name {
+  opacity: 1;
+}
+.ci-d .ci-s0 .ci-lab .ci-name {
+  display: none;
+}
+.ci-d .ci-s0 .ci-lab .ci-role {
+  opacity: 1;
+}
+.ci-d .ci-center {
+  position: absolute;
+  left: 127px;
+  top: 140px;
+  width: 150px;
+  height: 100px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.ci-d .ci-count {
+  font: 500 22px/1 var(--font-mono);
+  color: var(--foreground);
+  transition: opacity 0.4s;
+}
+.ci-d .ci-started .ci-count {
+  opacity: 0;
+}
+.ci-d .ci-title {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  font-size: 17px;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.5s 0.4s,
+    transform 0.5s 0.4s var(--spring);
+}
+.ci-d .ci-title span {
+  display: block;
+}
+.ci-d .ci-started .ci-title {
+  opacity: 1;
+  transform: none;
+}
+.ci-d .ci-tray {
+  position: absolute;
+  left: 24px;
+  top: 386px;
+  width: 356px;
+  height: 100px;
+  transition: opacity 0.5s ease-in-out;
+}
+.ci-d .ci-fade .ci-tray {
+  opacity: 0;
+}
+.ci-d .ci-tray > div {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s,
+    visibility 0s 0.3s;
+}
+.ci-d .ci-tray-feed .ci-t-feed,
+.ci-d .ci-tray-chat .ci-t-chat {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s,
+    transform 0.5s var(--spring),
+    visibility 0s;
+}
+.ci-d .ci-t-feed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+}
+.ci-d .ci-feed-title {
+  font-size: 17px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.ci-d .ci-feed-meta {
+  font: 500 11px/1.4 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  margin-top: 2px;
+}
+.ci-d .ci-join {
+  position: relative;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 15px;
+  font-weight: 600;
+  transition: transform 0.15s;
+}
+.ci-d .ci-clicking .ci-join {
+  transform: scale(0.95);
+}
+.ci-d .ci-tap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border-radius: 50%;
+  border: 2px solid var(--highlight);
+  opacity: 0;
+  pointer-events: none;
+}
+.ci-d .ci-clicking .ci-tap {
+  animation: ci-tap 0.5s ease-out;
+}
+.ci-d .ci-t-chat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+.ci-d .ci-sys {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted-foreground);
+}
+.ci-d .ci-msg {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.4s,
+    transform 0.5s var(--spring);
+}
+.ci-d .ci-chat-msg .ci-msg1,
+.ci-d .ci-chat-msg2 .ci-msg2 {
+  opacity: 1;
+  transform: none;
+}
+.ci-d .ci-msg .ci-face {
+  width: 24px;
+  height: 24px;
+  flex: none;
+}
+.ci-d .ci-bubble {
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: var(--secondary);
+  color: var(--foreground);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.ci-d .ci-cursor {
+  position: absolute;
+  left: 1070px;
+  top: 570px;
+  width: 22px;
+  height: 22px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 5;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+}
+.ci-d .ci-cursor-go .ci-cursor {
+  left: 996px;
+  top: 492px;
+  opacity: 1;
+  transition:
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out,
+    opacity 0.3s;
+}
+.ci-d .ci-clicking .ci-cursor {
+  transform: scale(0.88);
+}
+.ci-d .ci-cursor-done .ci-cursor {
+  opacity: 0;
+}
+.ci-d .ci-seat {
+  transition:
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out;
+}
+.ci-d .ci-guide {
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring),
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out,
+    width 0.9s ease-in-out,
+    height 0.9s ease-in-out,
+    background 0.6s;
+}
+.ci-d .ci-faces .ci-h {
+  opacity: 0;
+}
+.ci-d .ci-meet .ci-faces .ci-h {
+  opacity: 1;
+}
+.ci-d .ci-meet .ci-faces .ci-c {
+  opacity: 0;
+}
+.ci-d .ci-meet .ci-lab {
+  opacity: 0;
+}
+.ci-d .ci-meet .ci-title {
+  opacity: 0;
+  transition-delay: 0s;
+}
+.ci-d .ci-t-meet,
+.ci-d .ci-t-call,
+.ci-d .ci-t-alone,
+.ci-d .ci-t-slogan {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+.ci-d .ci-tray-meet .ci-t-meet {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s 0.5s,
+    transform 0.5s 0.5s var(--spring),
+    visibility 0s;
+}
+.ci-d .ci-msg2 {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+.ci-d .ci-msg2 .ci-bubble {
+  background: var(--highlight-soft);
+}
+.ci-d .ci-n5 .ci-step5 {
+  opacity: 1;
+}
+.ci-d .ci-n5 .ci-step5 .ci-dot {
+  background: var(--highlight);
+  color: var(--card);
+}
+.ci-d .ci-meet .ci-s0 {
+  left: 154px;
+  top: 54px;
+}
+.ci-d .ci-meet .ci-s1 {
+  left: 237.7px;
+  top: 114.8px;
+}
+.ci-d .ci-meet .ci-s2 {
+  left: 205.7px;
+  top: 213.2px;
+}
+.ci-d .ci-meet .ci-s3 {
+  left: 102.3px;
+  top: 213.2px;
+}
+.ci-d .ci-meet .ci-s4 {
+  left: 70.3px;
+  top: 114.8px;
+}
+.ci-d .ci-meet .ci-guide {
+  left: 114px;
+  top: 102px;
+  width: 176px;
+  height: 176px;
+  background: var(--secondary);
+  border-color: var(--border);
+  transform: none;
+}
+.ci-d .ci-guide {
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring),
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out,
+    width 0.9s ease-in-out,
+    height 0.9s ease-in-out,
+    background 0.6s,
+    border-width 0.6s;
+}
+.ci-d .ci-meet .ci-faces {
+  transform: scale(0.85);
+}
+.ci-d .ci-meet .ci-s0 {
+  left: 154px;
+  top: 38px;
+}
+.ci-d .ci-meet .ci-s1 {
+  left: 252.9px;
+  top: 109.9px;
+}
+.ci-d .ci-meet .ci-s2 {
+  left: 215.1px;
+  top: 226.1px;
+}
+.ci-d .ci-meet .ci-s3 {
+  left: 92.9px;
+  top: 226.1px;
+}
+.ci-d .ci-meet .ci-s4 {
+  left: 55.1px;
+  top: 109.9px;
+}
+.ci-d .ci-meet .ci-guide {
+  left: 90px;
+  top: 78px;
+  width: 224px;
+  height: 224px;
+  background: var(--table);
+  border: 3px solid var(--table-edge);
+}
+.ci-d .ci-cup {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.ci-d .ci-cup::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: #6b4a35;
+}
+.ci-d .ci-cup::after {
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: 8px;
+  width: 7px;
+  height: 5px;
+  border-radius: 3px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+.ci-d .ci-meet .ci-cup {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.4s,
+    transform 0.5s var(--spring);
+}
+.ci-d .ci-meet .ci-cp0 {
+  transition-delay: 1s;
+}
+.ci-d .ci-meet .ci-cp1 {
+  transition-delay: 1.1s;
+}
+.ci-d .ci-meet .ci-cp2 {
+  transition-delay: 1.2s;
+}
+.ci-d .ci-meet .ci-cp3 {
+  transition-delay: 1.3s;
+}
+.ci-d .ci-meet .ci-cp4 {
+  transition-delay: 1.4s;
+}
+.ci-d .ci-cp0 {
+  left: 191px;
+  top: 117px;
+}
+.ci-d .ci-cp1 {
+  left: 250px;
+  top: 159.8px;
+}
+.ci-d .ci-cp2 {
+  left: 227.4px;
+  top: 229.2px;
+}
+.ci-d .ci-cp3 {
+  left: 154.6px;
+  top: 229.2px;
+}
+.ci-d .ci-cp4 {
+  left: 132px;
+  top: 159.8px;
+}
+.ci-d .ci-awning {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  border-radius: 11px 11px 0 0;
+  height: 26px;
+  background: repeating-linear-gradient(90deg, var(--awning-a) 0 24px, var(--awning-b) 24px 48px);
+  transform: translateY(-140%);
+  opacity: 0;
+  transition:
+    transform 0.6s var(--spring),
+    opacity 0.3s;
+  z-index: 2;
+}
+.ci-d .ci-awning::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 12px;
+  background:
+    radial-gradient(circle at 12px 0, var(--awning-a) 11.5px, transparent 12px) 0 0 / 48px 12px
+      repeat-x,
+    radial-gradient(circle at 36px 0, var(--awning-b) 11.5px, transparent 12px) 0 0 / 48px 12px
+      repeat-x;
+}
+.ci-d .ci-meet .ci-awning {
+  transform: none;
+  opacity: 1;
+  transition-delay: 0.15s;
+}
+.ci-d .ci-t-meet .ci-feed-title,
+.ci-d .ci-t-call .ci-feed-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ci-d .ci-pin {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  fill: none;
+  stroke: var(--highlight);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.ci-d .ci-guide {
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring),
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out,
+    width 0.9s ease-in-out,
+    height 0.9s ease-in-out,
+    background 0.6s,
+    border-width 0.6s,
+    opacity 0.4s;
+}
+.ci-d .ci-tile {
+  position: absolute;
+  width: 113px;
+  height: 136px;
+  border-radius: 8px;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity 0.3s,
+    transform 0.3s,
+    border-color 0.4s;
+}
+.ci-d .ci-call .ci-tile {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.4s,
+    transform 0.5s var(--spring),
+    border-color 0.4s;
+}
+.ci-d .ci-call .ci-tl1 {
+  transition-delay: 0.3s;
+}
+.ci-d .ci-call .ci-tl2 {
+  transition-delay: 0.4s;
+}
+.ci-d .ci-call .ci-tl3 {
+  transition-delay: 0.5s;
+}
+.ci-d .ci-call .ci-tl4 {
+  transition-delay: 0.6s;
+}
+.ci-d .ci-call .ci-tl0 {
+  transition-delay: 0.7s;
+}
+.ci-d .ci-tl1 {
+  left: 24px;
+  top: 52px;
+}
+.ci-d .ci-tl2 {
+  left: 145px;
+  top: 52px;
+}
+.ci-d .ci-tl3 {
+  left: 266px;
+  top: 52px;
+}
+.ci-d .ci-tl4 {
+  left: 85px;
+  top: 196px;
+}
+.ci-d .ci-tl0 {
+  left: 206px;
+  top: 196px;
+}
+.ci-d .ci-call .ci-tl2 {
+  animation: ci-speak 2.4s ease-in-out 1.2s infinite;
+}
+.ci-d .ci-call .ci-guide {
+  opacity: 0;
+}
+.ci-d .ci-call .ci-cup.ci-cup {
+  opacity: 0;
+  transform: scale(0.4);
+  transition-delay: 0s;
+}
+.ci-d .ci-call .ci-awning {
+  transform: translateY(-140%);
+  opacity: 0;
+  transition-delay: 0s;
+}
+.ci-d .ci-call .ci-faces {
+  transform: none;
+}
+.ci-d .ci-call .ci-s1 {
+  left: 32.5px;
+  top: 66px;
+}
+.ci-d .ci-call .ci-s2 {
+  left: 153.5px;
+  top: 66px;
+}
+.ci-d .ci-call .ci-s3 {
+  left: 274.5px;
+  top: 66px;
+}
+.ci-d .ci-call .ci-s4 {
+  left: 93.5px;
+  top: 210px;
+}
+.ci-d .ci-call .ci-s0 {
+  left: 214.5px;
+  top: 210px;
+}
+.ci-d .ci-call .ci-lab {
+  opacity: 1;
+}
+.ci-d .ci-call .ci-lab > span {
+  background: transparent;
+}
+.ci-d .ci-callbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 344px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.ci-d .ci-call .ci-callbar {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.4s 0.9s,
+    transform 0.5s 0.9s var(--spring);
+}
+.ci-d .ci-cb {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+}
+.ci-d .ci-cb svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--foreground);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ci-d .ci-cb.ci-end {
+  background: var(--destructive);
+  border-color: var(--destructive);
+}
+.ci-d .ci-cb.ci-end svg {
+  stroke: var(--destructive-foreground);
+  transform: rotate(135deg);
+}
+.ci-d .ci-tray-call .ci-t-call {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s 0.5s,
+    transform 0.5s 0.5s var(--spring),
+    visibility 0s;
+}
+.ci-d .ci-lonely .ci-s0 .ci-faces .ci-c {
+  opacity: 0;
+}
+.ci-d .ci-lonely .ci-count {
+  opacity: 0;
+}
+.ci-d .ci-thought {
+  position: absolute;
+  left: 266px;
+  top: 62px;
+  width: 120px;
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  line-height: 1.4;
+  opacity: 0;
+  transform: scale(0.8);
+  transform-origin: 0 100%;
+  transition:
+    opacity 0.3s,
+    transform 0.5s var(--spring);
+}
+.ci-d .ci-thought::before,
+.ci-d .ci-thought::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+}
+.ci-d .ci-thought::before {
+  width: 9px;
+  height: 9px;
+  left: -12px;
+  bottom: 8px;
+}
+.ci-d .ci-thought::after {
+  width: 5px;
+  height: 5px;
+  left: -20px;
+  bottom: 0;
+}
+.ci-d .ci-think .ci-thought {
+  opacity: 1;
+  transform: none;
+}
+.ci-d .ci-tray-alone .ci-t-alone {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s 0.3s,
+    transform 0.5s 0.3s var(--spring),
+    visibility 0s;
+}
+.ci-d .ci-n0 .ci-step0 {
+  opacity: 1;
+}
+.ci-d .ci-n0 .ci-step0 .ci-dot {
+  background: var(--highlight);
+  color: var(--card);
+}
+.ci-d .ci-solo {
+  position: absolute;
+  left: 138px;
+  top: 126px;
+  width: 128px;
+  height: 128px;
+  transition:
+    left 0.6s ease-in-out,
+    top 0.6s ease-in-out,
+    width 0.6s ease-in-out,
+    height 0.6s ease-in-out;
+}
+.ci-d .ci-solo > span {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.35s;
+}
+.ci-d .ci-solo .ci-c {
+  opacity: 0;
+}
+.ci-d .ci-go .ci-solo {
+  transition-duration: 0.35s;
+  left: 154px;
+  top: 16px;
+  width: 96px;
+  height: 96px;
+}
+.ci-d .ci-go .ci-solo .ci-u {
+  opacity: 0;
+}
+.ci-d .ci-go .ci-solo .ci-c {
+  opacity: 1;
+}
+.ci-d .ci-landed .ci-solo {
+  opacity: 0;
+  visibility: hidden;
+}
+.ci-d .ci-seat.ci-arrive .ci-faces {
+  transition: none !important;
+}
+.ci-d .ci-lonely .ci-free,
+.ci-d .ci-lonely .ci-guide {
+  opacity: 0;
+}
+.ci-d .ci-waiting .ci-count {
+  opacity: 0;
+}
+.ci-d .ci-t-slogan .ci-accent {
+  color: var(--highlight);
+}
+.ci-d .ci-tray-slogan .ci-t-slogan {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s 0.3s,
+    transform 0.5s 0.3s var(--spring),
+    visibility 0s;
+}
+.ci-d .ci-form {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  visibility: hidden;
+  transition: visibility 0s 0.3s;
+  left: 24px;
+  top: 88px;
+  width: 356px;
+}
+.ci-d .ci-onb .ci-form {
+  visibility: visible;
+  transition: visibility 0s;
+}
+.ci-d .ci-fcard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.ci-d .ci-onb .ci-fcard {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.4s 0.3s,
+    transform 0.5s 0.3s var(--spring);
+}
+.ci-d .ci-onb .ci-fc2 {
+  transition-delay: 0.45s, 0.45s;
+}
+.ci-d .ci-onb .ci-fc3 {
+  transition-delay: 0.6s, 0.6s;
+}
+.ci-d .ci-fcard h4 {
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.ci-d .ci-frow {
+  display: flex;
+  gap: 6px;
+  height: 28px;
+}
+.ci-d .ci-fchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  max-width: 160px;
+  overflow: hidden;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-size: 13px;
+  color: var(--foreground);
+  white-space: nowrap;
+  transition:
+    max-width 0.4s ease-in-out,
+    padding 0.4s,
+    margin 0.4s,
+    opacity 0.3s,
+    border-width 0.4s,
+    transform 0.5s var(--spring);
+}
+.ci-d .ci-fchip.ci-s::before {
+  content: "+";
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+.ci-d .ci-fchip.ci-on {
+  border-color: var(--highlight);
+  background: var(--highlight-soft);
+  color: var(--highlight);
+  max-width: 0;
+  padding: 0;
+  border-width: 0;
+  opacity: 0;
+  transform: scale(0.8);
+}
+.ci-d .ci-fchip.ci-on::after {
+  content: "\00d7";
+  font-weight: 600;
+}
+.ci-d .ci-pick1 .ci-p1,
+.ci-d .ci-pick2 .ci-p2,
+.ci-d .ci-pick3 .ci-p3 {
+  max-width: 160px;
+  padding: 0 10px;
+  border-width: 1px;
+  opacity: 1;
+  transform: none;
+}
+.ci-d .ci-pick1 .ci-p1s,
+.ci-d .ci-pick2 .ci-p2s,
+.ci-d .ci-pick3 .ci-p3s {
+  max-width: 0;
+  padding: 0;
+  margin-left: -6px;
+  border-width: 0;
+  opacity: 0;
+}
+.ci-d .ci-onb .ci-solo {
+  left: 324px;
+  top: 20px;
+  width: 56px;
+  height: 56px;
+}
+.ci-d .ci-onb .ci-free,
+.ci-d .ci-onb .ci-guide {
+  opacity: 0;
+}
+.ci-d .ci-filled .ci-solo .ci-u {
+  opacity: 0;
+}
+.ci-d .ci-filled .ci-solo .ci-c {
+  opacity: 1;
+}
+.ci-d .ci-tray > .ci-where {
+  inset: 10px 0 auto 0;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  transform: none;
+}
+.ci-d .ci-tray-meet .ci-where,
+.ci-d .ci-tray-call .ci-where {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.4s 0.5s,
+    visibility 0s;
+}
+.ci-d .ci-wchip {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-size: 13px;
+  color: var(--foreground);
+  white-space: nowrap;
+  transition:
+    background 0.4s,
+    border-color 0.4s,
+    color 0.4s;
+}
+.ci-d .ci-meet:not(.ci-call) .ci-wcafe,
+.ci-d .ci-call .ci-wcall {
+  border-color: var(--highlight);
+  background: var(--highlight-soft);
+  color: var(--highlight);
+}
+.ci-d .ci-t-meet,
+.ci-d .ci-t-call {
+  padding-top: 40px;
+}
+.ci-d .ci-melt {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.5);
+  transition:
+    opacity 0.3s,
+    transform 0.3s,
+    visibility 0s 0.3s;
+}
+.ci-d .ci-s0 .ci-melt {
+  background: #ffcd44;
+}
+.ci-d .ci-s1 .ci-melt {
+  background: #b2d4ff;
+}
+.ci-d .ci-s2 .ci-melt {
+  background: #e5d090;
+}
+.ci-d .ci-s3 .ci-melt {
+  background: #ffc3be;
+}
+.ci-d .ci-s4 .ci-melt {
+  background: #9ae3c4;
+}
+.ci-d .ci-logo .ci-s0 {
+  left: 154px;
+  top: 97.6px;
+}
+.ci-d .ci-logo .ci-s1 {
+  left: 196.2px;
+  top: 128.3px;
+}
+.ci-d .ci-logo .ci-s2 {
+  left: 180.1px;
+  top: 177.9px;
+}
+.ci-d .ci-logo .ci-s3 {
+  left: 127.9px;
+  top: 177.9px;
+}
+.ci-d .ci-logo .ci-s4 {
+  left: 111.8px;
+  top: 128.3px;
+}
+.ci-d .ci-logo .ci-faces {
+  opacity: 0;
+  transform: scale(0.8);
+}
+.ci-d .ci-logo .ci-melt {
+  opacity: 0.92;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.6s 0.25s,
+    transform 0.7s 0.25s var(--spring),
+    visibility 0s;
+}
+.ci-d .ci-logo .ci-lab,
+.ci-d .ci-logo .ci-tile {
+  opacity: 0;
+  transition-delay: 0s;
+}
+.ci-d .ci-logo .ci-callbar {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.ci-d .ci-logo .ci-tray {
+  opacity: 0;
+}
+.ci-d .ci-wordmark {
+  position: absolute;
+  left: 0px;
+  width: 404px;
+  top: 292px;
+  text-align: center;
+  font: 600 36px/1.35 var(--font-brand);
+  letter-spacing: -0.03em;
+  font-variation-settings: "opsz" 14;
+  color: var(--foreground);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s,
+    visibility 0s 0.3s;
+}
+.ci-d .ci-logo .ci-wordmark {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.6s 0.9s,
+    transform 0.7s 0.9s var(--spring),
+    visibility 0s 0.9s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ci-d .ci-d .ci-clicking .ci-tap {
+    animation: none;
+  }
+  .ci-d * {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}
+.ci-d .ci-cursor path {
+  fill: var(--foreground);
+  stroke: var(--card);
+}

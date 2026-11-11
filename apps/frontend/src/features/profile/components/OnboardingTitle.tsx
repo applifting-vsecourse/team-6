@@ -1,18 +1,22 @@
-import { useContext } from "react"
-
 import { GazeBlobatar } from "@/components/GazeBlobatar"
+import { useMascotContext } from "@/components/Mascot/MascotContext"
 import { cn } from "@/lib/utils"
-
-import { AvatarSeedContext } from "@/features/profile/lib/avatarSeedContext"
 
 type OnboardingTitleProps = {
   title: string
   description: string
+  // Seed of the person's own blobatar beside the page title; none hides it.
+  avatarSeed?: string
 }
 
-/** Page title of an onboarding step with the person's own blobatar beside it (Figma B1–B3). */
-export function OnboardingTitle({ title, description }: OnboardingTitleProps) {
-  const seed = useContext(AvatarSeedContext)
+/**
+ * Page title of an onboarding step with the person's own blobatar beside it (Figma B1–B3). While
+ * the tour runs the mascot is that avatar and goes from card to card, so drawing it here as well
+ * would show it twice; on a repeat of onboarding, with no mascot, it is back where it always was.
+ */
+export function OnboardingTitle({ title, description, avatarSeed }: OnboardingTitleProps) {
+  const isTourActive = useMascotContext()?.isTourActive ?? false
+  const seed = isTourActive ? undefined : avatarSeed
 
   return (
     <div

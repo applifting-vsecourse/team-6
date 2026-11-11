@@ -6,12 +6,24 @@ import { ProfileService } from '@/modules/profile/services/profile.service';
 import { User } from '@/shared/auth/decorators/user.decorator';
 import { Identity } from '@/shared/auth/domain/identity';
 import { AuthenticatedUserGuard } from '@/shared/auth/guards/authenticated-user.guard';
-import { Body, Controller, Get, Put, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Put,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiCookieAuth,
+  ApiNotFoundResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { ProfileResponseDto } from './dto/profile-response.dto';
@@ -96,6 +108,25 @@ export class ProfileController {
     return this.toResponseDto(profile);
   }
 
+  @Post('tour-completed')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Mark the product tour as completed',
+    description:
+      'Records that the caller finished or skipped the tour, so it is not shown again on any device. Repeated calls keep the first time.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Profile with the tour marked as completed',
+    type: ProfileResponseDto,
+  })
+  @ApiUnauthorizedResponse({ description: 'Not signed in' })
+  @ApiNotFoundResponse({ description: 'The caller has no profile yet' })
+  async markTourCompleted(@User() user: Identity): Promise<ProfileResponseDto> {
+    const profile = await this.profileService.markTourCompleted(user.id);
+    return this.toResponseDto(profile);
+  }
+
   private toResponseDto(profile: ProfileEntity): ProfileResponseDto {
     const teaches = profile.tags
       .filter((t) => t.kind === TagKind.TEACH)
@@ -125,6 +156,7 @@ export class ProfileController {
       radiusKm: profile.radiusKm,
       note: profile.note,
       onboardingCompletedAt: profile.onboardingCompletedAt,
+      tourCompletedAt: profile.tourCompletedAt,
       teaches,
       learns,
       interests,

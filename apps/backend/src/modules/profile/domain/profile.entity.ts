@@ -59,5 +59,6 @@ export class ProfileEntity {
     public readonly roles: string[] = [],
     public readonly latitude: number | null = null,
     public readonly longitude: number | null = null,
+    public readonly tourCompletedAt: Date | null = null,
   ) {}
 }
