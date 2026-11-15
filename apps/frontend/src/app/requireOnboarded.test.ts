@@ -3,7 +3,6 @@ import { isRedirect } from "@tanstack/react-router"
 import { describe, expect, it } from "vitest"
 
 import { requireOnboarded } from "@/app/requireOnboarded"
-
 import { Route as BeginsRoute } from "@/routes/_ProtectedPages/kvintet.begins"
 import { Route as FeedRoute } from "@/routes/_ProtectedPages/kvintet.feed"
 import { Route as MessagesRoute } from "@/routes/_ProtectedPages/kvintet.messages"
