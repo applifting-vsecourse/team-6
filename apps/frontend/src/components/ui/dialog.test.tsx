@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog"
@@ -89,6 +89,58 @@ describe("DialogContent isBottomSheet", () => {
     fireEvent.touchMove(sheet, touch(50))
 
     expect(sheet.style.transform).toBe("translateY(0px)")
+  })
+
+  it("snaps back when the dialog refuses to close", async () => {
+    stubMobile(true)
+    // The mock never flips `open`, like Delete account while the delete is in flight.
+    const { onOpenChange, sheet } = renderSheet()
+
+    drag(sheet, 100, 250)
+
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+    await waitFor(() => expect(sheet.style.transform).toBe(""))
+  })
+
+  it("closes an uncontrolled dialog", async () => {
+    stubMobile(true)
+    render(
+      <Dialog defaultOpen>
+        <DialogContent isBottomSheet>
+          <DialogTitle>Title</DialogTitle>
+          <DialogDescription>Description</DialogDescription>
+        </DialogContent>
+      </Dialog>,
+    )
+
+    drag(screen.getByRole("dialog"), 100, 250)
+
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
+  })
+
+  it("snaps back when the browser cancels the touch", () => {
+    stubMobile(true)
+    const { onOpenChange, sheet } = renderSheet()
+
+    fireEvent.touchStart(sheet, touch(100))
+    fireEvent.touchMove(sheet, touch(250))
+    fireEvent.touchCancel(sheet, touchesEnd(250))
+
+    expect(onOpenChange).not.toHaveBeenCalled()
+    expect(sheet.style.transform).toBe("")
+  })
+
+  it("ignores multi-touch", () => {
+    stubMobile(true)
+    const { onOpenChange, sheet } = renderSheet()
+    const point = { clientX: 0, clientY: 100 }
+
+    fireEvent.touchStart(sheet, { touches: [point, point], changedTouches: [point] })
+    fireEvent.touchMove(sheet, touch(250))
+    fireEvent.touchEnd(sheet, touchesEnd(250))
+
+    expect(onOpenChange).not.toHaveBeenCalled()
+    expect(sheet.style.transform).toBe("")
   })
 
   it("does nothing on desktop", () => {

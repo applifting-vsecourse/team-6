@@ -7,21 +7,14 @@ import { Button } from "@/components/ui/button"
 import { useMediaQuery } from "@/lib/useMediaQuery"
 import { cn } from "@/lib/utils"
 
-// DialogContent needs the root's onOpenChange to close itself after a drag.
-const DialogOpenChangeContext = React.createContext<((isOpen: boolean) => void) | undefined>(
-  undefined,
-)
-
 const DISMISS_DRAG_PX = 100
 
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return (
-    <DialogOpenChangeContext.Provider value={props.onOpenChange}>
-      <DialogPrimitive.Root
-        data-slot="dialog"
-        {...props}
-      />
-    </DialogOpenChangeContext.Provider>
+    <DialogPrimitive.Root
+      data-slot="dialog"
+      {...props}
+    />
   )
 }
 
@@ -81,7 +74,8 @@ function DialogContent({
   isBottomSheet?: boolean
 }) {
   const { t } = useTranslation()
-  const onOpenChange = React.useContext(DialogOpenChangeContext)
+  // Closing goes through Radix itself, so controlled and uncontrolled dialogs both work.
+  const closeRef = React.useRef<HTMLButtonElement>(null)
   const isMobile = useMediaQuery("(max-width: 39.99rem)")
   const startY = React.useRef<number | null>(null)
   const dragY = React.useRef(0)
@@ -119,7 +113,7 @@ function DialogContent({
       if (dragY.current <= DISMISS_DRAG_PX) return snapBack(sheet)
       // The exit animation starts from the dragged position. If the dialog refuses to close
       // (e.g. a delete in flight), it is still open next frame: put it back.
-      onOpenChange?.(false)
+      closeRef.current?.click()
       requestAnimationFrame(() => {
         if (sheet.dataset.state === "open") snapBack(sheet)
       })
@@ -145,10 +139,18 @@ function DialogContent({
         {...props}
       >
         {isBottomSheet && (
-          <span
-            aria-hidden
-            className="mx-auto h-1 w-10 rounded-full bg-input sm:hidden"
-          />
+          <>
+            <span
+              aria-hidden
+              className="mx-auto h-1 w-10 rounded-full bg-input sm:hidden"
+            />
+            <DialogPrimitive.Close
+              ref={closeRef}
+              aria-hidden
+              tabIndex={-1}
+              className="hidden"
+            />
+          </>
         )}
         {children}
         {showCloseButton && (
