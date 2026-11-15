@@ -53,15 +53,12 @@ export function formatWhenAndWhere(
     timePart = timesList.join(", ")
   }
 
-  // 2. City and radius
-  let placePart = ""
-  if (profile.cityName) {
-    if (profile.radiusKm !== null && profile.radiusKm !== undefined && profile.radiusKm > 0) {
-      placePart = `${profile.cityName}, ${t("profile.withinRadius", { count: profile.radiusKm })}`
-    } else {
-      placePart = profile.cityName
-    }
-  }
+  // 2. City and radius (onboarding stores only the radius, so the city name is often missing)
+  const radiusPart =
+    profile.radiusKm !== null && profile.radiusKm !== undefined && profile.radiusKm > 0
+      ? t("profile.withinRadius", { count: profile.radiusKm })
+      : ""
+  const placePart = [profile.cityName, radiusPart].filter(Boolean).join(", ")
 
   // 3. Frequency
   let freqPart = ""
