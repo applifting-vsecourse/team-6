@@ -1,14 +1,14 @@
-import { STICKY_ATTRIBUTE, stickyRect } from "./stickyRect"
+import { HOLDER_ATTRIBUTE, STICKY_ATTRIBUTE, stickyRect } from "./stickyRect"
 
 const place = (element: HTMLElement, top: number, height: number, left = 100, width = 56) => {
   element.getBoundingClientRect = () =>
     ({ left, top, width, height, right: left + width, bottom: top + height }) as DOMRect
 }
 
-function build(options: { anchorTop: number; cardBottom: number; isSticky?: boolean }) {
+function build(options: { anchorTop: number; cardBottom: number; mode?: string | null }) {
   const card = document.createElement("section")
   const anchor = document.createElement("span")
-  if (options.isSticky !== false) anchor.setAttribute(STICKY_ATTRIBUTE, "")
+  if (options.mode !== null) anchor.setAttribute(STICKY_ATTRIBUTE, options.mode ?? "")
   card.append(anchor)
   place(anchor, options.anchorTop, 56)
   place(card, options.anchorTop + 32, options.cardBottom - options.anchorTop - 32)
@@ -31,15 +31,52 @@ describe("stickyRect", () => {
     expect(rect.bottom).toBe(100)
   })
 
-  it("keeps its column and size", () => {
+  it("keeps its column and size, and keeps talking", () => {
     const rect = stickyRect(build({ anchorTop: -400, cardBottom: 900 }))
 
     expect([rect.left, rect.right, rect.width, rect.height]).toEqual([100, 156, 56, 56])
+    expect(rect.isQuiet).toBe(false)
   })
 
   it("takes an anchor without the mark as it is", () => {
-    const anchor = build({ anchorTop: -400, cardBottom: 900, isSticky: false })
+    const anchor = build({ anchorTop: -400, cardBottom: 900, mode: null })
 
     expect(stickyRect(anchor).top).toBe(-400)
+  })
+
+  describe("small", () => {
+    it("is full size and talks while it is in its place", () => {
+      const rect = stickyRect(build({ anchorTop: 100, cardBottom: 900, mode: "small" }))
+
+      expect([rect.top, rect.width, rect.isQuiet]).toEqual([100, 56, false])
+    })
+
+    it("shrinks towards its right edge and falls quiet once it is stuck", () => {
+      const rect = stickyRect(build({ anchorTop: -400, cardBottom: 900, mode: "small" }))
+
+      expect([rect.top, rect.width, rect.height, rect.right]).toEqual([72, 40, 40, 156])
+      expect(rect.isQuiet).toBe(true)
+    })
+
+    it("glides down to its small size instead of snapping", () => {
+      // 6px past the line: 6px smaller.
+      expect(stickyRect(build({ anchorTop: 66, cardBottom: 900, mode: "small" })).width).toBe(50)
+    })
+  })
+
+  it("rides along a marked holder further up, not just its parent", () => {
+    const form = document.createElement("div")
+    form.setAttribute(HOLDER_ATTRIBUTE, "")
+    const row = document.createElement("div")
+    const anchor = document.createElement("span")
+    anchor.setAttribute(STICKY_ATTRIBUTE, "")
+    row.append(anchor)
+    form.append(row)
+    place(anchor, -400, 56)
+    place(row, -400, 56)
+    place(form, -400, 1200)
+
+    // The row has long gone; the form is still on screen, so the mascot stays.
+    expect(stickyRect(anchor).top).toBe(72)
   })
 })

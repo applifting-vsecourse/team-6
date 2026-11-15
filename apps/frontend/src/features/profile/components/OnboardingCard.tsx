@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react"
 
+import { useMascotContext } from "@/components/Mascot/MascotContext"
 import { MascotCorner } from "@/components/Mascot/MascotCorner"
 import { cn } from "@/lib/utils"
 
@@ -22,11 +23,16 @@ export function OnboardingCard({
   children,
   ...props
 }: OnboardingCardProps) {
+  // The guide is talking about this card from its bar (narrow windows): show which one it means.
+  const highlightId = useMascotContext()?.stage?.highlightId
+  const isHighlighted = mascotId !== undefined && highlightId === mascotId
+
   return (
     <section
       className={cn(
         "relative flex flex-col gap-3 rounded-lg border bg-card p-4 md:p-5",
         isInvalid ? "border-destructive" : "border-border",
+        isHighlighted && "ring-[3px] ring-ring/50",
         className,
       )}
       {...props}

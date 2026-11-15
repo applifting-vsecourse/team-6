@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 
+import { HOLDER_ATTRIBUTE } from "@/components/Mascot/stickyRect"
 import { PageLayout } from "@/components/PageLayout"
 import { cn } from "@/lib/utils"
 
@@ -40,7 +41,11 @@ export function AuthLayout({
           aside ? "max-w-6xl lg:flex lg:gap-16" : "max-w-lg",
         )}
       >
-        <div className="mx-auto w-full max-w-105 lg:mx-0 lg:flex-1">
+        {/* A mascot pinned beside the title (sign-up on a phone) stays for as long as this column is on screen. */}
+        <div
+          {...{ [HOLDER_ATTRIBUTE]: "" }}
+          className="mx-auto w-full max-w-105 lg:mx-0 lg:flex-1"
+        >
           <div className="flex items-start justify-between gap-4">
             <div className="flex flex-col gap-5 md:gap-2">
               <h1 className="text-h1-mobile md:text-h1">{title}</h1>

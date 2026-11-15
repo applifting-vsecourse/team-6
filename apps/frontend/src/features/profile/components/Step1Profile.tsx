@@ -5,6 +5,7 @@ import { MascotCorner } from "@/components/Mascot/MascotCorner"
 import { Button } from "@/components/ui/button"
 
 import type { Tag } from "@/features/profile/api/profileApi"
+import { OnboardingGuideBar } from "@/features/profile/components/OnboardingGuideBar"
 import { OnboardingTitle } from "@/features/profile/components/OnboardingTitle"
 import { RoleSelector } from "@/features/profile/components/RoleSelector"
 import { TagSelector } from "@/features/profile/components/TagSelector"
@@ -40,7 +41,7 @@ export function Step1Profile({ initialData, allTags, mascotSeed, onContinue }: S
   const [error, setError] = useState<string | null>(null)
   const roleSectionRef = useRef<HTMLDivElement | null>(null)
 
-  useOnboardingGuide({
+  const guide = useOnboardingGuide({
     seed: mascotSeed,
     readyText: t("tour.onboarding.step1Ready"),
     cards: [
@@ -197,6 +198,7 @@ export function Step1Profile({ initialData, allTags, mascotSeed, onContinue }: S
         </Button>
         <MascotCorner id={GUIDE_READY_ID} />
       </div>
+      {guide.bar ? <OnboardingGuideBar {...guide.bar} /> : null}
     </form>
   )
 }

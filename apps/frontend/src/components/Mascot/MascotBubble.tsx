@@ -11,7 +11,7 @@ import type { MascotBubble as Bubble } from "./MascotContext"
 /** Where the bubble is, in window coordinates, and which side of it points at the mascot. */
 export type BubbleLayout = {
   /** Where the bubble sits relative to the mascot; its tail is on the edge facing it. */
-  side: "right" | "left" | "above" | "below" | "dock"
+  side: "right" | "left" | "above" | "below"
   /** Width the bubble would like; its real width is measured, since text is only roughly sized. */
   width: number
   /** The most it may take; longer text wraps. */
@@ -30,8 +30,6 @@ const TAIL_CLASS: Record<BubbleLayout["side"], string> = {
   left: "-right-1.5 border-t border-r",
   above: "-bottom-1.5 border-b border-r",
   below: "-top-1.5 border-t border-l",
-  // Docked to the window, not to the mascot: nothing for a tail to point at.
-  dock: "hidden",
 }
 
 /**

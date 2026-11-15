@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { useMascotContext, useMascotStage } from "@/components/Mascot/MascotContext"
+import { useMediaQuery } from "@/lib/useMediaQuery"
 
 import { cardInView } from "@/features/profile/lib/cardInView"
 
@@ -36,6 +37,14 @@ type OnboardingGuide = {
 
 /** Where the mascot stands once every card is answered: the button that moves the person on. */
 export const GUIDE_READY_ID = "onboarding-continue"
+/** Where the mascot stands in a window too narrow for it to sit beside the cards: the guide bar. */
+export const GUIDE_BAR_ID = "onboarding-bar"
+// The cards are 640px wide in the middle of the window. Below this a bubble beside them has no
+// room, and a mascot on their corner covers what the person is filling in.
+const NARROW_QUERY = "(max-width: 1279.98px)"
+
+/** What the guide bar shows; `null` when the mascot speaks from the cards, or not at all. */
+export type GuideBar = { text: string; onNext?: () => void }
 const READY = "ready"
 
 type GuideState = {
@@ -86,11 +95,18 @@ const prefersReducedMotion = () => window.matchMedia?.("(prefers-reduced-motion:
  * and follows the person: "Next" or a finished single answer sends it to the next card, an answer
  * given in another card sends it there. After the last card it waits at the button.
  * It only speaks while the tour is running; otherwise the step looks as it always did.
+ *
+ * In a narrow window (a phone, a tablet, a small laptop) the mascot does not sit on the cards: it
+ * stands in a bar at the bottom of the screen, which the step draws from the returned `bar`, and
+ * the card it is talking about is highlighted instead.
  */
-export function useOnboardingGuide({ seed, cards, readyText }: OnboardingGuide) {
+export function useOnboardingGuide({ seed, cards, readyText }: OnboardingGuide): {
+  bar: GuideBar | null
+} {
   const { t } = useTranslation()
   const mascot = useMascotContext()
   const isGuiding = Boolean(mascot?.isTourActive && seed)
+  const isNarrow = useMediaQuery(NARROW_QUERY)
 
   const [state, setState] = useState<GuideState>(() => ({
     answers: snapshot(cards),
@@ -123,45 +139,43 @@ export function useOnboardingGuide({ seed, cards, readyText }: OnboardingGuide) 
     [nextId, passedId],
   )
 
-  const stage = useMemo(
-    () =>
-      isGuiding
-        ? {
-            anchorId,
-            seed,
-            bubble: {
-              text,
-              isClosable: true,
-              prefer: "beside" as const,
-              actions: hasNext ? [{ label: t("tour.next"), onClick: pass }] : undefined,
-            },
-          }
-        : null,
-    [isGuiding, anchorId, seed, text, hasNext, pass, t],
-  )
+  const stage = useMemo(() => {
+    if (!isGuiding) return null
+    // The bar carries the words itself, so the mascot only stands in it.
+    if (isNarrow) return { anchorId: GUIDE_BAR_ID, seed, highlightId: anchorId }
+    return {
+      anchorId,
+      seed,
+      bubble: {
+        text,
+        isClosable: true,
+        prefer: "beside" as const,
+        actions: hasNext ? [{ label: t("tour.next"), onClick: pass }] : undefined,
+      },
+    }
+  }, [isGuiding, isNarrow, anchorId, seed, text, hasNext, pass, t])
   useMascotStage(stage)
 
-  // Bring the card into view when the mascot moves on to it, so it never waits off screen. Not for
-  // the first card (the page opens on it), nor when the person just answered there: it is in view,
-  // and the page must not slide away under their hand. The page's own scrolling is not the
-  // person's, so it must not send the mascot elsewhere.
+  // Bring the card into view when the guide moves on to it, so it never waits off screen. Not for
+  // the card the step opens on, nor when the person just answered there: it is in view, and the
+  // page must not slide away under their hand. The page's own scrolling is not the person's, so
+  // it must not send the mascot elsewhere.
   const ownScrollUntil = useRef(0)
   useEffect(() => {
     ownScrollUntil.current = performance.now() + OWN_SCROLL_MS
   }, [])
   const resolveAnchor = mascot?.resolveAnchor
-  const isFirstStop = useRef(true)
+  // The anchor the page was last brought to. Not a "first run" flag: StrictMode runs an effect
+  // twice on mount, and the second run must not scroll the page either.
+  const shownAnchor = useRef(anchorId)
   const isFollowing = useRef(false)
   const isFollowingNow = current.isFollowing
   useEffect(() => {
     isFollowing.current = isFollowingNow
   }, [isFollowingNow])
   useEffect(() => {
-    if (!isGuiding) return
-    if (isFirstStop.current) {
-      isFirstStop.current = false
-      return
-    }
+    if (!isGuiding || shownAnchor.current === anchorId) return
+    shownAnchor.current = anchorId
     if (isFollowing.current) return
     const frame = requestAnimationFrame(() => {
       const anchor = resolveAnchor?.(anchorId)
@@ -178,9 +192,15 @@ export function useOnboardingGuide({ seed, cards, readyText }: OnboardingGuide) 
   // The person scrolls: the mascot goes to the card they have come to, once the page has come to
   // rest. It never goes further down than the first card still left empty, required or not (one
   // left with "Next" counts as dealt with): scroll past that one and it stays there. Up is free.
+  // Where the mascot already stands is always allowed, though: a person who went on and answered
+  // further down has it with them, and their next scroll must not yank it back up.
   // The button is a stop of its own, but only when every card is answered.
   const gate = cards.findIndex((card) => !card.isDone && !current.passedIds.includes(card.id))
-  const stops = (gate === -1 ? cards : cards.slice(0, gate + 1)).map((card) => card.id)
+  const reach = Math.max(
+    gate,
+    cards.findIndex((item) => item.id === current.activeId),
+  )
+  const stops = (gate === -1 ? cards : cards.slice(0, reach + 1)).map((card) => card.id)
   if (cards.every((card) => card.isDone)) stops.push(READY)
   const stopsKey = stops.join("|")
   useEffect(() => {
@@ -216,4 +236,8 @@ export function useOnboardingGuide({ seed, cards, readyText }: OnboardingGuide) 
       clearTimeout(timer)
     }
   }, [isGuiding, resolveAnchor, stopsKey])
+
+  return {
+    bar: isGuiding && isNarrow ? { text, onNext: hasNext ? pass : undefined } : null,
+  }
 }

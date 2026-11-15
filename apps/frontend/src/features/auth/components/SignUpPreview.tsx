@@ -1,6 +1,7 @@
 import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { MascotBubbleSlot } from "@/components/Mascot/MascotBubbleSlot"
 import { useMascotAnchor } from "@/components/Mascot/MascotContext"
+import { STICKY_ATTRIBUTE } from "@/components/Mascot/stickyRect"
 import { Blobatar } from "@/components/ui/blobatar"
 import { cn } from "@/lib/utils"
 
@@ -27,8 +28,11 @@ export function SignUpPreview({ username, variant }: SignUpPreviewProps) {
 
   if (variant === "inline") {
     return (
+      // On a phone the form scrolls this away, and with it the face changing with the username and
+      // shutting its eyes at the password. The mascot therefore stays pinned, small, under the header.
       <span
         ref={anchorRef}
+        {...{ [STICKY_ATTRIBUTE]: "small" }}
         className={cn("block size-16", hidden)}
       >
         <Blobatar

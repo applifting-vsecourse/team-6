@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 
 import type { MeetingFrequency } from "@/features/profile/api/profileApi"
 import { OnboardingCard } from "@/features/profile/components/OnboardingCard"
+import { OnboardingGuideBar } from "@/features/profile/components/OnboardingGuideBar"
 import { OnboardingTitle } from "@/features/profile/components/OnboardingTitle"
 import { GUIDE_READY_ID, useOnboardingGuide } from "@/features/profile/hooks/useOnboardingGuide"
 import { checkboxClass, radioClass } from "@/features/profile/lib/optionStyles"
@@ -46,7 +47,7 @@ export function Step3Questionnaire({
   const [error, setError] = useState<string | null>(null)
   const frequencySectionRef = useRef<HTMLElement | null>(null)
 
-  useOnboardingGuide({
+  const guide = useOnboardingGuide({
     seed: mascotSeed,
     readyText: t("tour.onboarding.step3Ready"),
     cards: [
@@ -237,6 +238,7 @@ export function Step3Questionnaire({
           <MascotCorner id={GUIDE_READY_ID} />
         </div>
       </div>
+      {guide.bar ? <OnboardingGuideBar {...guide.bar} /> : null}
     </form>
   )
 }

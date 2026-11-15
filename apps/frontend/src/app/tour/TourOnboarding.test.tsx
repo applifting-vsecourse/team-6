@@ -17,11 +17,12 @@ vi.mock("@/features/profile/components/LocationMapPicker", () => ({
   LocationMapPicker: () => null,
 }))
 
+const navigate = vi.hoisted(() => vi.fn())
 vi.mock("@tanstack/react-router", async (importOriginal) => {
   const actual = await importOriginal<typeof Router>()
   return {
     ...actual,
-    useNavigate: () => vi.fn(),
+    useNavigate: () => navigate,
     useRouterState: ({ select }: { select: (state: { location: object }) => unknown }) =>
       select({ location: { pathname: "/onboarding", search: { step: 1 } } }),
   }

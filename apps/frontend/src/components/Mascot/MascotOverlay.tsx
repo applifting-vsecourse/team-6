@@ -32,6 +32,8 @@ export function MascotOverlay() {
   const [layout, setLayout] = useState<BubbleLayout | null>(null)
   // The bubble waits for the mascot to land.
   const [isArrived, setIsArrived] = useState(false)
+  // The anchor has scrolled under the sticky header: the mascot must not ride over it.
+  const [isBehindHeader, setIsBehindHeader] = useState(false)
   // The text of the bubble that was closed with its cross; the same text stays closed.
   const [closedText, setClosedText] = useState<string | null>(null)
   const [measuredWidth, setMeasuredWidth] = useState<number | undefined>(undefined)
@@ -48,9 +50,13 @@ export function MascotOverlay() {
   const follow = useCallback(
     (shouldFly: boolean) => {
       const element = anchorId ? resolveAnchor?.(anchorId) : null
-      if (!element) return
-      const rect = stickyRect(element)
-      if (rect.width === 0) return
+      const rect = element ? stickyRect(element) : null
+      if (!element || !rect || rect.width === 0) {
+        // Nowhere to stand yet (the next page is still mounting): say nothing, rather than the
+        // new words from the old place.
+        setLayout(null)
+        return
+      }
 
       const isInFlight = flight.current !== 0
       const isMoving =
@@ -86,14 +92,25 @@ export function MascotOverlay() {
         })
       }
       placed.current = true
+
+      // The header is sticky and the mascot floats above everything, so an anchor that scrolls
+      // under the header would carry the mascot across it. An anchor inside the header is fine.
+      const header = document.querySelector("header")
+      const isCovered =
+        !header?.contains(element) && rect.top < (header?.getBoundingClientRect().bottom ?? 0)
+      setIsBehindHeader(isCovered)
+
       const slot = slotId ? resolveAnchor?.(slotId)?.getBoundingClientRect() : null
-      setLayout(
-        placeBubble(
-          rect,
-          { width: window.innerWidth, height: window.innerHeight },
-          { preferredWidth: measuredWidth ?? bubbleWidth, slot, prefer },
-        ),
-      )
+      const next =
+        rect.isQuiet || isCovered
+          ? null
+          : placeBubble(
+              rect,
+              { width: window.innerWidth, height: window.innerHeight },
+              { preferredWidth: measuredWidth ?? bubbleWidth, slot, prefer },
+            )
+      // This runs on every scroll event: only a bubble that really moved may redraw.
+      setLayout((previous) => (JSON.stringify(previous) === JSON.stringify(next) ? previous : next))
     },
     [
       anchorId,
@@ -161,7 +178,7 @@ export function MascotOverlay() {
             className="pointer-events-none fixed top-0 left-0 z-45"
             style={{ x, y, width, height }}
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: isBehindHeader ? 0 : 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
@@ -225,7 +242,9 @@ export function MascotOverlay() {
             bubble={bubble}
             layout={layout}
             isVisible={isArrived}
-            onClose={bubble.isClosable ? () => setClosedText(bubble.text) : undefined}
+            onClose={
+              bubble.onClose ?? (bubble.isClosable ? () => setClosedText(bubble.text) : undefined)
+            }
             onMeasure={setMeasuredWidth}
           />
         ) : null}

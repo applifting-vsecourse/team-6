@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { StrictMode, useEffect, useState, type ReactNode } from "react"
 import { act, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
@@ -13,6 +13,10 @@ function TourOn() {
   return null
 }
 
+function WhenTourRuns({ children }: { children: ReactNode }) {
+  return useMascotContext()?.isTourActive ? children : null
+}
+
 function Probe() {
   const stage = useMascotContext()?.stage
   return (
@@ -20,6 +24,7 @@ function Probe() {
       <p data-testid="anchor">{stage?.anchorId ?? "none"}</p>
       <p data-testid="text">{stage?.bubble?.text ?? "none"}</p>
       <p data-testid="seed">{stage?.seed ?? "none"}</p>
+      <p data-testid="highlight">{stage?.highlightId ?? "none"}</p>
       {stage?.bubble?.actions?.map((action) => (
         <button
           key={action.label}
@@ -39,7 +44,7 @@ function Step({ seed = "petr" }: { seed?: string }) {
   const [topics, setTopics] = useState(0)
   const [frequency, setFrequency] = useState("")
   const [note, setNote] = useState("")
-  useOnboardingGuide({
+  const guide = useOnboardingGuide({
     seed,
     readyText: "Ready",
     cards: [
@@ -75,6 +80,8 @@ function Step({ seed = "petr" }: { seed?: string }) {
       <button onClick={() => setTopics((count) => count + 1)}>add topic</button>
       <button onClick={() => setFrequency("WEEKLY")}>choose weekly</button>
       <button onClick={() => setNote("hello")}>write note</button>
+      <p data-testid="bar">{guide.bar?.text ?? "none"}</p>
+      {guide.bar?.onNext ? <button onClick={guide.bar.onNext}>bar next</button> : null}
     </>
   )
 }
@@ -188,6 +195,71 @@ describe("useOnboardingGuide", () => {
     expect(screen.getByRole("button", { name: "add role" })).toBeInTheDocument()
   })
 
+  it("does not scroll the page when the step opens, StrictMode's second run included", async () => {
+    const scrollIntoView = vi.spyOn(Element.prototype, "scrollIntoView")
+    // jsdom lays nothing out, so no anchor would count as on screen.
+    vi.spyOn(Element.prototype, "getClientRects").mockReturnValue([new DOMRect()] as never)
+    render(
+      <StrictMode>
+        <MascotProvider>
+          <TourOn />
+          <Probe />
+          {/* As in the app: the tour is already running when the step mounts. */}
+          <WhenTourRuns>
+            <Step />
+          </WhenTourRuns>
+          <section>
+            <MascotCorner id="onboarding-role" />
+          </section>
+        </MascotProvider>
+      </StrictMode>,
+    )
+    await act(() => new Promise((resolve) => requestAnimationFrame(() => resolve(undefined))))
+
+    expect(scrollIntoView).not.toHaveBeenCalled()
+    vi.restoreAllMocks()
+  })
+
+  describe("in a narrow window", () => {
+    beforeEach(() => {
+      window.matchMedia = ((query: string) => ({
+        matches: query.includes("max-width"),
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+      })) as unknown as typeof window.matchMedia
+    })
+    afterEach(() => {
+      // jsdom has none of its own.
+      Reflect.deleteProperty(window, "matchMedia")
+    })
+
+    it("stands in the bar, hands it the words and highlights the card it means", () => {
+      renderStep()
+
+      expectAnchor("onboarding-bar")
+      expect(screen.getByTestId("highlight")).toHaveTextContent("onboarding-role")
+      expect(screen.getByTestId("bar")).toHaveTextContent("Pick roles")
+    })
+
+    it("moves the highlight on with Next from the bar", async () => {
+      renderStep()
+      expect(screen.queryByRole("button", { name: "bar next" })).not.toBeInTheDocument()
+
+      await click("add role")
+      await click("bar next")
+
+      expectAnchor("onboarding-bar")
+      expect(screen.getByTestId("highlight")).toHaveTextContent("onboarding-topics")
+      expect(screen.getByTestId("bar")).toHaveTextContent("Pick topics")
+    })
+
+    it("draws no bar when the tour is not running", () => {
+      renderStep({ isTourOn: false })
+
+      expect(screen.getByTestId("bar")).toHaveTextContent("none")
+    })
+  })
+
   describe("while the person scrolls", () => {
     const rects: Record<string, { top: number; bottom: number }> = {}
 
@@ -209,6 +281,7 @@ describe("useOnboardingGuide", () => {
     const setup = { isRoleDone: true, isTopicsOptional: false }
 
     function Scrolled() {
+      const [topicsAnswer, setTopicsAnswer] = useState("")
       useOnboardingGuide({
         seed: "petr",
         readyText: "Ready",
@@ -217,9 +290,10 @@ describe("useOnboardingGuide", () => {
           {
             id: "topics",
             text: "Pick topics",
-            isDone: false,
-            answer: "",
+            isDone: topicsAnswer !== "",
+            answer: topicsAnswer,
             isOptional: setup.isTopicsOptional,
+            isManual: true,
           },
           { id: "note", text: "Write a note", isDone: false, answer: "", isOptional: true },
         ],
@@ -229,6 +303,7 @@ describe("useOnboardingGuide", () => {
           <Card id="role" />
           <Card id="topics" />
           <Card id="note" />
+          <button onClick={() => setTopicsAnswer("sql")}>answer topics</button>
         </>
       )
     }
@@ -383,6 +458,27 @@ describe("useOnboardingGuide", () => {
       )
 
       expectAnchor("onboarding-role")
+    })
+
+    it("does not yank the mascot back from a card the person answered further down", () => {
+      // The first card is empty, but the mascot is already on the second (as after an answer there).
+      setup.isRoleDone = false
+      mount()
+      scrollTo({ role: { top: 350, bottom: 600 }, topics: { top: 624, bottom: 800 } }, 200)
+      expectAnchor("onboarding-role")
+      act(() => screen.getByRole("button", { name: "answer topics" }).click())
+      expectAnchor("onboarding-topics")
+
+      scrollTo(
+        {
+          role: { top: -400, bottom: -200 },
+          topics: { top: 350, bottom: 600 },
+          note: { top: 624, bottom: 800 },
+        },
+        200,
+      )
+
+      expectAnchor("onboarding-topics")
     })
 
     it("does not take the page's own scrolling for the person's", () => {

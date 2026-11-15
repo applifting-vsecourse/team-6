@@ -1,7 +1,7 @@
 import type { ComponentType, ReactNode } from "react"
-import { render, screen, within } from "@testing-library/react"
+import { act, fireEvent, render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { MascotProvider, useMascotContext } from "@/components/Mascot/MascotContext"
 import { Route } from "@/routes/index"
@@ -76,6 +76,54 @@ describe("LandingPage", () => {
 
     await user.unhover(button)
     expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: silent")
+  })
+
+  describe("on a phone, which has nothing to hover with", () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+      window.matchMedia = ((query: string) => ({
+        matches: query === "(hover: none)",
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+      })) as unknown as typeof window.matchMedia
+    })
+    afterEach(() => {
+      vi.useRealTimers()
+      // jsdom has none of its own.
+      Reflect.deleteProperty(window, "matchMedia")
+    })
+
+    it("greets for a moment when the page opens, then goes quiet", () => {
+      render(
+        <MascotProvider>
+          <MascotProbe />
+          <LandingPage />
+        </MascotProvider>,
+      )
+      expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: Let's get started!")
+
+      act(() => void vi.advanceTimersByTime(4100))
+
+      expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: silent")
+    })
+
+    it("greets again for a moment after a tap", () => {
+      render(
+        <MascotProvider>
+          <MascotProbe />
+          <LandingPage />
+        </MascotProvider>,
+      )
+      act(() => void vi.advanceTimersByTime(4100))
+      const button = screen.getByRole("link", { name: "Create account" })
+
+      fireEvent.pointerEnter(button, { pointerType: "touch" })
+      expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: Let's get started!")
+
+      // A finger never "leaves" the way a mouse does, so the greeting must go by itself.
+      act(() => void vi.advanceTimersByTime(4100))
+      expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: silent")
+    })
   })
 
   it("greets a keyboard user who focuses the button too", async () => {

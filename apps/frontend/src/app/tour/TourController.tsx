@@ -51,7 +51,8 @@ export function TourController() {
   const profile = profileQuery.data
   // A person with no profile yet has not finished onboarding, so the tour is still ahead of them.
   const isDue = profileQuery.isSuccess && !profile?.tourCompletedAt
-  const isActive = Boolean(user) && (isReplay || isDue)
+  // At the header the tour is already saved as done; it only has its goodbye left to say.
+  const isActive = Boolean(user) && (isReplay || isDue || isAtHeader)
 
   const stepKey = isActive
     ? resolveTourStep({
@@ -71,8 +72,13 @@ export function TourController() {
   const stage = useMemo(() => {
     if (!user || !stepKey) return null
 
-    const finish = () => {
+    // The mascot flies home to the header. The tour is saved as done right here, not at "Done":
+    // a person who walks away from the goodbye must not get the whole tour again.
+    const goHome = () => {
       if (!isReplay) markTourDone()
+      setIsAtHeader(true)
+    }
+    const finish = () => {
       setIsReplay(false)
       setIsAtHeader(false)
       setStage?.(null)
@@ -80,7 +86,7 @@ export function TourController() {
     const next = (onClick: () => void): MascotAction => ({ label: t("tour.next"), onClick })
     const actions: Record<TourStepKey, MascotAction[]> = {
       overview: [next(() => void navigate({ to: ROUTES.kvintetFeed }))],
-      feed: [next(() => setIsAtHeader(true))],
+      feed: [next(goHome)],
       header: [{ label: t("tour.done"), onClick: finish }],
     }
 
@@ -88,7 +94,12 @@ export function TourController() {
       anchorId: TOUR_ANCHOR[stepKey],
       // From here on the mascot is this person's own avatar, seeded like the header and the menus.
       seed: user.username || user.id,
-      bubble: { text: t(`tour.${stepKey}`), actions: actions[stepKey], isClosable: true },
+      bubble: {
+        text: t(`tour.${stepKey}`),
+        actions: actions[stepKey],
+        // The cross ends the tour: nobody has to click through it to be rid of it.
+        onClose: stepKey === "header" ? finish : goHome,
+      },
     }
   }, [user, stepKey, isReplay, markTourDone, setStage, navigate, t])
   useMascotStage(stage)

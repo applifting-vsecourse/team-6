@@ -10,6 +10,7 @@ import {
   LocationMapPicker,
 } from "@/features/profile/components/LocationMapPicker"
 import { OnboardingCard } from "@/features/profile/components/OnboardingCard"
+import { OnboardingGuideBar } from "@/features/profile/components/OnboardingGuideBar"
 import { OnboardingTitle } from "@/features/profile/components/OnboardingTitle"
 import { GUIDE_READY_ID, useOnboardingGuide } from "@/features/profile/hooks/useOnboardingGuide"
 import { checkboxClass } from "@/features/profile/lib/optionStyles"
@@ -56,7 +57,7 @@ export function Step2Availability({
   const [timeOfDayError, setTimeOfDayError] = useState<string | null>(null)
   const [locationError, setLocationError] = useState<string | null>(null)
 
-  useOnboardingGuide({
+  const guide = useOnboardingGuide({
     seed: mascotSeed,
     readyText: t("tour.onboarding.step2Ready"),
     cards: [
@@ -261,6 +262,7 @@ export function Step2Availability({
           <MascotCorner id={GUIDE_READY_ID} />
         </div>
       </div>
+      {guide.bar ? <OnboardingGuideBar {...guide.bar} /> : null}
     </form>
   )
 }

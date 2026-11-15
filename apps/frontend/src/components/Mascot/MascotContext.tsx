@@ -27,8 +27,8 @@ export type MascotBubble = {
   /** Room a page set aside for this bubble (`MascotBubbleSlot`). Without it, it opens beside the mascot. */
   slotId?: string
   /**
-   * Without a slot: `above` the mascot, or `beside` it, where it must not cover the page, and
-   * with no room beside it the bubble docks to the bottom of the window.
+   * Without a slot: `above` the mascot, or `beside` it (to its right, narrowed to the room there),
+   * where it must not cover what the mascot stands on.
    */
   prefer?: "above" | "beside"
   actions?: MascotAction[]
@@ -37,6 +37,8 @@ export type MascotBubble = {
    * click on it brings the bubble back. A new text opens it again, so a guide keeps guiding.
    */
   isClosable?: boolean
+  /** Shows the cross too, but the page decides what it does (e.g. end the tour). */
+  onClose?: () => void
 }
 
 export type MascotStage = {
@@ -46,6 +48,11 @@ export type MascotStage = {
   seed?: string
   /** The mascot looks away: its eyes shut, e.g. while a password is typed. */
   isEyesClosed?: boolean
+  /**
+   * The anchor the mascot is talking about while it stands somewhere else (a guide bar on a
+   * phone): that element can highlight itself.
+   */
+  highlightId?: string
   bubble?: MascotBubble
 }
 

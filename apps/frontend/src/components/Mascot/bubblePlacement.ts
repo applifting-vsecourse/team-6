@@ -9,6 +9,8 @@ const CHAR_WIDTH = 9
 const PADDING = 32
 // Room for the Skip and Next buttons side by side.
 const MIN_WIDTH_WITH_ACTIONS = 220
+// Narrower than this a bubble beside the mascot is a column of single words.
+const MIN_BESIDE_WIDTH = 200
 const GUTTER = 16
 const TAIL_ROOM = 14
 const TAIL_INSET = 16
@@ -80,30 +82,23 @@ export function placeBubble(
     }
   }
 
-  const room = width + TAIL_ROOM + GUTTER
   if (prefer === "beside") {
-    // The mascot sits on a card the person is filling in: beside it or docked, never on the card.
-    if (viewport.width - mascot.right >= room) {
-      return {
-        side: "right",
-        width,
-        maxWidth,
-        left: mascot.right + TAIL_ROOM,
-        top: mascot.top,
-        tailX,
-        tailY: mascot.height / 2,
-      }
-    }
+    // The mascot sits on something the person is working in: the bubble goes to its right and
+    // takes the room there is, rather than cover it. A page with no room there shows no bubble.
+    const room = viewport.width - mascot.right - TAIL_ROOM - GUTTER
+    const narrowed = Math.max(Math.min(maxWidth, room), MIN_BESIDE_WIDTH)
     return {
-      side: "dock",
-      width,
-      maxWidth,
-      left: (viewport.width - width) / 2,
-      bottom: GUTTER,
+      side: "right",
+      width: Math.min(width, narrowed),
+      maxWidth: narrowed,
+      left: mascot.right + TAIL_ROOM,
+      top: mascot.top,
       tailX,
-      tailY: 0,
+      tailY: mascot.height / 2,
     }
   }
+
+  const room = width + TAIL_ROOM + GUTTER
   if (mascot.top >= HEADER_HEIGHT && viewport.width - mascot.right >= room) {
     return {
       side: "right",

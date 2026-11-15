@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
@@ -24,13 +24,36 @@ const STEPS = [
   { seed: "eva", n: 3, hasShort: false },
 ] as const
 
+// How long the greeting stays up where it cannot be hovered.
+const GREETING_MS = 4000
+const isTouchOnly = () => window.matchMedia?.("(hover: none)").matches ?? false
+
 function LandingPage() {
   const { t } = useTranslation()
   const { user } = useSession()
   const [mascotAnchorRef] = useMascotAnchor("landing-cta")
   // The greeting would cover the sign-in button or the text above, so it speaks only while the
-  // button or the mascot is pointed at (or focused), and never takes a click itself.
-  const [isGreeting, setIsGreeting] = useState(false)
+  // button or the mascot is pointed at (or focused), and never takes a click itself. A phone has
+  // nothing to point with: there it speaks for a moment when the page opens and after a tap.
+  const [isGreeting, setIsGreeting] = useState(isTouchOnly)
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const hideSoon = () => {
+    clearTimeout(hideTimer.current)
+    hideTimer.current = setTimeout(() => setIsGreeting(false), GREETING_MS)
+  }
+  useEffect(() => {
+    if (isTouchOnly()) hideSoon()
+    return () => clearTimeout(hideTimer.current)
+  }, [])
+  const onPointerEnter = (event: PointerEvent) => {
+    setIsGreeting(true)
+    // A finger "enters" with a tap and never leaves the way a mouse does.
+    if (event.pointerType === "mouse") clearTimeout(hideTimer.current)
+    else hideSoon()
+  }
+  const onPointerLeave = (event: PointerEvent) => {
+    if (event.pointerType === "mouse") setIsGreeting(false)
+  }
   // The yellow mascot greets visitors only; someone with an account has no use for it here.
   const stage = useMemo(
     () =>
@@ -70,8 +93,8 @@ function LandingPage() {
                     <>
                       <div
                         className="relative"
-                        onPointerEnter={() => setIsGreeting(true)}
-                        onPointerLeave={() => setIsGreeting(false)}
+                        onPointerEnter={onPointerEnter}
+                        onPointerLeave={onPointerLeave}
                         onFocus={() => setIsGreeting(true)}
                         onBlur={() => setIsGreeting(false)}
                       >

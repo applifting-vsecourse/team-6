@@ -36,9 +36,9 @@ export function HeaderMenu() {
   const [anchorRef, isOccupied] = useMascotAnchor("header-avatar")
   const mascot = useMascotContext()
   const replayTour = mascot?.replayTour
-  // The mascot is this person's avatar until the tour ends: it moves in here as the last step and
-  // the real one steps aside until then (and while it stands here).
-  const avatarClass = cn((isOccupied || mascot?.isTourActive) && "invisible")
+  // While the mascot is on screen as this person's avatar (in onboarding, on the tour, and when
+  // it lands here at the end), the real one steps aside so the face is never shown twice.
+  const avatarClass = cn((isOccupied || mascot?.stage?.seed) && "invisible")
 
   if (!user) {
     return (
