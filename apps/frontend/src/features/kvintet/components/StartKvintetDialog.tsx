@@ -100,13 +100,10 @@ export function StartKvintetDialog({ isOpen, onOpenChange, avatarSeed }: StartKv
     >
       {/* Below `sm` the dialog sits at the bottom like the mobile design's sheet. */}
       <DialogContent
+        isBottomSheet
         showCloseButton={false}
-        className="gap-4.5 bg-card p-7 max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:max-w-full max-sm:translate-x-0 max-sm:translate-y-0 max-sm:gap-4 max-sm:rounded-b-none max-sm:p-4 max-sm:pt-3 max-sm:data-[state=closed]:slide-out-to-bottom max-sm:data-[state=closed]:zoom-out-100 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=open]:zoom-in-100 sm:max-w-130"
+        className="gap-4.5 p-7 max-sm:gap-4 max-sm:p-4 max-sm:pt-3 sm:max-w-130 sm:rounded-lg"
       >
-        <span
-          aria-hidden
-          className="mx-auto h-1 w-10 rounded-full bg-border sm:hidden"
-        />
         <div className="flex items-center gap-3.5">
           {avatarSeed ? (
             // You are in colour; the grey faces are everyone you have not met yet.

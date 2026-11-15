@@ -4,14 +4,24 @@ import { Dialog as DialogPrimitive } from "radix-ui"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
+import { useMediaQuery } from "@/lib/useMediaQuery"
 import { cn } from "@/lib/utils"
+
+// DialogContent needs the root's onOpenChange to close itself after a drag.
+const DialogOpenChangeContext = React.createContext<((isOpen: boolean) => void) | undefined>(
+  undefined,
+)
+
+const DISMISS_DRAG_PX = 100
 
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return (
-    <DialogPrimitive.Root
-      data-slot="dialog"
-      {...props}
-    />
+    <DialogOpenChangeContext.Provider value={props.onOpenChange}>
+      <DialogPrimitive.Root
+        data-slot="dialog"
+        {...props}
+      />
+    </DialogOpenChangeContext.Provider>
   )
 }
 
@@ -63,11 +73,63 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  isBottomSheet = false,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
+  // Below `sm`: sits at the bottom with a handle and can be dragged down to dismiss.
+  isBottomSheet?: boolean
 }) {
   const { t } = useTranslation()
+  const onOpenChange = React.useContext(DialogOpenChangeContext)
+  const isMobile = useMediaQuery("(max-width: 39.99rem)")
+  const startY = React.useRef<number | null>(null)
+  const dragY = React.useRef(0)
+
+  const snapBack = (sheet: HTMLElement) => {
+    sheet.style.transition = "transform 200ms ease-out"
+    sheet.style.transform = ""
+  }
+
+  const dragHandlers = {
+    onTouchStart: (e: React.TouchEvent<HTMLElement>) => {
+      const target = e.target as Element
+      const touchY = e.touches[0]?.clientY
+      // Touches in a portaled popup (Select) bubble here too; inputs keep their own gestures.
+      const canDrag =
+        isMobile &&
+        touchY !== undefined &&
+        e.touches.length === 1 &&
+        e.currentTarget.contains(target) &&
+        !target.closest("input, textarea, select, [role=slider]")
+      startY.current = canDrag ? touchY : null
+      dragY.current = 0
+      if (canDrag) e.currentTarget.style.transition = "none"
+    },
+    onTouchMove: (e: React.TouchEvent<HTMLElement>) => {
+      const touchY = e.touches[0]?.clientY
+      if (startY.current === null || touchY === undefined) return
+      dragY.current = Math.max(0, touchY - startY.current)
+      e.currentTarget.style.transform = `translateY(${dragY.current}px)`
+    },
+    onTouchEnd: (e: React.TouchEvent<HTMLElement>) => {
+      if (startY.current === null) return
+      startY.current = null
+      const sheet = e.currentTarget
+      if (dragY.current <= DISMISS_DRAG_PX) return snapBack(sheet)
+      // The exit animation starts from the dragged position. If the dialog refuses to close
+      // (e.g. a delete in flight), it is still open next frame: put it back.
+      onOpenChange?.(false)
+      requestAnimationFrame(() => {
+        if (sheet.dataset.state === "open") snapBack(sheet)
+      })
+    },
+    onTouchCancel: (e: React.TouchEvent<HTMLElement>) => {
+      if (startY.current === null) return
+      startY.current = null
+      snapBack(e.currentTarget)
+    },
+  }
 
   return (
     <DialogPortal data-slot="dialog-portal">
@@ -76,10 +138,18 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           "fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg",
+          isBottomSheet && bottomSheetDialogContentClassName,
           className,
         )}
+        {...(isBottomSheet && dragHandlers)}
         {...props}
       >
+        {isBottomSheet && (
+          <span
+            aria-hidden
+            className="mx-auto h-1 w-10 rounded-full bg-input sm:hidden"
+          />
+        )}
         {children}
         {showCloseButton && (
           <DialogPrimitive.Close
@@ -154,7 +224,7 @@ function DialogDescription({
   )
 }
 
-export const bottomSheetDialogContentClassName =
+const bottomSheetDialogContentClassName =
   "gap-4 bg-card p-6 max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:max-w-full max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-b-none max-sm:p-4 max-sm:pt-3 max-sm:pb-7 max-sm:data-[state=closed]:slide-out-to-bottom max-sm:data-[state=closed]:zoom-out-100 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=open]:zoom-in-100 sm:max-w-[480px] sm:rounded-[14px] sm:p-7"
 
 export {
