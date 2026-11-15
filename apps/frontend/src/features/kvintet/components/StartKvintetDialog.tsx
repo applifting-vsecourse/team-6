@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { getErrorMessage } from "@/lib/errorMessage"
+import { useMediaQuery } from "@/lib/useMediaQuery"
 
 import { referenceQueryOptions } from "@/features/kvintet/api/referenceQueryOptions"
 import { useStartKvintet } from "@/features/kvintet/hooks/useStartKvintet"
@@ -73,6 +74,8 @@ type StartKvintetDialogProps = {
 export function StartKvintetDialog({ isOpen, onOpenChange, avatarSeed }: StartKvintetDialogProps) {
   const { t } = useTranslation()
   const label = useSlugLabel()
+  // Same breakpoint as the bottom-sheet layout below (Tailwind `sm` = 40rem).
+  const isPhone = useMediaQuery("(max-width: 39.99rem)")
   const schema = useMemo(() => createSchema(t), [t])
   const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues })
   const { data: reference } = useQuery(referenceQueryOptions())
@@ -101,7 +104,13 @@ export function StartKvintetDialog({ isOpen, onOpenChange, avatarSeed }: StartKv
       {/* Below `sm` the dialog sits at the bottom like the mobile design's sheet. */}
       <DialogContent
         showCloseButton={false}
-        className="gap-4.5 bg-card p-7 max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:max-w-full max-sm:translate-x-0 max-sm:translate-y-0 max-sm:gap-4 max-sm:rounded-b-none max-sm:p-4 max-sm:pt-3 max-sm:data-[state=closed]:slide-out-to-bottom max-sm:data-[state=closed]:zoom-out-100 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=open]:zoom-in-100 sm:max-w-130"
+        // On phones keep focus on the dialog itself: focusing the first input would pop the keyboard up on open.
+        onOpenAutoFocus={(event) => {
+          if (!isPhone) return
+          event.preventDefault()
+          if (event.currentTarget instanceof HTMLElement) event.currentTarget.focus()
+        }}
+        className="gap-4.5 bg-card p-7 max-sm:top-auto max-sm:bottom-[var(--keyboard-inset,0px)] max-sm:left-0 max-sm:max-w-full max-sm:translate-x-0 max-sm:translate-y-0 max-sm:gap-4 max-sm:rounded-b-none max-sm:p-4 max-sm:pt-3 max-sm:data-[state=closed]:slide-out-to-bottom max-sm:data-[state=closed]:zoom-out-100 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=open]:zoom-in-100 sm:max-w-130"
       >
         <span
           aria-hidden

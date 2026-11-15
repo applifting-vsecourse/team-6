@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useVisualViewportVars } from "@/lib/useVisualViewportVars"
 
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return (
@@ -68,6 +69,7 @@ function DialogContent({
   showCloseButton?: boolean
 }) {
   const { t } = useTranslation()
+  useVisualViewportVars()
 
   return (
     <DialogPortal data-slot="dialog-portal">
@@ -75,7 +77,8 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg",
+          // Sized to the visible viewport so the on-screen keyboard never hides the top; scrolls inside.
+          "fixed top-[calc(50%-var(--keyboard-inset,0px)/2)] left-[50%] z-50 grid max-h-[var(--vv-height,100dvh)] overflow-y-auto w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg",
           className,
         )}
         {...props}
@@ -155,7 +158,7 @@ function DialogDescription({
 }
 
 export const bottomSheetDialogContentClassName =
-  "gap-4 bg-card p-6 max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:max-w-full max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-b-none max-sm:p-4 max-sm:pt-3 max-sm:pb-7 max-sm:data-[state=closed]:slide-out-to-bottom max-sm:data-[state=closed]:zoom-out-100 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=open]:zoom-in-100 sm:max-w-[480px] sm:rounded-[14px] sm:p-7"
+  "gap-4 bg-card p-6 max-sm:top-auto max-sm:bottom-[var(--keyboard-inset,0px)] max-sm:left-0 max-sm:max-w-full max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-b-none max-sm:p-4 max-sm:pt-3 max-sm:pb-7 max-sm:data-[state=closed]:slide-out-to-bottom max-sm:data-[state=closed]:zoom-out-100 max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=open]:zoom-in-100 sm:max-w-[480px] sm:rounded-[14px] sm:p-7"
 
 export {
   Dialog,
