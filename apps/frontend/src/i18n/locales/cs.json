@@ -10,6 +10,27 @@
     },
     "deleteSuccess": "Váš účet byl úspěšně smazán."
   },
+  "admin": {
+    "description": "Jen součty. Žádná jména ani zprávy.",
+    "error": {
+      "retry": "Zkusit znovu",
+      "title": "Čísla se nepodařilo načíst"
+    },
+    "kvintets": {
+      "active": "Začaly",
+      "formingReady": "Skládají se, 3–4 lidé (mohou hlasovat pro start)",
+      "formingSmall": "Skládají se, 1–2 lidé",
+      "title": "Kvintety",
+      "total": "Všechny kvintety"
+    },
+    "title": "Přehled pilotu",
+    "users": {
+      "activeToday": "Dnes přihlášení",
+      "onboarded": "Dokončili profil",
+      "registered": "Registrovaní",
+      "title": "Lidé"
+    }
+  },
   "auth": {
     "acceptCodeOfConduct": "Souhlasím s <coc>pravidly komunity</coc>",
     "confirmPassword": "Potvrzení hesla",
@@ -328,6 +349,7 @@
     "WEEKLY": "každý týden"
   },
   "nav": {
+    "admin": "Admin",
     "kvintetFeed": "Kvintety",
     "kvintetFeedDisabled": "Už jste v kvintetu, proto nemůžete procházet další.",
     "overview": "Domů",

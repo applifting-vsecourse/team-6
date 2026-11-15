@@ -21,6 +21,11 @@ export const betterAuthCoreConfig: BetterAuthOptions = {
       },
     },
   },
+  session: {
+    // "Active today" in the admin stats counts sessions refreshed today, so refresh hourly (default: daily).
+    // shortcut: misses a user who signed in and out again today, add user.lastActiveAt if the number has to be exact
+    updateAge: 60 * 60,
+  },
   emailAndPassword: {
     enabled: true,
   },

@@ -8,7 +8,8 @@ import { AppHeader } from "@/features/auth/components/AppHeader"
 // The gaze driver needs browser APIs jsdom lacks (matchMedia, ResizeObserver).
 vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
 
-const useSession = vi.fn<() => { user: { id: string; name: string; username: string } | null }>()
+const useSession =
+  vi.fn<() => { user: { id: string; name: string; username: string; role?: string } | null }>()
 
 vi.mock("@/features/auth/hooks/useSession", () => ({ useSession: () => useSession() }))
 vi.mock("@/features/auth/hooks/useSignOut", () => ({
@@ -92,6 +93,23 @@ describe("AppHeader", () => {
     await userEvent.hover(item)
 
     expect(await screen.findByRole("tooltip")).toHaveTextContent("You are already in a kvintet.")
+  })
+
+  it("shows the Admin link to an admin only, in the header and the mobile menu", async () => {
+    useSession.mockReturnValue({ user: jana })
+    const { unmount } = render(<AppHeader />)
+    expect(screen.queryByRole("link", { name: "Admin" })).not.toBeInTheDocument()
+    unmount()
+
+    useSession.mockReturnValue({ user: { ...jana, role: "admin" } })
+    render(<AppHeader />)
+    expect(screen.getByRole("link", { name: "Admin" })).toHaveAttribute("href", "/admin")
+
+    await userEvent.click(screen.getByRole("button", { name: "Open menu" }))
+    expect(within(screen.getByRole("dialog")).getByRole("link", { name: "Admin" })).toHaveAttribute(
+      "href",
+      "/admin",
+    )
   })
 
   it("shows navigation and the mobile menu when signed in", () => {

@@ -55,6 +55,7 @@ export function AppHeader({
   return (
     <Header
       hasNav={Boolean(user) && !isOnboarding}
+      isAdmin={user?.role === "admin"}
       navDisabled={navDisabled}
       step={isOnboarding ? onboardingStep : undefined}
       chat={chat}
