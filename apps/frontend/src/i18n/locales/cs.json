@@ -188,7 +188,7 @@
     "dialog": {
       "cancel": "Zrušit",
       "category": "Kategorie",
-      "categoryPlaceholder": "Zvolte kategorii",
+      "categoryHint": "Vyberte nejvýše 3",
       "confirmLeave": "Opustit",
       "confirmLeaveActive": "Opustit kvintet",
       "description": "Budete v něm první. Další se přidají podle tématu.",

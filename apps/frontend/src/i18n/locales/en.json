@@ -184,7 +184,7 @@
     "dialog": {
       "cancel": "Cancel",
       "category": "Category",
-      "categoryPlaceholder": "Pick a category",
+      "categoryHint": "Pick up to 3",
       "confirmLeave": "Leave",
       "confirmLeaveActive": "Leave kvintet",
       "description": "You'll be its first member. Others join by topic.",

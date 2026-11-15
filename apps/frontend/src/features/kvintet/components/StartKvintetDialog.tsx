@@ -27,14 +27,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { getErrorMessage } from "@/lib/errorMessage"
 
 import { referenceQueryOptions } from "@/features/kvintet/api/referenceQueryOptions"
@@ -44,6 +38,7 @@ import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
 // Same limits as the backend DTO; the server stays the authority.
 const TITLE_MAX = 120
 const DESCRIPTION_MAX = 500
+const CATEGORIES_MAX = 3
 
 const createSchema = (t: TFunction) =>
   z.object({
@@ -52,7 +47,10 @@ const createSchema = (t: TFunction) =>
       .trim()
       .min(1, t("kvintet.validation.titleRequired"))
       .max(TITLE_MAX, t("kvintet.validation.titleTooLong", { max: TITLE_MAX })),
-    categorySlug: z.string().min(1, t("kvintet.validation.categoryRequired")),
+    categorySlugs: z
+      .array(z.string())
+      .min(1, t("kvintet.validation.categoryRequired"))
+      .max(CATEGORIES_MAX),
     description: z
       .string()
       .trim()
@@ -61,7 +59,7 @@ const createSchema = (t: TFunction) =>
 
 type FormValues = z.infer<ReturnType<typeof createSchema>>
 
-const defaultValues: FormValues = { title: "", categorySlug: "", description: "" }
+const defaultValues: FormValues = { title: "", categorySlugs: [], description: "" }
 
 type StartKvintetDialogProps = {
   isOpen: boolean
@@ -89,7 +87,7 @@ export function StartKvintetDialog({ isOpen, onOpenChange, avatarSeed }: StartKv
   const handleSubmit = (values: FormValues) =>
     start.mutate({
       title: values.title,
-      categorySlugs: [values.categorySlug],
+      categorySlugs: values.categorySlugs,
       description: values.description || undefined,
     })
 
@@ -153,33 +151,37 @@ export function StartKvintetDialog({ isOpen, onOpenChange, avatarSeed }: StartKv
 
             <FormField
               control={form.control}
-              name="categorySlug"
+              name="categorySlugs"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("kvintet.dialog.category")}</FormLabel>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <FormControl>
-                      <SelectTrigger
-                        className="bg-card"
-                        onBlur={field.onBlur}
-                      >
-                        <SelectValue placeholder={t("kvintet.dialog.categoryPlaceholder")} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {reference?.categories.map((category) => (
-                        <SelectItem
-                          key={category.slug}
-                          value={category.slug}
+                  <FormControl>
+                    <ToggleGroup
+                      type="multiple"
+                      variant="outline"
+                      spacing={2}
+                      role="group"
+                      aria-label={t("kvintet.dialog.category")}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      className="w-auto flex-wrap justify-start"
+                    >
+                      {reference?.categories.map(({ slug }) => (
+                        <ToggleGroupItem
+                          key={slug}
+                          value={slug}
+                          // A fourth cannot be picked; the chosen ones stay pressable to undo.
+                          disabled={
+                            !field.value.includes(slug) && field.value.length >= CATEGORIES_MAX
+                          }
+                          className="h-8 rounded-full border-input px-3 font-semibold text-foreground data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:hover:bg-primary/90"
                         >
-                          {label("categories", category.slug)}
-                        </SelectItem>
+                          {label("categories", slug)}
+                        </ToggleGroupItem>
                       ))}
-                    </SelectContent>
-                  </Select>
+                    </ToggleGroup>
+                  </FormControl>
+                  <FormDescription>{t("kvintet.dialog.categoryHint")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
