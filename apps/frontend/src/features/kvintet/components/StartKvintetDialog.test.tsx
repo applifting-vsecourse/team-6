@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { api } from "@/lib/api-client"
 
@@ -80,5 +80,34 @@ describe("StartKvintetDialog", () => {
     renderDialog("")
 
     expect(screen.getByRole("dialog").querySelector("[data-slot='avatar']")).toBeNull()
+  })
+
+  describe("focus on open", () => {
+    const stubPhone = (isPhone: boolean) =>
+      vi.stubGlobal("matchMedia", () => ({
+        matches: isPhone,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }))
+
+    afterEach(() => vi.unstubAllGlobals())
+
+    it("keeps the keyboard closed on a phone by focusing the dialog, not the topic", async () => {
+      stubPhone(true)
+      renderDialog()
+
+      const dialog = await screen.findByRole("dialog")
+      await waitFor(() => expect(dialog).toHaveFocus())
+      expect(screen.getByLabelText("What do you want to talk about")).not.toHaveFocus()
+    })
+
+    it("focuses the topic on larger screens", async () => {
+      stubPhone(false)
+      renderDialog()
+
+      await waitFor(() =>
+        expect(screen.getByLabelText("What do you want to talk about")).toHaveFocus(),
+      )
+    })
   })
 })

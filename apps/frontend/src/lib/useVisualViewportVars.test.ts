@@ -5,13 +5,18 @@ import { useVisualViewportVars } from "./useVisualViewportVars"
 
 const root = document.documentElement.style
 
+const stubViewport = (height: number, scale = 1) => {
+  const viewport = Object.assign(new EventTarget(), { height, offsetTop: 0, scale })
+  vi.stubGlobal("visualViewport", viewport)
+  vi.stubGlobal("innerHeight", 800)
+  return viewport
+}
+
 describe("useVisualViewportVars", () => {
   afterEach(() => vi.unstubAllGlobals())
 
   it("publishes the visible height and keyboard inset, and cleans up", () => {
-    const viewport = Object.assign(new EventTarget(), { height: 800, offsetTop: 0 })
-    vi.stubGlobal("visualViewport", viewport)
-    vi.stubGlobal("innerHeight", 800)
+    const viewport = stubViewport(800)
 
     const { unmount } = renderHook(() => useVisualViewportVars())
     expect(root.getPropertyValue("--keyboard-inset")).toBe("0px")
@@ -24,6 +29,27 @@ describe("useVisualViewportVars", () => {
     unmount()
     expect(root.getPropertyValue("--vv-height")).toBe("")
     expect(root.getPropertyValue("--keyboard-inset")).toBe("")
+  })
+
+  it("keeps the variables until the last of several dialogs unmounts", () => {
+    stubViewport(500)
+
+    const first = renderHook(() => useVisualViewportVars())
+    const second = renderHook(() => useVisualViewportVars())
+    first.unmount()
+    expect(root.getPropertyValue("--vv-height")).toBe("500px")
+
+    second.unmount()
+    expect(root.getPropertyValue("--vv-height")).toBe("")
+  })
+
+  it("does not mistake pinch-zoom for a keyboard", () => {
+    stubViewport(400, 2)
+
+    const { unmount } = renderHook(() => useVisualViewportVars())
+    expect(root.getPropertyValue("--keyboard-inset")).toBe("0px")
+    expect(root.getPropertyValue("--vv-height")).toBe("800px")
+    unmount()
   })
 
   it("does nothing without visualViewport", () => {

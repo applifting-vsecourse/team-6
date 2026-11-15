@@ -4,8 +4,8 @@ import { Dialog as DialogPrimitive } from "radix-ui"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
 import { useVisualViewportVars } from "@/lib/useVisualViewportVars"
+import { cn } from "@/lib/utils"
 
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return (
@@ -78,7 +78,7 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           // Sized to the visible viewport so the on-screen keyboard never hides the top; scrolls inside.
-          "fixed top-[calc(50%-var(--keyboard-inset,0px)/2)] left-[50%] z-50 grid max-h-[var(--vv-height,100dvh)] overflow-y-auto w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg",
+          "fixed top-[calc(50%-var(--keyboard-inset,0px)/2)] left-[50%] z-50 grid max-h-[var(--vv-height,100dvh)] w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 overflow-y-auto rounded-lg border bg-background p-6 shadow-lg duration-200 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg",
           className,
         )}
         {...props}
