@@ -1,11 +1,10 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react"
 import { happy, unsure } from "blobatar/expression"
-import { MapPin, Mic, Pause, Phone, Play, Video } from "lucide-react"
+import { MapPin, Mic, Phone, Video } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { AnonymousBlobatar, Face } from "@/components/AnonymousBlobatar"
 import { GazeBlobatar } from "@/components/GazeBlobatar"
-import { Button } from "@/components/ui/button"
 import type en from "@/i18n/locales/en.json"
 import { useMediaQuery } from "@/lib/useMediaQuery"
 import { cn } from "@/lib/utils"
@@ -27,6 +26,9 @@ const STEPS = [0, 1, 2, 3, 4, 5] as const
 // The stages are drawn at a fixed size and zoomed down to whatever room the page has. The desktop
 // stage is 1120 wide but its steps and card only span 1008 of it; the 56 px margins are cropped.
 const STAGE_WIDTH = { desktop: 1008, phone: 360 }
+const PHONE_HEIGHT = 640
+// A little air around the phone stage.
+const PHONE_CHROME = 16
 
 /** A blobatar stacked in a seat; CSS fades between the layers (grey, colour, happy). */
 function Layer({ kind, children }: { kind: "g" | "c" | "h" | "u"; children: ReactNode }) {
@@ -128,9 +130,7 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
   const { t } = useTranslation()
   const isDesktop = useMediaQuery("(min-width: 768px)")
   const isReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)")
-  // Pausing shows the last meeting scene, the same still frame reduced motion gets (WCAG 2.2.2).
-  const [isPaused, setIsPaused] = useState(false)
-  const { flags, count } = useCoreIdeaTimeline(isDesktop, isReducedMotion || isPaused)
+  const { flags, count } = useCoreIdeaTimeline(isDesktop, isReducedMotion)
 
   const frameRef = useRef<HTMLDivElement>(null)
   const [fit, setFit] = useState(1)
@@ -139,10 +139,13 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
     const frame = frameRef.current
     if (!frame) return
     // The desktop stage fills its parent, larger than drawn if need be, so its margins match the
-    // page's; the phone stage only shrinks.
+    // page's; the phone stage only shrinks, and also to the height of the screen, so the whole
+    // scene fits in one view. clientHeight is the viewport with the browser
+    // bars showing, so it does not jump as they hide on scroll.
     const measure = () => {
       const ratio = frame.clientWidth / STAGE_WIDTH[isDesktop ? "desktop" : "phone"]
-      setFit(isDesktop ? ratio : Math.min(1, ratio))
+      const byHeight = (document.documentElement.clientHeight - PHONE_CHROME) / PHONE_HEIGHT
+      setFit(isDesktop ? ratio : Math.min(1, ratio, byHeight))
     }
     measure()
     const observer = new ResizeObserver(measure)
@@ -389,18 +392,6 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
           </>
         )}
       </div>
-      {isReducedMotion ? null : (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="mt-2"
-          onClick={() => setIsPaused((isPausedNow) => !isPausedNow)}
-        >
-          {isPaused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
-          {text(isPaused ? "play" : "pause")}
-        </Button>
-      )}
     </div>
   )
 }

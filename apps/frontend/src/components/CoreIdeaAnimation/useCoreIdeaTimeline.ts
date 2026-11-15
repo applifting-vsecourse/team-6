@@ -174,8 +174,8 @@ export function useCoreIdeaTimeline(isDesktop: boolean, isStatic: boolean) {
       for (const [ms, apply] of beats(isDesktop)) at(ms + 60, apply)
       timers.push(window.setTimeout(run, (isDesktop ? LOOP_MS + 600 : LOOP_MS) + 60))
     }
-    // The first start waits for the page to settle; playing again after a pause starts at once,
-    // from the beginning, whatever scene the loop stopped on.
+    // The first start waits for the page to settle; a later one (the stage or reduced motion
+    // changed) starts at once, from the beginning.
     timers.push(window.setTimeout(run, hasPlayed.current ? 0 : 300))
     hasPlayed.current = true
 

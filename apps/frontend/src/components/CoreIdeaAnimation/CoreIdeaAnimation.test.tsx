@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react"
+import { act, render, screen } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 import { CoreIdeaAnimation } from "@/components/CoreIdeaAnimation/CoreIdeaAnimation"
@@ -126,29 +126,5 @@ describe("CoreIdeaAnimation", () => {
     at(700) // 27.4 s: restarted
     expect(stage(container)).toHaveClass("ci-n0", "ci-lonely")
     expect(stage(container)).not.toHaveClass("ci-logo")
-  })
-
-  it("pauses on the button and plays again from the beginning", () => {
-    stubMedia([])
-    const { container } = render(<CoreIdeaAnimation />)
-
-    act(() => void vi.advanceTimersByTime(5_000))
-    fireEvent.click(screen.getByRole("button", { name: "Pause animation" }))
-
-    act(() => void vi.advanceTimersByTime(60_000))
-    expect(stage(container)).toHaveClass("ci-meet", "ci-landed")
-    expect(container.querySelector(".ci-count")).toHaveTextContent("5 / 5")
-
-    fireEvent.click(screen.getByRole("button", { name: "Play animation" }))
-    act(() => void vi.advanceTimersByTime(200))
-    expect(stage(container)).toHaveClass("ci-n0", "ci-lonely")
-    expect(screen.getByRole("button", { name: "Pause animation" })).toBeInTheDocument()
-  })
-
-  it("offers no pause button when reduced motion already holds a still frame", () => {
-    stubMedia(["reduced-motion"])
-    render(<CoreIdeaAnimation />)
-
-    expect(screen.queryByRole("button")).not.toBeInTheDocument()
   })
 })

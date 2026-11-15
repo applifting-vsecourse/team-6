@@ -32,8 +32,9 @@ function LandingPage() {
       <PageLayout header={<SiteHeader />}>
         <div className="px-4">
           <div className="mx-auto flex w-full max-w-335 flex-col gap-5 pt-7 pb-10 md:gap-18 md:pt-18 md:pb-22">
-            <section className="flex flex-col gap-8 xl:flex-row xl:items-center xl:gap-12">
-              <div className="flex flex-col items-start gap-5 md:gap-5.5 xl:w-88 xl:shrink-0">
+            <section className="flex flex-col gap-5 md:gap-8 xl:flex-row xl:items-center xl:gap-12">
+              {/* On a phone the column dissolves so the buttons can sit beneath the animation. */}
+              <div className="flex flex-col items-start gap-5 max-md:contents md:gap-5.5 xl:w-88 xl:shrink-0">
                 <h1 className="text-display-mobile md:text-display">{t("landing.heroTitle2")}</h1>
                 <p className="text-lead text-muted-foreground">
                   <span className="md:hidden">{t("landing.heroTextShort")}</span>
@@ -41,7 +42,7 @@ function LandingPage() {
                 </p>
                 {/* The call to action depends on who is asking: no point offering an
                   account to someone who already has one. */}
-                <div className="flex w-full flex-col gap-2.5 md:w-auto md:flex-row md:gap-3">
+                <div className="flex w-full flex-col gap-2.5 max-md:order-1 md:w-auto md:flex-row md:gap-3">
                   {user ? (
                     <Button asChild>
                       <Link to={ROUTES.overview}>{t("landing.goToOverview")}</Link>
