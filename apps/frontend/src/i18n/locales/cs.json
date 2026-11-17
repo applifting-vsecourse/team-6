@@ -358,8 +358,11 @@
       "rolePlaceholder": "např. Softwarový inženýr",
       "roleRequired": "Vyberte alespoň jednu roli",
       "searchAllRoles": "Není tu? Hledat ve všech rolích",
+      "searchAllTags": "Není tu? Hledat ve všech štítcích",
       "searchRoleAria": "Hledat roli",
       "searchRolePlaceholder": "Hledat roli…",
+      "searchTagsAria": "Hledat štítky v sekci {{section}}",
+      "searchTagsPlaceholder": "Hledat štítky…",
       "teachHint": "Vyberte libovolný počet štítků.",
       "teachTitle": "Co umím naučit",
       "title": "Řekněte nám něco o sobě"

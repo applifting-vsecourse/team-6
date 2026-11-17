@@ -11,5 +11,7 @@ export class TagEntity {
   constructor(
     public readonly id: string,
     public readonly slug: string,
+    /** Category slugs, in category sort order; a tag may belong to several. */
+    public readonly categories: string[] = [],
   ) {}
 }

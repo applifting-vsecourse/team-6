@@ -44,10 +44,11 @@ vi.mock("@/features/profile/api/profileApi", async (importOriginal) => {
       queryKey: ["reference"],
       queryFn: () =>
         Promise.resolve({
+          categories: [{ slug: "software-development" }, { slug: "business" }],
           cities: [{ id: "c_praha", name: "Praha", lat: 50.07, lng: 14.43 }],
           tags: [
-            { id: "1", slug: "excel" },
-            { id: "2", slug: "python" },
+            { id: "1", slug: "excel", categories: ["business"] },
+            { id: "2", slug: "python", categories: ["software-development"] },
           ],
         }),
     }),
