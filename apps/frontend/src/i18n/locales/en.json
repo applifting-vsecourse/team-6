@@ -350,8 +350,11 @@
       "rolePlaceholder": "e.g. Software Engineer",
       "roleRequired": "Select at least one role",
       "searchAllRoles": "Not here? Search all roles",
+      "searchAllTags": "Not here? Search all tags",
       "searchRoleAria": "Search role",
       "searchRolePlaceholder": "Search role…",
+      "searchTagsAria": "Search tags in {{section}}",
+      "searchTagsPlaceholder": "Search tags…",
       "teachHint": "Pick any number of tags.",
       "teachTitle": "What I can teach",
       "title": "Tell us about you"

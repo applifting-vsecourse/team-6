@@ -162,7 +162,7 @@ All routes are under `/api`, need a session unless marked public, and are docume
 
 | Method & path                                | Purpose                                  | Guard           |
 | -------------------------------------------- | ---------------------------------------- | --------------- |
-| `GET /reference`                             | Categories (tags, cities to follow)      | public          |
+| `GET /reference`                             | Categories, tags with categories, cities | public          |
 | `GET/PUT /me/profile`                        | Read / save profile + questionnaire      | auth            |
 | `DELETE /me`                                 | Delete account                           | auth            |
 | `GET /offers?category=`                      | Board listing                            | auth            |

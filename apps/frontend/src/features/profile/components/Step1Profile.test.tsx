@@ -5,10 +5,11 @@ import { describe, expect, it, vi } from "vitest"
 import { Step1Profile } from "./Step1Profile"
 
 const mockTags = [
-  { id: "1", slug: "excel" },
-  { id: "2", slug: "python" },
-  { id: "3", slug: "hiking" },
+  { id: "1", slug: "excel", categories: ["business"] },
+  { id: "2", slug: "python", categories: ["software-development"] },
+  { id: "3", slug: "hiking", categories: ["leisure"] },
 ]
+const mockCategories = [{ slug: "software-development" }, { slug: "business" }, { slug: "leisure" }]
 
 describe("Step1Profile", () => {
   it("renders role field and requires it before continuing", async () => {
@@ -25,6 +26,7 @@ describe("Step1Profile", () => {
           interestTagIds: [],
         }}
         allTags={mockTags}
+        categories={mockCategories}
         onContinue={onContinue}
       />,
     )
@@ -48,6 +50,7 @@ describe("Step1Profile", () => {
           interestTagIds: [],
         }}
         allTags={mockTags}
+        categories={mockCategories}
         onContinue={onContinue}
       />,
     )
@@ -55,10 +58,11 @@ describe("Step1Profile", () => {
     await userEvent.click(await screen.findByRole("button", { name: "Marketing & sales" }))
 
     await userEvent.click(screen.getByRole("button", { name: "Select role Marketing Specialist" }))
-    // Every card suggests Excel while it has room; the first card is "What I can teach".
-    const [excelInTeach] = screen.getAllByRole("button", { name: "Add tag Excel" })
-    if (!excelInTeach) throw new Error("Excel suggestion missing")
-    await userEvent.click(excelInTeach)
+    // Each tag card has its own category chips; the first card is "What I can teach".
+    const [businessInTeach] = screen.getAllByRole("button", { name: "Business" })
+    if (!businessInTeach) throw new Error("Business category missing")
+    await userEvent.click(businessInTeach)
+    await userEvent.click(screen.getByRole("button", { name: "Add tag Excel" }))
     await userEvent.click(screen.getByRole("button", { name: "Continue" }))
 
     expect(onContinue).toHaveBeenCalledWith({
@@ -82,6 +86,7 @@ describe("Step1Profile", () => {
           interestTagIds: [],
         }}
         allTags={mockTags}
+        categories={mockCategories}
         onContinue={onContinue}
       />,
     )

@@ -19,8 +19,21 @@ export class ReferenceRepository {
   async findAllTags(): Promise<TagEntity[]> {
     const tags = await this.prisma.tag.findMany({
       orderBy: { slug: 'asc' },
+      include: {
+        categories: {
+          orderBy: { category: { sortOrder: 'asc' } },
+          select: { category: { select: { slug: true } } },
+        },
+      },
     });
-    return tags.map((t) => new TagEntity(String(t.id), t.slug));
+    return tags.map(
+      (t) =>
+        new TagEntity(
+          String(t.id),
+          t.slug,
+          t.categories.map((c) => c.category.slug),
+        ),
+    );
   }
 
   async findCategories(): Promise<{ slug: string }[]> {
