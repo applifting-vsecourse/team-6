@@ -237,6 +237,7 @@ describe("ProfilePage", () => {
           afternoons: false,
           evenings: false,
           cityName: null,
+          radiusKm: null,
           meetingFrequency: null,
         },
       }),
@@ -448,6 +449,23 @@ describe("formatWhenAndWhere", () => {
       meetingFrequency: null,
     }
     expect(formatWhenAndWhere(withoutRadius, tMock)).toBe("Weekends afternoons · Ostrava")
+  })
+
+  it("shows just the radius when there is no city name", () => {
+    const noCity = {
+      ...mockProfile,
+      weekdays: true,
+      weekends: false,
+      mornings: false,
+      afternoons: false,
+      evenings: true,
+      cityName: null,
+      radiusKm: 10,
+      meetingFrequency: "BIWEEKLY" as const,
+    }
+    expect(formatWhenAndWhere(noCity, tMock)).toBe(
+      "Weekdays evenings · within 10 km · every two weeks",
+    )
   })
 })
 
