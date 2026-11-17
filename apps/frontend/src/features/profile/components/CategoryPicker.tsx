@@ -10,7 +10,13 @@ import { TagBadge } from "@/features/profile/components/TagBadge"
 
 export type PickerGroup = { id: string; label: string }
 // An item may sit in several groups; one in none is still found by the search.
-export type PickerItem = { id: string; label: string; groupIds: readonly string[] }
+// `slug` is searched next to the label; `id` is not, as a tag id is a number.
+export type PickerItem = {
+  id: string
+  slug: string
+  label: string
+  groupIds: readonly string[]
+}
 
 type CategoryPickerProps = {
   title: string
@@ -69,7 +75,7 @@ export function CategoryPicker({
       : items.filter(
           (item) =>
             !selectedIds.includes(item.id) &&
-            (item.label.toLowerCase().includes(query) || item.id.toLowerCase().includes(query)),
+            (item.label.toLowerCase().includes(query) || item.slug.toLowerCase().includes(query)),
         )
 
   return (

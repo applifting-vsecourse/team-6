@@ -68,4 +68,16 @@ describe("TagSelector", () => {
 
     expect(screen.getByRole("button", { name: "Remove tag Bouldering" })).toBeInTheDocument()
   })
+
+  it("does not match the numeric id of a tag", async () => {
+    render(<Harness />)
+
+    await userEvent.click(screen.getByRole("button", { name: "Not here? Search all tags" }))
+    await userEvent.type(
+      screen.getByRole("textbox", { name: "Search tags in What I can teach" }),
+      "1",
+    )
+
+    expect(screen.queryByRole("button", { name: /^Add tag / })).not.toBeInTheDocument()
+  })
 })

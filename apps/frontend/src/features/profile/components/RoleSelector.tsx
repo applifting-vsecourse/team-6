@@ -80,6 +80,7 @@ export function RoleSelector({
   const items = ROLE_FIELDS.flatMap((field) =>
     field.roles.map((slug) => ({
       id: slug,
+      slug,
       label: slugLabel("roles", slug),
       groupIds: [field.id],
     })),

@@ -34,6 +34,7 @@ export function TagSelector({
       groups={categories.map(({ slug }) => ({ id: slug, label: slugLabel("categories", slug) }))}
       items={allTags.map((tag) => ({
         id: tag.id,
+        slug: tag.slug,
         label: slugLabel("tags", tag.slug),
         groupIds: tag.categories,
       }))}
