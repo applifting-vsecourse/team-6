@@ -113,4 +113,80 @@ describe("LocationMapPicker", () => {
       }),
     )
   })
+
+  describe("pin visibility", () => {
+    const mockGeolocation = () => {
+      Object.defineProperty(globalThis.navigator, "geolocation", {
+        value: {
+          getCurrentPosition: (success: (pos: GeolocationPosition) => void) =>
+            success({
+              coords: { latitude: 49.195, longitude: 16.608 },
+            } as GeolocationPosition),
+        },
+        writable: true,
+        configurable: true,
+      })
+    }
+
+    it("shows no pin, circle or coordinates before a location is picked", async () => {
+      const onChange = vi.fn()
+      render(
+        <LocationMapPicker
+          latitude={null}
+          longitude={null}
+          radiusKm={25}
+          onChange={onChange}
+        />,
+      )
+
+      const map = screen.getByTestId("location-map-container")
+      expect(map.querySelector(".kvinted-map-pin")).toBeNull()
+      expect(map.querySelector("path.leaflet-interactive")).toBeNull()
+      expect(screen.queryByText(/50\.0000/)).not.toBeInTheDocument()
+      expect(screen.queryByText("25 km radius")).not.toBeInTheDocument()
+
+      // Changing the radius must not report the default point as a selection
+      await userEvent.click(screen.getByRole("button", { name: "Up to 50 km" }))
+      expect(onChange).not.toHaveBeenCalled()
+      expect(map.querySelector(".kvinted-map-pin")).toBeNull()
+    })
+
+    it("shows the pin and coordinates when a location is given", () => {
+      render(
+        <LocationMapPicker
+          latitude={50.07}
+          longitude={14.43}
+          radiusKm={25}
+          onChange={vi.fn()}
+        />,
+      )
+
+      expect(
+        screen.getByTestId("location-map-container").querySelector(".kvinted-map-pin"),
+      ).not.toBeNull()
+      expect(screen.getByText(/50\.0700/)).toBeInTheDocument()
+      expect(screen.getByText("25 km radius")).toBeInTheDocument()
+    })
+
+    it("shows the pin after 'Use my location' picks a place", async () => {
+      mockGeolocation()
+      const onChange = vi.fn()
+      render(
+        <LocationMapPicker
+          latitude={null}
+          longitude={null}
+          radiusKm={25}
+          onChange={onChange}
+        />,
+      )
+
+      await userEvent.click(screen.getByRole("button", { name: /Use my location/i }))
+
+      expect(
+        screen.getByTestId("location-map-container").querySelector(".kvinted-map-pin"),
+      ).not.toBeNull()
+      expect(screen.getByText(/49\.1950/)).toBeInTheDocument()
+      expect(onChange).toHaveBeenCalledWith({ latitude: 49.195, longitude: 16.608, radiusKm: 25 })
+    })
+  })
 })

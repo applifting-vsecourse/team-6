@@ -376,7 +376,7 @@
       "geolocationUnavailable": "Geolokace není v tomto prohlížeči podporována.",
       "locating": "Zjišťuji polohu…",
       "locationRequired": "Zvolte polohu na mapě.",
-      "mapHint": "Přetáhněte špendlík. Ostatní uvidí jen vzdálenost.",
+      "mapHint": "Klikněte do mapy nebo použijte svou polohu. Ostatní uvidí jen vzdálenost.",
       "mornings": "Dopoledne",
       "radius": "Jak daleko můžete dojet?",
       "radiusOption": "Do {{count}} km",
