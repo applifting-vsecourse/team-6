@@ -3,6 +3,8 @@ import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
+import { Sheet } from "@/components/ui/sheet"
+
 import { HeaderMenu, MobileAccount, MobileSignOut } from "@/features/auth/components/HeaderMenu"
 
 // The gaze driver needs browser APIs jsdom lacks (matchMedia, ResizeObserver).
@@ -30,19 +32,27 @@ vi.mock("@/features/auth/hooks/useSignOut", () => ({
 describe("MobileAccount", () => {
   beforeEach(() => useSession.mockReset())
 
-  it("shows who is signed in, without any sign-out or profile link", () => {
+  // SheetClose needs the sheet's dialog context, as in the real mobile menu.
+  const renderInSheet = () =>
+    render(
+      <Sheet>
+        <MobileAccount />
+      </Sheet>,
+    )
+
+  it("shows who is signed in as a link to the profile, without a sign-out button", () => {
     useSession.mockReturnValue({ user: { id: "u1", name: "Jana Nováková", username: "jana" } })
-    render(<MobileAccount />)
+    renderInSheet()
 
     expect(screen.getByText("Jana Nováková")).toBeInTheDocument()
-    expect(screen.getByText("@jana")).toBeInTheDocument()
+    expect(screen.getByText("View your profile")).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: /Jana Nováková/ })).toHaveAttribute("href", "/profile")
     expect(screen.queryByRole("button")).not.toBeInTheDocument()
-    expect(screen.queryByRole("link")).not.toBeInTheDocument()
   })
 
-  it("leaves the @ out when there is no username", () => {
+  it("never prints a handle, only the profile link text", () => {
     useSession.mockReturnValue({ user: { id: "u1", name: "Jana Nováková", username: "" } })
-    render(<MobileAccount />)
+    renderInSheet()
 
     expect(screen.queryByText(/^@/)).not.toBeInTheDocument()
   })

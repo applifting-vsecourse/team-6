@@ -162,7 +162,7 @@ All routes are under `/api`, need a session unless marked public, and are docume
 
 | Method & path                                | Purpose                                  | Guard           |
 | -------------------------------------------- | ---------------------------------------- | --------------- |
-| `GET /reference`                             | Categories (tags, cities to follow)      | public          |
+| `GET /reference`                             | Categories, tags with categories, cities | public          |
 | `GET/PUT /me/profile`                        | Read / save profile + questionnaire      | auth            |
 | `DELETE /me`                                 | Delete account                           | auth            |
 | `GET /offers?category=`                      | Board listing                            | auth            |
@@ -186,17 +186,17 @@ Member-only routes use `mine` instead of `:id`, so a client cannot address someo
 
 ## 4. Frontend
 
-Routes (TanStack Router, file-based). Guards are pathless layout routes (`_Authenticated`, `_Onboarded`, `_Admin`) whose loader checks the session and redirects. `_Onboarded` sends users without a finished profile to `/onboarding`; `_Admin` shows the 404 page to non-admins.
+Routes (TanStack Router, file-based). The `_ProtectedPages` layout route checks the session in its loader and redirects to `/login`. Home (`/overview`) is open to every signed-in user and tells those with an unfinished profile to finish it; there is no forced redirect to `/onboarding`. The pages the server serves only to onboarded users (`OnboardedGuard`, otherwise 403 `ONBOARDING_REQUIRED`) guard themselves with `requireOnboarded` (`src/app/requireOnboarded.ts`) as `beforeLoad`, which sends users with an unfinished or missing profile to Home. It is used by `/kvintet/feed`, `/kvintet/messages` and `/kvintet/begins`.
 
-| Route                                                         | Access                   |
-| ------------------------------------------------------------- | ------------------------ |
-| `/`, `/login`, `/signup`, `/code-of-conduct`, `/how-it-works` | public                   |
-| `/overview`                                                   | signed in                |
-| `/onboarding`                                                 | signed in, not onboarded |
-| `/profile`                                                    | signed in + onboarded    |
-| `/board`, `/board/new`                                        | signed in + onboarded    |
-| `/kvintet/feed`, `/kvintet/messages`, `/kvintet/begins`       | signed in + onboarded    |
-| `/admin`                                                      | admin                    |
+| Route                                                         | Access                            |
+| ------------------------------------------------------------- | --------------------------------- |
+| `/`, `/login`, `/signup`, `/code-of-conduct`, `/how-it-works` | public                            |
+| `/overview`                                                   | signed in                         |
+| `/onboarding`                                                 | signed in, not onboarded          |
+| `/profile`                                                    | signed in + onboarded             |
+| `/board`, `/board/new`                                        | signed in + onboarded             |
+| `/kvintet/feed`, `/kvintet/messages`, `/kvintet/begins`       | signed in + onboarded (else Home) |
+| `/admin`                                                      | admin                             |
 
 The chat has its own page, `/kvintet/messages`, linked from the "Open chat" button on Home for an `ACTIVE` kvintet; it shows the kvintet title, a back link and the members as a row of blobatars whose eyes follow the cursor (names only for screen readers and as tooltips), and sends anyone whose kvintet is missing or not `ACTIVE` back to Home (`/overview`). Features may not import each other, so the `kvintet` feature renders that page and takes the chat as a render prop that the route supplies.
 

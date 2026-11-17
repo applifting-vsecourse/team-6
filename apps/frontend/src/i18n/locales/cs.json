@@ -187,8 +187,7 @@
     },
     "dialog": {
       "cancel": "Zrušit",
-      "category": "Kategorie",
-      "categoryPlaceholder": "Zvolte kategorii",
+      "category": "Kategorie (1–3)",
       "confirmLeave": "Opustit",
       "confirmLeaveActive": "Opustit kvintet",
       "description": "Budete v něm první. Další se přidají podle tématu.",
@@ -197,6 +196,7 @@
       "leaveActiveDescription": "Ostatní uvidí, že jste odešli. Pak se můžete přidat do jiného kvintetu.",
       "leaveActiveNotice": "Ostatní pokračují bez vás.",
       "leaveActiveTitle": "Opustit kvintet?",
+      "leaveLastMemberDescription": "Jste tu sami, takže se kvintet smaže.",
       "leaveProposalConfirm": "Opustíte tento kvintet. Když někdo přijde nebo odejde, hlasy všech se vynulují.",
       "leaveTitle": "Opravdu chcete odejít?",
       "leaving": "Odcházím…",
@@ -320,7 +320,8 @@
     "unreadMessages_few": "{{count}} nepřečtené zprávy",
     "unreadMessages_many": "{{count}} nepřečtené zprávy",
     "unreadMessages_one": "{{count}} nepřečtená zpráva",
-    "unreadMessages_other": "{{count}} nepřečtených zpráv"
+    "unreadMessages_other": "{{count}} nepřečtených zpráv",
+    "viewProfile": "Zobrazit profil"
   },
   "meetingFrequency": {
     "BIWEEKLY": "jednou za 14 dní",
@@ -356,8 +357,11 @@
       "rolePlaceholder": "např. Softwarový inženýr",
       "roleRequired": "Vyberte alespoň jednu roli",
       "searchAllRoles": "Není tu? Hledat ve všech rolích",
+      "searchAllTags": "Není tu? Hledat ve všech štítcích",
       "searchRoleAria": "Hledat roli",
       "searchRolePlaceholder": "Hledat roli…",
+      "searchTagsAria": "Hledat štítky v sekci {{section}}",
+      "searchTagsPlaceholder": "Hledat štítky…",
       "teachHint": "Vyberte libovolný počet štítků.",
       "teachTitle": "Co umím naučit",
       "title": "Řekněte nám něco o sobě"
@@ -372,7 +376,7 @@
       "geolocationUnavailable": "Geolokace není v tomto prohlížeči podporována.",
       "locating": "Zjišťuji polohu…",
       "locationRequired": "Zvolte polohu na mapě.",
-      "mapHint": "Přetáhněte špendlík. Ostatní uvidí jen vzdálenost.",
+      "mapHint": "Klikněte do mapy nebo použijte svou polohu. Ostatní uvidí jen vzdálenost.",
       "mornings": "Dopoledne",
       "radius": "Jak daleko můžete dojet?",
       "radiusOption": "Do {{count}} km",

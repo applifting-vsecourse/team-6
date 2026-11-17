@@ -143,6 +143,17 @@ describe("DialogContent isBottomSheet", () => {
     expect(sheet.style.transform).toBe("")
   })
 
+  it("does not dismiss while the sheet is scrolled", () => {
+    stubMobile(true)
+    const { onOpenChange, sheet } = renderSheet()
+    sheet.scrollTop = 40
+
+    drag(sheet, 100, 250)
+
+    expect(onOpenChange).not.toHaveBeenCalled()
+    expect(sheet.style.transform).toBe("")
+  })
+
   it("does nothing on desktop", () => {
     stubMobile(false)
     const { onOpenChange, sheet } = renderSheet()

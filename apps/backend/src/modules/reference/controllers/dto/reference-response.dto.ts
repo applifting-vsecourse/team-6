@@ -27,6 +27,16 @@ export class TagDto {
   slug!: string;
 }
 
+// The reference list also says which categories a tag belongs to; a profile's tags do not.
+export class ReferenceTagDto extends TagDto {
+  @ApiProperty({
+    type: [String],
+    example: ['software-development', 'business'],
+    description: 'Slugs of the categories the tag belongs to, in sort order',
+  })
+  categories!: string[];
+}
+
 export class ReferenceResponseDto {
   @ApiProperty({ type: [CategoryDto] })
   categories!: CategoryDto[];
@@ -34,6 +44,6 @@ export class ReferenceResponseDto {
   @ApiProperty({ type: [CityDto] })
   cities!: CityDto[];
 
-  @ApiProperty({ type: [TagDto] })
-  tags!: TagDto[];
+  @ApiProperty({ type: [ReferenceTagDto] })
+  tags!: ReferenceTagDto[];
 }

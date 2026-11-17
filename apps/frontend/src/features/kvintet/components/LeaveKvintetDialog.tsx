@@ -17,6 +17,8 @@ type LeaveKvintetDialogProps = {
   onConfirm: () => void
   isLeaving: boolean
   isActiveKvintet: boolean
+  // The backend deletes the kvintet when its last member leaves.
+  isLastMember: boolean
   avatarSeed?: string
 }
 
@@ -26,6 +28,7 @@ export function LeaveKvintetDialog({
   onConfirm,
   isLeaving,
   isActiveKvintet,
+  isLastMember,
   avatarSeed,
 }: LeaveKvintetDialogProps) {
   const { t } = useTranslation()
@@ -34,9 +37,11 @@ export function LeaveKvintetDialog({
     ? t("kvintet.dialog.leaveActiveTitle")
     : t("kvintet.dialog.leaveTitle")
 
-  const description = isActiveKvintet
-    ? t("kvintet.dialog.leaveActiveDescription")
-    : t("kvintet.dialog.leaveProposalConfirm")
+  const description = isLastMember
+    ? t("kvintet.dialog.leaveLastMemberDescription")
+    : isActiveKvintet
+      ? t("kvintet.dialog.leaveActiveDescription")
+      : t("kvintet.dialog.leaveProposalConfirm")
 
   return (
     <Dialog
@@ -58,7 +63,7 @@ export function LeaveKvintetDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {isActiveKvintet ? (
+        {isActiveKvintet && !isLastMember ? (
           <div className="rounded-lg bg-destructive-soft px-3 py-2.5 text-small font-medium text-destructive">
             {t("kvintet.dialog.leaveActiveNotice")}
           </div>

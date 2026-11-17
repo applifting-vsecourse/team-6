@@ -91,7 +91,7 @@ export function KvintetSeats({
         <ul
           role={label ? "img" : undefined}
           aria-label={label}
-          className={cn("flex flex-wrap gap-x-3.5 gap-y-3", className)}
+          className={cn("grid grid-cols-5 gap-x-2 gap-y-3", className)}
         >
           {Array.from({ length: SEATS }, (_, i) => {
             const member = members[i]
@@ -100,7 +100,7 @@ export function KvintetSeats({
                 key={i}
                 data-seat={member ? "member" : "free"}
                 className={cn(
-                  "flex flex-col items-center gap-1.5 text-small",
+                  "flex min-w-0 flex-col items-center gap-1.5 text-small",
                   member ? "text-foreground" : "text-muted-foreground",
                 )}
               >
@@ -125,7 +125,10 @@ export function KvintetSeats({
                     </SeatTooltip>
                   )}
                 </span>
-                <span className="line-clamp-2 max-w-16 text-center break-words">
+                <span
+                  title={member ? member.label : undefined}
+                  className="w-full truncate text-center"
+                >
                   {member ? member.label : freeLabel}
                 </span>
               </li>
