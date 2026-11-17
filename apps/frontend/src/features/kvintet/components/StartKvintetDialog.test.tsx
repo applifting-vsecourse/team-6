@@ -41,18 +41,21 @@ beforeEach(() => {
 })
 
 describe("StartKvintetDialog", () => {
-  it("offers the categories in one select and sends the chosen one as a list", async () => {
+  it("offers the categories as chips and sends the chosen ones as a list", async () => {
     renderDialog()
     await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
 
-    await userEvent.click(screen.getByRole("combobox", { name: "Category" }))
-    const listbox = await screen.findByRole("listbox")
+    const group = screen.getByRole("group", { name: "Categories (1–3)" })
     expect(
-      within(listbox)
-        .getAllByRole("option")
-        .map((option) => option.textContent),
+      within(group)
+        .getAllByRole("button")
+        .map((chip) => chip.textContent),
     ).toEqual(["Software development", "Business", "Languages", "Leisure"])
-    await userEvent.click(within(listbox).getByRole("option", { name: "Languages" }))
+    await userEvent.click(within(group).getByRole("button", { name: "Languages" }))
+    expect(within(group).getByRole("button", { name: "Languages" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    )
     await userEvent.click(screen.getByRole("button", { name: "Start a kvintet" }))
 
     await waitFor(() =>
@@ -60,6 +63,39 @@ describe("StartKvintetDialog", () => {
         json: { title: "Topic", categorySlugs: ["languages"] },
       }),
     )
+  })
+
+  it("lets you pick up to three categories and disables the rest", async () => {
+    renderDialog()
+    await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
+
+    const group = screen.getByRole("group", { name: "Categories (1–3)" })
+    for (const name of ["Software development", "Business", "Languages"]) {
+      await userEvent.click(within(group).getByRole("button", { name }))
+    }
+    expect(within(group).getByRole("button", { name: "Leisure" })).toBeDisabled()
+
+    // A chosen chip can still be unpressed, which frees the others again.
+    await userEvent.click(within(group).getByRole("button", { name: "Business" }))
+    expect(within(group).getByRole("button", { name: "Leisure" })).toBeEnabled()
+    await userEvent.click(within(group).getByRole("button", { name: "Leisure" }))
+    await userEvent.click(screen.getByRole("button", { name: "Start a kvintet" }))
+
+    await waitFor(() =>
+      expect(api.post).toHaveBeenCalledWith("kvintets", {
+        json: { title: "Topic", categorySlugs: ["software-development", "languages", "leisure"] },
+      }),
+    )
+  })
+
+  it("asks for at least one category", async () => {
+    renderDialog()
+    await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
+
+    await userEvent.click(screen.getByRole("button", { name: "Start a kvintet" }))
+
+    expect(await screen.findByText("Choose a category")).toBeInTheDocument()
+    expect(api.post).not.toHaveBeenCalled()
   })
 
   it("explains what the others will see, and shows the person starting it", () => {
