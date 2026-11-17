@@ -314,7 +314,8 @@
     "switchToDark": "Switch to dark theme",
     "switchToLight": "Switch to light theme",
     "unreadMessages_one": "{{count}} unread message",
-    "unreadMessages_other": "{{count}} unread messages"
+    "unreadMessages_other": "{{count}} unread messages",
+    "viewProfile": "View your profile"
   },
   "meetingFrequency": {
     "BIWEEKLY": "every two weeks",

@@ -19,6 +19,7 @@ import { useSession } from "@/features/auth/hooks/useSession"
 import { profileQueryOptions, type ProfileResponse } from "@/features/profile/api/profileApi"
 import { TagBadge } from "@/features/profile/components/TagBadge"
 import { useProfile } from "@/features/profile/hooks/useProfile"
+import { fieldOfRole, ROLE_FIELDS } from "@/features/profile/lib/roleFields"
 
 export function formatWhenAndWhere(
   profile: ProfileResponse | null | undefined,
@@ -195,12 +196,16 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
   const seed = user?.username || user?.id || "user"
   const displayName = user?.name ?? ""
 
-  // Subtitle: @username · role/position
-  const roleText =
-    profile?.position ??
-    (profile?.roles && profile.roles.length > 0
-      ? profile.roles.map((r) => label("roles", r)).join(", ")
-      : undefined)
+  // `position` is the first role slug (or free text on seeded users), so it is only a fallback
+  // for a profile without roles and still goes through the label lookup.
+  const roleLabels = profile?.roles?.length
+    ? profile.roles.map((r) => label("roles", r))
+    : profile?.position
+      ? [label("roles", profile.position)]
+      : []
+
+  // Subtitle: @username · role
+  const roleText = roleLabels.join(", ") || undefined
 
   const subtitleParts = [user?.username ? `@${user.username}` : undefined, roleText].filter(Boolean)
   const subtitle = subtitleParts.join(" · ")
@@ -208,8 +213,9 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
   const whenAndWhere = formatWhenAndWhere(profile, t) ?? t("profile.empty.whenAndWhere")
 
   // The field and the role, e.g. "Marketing & sales · Marketing specialist".
+  const field = ROLE_FIELDS.find((f) => f.id === fieldOfRole(profile?.roles?.[0] ?? ""))
   const roleSummary =
-    [...(profile?.roles ?? []).map((r) => label("roles", r)), profile?.position]
+    [field ? t(field.labelKey) : undefined, roleLabels.join(", ") || undefined]
       .filter(Boolean)
       .join(" · ") || t("profile.empty.role")
 

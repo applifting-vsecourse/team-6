@@ -91,6 +91,20 @@ describe("KvintetCard", () => {
     expect(screen.queryByText(/Teaches/)).not.toBeInTheDocument()
   })
 
+  it("cuts a long role with an ellipsis and a tooltip, and gives the fallback label none", () => {
+    const position = "Accountant & financial controller"
+    renderCard({
+      members: [
+        { position, teach: [], learn: [], interests: [] },
+        { position: null, teach: [], learn: [], interests: [] },
+      ],
+    })
+
+    expect(screen.getByText(position)).toHaveAttribute("title", position)
+    expect(screen.getByText(position)).toHaveClass("truncate")
+    expect(screen.getByText("Member")).not.toHaveAttribute("title")
+  })
+
   it("shows the shared meeting frequency only when there is one", () => {
     const { unmount } = render(
       <KvintetCard
