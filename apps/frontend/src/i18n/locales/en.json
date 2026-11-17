@@ -366,7 +366,7 @@
       "geolocationUnavailable": "Geolocation is not supported in this browser.",
       "locating": "Locating…",
       "locationRequired": "Please select a location on the map.",
-      "mapHint": "Drag the pin. Others only see the distance.",
+      "mapHint": "Click the map or use your location. Others only see the distance.",
       "mornings": "Mornings",
       "radius": "How far can you travel?",
       "radiusOption": "Up to {{count}} km",
