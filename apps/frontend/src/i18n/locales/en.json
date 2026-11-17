@@ -183,8 +183,7 @@
     },
     "dialog": {
       "cancel": "Cancel",
-      "category": "Category",
-      "categoryHint": "Pick up to 3",
+      "category": "Categories (1–3)",
       "confirmLeave": "Leave",
       "confirmLeaveActive": "Leave kvintet",
       "description": "You'll be its first member. Others join by topic.",

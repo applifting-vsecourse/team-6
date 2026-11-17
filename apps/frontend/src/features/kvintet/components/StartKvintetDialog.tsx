@@ -181,7 +181,6 @@ export function StartKvintetDialog({ isOpen, onOpenChange, avatarSeed }: StartKv
                       ))}
                     </ToggleGroup>
                   </FormControl>
-                  <FormDescription>{t("kvintet.dialog.categoryHint")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

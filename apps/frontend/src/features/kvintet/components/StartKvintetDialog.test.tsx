@@ -45,7 +45,7 @@ describe("StartKvintetDialog", () => {
     renderDialog()
     await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
 
-    const group = screen.getByRole("group", { name: "Category" })
+    const group = screen.getByRole("group", { name: "Categories (1–3)" })
     expect(
       within(group)
         .getAllByRole("button")
@@ -69,8 +69,7 @@ describe("StartKvintetDialog", () => {
     renderDialog()
     await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
 
-    const group = screen.getByRole("group", { name: "Category" })
-    expect(screen.getByText("Pick up to 3")).toBeInTheDocument()
+    const group = screen.getByRole("group", { name: "Categories (1–3)" })
     for (const name of ["Software development", "Business", "Languages"]) {
       await userEvent.click(within(group).getByRole("button", { name }))
     }
