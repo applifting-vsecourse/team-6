@@ -193,6 +193,7 @@
       "leaveActiveDescription": "Others will see that you left. Then you can join another kvintet.",
       "leaveActiveNotice": "The others carry on without you.",
       "leaveActiveTitle": "Leave the kvintet?",
+      "leaveLastMemberDescription": "You're the only member, so the kvintet will be removed.",
       "leaveProposalConfirm": "You'll leave this kvintet. When someone joins or leaves, everyone's votes are reset.",
       "leaveTitle": "Are you sure you want to leave?",
       "leaving": "Leaving…",
