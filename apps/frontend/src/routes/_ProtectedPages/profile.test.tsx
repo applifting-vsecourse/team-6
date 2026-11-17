@@ -138,7 +138,19 @@ describe("ProfilePage", () => {
     render(<ProfilePage user={defaultUser} />)
 
     expect(screen.getByRole("heading", { name: "Jana Nováková" })).toBeInTheDocument()
-    expect(screen.getByText(/@jana.novakova · Marketing specialist/)).toBeInTheDocument()
+    expect(screen.getByText(/@jana.novakova · Marketing Specialist/)).toBeInTheDocument()
+    expect(screen.queryByText(/marketing-specialist/)).not.toBeInTheDocument()
+  })
+
+  it("labels the position when the profile has no roles", () => {
+    mockUseProfile.mockReturnValue(
+      mockProfileData({ profile: { ...mockProfile, roles: [], position: "qa-engineer" } }),
+    )
+
+    render(<ProfilePage user={defaultUser} />)
+
+    expect(screen.getByText(/@jana.novakova · QA/)).toBeInTheDocument()
+    expect(screen.queryByText(/qa-engineer/)).not.toBeInTheDocument()
   })
 
   it("shows the role and the expectations, each with an edit link to its onboarding step", () => {
@@ -151,7 +163,8 @@ describe("ProfilePage", () => {
     render(<ProfilePage user={defaultUser} />)
 
     const role = screen.getByRole("heading", { name: "My role" }).closest("section")!
-    expect(role).toHaveTextContent("Marketing Specialist · Marketing specialist")
+    expect(role).toHaveTextContent("Marketing & sales · Marketing Specialist")
+    expect(role).not.toHaveTextContent("marketing-specialist")
     expect(within(role).getByRole("link", { name: "Edit" })).toHaveAttribute(
       "href",
       "/onboarding?step=1",

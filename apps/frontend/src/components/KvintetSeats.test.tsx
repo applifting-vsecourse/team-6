@@ -89,6 +89,9 @@ describe("KvintetSeats", () => {
     expect(count(container, "member")).toBe(1)
     expect(count(container, "free")).toBe(4)
     expect(screen.getByText("Backend")).toBeInTheDocument()
+    // A long role is cut with an ellipsis (and a tooltip), never broken mid-word.
+    expect(screen.getByText("Backend")).toHaveAttribute("title", "Backend")
+    expect(screen.getByText("Backend")).toHaveClass("truncate")
     expect(screen.getAllByText("Free")).toHaveLength(4)
   })
 })

@@ -320,7 +320,8 @@
     "unreadMessages_few": "{{count}} nepřečtené zprávy",
     "unreadMessages_many": "{{count}} nepřečtené zprávy",
     "unreadMessages_one": "{{count}} nepřečtená zpráva",
-    "unreadMessages_other": "{{count}} nepřečtených zpráv"
+    "unreadMessages_other": "{{count}} nepřečtených zpráv",
+    "viewProfile": "Zobrazit profil"
   },
   "meetingFrequency": {
     "BIWEEKLY": "jednou za 14 dní",
