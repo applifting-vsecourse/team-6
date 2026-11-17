@@ -114,7 +114,6 @@ export async function createDemoKvintets(
     const created = await prisma.kvintet.create({
       data: {
         title: kvintet.title,
-        categoryId: categoryIds[0],
         categories: {
           create: categoryIds.map((categoryId) => ({ categoryId })),
         },

@@ -52,7 +52,6 @@ describe('KvintetRepository (Postgres)', () => {
     const kvintet = await prisma.kvintet.create({
       data: {
         title: `${prefix} kvintet`,
-        categoryId,
         categories: { create: { categoryId } },
         members: { create: memberIds.map((userId) => ({ userId })) },
       },

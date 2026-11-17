@@ -49,7 +49,7 @@ describe('MessageRepository (Postgres)', () => {
       data: {
         title: `${prefix} kvintet`,
         status,
-        categoryId,
+        categories: { create: { categoryId } },
         members: { create: memberIds.map((userId) => ({ userId })) },
       },
     });
