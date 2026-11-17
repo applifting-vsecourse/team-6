@@ -78,20 +78,22 @@ describe("KvintetSeats", () => {
   })
 
   it("lays the row out with a label under every seat and 'Free' for the empty ones", () => {
+    const longRole = "Accountant & financial controller"
     const { container } = render(
       <KvintetSeats
         layout="row"
         freeLabel="Free"
-        members={[{ seed: "a", anonymous: true, label: "Backend" }]}
+        members={[{ seed: "a", anonymous: true, label: longRole }]}
       />,
     )
 
     expect(count(container, "member")).toBe(1)
     expect(count(container, "free")).toBe(4)
-    expect(screen.getByText("Backend")).toBeInTheDocument()
     // A long role is cut with an ellipsis (and a tooltip), never broken mid-word.
-    expect(screen.getByText("Backend")).toHaveAttribute("title", "Backend")
-    expect(screen.getByText("Backend")).toHaveClass("truncate")
-    expect(screen.getAllByText("Free")).toHaveLength(4)
+    expect(screen.getByText(longRole)).toHaveAttribute("title", longRole)
+    expect(screen.getByText(longRole)).toHaveClass("truncate")
+    const free = screen.getAllByText("Free")
+    expect(free).toHaveLength(4)
+    free.forEach((seat) => expect(seat).not.toHaveAttribute("title"))
   })
 })
