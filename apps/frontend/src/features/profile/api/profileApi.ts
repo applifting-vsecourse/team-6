@@ -8,7 +8,10 @@ export const tagSchema = z.object({
   slug: z.string(),
 })
 
-export type Tag = z.infer<typeof tagSchema>
+// The reference list also says which categories a tag belongs to; a profile's tags do not.
+export const referenceTagSchema = tagSchema.extend({ categories: z.array(z.string()) })
+
+export type ReferenceTag = z.infer<typeof referenceTagSchema>
 
 export const citySchema = z.object({
   id: z.string(),
@@ -20,8 +23,9 @@ export const citySchema = z.object({
 export type City = z.infer<typeof citySchema>
 
 export const referenceResponseSchema = z.object({
+  categories: z.array(z.object({ slug: z.string() })),
   cities: z.array(citySchema),
-  tags: z.array(tagSchema),
+  tags: z.array(referenceTagSchema),
 })
 
 export type ReferenceResponse = z.infer<typeof referenceResponseSchema>

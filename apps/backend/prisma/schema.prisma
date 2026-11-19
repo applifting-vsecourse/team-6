@@ -135,7 +135,6 @@ model Category {
   id                Int               @id @default(autoincrement())
   slug              String            @unique
   sortOrder         Int
-  kvintets          Kvintet[]
   tags              TagCategory[]
   kvintetCategories KvintetCategory[]
 
@@ -208,9 +207,6 @@ model Kvintet {
   status      KvintetStatus     @default(FORMING)
   title       String
   description String?
-  // Deprecated: holds the first of `categories`. Kept until a later deploy drops it (additive migrations only).
-  categoryId  Int
-  category    Category          @relation(fields: [categoryId], references: [id])
   categories  KvintetCategory[]
   createdAt   DateTime          @default(now())
   activatedAt DateTime?

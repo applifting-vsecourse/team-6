@@ -5,18 +5,22 @@ import { describe, expect, it } from "vitest"
 
 import { TagSelector } from "./TagSelector"
 
-const tags = ["excel", "python", "hiking", "spanish", "sql"].map((slug, i) => ({
-  id: String(i),
-  slug,
-}))
+const categories = [{ slug: "software-development" }, { slug: "business" }, { slug: "leisure" }]
+const tags = [
+  { id: "0", slug: "excel", categories: ["software-development", "business"] },
+  { id: "1", slug: "python", categories: ["software-development"] },
+  { id: "2", slug: "hiking", categories: ["leisure"] },
+  { id: "3", slug: "sql", categories: ["software-development"] },
+  { id: "4", slug: "bouldering", categories: [] },
+]
 
-function Harness() {
-  const [selected, setSelected] = useState<string[]>([])
+function Harness({ selectedAtStart = [] as string[] }) {
+  const [selected, setSelected] = useState(selectedAtStart)
   return (
     <TagSelector
       selectedTagIds={selected}
       allTags={tags}
-      defaultSuggestedSlugs={["excel", "python"]}
+      categories={categories}
       onSelectTag={(id) => setSelected((prev) => [...prev, id])}
       onRemoveTag={(id) => setSelected((prev) => prev.filter((x) => x !== id))}
     />
@@ -24,57 +28,74 @@ function Harness() {
 }
 
 describe("TagSelector", () => {
-  it("suggests three topics, the preferred ones first", () => {
+  it("shows the categories and the search, and no topic until a category is picked", () => {
     render(<Harness />)
 
-    const added = screen.getAllByRole("button", { name: /^Add tag / })
-    expect(added.map((button) => button.getAttribute("aria-label"))).toEqual([
-      "Add tag Excel",
-      "Add tag Python",
-      "Add tag Hiking",
-    ])
-    expect(screen.getByText("Suggested for you")).toBeInTheDocument()
+    expect(screen.getByText("Category")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Software development" })).toBeInTheDocument()
+    expect(screen.getByRole("textbox", { name: "Search topics" })).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: /^Add tag / })).not.toBeInTheDocument()
   })
 
-  it("brings the next suggestion in once one is picked", async () => {
+  it("lists the topics of the picked category", async () => {
     render(<Harness />)
 
-    await userEvent.click(screen.getByRole("button", { name: "Add tag Excel" }))
+    await userEvent.click(screen.getByRole("button", { name: "Business" }))
 
+    expect(screen.getByRole("button", { name: "Business" })).toHaveAttribute("aria-pressed", "true")
+    expect(screen.getByRole("button", { name: "Add tag Excel" })).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "Add tag Python" })).not.toBeInTheDocument()
+  })
+
+  it("moves a picked topic up among the chosen ones, and takes it back with its cross", async () => {
+    render(<Harness />)
+    await userEvent.click(screen.getByRole("button", { name: "Business" }))
+
+    await userEvent.click(screen.getByRole("button", { name: "Add tag Excel" }))
     expect(screen.getByRole("button", { name: "Remove tag Excel" })).toBeInTheDocument()
-    expect(screen.getAllByRole("button", { name: /^Add tag / })).toHaveLength(3)
-    expect(screen.getByRole("button", { name: "Add tag Spanish" })).toBeInTheDocument()
-  })
-
-  it("takes a chosen topic away with its cross", async () => {
-    render(<Harness />)
-    await userEvent.click(screen.getByRole("button", { name: "Add tag Excel" }))
+    expect(screen.queryByRole("button", { name: "Add tag Excel" })).not.toBeInTheDocument()
 
     await userEvent.click(screen.getByRole("button", { name: "Remove tag Excel" }))
-
-    expect(screen.queryByRole("button", { name: "Remove tag Excel" })).not.toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Add tag Excel" })).toBeInTheDocument()
   })
 
-  it("searches our topics, and the suggestions step aside while it does", async () => {
-    render(<Harness />)
+  it("keeps a chosen topic visible when another category is open", async () => {
+    render(<Harness selectedAtStart={["2"]} />)
 
-    await userEvent.type(screen.getByRole("textbox", { name: "Search topics" }), "sp")
+    await userEvent.click(screen.getByRole("button", { name: "Business" }))
 
-    expect(screen.getByRole("button", { name: "Add tag Spanish" })).toBeInTheDocument()
-    expect(screen.queryByRole("button", { name: "Add tag Excel" })).not.toBeInTheDocument()
-    expect(screen.queryByText("Suggested for you")).not.toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Remove tag Hiking" })).toBeInTheDocument()
   })
 
-  it("empties the search once a topic is picked from it", async () => {
+  it("finds a topic that has no category through the search", async () => {
+    render(<Harness />)
+
+    await userEvent.type(screen.getByRole("textbox", { name: "Search topics" }), "boulder")
+    await userEvent.click(screen.getByRole("button", { name: "Add tag Bouldering" }))
+
+    expect(screen.getByRole("button", { name: "Remove tag Bouldering" })).toBeInTheDocument()
+  })
+
+  it("puts the categories away while it searches, and empties the search after a pick", async () => {
     render(<Harness />)
     const search = screen.getByRole("textbox", { name: "Search topics" })
-    await userEvent.type(search, "sp")
 
-    await userEvent.click(screen.getByRole("button", { name: "Add tag Spanish" }))
+    await userEvent.type(search, "py")
+    expect(screen.queryByText("Category")).not.toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole("button", { name: "Add tag Python" }))
 
     expect(search).toHaveValue("")
-    expect(screen.getByRole("button", { name: "Remove tag Spanish" })).toBeInTheDocument()
+    expect(screen.getByText("Category")).toBeInTheDocument()
+  })
+
+  it("does not match the numeric id of a topic", async () => {
+    render(<Harness />)
+
+    await userEvent.type(screen.getByRole("textbox", { name: "Search topics" }), "1")
+
+    expect(screen.queryByRole("button", { name: /^Add tag / })).not.toBeInTheDocument()
+    expect(screen.getByText("No topic found")).toBeInTheDocument()
   })
 
   it("says so when nothing matches, and never offers to create a topic", async () => {

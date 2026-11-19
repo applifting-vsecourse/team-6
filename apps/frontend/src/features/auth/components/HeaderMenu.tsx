@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import { sleepy } from "blobatar/expression"
-import { LogOut, Sparkles, User } from "lucide-react"
+import { ChevronRight, LogOut, Sparkles, User } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
@@ -201,20 +201,28 @@ export function MobileAccount() {
     )
   }
 
+  // The card is the way to the profile on a phone: the desktop user menu is hidden there.
   return (
-    <div className="flex items-center gap-4 rounded-lg border border-border bg-card p-4">
-      <GazeBlobatar
-        name={seedOf(user)}
-        animate="always"
-        className="size-12 shrink-0"
-      />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <p className="truncate font-semibold text-foreground">{user.name}</p>
-        {user.username ? (
-          <p className="truncate text-sm text-muted-foreground">@{user.username}</p>
-        ) : null}
-      </div>
-    </div>
+    <SheetClose asChild>
+      <Link
+        to={ROUTES.profile}
+        className="flex items-center gap-4 rounded-lg border border-border bg-card p-4"
+      >
+        <GazeBlobatar
+          name={seedOf(user)}
+          animate="always"
+          className="size-12 shrink-0"
+        />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <p className="truncate font-semibold text-foreground">{user.name}</p>
+          <p className="truncate text-sm text-muted-foreground">{t("layout.viewProfile")}</p>
+        </div>
+        <ChevronRight
+          aria-hidden
+          className="size-4 text-muted-foreground"
+        />
+      </Link>
+    </SheetClose>
   )
 }
 

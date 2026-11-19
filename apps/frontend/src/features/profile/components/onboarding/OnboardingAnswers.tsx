@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { formatNumber } from "@/lib/date"
 import { cn } from "@/lib/utils"
 
-import type { MeetingFrequency, Tag } from "@/features/profile/api/profileApi"
+import type { MeetingFrequency, ReferenceTag } from "@/features/profile/api/profileApi"
 import { LocationMapPicker } from "@/features/profile/components/LocationMapPicker"
 import { ChoiceTile } from "@/features/profile/components/onboarding/ChoiceTile"
 import { OnboardingSummary } from "@/features/profile/components/onboarding/OnboardingSummary"
@@ -14,13 +14,13 @@ import { TagSelector } from "@/features/profile/components/TagSelector"
 import { NOTE_MAX_LENGTH, type OnboardingDraft } from "@/features/profile/lib/onboardingDraft"
 import type { OnboardingPageId } from "@/features/profile/lib/onboardingPages"
 import { softFieldClass } from "@/features/profile/lib/optionStyles"
-import { SUGGESTED_TAG_SLUGS } from "@/features/profile/lib/suggestedTags"
 
 type OnboardingAnswersProps = {
   page: OnboardingPageId
   draft: OnboardingDraft
   onChange: (patch: Partial<OnboardingDraft>) => void
-  allTags: Tag[]
+  allTags: ReferenceTag[]
+  categories: { slug: string }[]
   /** From the summary: back to one of the questions. */
   onEdit: (page: OnboardingPageId) => void
 }
@@ -47,6 +47,7 @@ export function OnboardingAnswers({
   draft,
   onChange,
   allTags,
+  categories,
   onEdit,
 }: OnboardingAnswersProps) {
   const { t } = useTranslation()
@@ -59,7 +60,7 @@ export function OnboardingAnswers({
       <TagSelector
         selectedTagIds={draft[field]}
         allTags={allTags}
-        defaultSuggestedSlugs={[...SUGGESTED_TAG_SLUGS[key]]}
+        categories={categories}
         onSelectTag={(id) => onChange({ [field]: toggle(draft[field], id, true) })}
         onRemoveTag={(id) => onChange({ [field]: toggle(draft[field], id, false) })}
       />

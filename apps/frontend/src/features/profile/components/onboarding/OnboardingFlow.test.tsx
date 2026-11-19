@@ -54,10 +54,11 @@ vi.mock("@/features/profile/api/profileApi", async (importOriginal) => {
       queryFn: () =>
         Promise.resolve({
           cities: [],
+          categories: [{ slug: "business" }, { slug: "software-development" }],
           tags: [
-            { id: "1", slug: "excel" },
-            { id: "2", slug: "python" },
-            { id: "3", slug: "hiking" },
+            { id: "1", slug: "excel", categories: ["business"] },
+            { id: "2", slug: "python", categories: ["software-development"] },
+            { id: "3", slug: "hiking", categories: [] },
           ],
         }),
     }),
@@ -118,11 +119,13 @@ describe("OnboardingFlow", () => {
     await press("Continue")
     expect(saveProfile).toHaveBeenLastCalledWith({ roles: ["copywriter"], position: "copywriter" })
 
+    await press("Business")
     await userEvent.click(await screen.findByRole("button", { name: "Add tag Excel" }))
     await press("Continue")
     expect(saveProfile).toHaveBeenLastCalledWith({ teachTagIds: ["1"] })
 
-    await userEvent.click(await screen.findByRole("button", { name: "Add tag Python" }))
+    await userEvent.type(await screen.findByRole("textbox", { name: "Search topics" }), "pyth")
+    await userEvent.click(screen.getByRole("button", { name: "Add tag Python" }))
     await press("Continue")
     expect(saveProfile).toHaveBeenLastCalledWith({ learnTagIds: ["2"] })
 
@@ -313,6 +316,39 @@ describe("OnboardingFlow", () => {
       expect(await screen.findByRole("alert")).toHaveTextContent("An unexpected error occurred.")
       expect(heading()).toHaveTextContent("Anything else the group should know?")
       expect(navigate).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("the place page", () => {
+    it("says what to do first while there is no pin to drag", async () => {
+      await open("place")
+
+      expect(
+        screen.getByText("Click the map or use your location. Others only see the distance."),
+      ).toBeInTheDocument()
+      expect(screen.queryByText(/Drag the pin/)).not.toBeInTheDocument()
+    })
+
+    it("talks about dragging the pin once there is one", async () => {
+      profileQueryFn.mockResolvedValue({
+        roles: [],
+        teaches: [],
+        learns: [],
+        interests: [],
+        latitude: 50,
+        longitude: 14,
+      })
+      await open("place")
+
+      expect(screen.getByText(/^Drag the pin and pick how far/)).toBeInTheDocument()
+    })
+
+    it("changes its hint as soon as the pin is dropped", async () => {
+      await open("place")
+
+      await userEvent.click(screen.getByRole("button", { name: "Pick on map" }))
+
+      expect(screen.getByText(/^Drag the pin and pick how far/)).toBeInTheDocument()
     })
   })
 

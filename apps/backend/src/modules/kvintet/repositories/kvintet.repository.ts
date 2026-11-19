@@ -198,8 +198,6 @@ export class KvintetRepository {
         data: {
           title: input.title,
           description: input.description,
-          // Deprecated column, kept until it is dropped: the first chosen category.
-          categoryId: categoryIds[0],
           categories: {
             create: categoryIds.map((categoryId) => ({ categoryId })),
           },

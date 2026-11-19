@@ -78,11 +78,11 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
         </div>
       </div>
 
-      <ul className="flex flex-wrap gap-x-3.5 gap-y-4 sm:gap-x-7">
+      <ul className="grid grid-cols-5 gap-x-2 gap-y-4 sm:flex sm:flex-wrap sm:gap-x-7">
         {kvintet.members.map((member, index) => (
           <li
             key={index}
-            className="flex flex-col items-center gap-1.5 text-small text-foreground"
+            className="flex min-w-0 flex-col items-center gap-1.5 text-small text-foreground"
           >
             {/* The feed never carries a name, so the face is seeded by the seat, not the person. */}
             <AnonymousBlobatar
@@ -90,13 +90,18 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
               className="size-12 shrink-0"
               motion="hover"
             />
-            <span className="max-w-24 text-center">{member.position ?? t("kvintet.member")}</span>
+            <span
+              title={member.position ?? undefined}
+              className="w-full truncate text-center sm:max-w-24"
+            >
+              {member.position ?? t("kvintet.member")}
+            </span>
           </li>
         ))}
         {Array.from({ length: freeSeats }, (_, index) => (
           <li
             key={`free-${index}`}
-            className="flex flex-col items-center gap-1.5 text-small text-muted-foreground"
+            className="flex min-w-0 flex-col items-center gap-1.5 text-small text-muted-foreground"
           >
             <span className="grid size-12 place-items-center">
               <FreeSeat className="size-9" />

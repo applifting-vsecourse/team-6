@@ -1,7 +1,8 @@
-import { useCallback, useMemo, useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Input } from "@/components/ui/input"
+import { useSlugLabel } from "@/lib/useSlugLabel"
 
 import { ChoiceTile } from "@/features/profile/components/onboarding/ChoiceTile"
 import { chipClass, softFieldClass } from "@/features/profile/lib/optionStyles"
@@ -79,31 +80,21 @@ export function RoleSelector({ selectedRoles, onSelectRole, onRemoveRole }: Role
   )
   const field = ROLE_FIELDS.find((item) => item.id === fieldId)
 
-  const getRoleLabel = useCallback(
-    (roleSlugOrId: string): string => {
-      const key = `roles.${roleSlugOrId}`
-      const translated = (t as (k: string, opts?: { defaultValue?: string }) => string)(key, {
-        defaultValue: roleSlugOrId,
-      })
-      return translated === key ? roleSlugOrId : translated
-    },
-    [t],
-  )
+  const slugLabel = useSlugLabel()
+  const getRoleLabel = (slug: string) => slugLabel("roles", slug)
 
-  const searchResults = useMemo(() => {
-    const lowerSearch = search.trim().toLowerCase()
-
-    // Nothing until the person types, so opening the search does not dump all roles.
-    if (lowerSearch === "") return []
-
-    return PREDEFINED_ROLES.filter((role) => {
-      if (selectedRoles.includes(role.id) || selectedRoles.includes(role.slug)) return false
-      return (
-        getRoleLabel(role.slug).toLowerCase().includes(lowerSearch) ||
-        role.slug.toLowerCase().includes(lowerSearch)
-      )
-    }).map((role) => role.slug)
-  }, [selectedRoles, getRoleLabel, search])
+  // Nothing until the person types, so opening the search does not dump all roles.
+  const lowerSearch = search.trim().toLowerCase()
+  const searchResults =
+    lowerSearch === ""
+      ? []
+      : PREDEFINED_ROLES.filter((role) => {
+          if (selectedRoles.includes(role.id) || selectedRoles.includes(role.slug)) return false
+          return (
+            getRoleLabel(role.slug).toLowerCase().includes(lowerSearch) ||
+            role.slug.toLowerCase().includes(lowerSearch)
+          )
+        }).map((role) => role.slug)
 
   // The field's roles first, then the chosen ones from elsewhere, then what the search found.
   const fieldRoles: readonly string[] = field?.roles ?? []

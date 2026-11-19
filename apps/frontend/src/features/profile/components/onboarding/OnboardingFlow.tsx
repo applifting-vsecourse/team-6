@@ -14,7 +14,7 @@ import {
   referenceQueryOptions,
   useSaveProfile,
   type ProfileResponse,
-  type Tag,
+  type ReferenceTag,
 } from "@/features/profile/api/profileApi"
 import { OnboardingAnswers } from "@/features/profile/components/onboarding/OnboardingAnswers"
 import { OnboardingFrame } from "@/features/profile/components/onboarding/OnboardingFrame"
@@ -85,13 +85,15 @@ export function OnboardingFlow({ userId, seed, page, onPageChange }: OnboardingF
       onPageChange={onPageChange}
       profile={profileQuery.data ?? null}
       allTags={referenceQuery.data?.tags ?? []}
+      categories={referenceQuery.data?.categories ?? []}
     />
   )
 }
 
 type OnboardingFlowPagesProps = OnboardingFlowProps & {
   profile: ProfileResponse
-  allTags: Tag[]
+  allTags: ReferenceTag[]
+  categories: { slug: string }[]
 }
 
 function OnboardingFlowPages({
@@ -101,6 +103,7 @@ function OnboardingFlowPages({
   onPageChange,
   profile,
   allTags,
+  categories,
 }: OnboardingFlowPagesProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -164,6 +167,12 @@ function OnboardingFlowPages({
         }
       : null
 
+  // Until a place is picked there is no pin to drag, so the map's hint says what to do first.
+  const hint =
+    page === "place" && draft.latitude === null
+      ? t("onboarding.guide.place.hintBeforePick")
+      : t(`onboarding.guide.${page}.hint`)
+
   const continueLabel =
     page === "summary"
       ? t("onboarding.summary.next")
@@ -176,7 +185,7 @@ function OnboardingFlowPages({
       page={page}
       seed={seed}
       title={t(`onboarding.guide.${page}.title`)}
-      hint={t(`onboarding.guide.${page}.hint`)}
+      hint={hint}
       error={error}
       saveError={saveError}
       expression={page === "summary" ? happy : undefined}
@@ -196,6 +205,7 @@ function OnboardingFlowPages({
           if (errorPage === page) setErrorPage(null)
         }}
         allTags={allTags}
+        categories={categories}
         onEdit={goTo}
       />
     </OnboardingFrame>

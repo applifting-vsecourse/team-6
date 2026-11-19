@@ -30,11 +30,9 @@ export function LocationMapPicker({
 }: LocationMapPickerProps) {
   const { t } = useTranslation()
 
-  const initialLat = latitude ?? DEFAULT_EUROPE_LAT
-  const initialLng = longitude ?? DEFAULT_EUROPE_LNG
-
-  const [currentLat, setCurrentLat] = useState<number>(initialLat)
-  const [currentLng, setCurrentLng] = useState<number>(initialLng)
+  // null until the user picks a place; the Europe default is only the map's initial view
+  const [currentLat, setCurrentLat] = useState<number | null>(latitude)
+  const [currentLng, setCurrentLng] = useState<number | null>(longitude)
   const [currentRadius, setCurrentRadius] = useState<number>(
     radiusKm > 0 ? radiusKm : DEFAULT_RADIUS_KM,
   )
@@ -47,15 +45,13 @@ export function LocationMapPicker({
   const circleRef = useRef<L.Circle | null>(null)
 
   const radiusRef = useRef<number>(currentRadius)
-  const latLngRef = useRef({ lat: currentLat, lng: currentLng })
+  const latLngRef = useRef<{ lat: number; lng: number } | null>(
+    latitude != null && longitude != null ? { lat: latitude, lng: longitude } : null,
+  )
 
   useEffect(() => {
     radiusRef.current = currentRadius
   }, [currentRadius])
-
-  useEffect(() => {
-    latLngRef.current = { lat: currentLat, lng: currentLng }
-  }, [currentLat, currentLng])
 
   // Figma B2c: four presets. The slider below reaches the longer ones.
   const presetRadii = [5, 10, 25, 50]
@@ -74,24 +70,17 @@ export function LocationMapPicker({
     [onChange],
   )
 
-  // Initialize Leaflet map
-  useEffect(() => {
-    if (!mapContainerRef.current) return
-    // Guard against re-initialization
-    if (mapInstanceRef.current) return
-
-    try {
-      const map = L.map(mapContainerRef.current, {
-        center: [currentLat, currentLng],
-        zoom: radiusRef.current > 50 ? 8 : 10,
-        scrollWheelZoom: false,
-      })
-
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>',
-        maxZoom: 18,
-      }).addTo(map)
+  // Creates the draggable marker and radius circle on first use, then just moves them.
+  const showPin = useCallback(
+    (lat: number, lng: number) => {
+      const map = mapInstanceRef.current
+      if (!map) return
+      if (markerRef.current && circleRef.current) {
+        markerRef.current.setLatLng([lat, lng])
+        circleRef.current.setLatLng([lat, lng])
+        circleRef.current.setRadius(radiusRef.current * 1000)
+        return
+      }
 
       // Leaflet draws the circle as SVG, which needs real colours: read the theme's accent.
       const accent =
@@ -109,12 +98,8 @@ export function LocationMapPicker({
         iconAnchor: [14, 14],
       })
 
-      const marker = L.marker([currentLat, currentLng], {
-        draggable: true,
-        icon: customIcon,
-      }).addTo(map)
-
-      const circle = L.circle([currentLat, currentLng], {
+      const marker = L.marker([lat, lng], { draggable: true, icon: customIcon }).addTo(map)
+      const circle = L.circle([lat, lng], {
         radius: radiusRef.current * 1000,
         color: accent,
         fillColor: accent,
@@ -123,29 +108,49 @@ export function LocationMapPicker({
       }).addTo(map)
 
       marker.on("drag", (e: L.LeafletEvent) => {
-        const target = e.target as L.Marker
-        const pos = target.getLatLng()
-        circle.setLatLng(pos)
+        circle.setLatLng((e.target as L.Marker).getLatLng())
       })
 
       marker.on("dragend", (e: L.LeafletEvent) => {
-        const target = e.target as L.Marker
-        const pos = target.getLatLng()
+        const pos = (e.target as L.Marker).getLatLng()
         circle.setLatLng(pos)
         circle.setRadius(radiusRef.current * 1000)
         updateLocation(pos.lat, pos.lng, radiusRef.current)
       })
 
+      markerRef.current = marker
+      circleRef.current = circle
+    },
+    [updateLocation],
+  )
+
+  // Initialize Leaflet map
+  useEffect(() => {
+    if (!mapContainerRef.current) return
+    // Guard against re-initialization
+    if (mapInstanceRef.current) return
+
+    try {
+      const map = L.map(mapContainerRef.current, {
+        center: [latitude ?? DEFAULT_EUROPE_LAT, longitude ?? DEFAULT_EUROPE_LNG],
+        zoom: radiusRef.current > 50 ? 8 : 10,
+        scrollWheelZoom: false,
+      })
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>',
+        maxZoom: 18,
+      }).addTo(map)
+
+      mapInstanceRef.current = map
+
       map.on("click", (e: L.LeafletMouseEvent) => {
-        marker.setLatLng(e.latlng)
-        circle.setLatLng(e.latlng)
-        circle.setRadius(radiusRef.current * 1000)
+        showPin(e.latlng.lat, e.latlng.lng)
         updateLocation(e.latlng.lat, e.latlng.lng, radiusRef.current)
       })
 
-      mapInstanceRef.current = map
-      markerRef.current = marker
-      circleRef.current = circle
+      if (latitude != null && longitude != null) showPin(latitude, longitude)
     } catch {
       // In non-DOM or JSDOM environments, map creation may fail silently
     }
@@ -180,13 +185,8 @@ export function LocationMapPicker({
         const lng = pos.coords.longitude
         const activeRadius = radiusRef.current
         updateLocation(lat, lng, activeRadius)
-
-        if (mapInstanceRef.current && markerRef.current && circleRef.current) {
-          markerRef.current.setLatLng([lat, lng])
-          circleRef.current.setLatLng([lat, lng])
-          circleRef.current.setRadius(activeRadius * 1000)
-          mapInstanceRef.current.setView([lat, lng], 11)
-        }
+        showPin(lat, lng)
+        mapInstanceRef.current?.setView([lat, lng], 11)
       },
       (err) => {
         setIsLocating(false)
@@ -198,12 +198,15 @@ export function LocationMapPicker({
       },
       { timeout: 10000, enableHighAccuracy: false, maximumAge: 300000 },
     )
-  }, [t, updateLocation])
+  }, [t, updateLocation, showPin])
 
   const handleRadiusChange = (newRadius: number) => {
     setCurrentRadius(newRadius)
     radiusRef.current = newRadius
-    updateLocation(latLngRef.current.lat, latLngRef.current.lng, newRadius)
+    // Nothing picked yet: the radius is reported together with the first pick.
+    if (latLngRef.current) {
+      updateLocation(latLngRef.current.lat, latLngRef.current.lng, newRadius)
+    }
 
     if (circleRef.current) {
       circleRef.current.setRadius(newRadius * 1000)
@@ -236,21 +239,23 @@ export function LocationMapPicker({
         style={{ zIndex: 0 }}
       />
 
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <span className="flex items-center gap-1 font-mono text-meta tracking-meta text-muted-foreground uppercase">
-          <MapPin className="size-3 text-destructive" />
-          {formatNumber(currentLat, {
-            minimumFractionDigits: 4,
-            maximumFractionDigits: 4,
-          })}
-          °,{" "}
-          {formatNumber(currentLng, {
-            minimumFractionDigits: 4,
-            maximumFractionDigits: 4,
-          })}
-          °
-        </span>
-      </div>
+      {currentLat != null && currentLng != null && (
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <span className="flex items-center gap-1 font-mono text-meta tracking-meta text-muted-foreground uppercase">
+            <MapPin className="size-3 text-destructive" />
+            {formatNumber(currentLat, {
+              minimumFractionDigits: 4,
+              maximumFractionDigits: 4,
+            })}
+            °,{" "}
+            {formatNumber(currentLng, {
+              minimumFractionDigits: 4,
+              maximumFractionDigits: 4,
+            })}
+            °
+          </span>
+        </div>
+      )}
 
       <div className="flex flex-col gap-2.5">
         <div className="flex items-start justify-between">

@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next"
 
-import type { Tag } from "@/features/profile/api/profileApi"
+import type { ReferenceTag } from "@/features/profile/api/profileApi"
 import type { OnboardingDraft } from "@/features/profile/lib/onboardingDraft"
 import type { OnboardingPageId } from "@/features/profile/lib/onboardingPages"
 
 type OnboardingSummaryProps = {
   draft: OnboardingDraft
-  allTags: Tag[]
+  allTags: ReferenceTag[]
   onEdit: (page: OnboardingPageId) => void
 }
 
