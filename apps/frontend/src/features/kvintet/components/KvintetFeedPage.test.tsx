@@ -290,8 +290,7 @@ describe("starting a kvintet", () => {
   }
 
   const pickCategory = async (name: string) => {
-    await userEvent.click(screen.getByRole("combobox", { name: "Category" }))
-    await userEvent.click(await screen.findByRole("option", { name }))
+    await userEvent.click(screen.getByRole("button", { name }))
   }
 
   it("shows what is missing instead of disabling the button", async () => {

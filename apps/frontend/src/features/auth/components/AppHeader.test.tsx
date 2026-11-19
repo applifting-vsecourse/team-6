@@ -129,7 +129,9 @@ describe("AppHeader", () => {
     await userEvent.click(screen.getByRole("button", { name: "Open menu" }))
 
     const menu = within(screen.getByRole("dialog"))
-    expect(menu.getByText("@jana")).toBeInTheDocument()
+    // The account card is the phone's way to the profile.
+    expect(menu.getByRole("link", { name: /Jana Nováková/ })).toHaveAttribute("href", "/profile")
+    expect(menu.getByText("View your profile")).toBeInTheDocument()
     expect(menu.getByRole("link", { name: /Group chat/ })).toHaveAttribute(
       "href",
       "/kvintet/messages",

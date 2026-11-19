@@ -13,7 +13,7 @@ import {
   useSaveProfile,
   type MeetingFrequency,
   type ProfileResponse,
-  type Tag,
+  type ReferenceTag,
 } from "@/features/profile/api/profileApi"
 import { OnboardingProgress } from "@/features/profile/components/OnboardingProgress"
 import { Step1Profile } from "@/features/profile/components/Step1Profile"
@@ -66,6 +66,7 @@ export function OnboardingWizard({
   }
 
   const allTags = referenceQuery.data?.tags ?? []
+  const categories = referenceQuery.data?.categories ?? []
 
   return (
     <AvatarSeedContext.Provider value={avatarSeed}>
@@ -75,6 +76,7 @@ export function OnboardingWizard({
         onStepChange={onStepChange}
         profile={profileQuery.data ?? null}
         allTags={allTags}
+        categories={categories}
       />
     </AvatarSeedContext.Provider>
   )
@@ -85,7 +87,8 @@ type OnboardingWizardFormProps = {
   step: OnboardingStep
   onStepChange: (step: OnboardingStep) => void
   profile: ProfileResponse
-  allTags: Tag[]
+  allTags: ReferenceTag[]
+  categories: { slug: string }[]
 }
 
 function OnboardingWizardForm({
@@ -94,6 +97,7 @@ function OnboardingWizardForm({
   onStepChange: setCurrentStep,
   profile,
   allTags,
+  categories,
 }: OnboardingWizardFormProps) {
   const navigate = useNavigate()
   const saveProfileMutation = useSaveProfile(userId)
@@ -221,6 +225,7 @@ function OnboardingWizardForm({
         <Step1Profile
           initialData={step1Data}
           allTags={allTags}
+          categories={categories}
           onContinue={handleStep1Continue}
         />
       )}

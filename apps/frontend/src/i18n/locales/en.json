@@ -205,8 +205,7 @@
     },
     "dialog": {
       "cancel": "Cancel",
-      "category": "Category",
-      "categoryPlaceholder": "Pick a category",
+      "category": "Categories (1–3)",
       "confirmLeave": "Leave",
       "confirmLeaveActive": "Leave kvintet",
       "description": "You'll be its first member. Others join by topic.",
@@ -215,6 +214,7 @@
       "leaveActiveDescription": "Others will see that you left. Then you can join another kvintet.",
       "leaveActiveNotice": "The others carry on without you.",
       "leaveActiveTitle": "Leave the kvintet?",
+      "leaveLastMemberDescription": "You're the only member, so the kvintet will be removed.",
       "leaveProposalConfirm": "You'll leave this kvintet. When someone joins or leaves, everyone's votes are reset.",
       "leaveTitle": "Are you sure you want to leave?",
       "leaving": "Leaving…",
@@ -336,7 +336,8 @@
     "switchToDark": "Switch to dark theme",
     "switchToLight": "Switch to light theme",
     "unreadMessages_one": "{{count}} unread message",
-    "unreadMessages_other": "{{count}} unread messages"
+    "unreadMessages_other": "{{count}} unread messages",
+    "viewProfile": "View your profile"
   },
   "meetingFrequency": {
     "BIWEEKLY": "every two weeks",
@@ -373,8 +374,11 @@
       "rolePlaceholder": "e.g. Software Engineer",
       "roleRequired": "Select at least one role",
       "searchAllRoles": "Not here? Search all roles",
+      "searchAllTags": "Not here? Search all tags",
       "searchRoleAria": "Search role",
       "searchRolePlaceholder": "Search role…",
+      "searchTagsAria": "Search tags in {{section}}",
+      "searchTagsPlaceholder": "Search tags…",
       "teachHint": "Pick any number of tags.",
       "teachTitle": "What I can teach",
       "title": "Tell us about you"
@@ -389,7 +393,7 @@
       "geolocationUnavailable": "Geolocation is not supported in this browser.",
       "locating": "Locating…",
       "locationRequired": "Please select a location on the map.",
-      "mapHint": "Drag the pin. Others only see the distance.",
+      "mapHint": "Click the map or use your location. Others only see the distance.",
       "mornings": "Mornings",
       "radius": "How far can you travel?",
       "radiusOption": "Up to {{count}} km",

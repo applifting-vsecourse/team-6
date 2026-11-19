@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
 
-import type { Tag } from "@/features/profile/api/profileApi"
+import type { ReferenceTag } from "@/features/profile/api/profileApi"
 import { OnboardingTitle } from "@/features/profile/components/OnboardingTitle"
 import { RoleSelector } from "@/features/profile/components/RoleSelector"
 import { TagSelector } from "@/features/profile/components/TagSelector"
@@ -18,11 +18,12 @@ export type Step1Data = {
 
 type Step1ProfileProps = {
   initialData: Step1Data
-  allTags: Tag[]
+  allTags: ReferenceTag[]
+  categories: { slug: string }[]
   onContinue: (data: Step1Data) => void
 }
 
-export function Step1Profile({ initialData, allTags, onContinue }: Step1ProfileProps) {
+export function Step1Profile({ initialData, allTags, categories, onContinue }: Step1ProfileProps) {
   const { t } = useTranslation()
 
   const [roles, setRoles] = useState<string[]>(() => {
@@ -82,19 +83,7 @@ export function Step1Profile({ initialData, allTags, onContinue }: Step1ProfileP
         hint={t("onboarding.step1.teachHint")}
         selectedTagIds={teachTagIds}
         allTags={allTags}
-        defaultSuggestedSlugs={[
-          "data-analysis",
-          "public-speaking",
-          "copywriting",
-          "photography",
-          "project-management",
-          "excel",
-          "spanish",
-          "social-media",
-          "python",
-          "typescript",
-          "react",
-        ]}
+        categories={categories}
         onSelectTag={(id) => setTeachTagIds((prev) => (prev.includes(id) ? prev : [...prev, id]))}
         onRemoveTag={(id) => setTeachTagIds((prev) => prev.filter((tId) => tId !== id))}
       />
@@ -103,18 +92,7 @@ export function Step1Profile({ initialData, allTags, onContinue }: Step1ProfileP
         title={t("onboarding.step1.learnTitle")}
         selectedTagIds={learnTagIds}
         allTags={allTags}
-        defaultSuggestedSlugs={[
-          "ux-design",
-          "negotiation",
-          "statistics",
-          "machine-learning",
-          "video-editing",
-          "python",
-          "sql",
-          "docker",
-          "kubernetes",
-          "rust",
-        ]}
+        categories={categories}
         onSelectTag={(id) => setLearnTagIds((prev) => (prev.includes(id) ? prev : [...prev, id]))}
         onRemoveTag={(id) => setLearnTagIds((prev) => prev.filter((tId) => tId !== id))}
       />
@@ -123,18 +101,7 @@ export function Step1Profile({ initialData, allTags, onContinue }: Step1ProfileP
         title={t("onboarding.step1.interestsTitle")}
         selectedTagIds={interestTagIds}
         allTags={allTags}
-        defaultSuggestedSlugs={[
-          "running",
-          "cooking",
-          "travel",
-          "startups",
-          "music",
-          "hiking",
-          "board-games",
-          "fitness",
-          "gaming",
-          "coffee",
-        ]}
+        categories={categories}
         onSelectTag={(id) =>
           setInterestTagIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
         }

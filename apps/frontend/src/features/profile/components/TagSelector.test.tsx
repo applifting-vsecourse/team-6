@@ -5,10 +5,14 @@ import { describe, expect, it } from "vitest"
 
 import { TagSelector } from "./TagSelector"
 
-const tags = ["excel", "python", "hiking", "spanish", "sql"].map((slug, i) => ({
-  id: String(i),
-  slug,
-}))
+const categories = [{ slug: "software-development" }, { slug: "business" }, { slug: "leisure" }]
+const tags = [
+  { id: "0", slug: "excel", categories: ["software-development", "business"] },
+  { id: "1", slug: "python", categories: ["software-development"] },
+  { id: "2", slug: "hiking", categories: ["leisure"] },
+  { id: "3", slug: "sql", categories: ["software-development"] },
+  { id: "4", slug: "bouldering", categories: [] },
+]
 
 function Harness() {
   const [selected, setSelected] = useState<string[]>([])
@@ -17,7 +21,7 @@ function Harness() {
       title="What I can teach"
       selectedTagIds={selected}
       allTags={tags}
-      defaultSuggestedSlugs={["excel", "python"]}
+      categories={categories}
       onSelectTag={(id) => setSelected((prev) => [...prev, id])}
       onRemoveTag={(id) => setSelected((prev) => prev.filter((x) => x !== id))}
     />
@@ -25,25 +29,55 @@ function Harness() {
 }
 
 describe("TagSelector", () => {
-  it("suggests three tags, the preferred ones first, and has no search box", () => {
+  it("shows only the categories until one is picked", () => {
     render(<Harness />)
 
-    const added = screen.getAllByRole("button", { name: /^Add tag / })
-    expect(added.map((button) => button.getAttribute("aria-label"))).toEqual([
-      "Add tag Excel",
-      "Add tag Python",
-      "Add tag Hiking",
-    ])
-    expect(screen.queryByRole("textbox")).not.toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Software development" })).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: /^Add tag / })).not.toBeInTheDocument()
   })
 
-  it("brings the next suggestion in once one is picked", async () => {
+  it("lists the tags of the picked category and toggles them", async () => {
     render(<Harness />)
 
-    await userEvent.click(screen.getByRole("button", { name: "Add tag Excel" }))
+    await userEvent.click(screen.getByRole("button", { name: "Business" }))
+    expect(screen.getByRole("button", { name: "Add tag Excel" })).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "Add tag Python" })).not.toBeInTheDocument()
 
-    expect(screen.getByRole("button", { name: "Remove tag Excel" })).toBeInTheDocument()
-    expect(screen.getAllByRole("button", { name: /^Add tag / })).toHaveLength(3)
-    expect(screen.getByRole("button", { name: "Add tag Spanish" })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole("button", { name: "Add tag Excel" }))
+    const chosen = screen.getByRole("button", { name: "Remove tag Excel" })
+    expect(chosen).toHaveAttribute("aria-pressed", "true")
+
+    await userEvent.click(chosen)
+    expect(screen.getByRole("button", { name: "Add tag Excel" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    )
+  })
+
+  it("finds a tag without a category through the search", async () => {
+    render(<Harness />)
+
+    await userEvent.click(screen.getByRole("button", { name: "Not here? Search all tags" }))
+    expect(screen.queryByRole("button", { name: /^Add tag / })).not.toBeInTheDocument()
+
+    await userEvent.type(
+      screen.getByRole("textbox", { name: "Search tags in What I can teach" }),
+      "boulder",
+    )
+    await userEvent.click(screen.getByRole("button", { name: "Add tag Bouldering" }))
+
+    expect(screen.getByRole("button", { name: "Remove tag Bouldering" })).toBeInTheDocument()
+  })
+
+  it("does not match the numeric id of a tag", async () => {
+    render(<Harness />)
+
+    await userEvent.click(screen.getByRole("button", { name: "Not here? Search all tags" }))
+    await userEvent.type(
+      screen.getByRole("textbox", { name: "Search tags in What I can teach" }),
+      "1",
+    )
+
+    expect(screen.queryByRole("button", { name: /^Add tag / })).not.toBeInTheDocument()
   })
 })
