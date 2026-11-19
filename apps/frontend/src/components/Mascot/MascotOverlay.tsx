@@ -3,13 +3,13 @@ import { happy, sleepy } from "blobatar/expression"
 import { animate, AnimatePresence, motion, useMotionValue, useReducedMotion } from "motion/react"
 import { useTranslation } from "react-i18next"
 
-import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Button } from "@/components/ui/button"
 
 import { placeBubble, preferredBubbleWidth } from "./bubblePlacement"
 import { LOOK_AWAY_TRAVEL, lookAwayFromPointer, trackPointer } from "./lookAway"
 import { MascotBubble, type BubbleLayout } from "./MascotBubble"
 import { MASCOT_SEED, useMascotContext } from "./MascotContext"
+import { MascotFace } from "./MascotFace"
 import { stickyRect } from "./stickyRect"
 
 const FLIGHT = { type: "spring", stiffness: 140, damping: 20, mass: 0.9 } as const
@@ -193,12 +193,12 @@ export function MascotOverlay() {
                 animate={{ opacity: seed ? 0 : 1, scale: seed ? 0.85 : 1 }}
                 transition={CROSS_FADE}
               >
-                <GazeBlobatar
+                <MascotFace
                   name={MASCOT_SEED}
-                  expression={isEyesClosed ? sleepy : happy}
+                  expression={isEyesClosed ? sleepy : (stage.expression ?? happy)}
+                  shakeKey={stage.shakeKey}
                   lookAt={lookAway}
                   travel={travel}
-                  className="size-full"
                 />
               </motion.div>
               <AnimatePresence>
@@ -211,12 +211,12 @@ export function MascotOverlay() {
                     exit={{ opacity: 0, scale: 0.85 }}
                     transition={CROSS_FADE}
                   >
-                    <GazeBlobatar
+                    <MascotFace
                       name={seed}
-                      expression={isEyesClosed ? sleepy : undefined}
+                      expression={isEyesClosed ? sleepy : stage.expression}
+                      shakeKey={stage.shakeKey}
                       lookAt={lookAway}
                       travel={travel}
-                      className="size-full"
                     />
                   </motion.div>
                 ) : null}

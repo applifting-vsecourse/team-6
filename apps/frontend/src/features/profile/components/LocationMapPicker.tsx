@@ -10,9 +10,10 @@ import { formatNumber } from "@/lib/date"
 
 import "leaflet/dist/leaflet.css"
 
+import { DEFAULT_RADIUS_KM } from "@/features/profile/lib/onboardingDraft"
+
 export const DEFAULT_EUROPE_LAT = 50.0
 export const DEFAULT_EUROPE_LNG = 15.0
-export const DEFAULT_RADIUS_KM = 25
 
 type LocationMapPickerProps = {
   latitude: number | null
@@ -56,7 +57,8 @@ export function LocationMapPicker({
     latLngRef.current = { lat: currentLat, lng: currentLng }
   }, [currentLat, currentLng])
 
-  const presetRadii = [5, 10, 25, 50, 100, 150]
+  // Figma B2c: four presets. The slider below reaches the longer ones.
+  const presetRadii = [5, 10, 25, 50]
 
   const updateLocation = useCallback(
     (lat: number, lng: number, rad: number) => {
@@ -91,12 +93,16 @@ export function LocationMapPicker({
         maxZoom: 18,
       }).addTo(map)
 
+      // Leaflet draws the circle as SVG, which needs real colours: read the theme's accent.
+      const accent =
+        getComputedStyle(document.documentElement).getPropertyValue("--highlight").trim() ||
+        "#2f5bd3"
+
       const customIcon = L.divIcon({
         className: "kvinted-map-pin",
         html: `
           <div style="position: relative; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
-            <div style="position: absolute; width: 28px; height: 28px; border-radius: 50%; background: rgba(34, 197, 94, 0.35);"></div>
-            <div style="position: relative; width: 14px; height: 14px; border-radius: 50%; background: #16a34a; border: 2.5px solid #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.35);"></div>
+            <div style="position: relative; width: 16px; height: 16px; border-radius: 50%; background: var(--highlight); border: 2.5px solid var(--card); box-shadow: 0 1px 4px rgba(0,0,0,0.35);"></div>
           </div>
         `,
         iconSize: [28, 28],
@@ -110,9 +116,9 @@ export function LocationMapPicker({
 
       const circle = L.circle([currentLat, currentLng], {
         radius: radiusRef.current * 1000,
-        color: "#16a34a",
-        fillColor: "#22c55e",
-        fillOpacity: 0.18,
+        color: accent,
+        fillColor: accent,
+        fillOpacity: 0.15,
         weight: 2,
       }).addTo(map)
 
@@ -160,7 +166,7 @@ export function LocationMapPicker({
 
   const handleUseCurrentLocation = useCallback(() => {
     if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
-      setLocationNote(t("onboarding.step2.geolocationUnavailable"))
+      setLocationNote(t("onboarding.place.geolocationUnavailable"))
       return
     }
 
@@ -185,9 +191,9 @@ export function LocationMapPicker({
       (err) => {
         setIsLocating(false)
         if (err.code === err.PERMISSION_DENIED) {
-          setLocationNote(t("onboarding.step2.geolocationDenied"))
+          setLocationNote(t("onboarding.place.geolocationDenied"))
         } else {
-          setLocationNote(t("onboarding.step2.geolocationUnavailable"))
+          setLocationNote(t("onboarding.place.geolocationUnavailable"))
         }
       },
       { timeout: 10000, enableHighAccuracy: false, maximumAge: 300000 },
@@ -210,29 +216,23 @@ export function LocationMapPicker({
 
   return (
     <div className="flex flex-col gap-3.5">
-      <div className="flex flex-col items-start gap-3 md:flex-row md:justify-between md:gap-4">
-        <div className="flex flex-col gap-0.5">
-          <h2 className="text-h3">{t("onboarding.step2.whereTitle")}</h2>
-          <p className="text-small text-muted-foreground">{t("onboarding.step2.mapHint")}</p>
-        </div>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleUseCurrentLocation}
-          disabled={isLocating}
-          className="h-auto shrink-0 px-3 py-2 text-small font-normal text-highlight"
-        >
-          <LocateFixed className="size-3.5" />
-          {isLocating ? t("onboarding.step2.locating") : t("onboarding.step2.useCurrentLocation")}
-        </Button>
-      </div>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={handleUseCurrentLocation}
+        disabled={isLocating}
+        className="h-auto w-fit shrink-0 border-input bg-card px-3 py-2 text-small font-normal text-highlight"
+      >
+        <LocateFixed className="size-3.5" />
+        {isLocating ? t("onboarding.place.locating") : t("onboarding.place.useCurrentLocation")}
+      </Button>
 
       {locationNote && <p className="text-small text-muted-foreground">{locationNote}</p>}
 
       <div
         ref={mapContainerRef}
         data-testid="location-map-container"
-        className="relative h-65 w-full overflow-hidden rounded-lg border border-border bg-secondary"
+        className="relative h-65 w-full overflow-hidden rounded-[10px] border border-border bg-secondary"
         style={{ zIndex: 0 }}
       />
 
@@ -250,9 +250,6 @@ export function LocationMapPicker({
           })}
           °
         </span>
-        <span className="text-small text-foreground">
-          {t("onboarding.step2.selectedRadius", { count: formatNumber(currentRadius) })}
-        </span>
       </div>
 
       <div className="flex flex-col gap-2.5">
@@ -261,11 +258,29 @@ export function LocationMapPicker({
             htmlFor="radius-slider"
             className="text-compact font-medium text-foreground"
           >
-            {t("onboarding.step2.radiusSliderLabel")}
+            {t("onboarding.place.radiusSliderLabel")}
           </Label>
-          <span className="font-mono text-meta tracking-meta text-highlight uppercase">
-            {t("onboarding.step2.radiusOption", { count: formatNumber(currentRadius) })}
-          </span>
+          {presetRadii.includes(currentRadius) ? null : (
+            <span className="font-mono text-meta tracking-meta text-highlight uppercase">
+              {t("onboarding.place.radiusOption", { count: formatNumber(currentRadius) })}
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-1.5">
+          {presetRadii.map((rad) => (
+            <Button
+              key={rad}
+              type="button"
+              variant={currentRadius === rad ? "default" : "outline"}
+              aria-pressed={currentRadius === rad}
+              size="sm"
+              onClick={() => handleRadiusChange(rad)}
+              className="h-auto rounded-full px-2.5 py-1 text-small font-normal"
+            >
+              {t("onboarding.place.radiusOption", { count: formatNumber(rad) })}
+            </Button>
+          ))}
         </div>
 
         <Slider
@@ -275,23 +290,8 @@ export function LocationMapPicker({
           step={5}
           value={[currentRadius]}
           onValueChange={([val]) => val !== undefined && handleRadiusChange(val)}
-          aria-label={t("onboarding.step2.radiusSliderLabel")}
+          aria-label={t("onboarding.place.radiusSliderLabel")}
         />
-
-        <div className="flex flex-wrap gap-1.5">
-          {presetRadii.map((rad) => (
-            <Button
-              key={rad}
-              type="button"
-              variant={currentRadius === rad ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleRadiusChange(rad)}
-              className="h-auto rounded-full px-2.5 py-1 text-small font-normal"
-            >
-              {t("onboarding.step2.radiusOption", { count: formatNumber(rad) })}
-            </Button>
-          ))}
-        </div>
       </div>
     </div>
   )

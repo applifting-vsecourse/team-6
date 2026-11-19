@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react"
+import type { Expression } from "blobatar/expression"
 
 /** Seed of the yellow mascot. The blobatar package turns it into `#ffcd44`, "you" in the core-idea animation. */
 export const MASCOT_SEED = "jana"
@@ -26,11 +27,8 @@ export type MascotBubble = {
   text: string
   /** Room a page set aside for this bubble (`MascotBubbleSlot`). Without it, it opens beside the mascot. */
   slotId?: string
-  /**
-   * Without a slot: `above` the mascot, or `beside` it (to its right, narrowed to the room there),
-   * where it must not cover what the mascot stands on.
-   */
-  prefer?: "above" | "beside"
+  /** Without a slot: open `above` the mascot instead of beside it. */
+  prefer?: "above"
   actions?: MascotAction[]
   /**
    * Shows a close cross in the top right corner. It only hides the bubble: the mascot stays, and a
@@ -48,11 +46,10 @@ export type MascotStage = {
   seed?: string
   /** The mascot looks away: its eyes shut, e.g. while a password is typed. */
   isEyesClosed?: boolean
-  /**
-   * The anchor the mascot is talking about while it stands somewhere else (a guide bar on a
-   * phone): that element can highlight itself.
-   */
-  highlightId?: string
+  /** A pose to hold, e.g. `happy`. Leave out for the neutral face (the yellow mascot is happy). */
+  expression?: Expression
+  /** The mascot shakes its head once each time this changes. */
+  shakeKey?: number
   bubble?: MascotBubble
 }
 

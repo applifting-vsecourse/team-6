@@ -33,7 +33,7 @@ export function TagBadge({
           <button
             type="button"
             onClick={onAction}
-            aria-label={actionAriaLabel ?? t("onboarding.step1.removeTag", { name: label })}
+            aria-label={actionAriaLabel ?? t("onboarding.tags.removeTag", { name: label })}
             className="inline-flex size-4 items-center justify-center rounded-full opacity-80 hover:opacity-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
           >
             <X className="size-3 stroke-[2.5]" />
@@ -48,7 +48,7 @@ export function TagBadge({
       <button
         type="button"
         onClick={onAction}
-        aria-label={actionAriaLabel ?? t("onboarding.step1.addTag", { name: label })}
+        aria-label={actionAriaLabel ?? t("onboarding.tags.addTag", { name: label })}
         className={cn(
           "inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-small text-foreground transition-colors select-none hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
           className,

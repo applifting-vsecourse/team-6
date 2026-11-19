@@ -74,45 +74,6 @@ describe("placeBubble beside the mascot", () => {
   })
 })
 
-describe("placeBubble beside a card", () => {
-  it("opens to the right of the mascot", () => {
-    const layout = placeBubble(
-      rect(1000, 300, 56),
-      { width: 1440, height: 800 },
-      { prefer: "beside" },
-    )
-
-    expect(layout.side).toBe("right")
-    expect(layout.top).toBe(300)
-    expect(layout.left).toBe(1070)
-  })
-
-  it("narrows to the room beside the card instead of leaving it", () => {
-    // A 640px card centred in a 1280px window, the mascot on its corner: 250px are left.
-    const layout = placeBubble(rect(944, 300, 56), DESKTOP, {
-      preferredWidth: 280,
-      prefer: "beside",
-    })
-
-    expect(layout.side).toBe("right")
-    expect(layout.maxWidth).toBe(250)
-    expect(layout.left + layout.width).toBeLessThanOrEqual(1280 - 16)
-  })
-
-  it("never gets narrower than a readable column", () => {
-    expect(placeBubble(rect(1100, 300, 56), DESKTOP, { prefer: "beside" }).maxWidth).toBe(200)
-  })
-
-  it("never opens left, above or below, where it would cover the card", () => {
-    const sides = [
-      placeBubble(rect(600, 300, 44), { width: 800, height: 700 }, { prefer: "beside" }).side,
-      placeBubble(rect(600, 40, 44), { width: 800, height: 700 }, { prefer: "beside" }).side,
-    ]
-
-    expect(sides).toEqual(["right", "right"])
-  })
-})
-
 describe("placeBubble in a slot", () => {
   // The room above the buttons on the landing page, with the mascot on the corner of one.
   const slot = rect(80, 300, 352, 56)

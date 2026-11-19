@@ -219,19 +219,19 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
     <div className="ci-form">
       <FormCard
         n={1}
-        title={t("onboarding.step1.role")}
+        title={t("landing.animation.formRole")}
         picked={t("roles.accountant")}
         suggestions={[t("roles.accountant"), t("roles.tech-recruiter")]}
       />
       <FormCard
         n={2}
-        title={t("onboarding.step1.teachTitle")}
+        title={t("landing.animation.formTeach")}
         picked={t("tags.excel")}
         suggestions={[t("tags.excel"), t("tags.copywriting"), t("tags.sql")]}
       />
       <FormCard
         n={3}
-        title={t("onboarding.step1.learnTitle")}
+        title={t("landing.animation.formLearn")}
         picked={t("tags.python")}
         suggestions={[t("tags.python"), t("tags.statistics"), t("tags.docker")]}
       />

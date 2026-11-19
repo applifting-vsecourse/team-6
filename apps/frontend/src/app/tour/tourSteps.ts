@@ -13,7 +13,7 @@ type TourState = {
 
 /**
  * Where the mascot stands on the tour, from the page the person is on. `null`: it stays out of the
- * way. Onboarding is not here: its own cards drive the mascot (`useOnboardingGuide`).
+ * way. Onboarding is not here: its pages show the avatar themselves (`GuideAvatar`).
  */
 export function resolveTourStep({
   pathname,

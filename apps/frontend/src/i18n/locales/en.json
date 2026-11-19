@@ -291,6 +291,9 @@
       "count": "{{n}} / 5",
       "feedMeta": "Data & AI · Every week",
       "feedTitle": "From Excel to Python",
+      "formLearn": "What I want to learn",
+      "formRole": "What do you do?",
+      "formTeach": "What I can teach",
       "join": "Join",
       "nameEva": "Eve",
       "nameLucie": "Lucy",
@@ -379,83 +382,140 @@
     "profile": "Profile"
   },
   "onboarding": {
-    "step1": {
-      "addRole": "Select role {{name}}",
-      "addTag": "Add tag {{name}}",
-      "description": "Others see your role and tags. Your name only once the kvintet starts.",
-      "fields": {
-        "data": "Data & AI",
-        "design": "Design",
-        "education": "Education & other",
-        "marketing": "Marketing & sales",
-        "people": "People & finance",
-        "product": "Product & management",
-        "tech": "Tech & dev"
-      },
-      "interestsTitle": "Interests",
-      "learnTitle": "What I want to learn",
-      "removeRole": "Remove role {{name}}",
-      "removeTag": "Remove tag {{name}}",
-      "role": "What do you do?",
-      "roleHint": "Pick your field, then your role.",
-      "rolePlaceholder": "e.g. Software Engineer",
-      "roleRequired": "Select at least one role",
-      "searchAllRoles": "Not here? Search all roles",
-      "searchRoleAria": "Search role",
-      "searchRolePlaceholder": "Search role…",
-      "teachHint": "Pick any number of tags.",
-      "teachTitle": "What I can teach",
-      "title": "Tell us about you"
+    "days": {
+      "weekdays": "Weekdays",
+      "weekends": "Weekends"
     },
-    "step2": {
-      "afternoons": "Afternoons",
-      "daysRequired": "Please select at least one day option (weekdays or weekends).",
-      "daysTitle": "Days",
-      "description": "So you meet people nearby.",
-      "evenings": "Evenings",
+    "expectations": {
+      "learn": "Learn something new",
+      "meet": "Meet new people",
+      "share": "Share what I know",
+      "solve": "Solve a specific problem"
+    },
+    "fieldLabel": "Field",
+    "fields": {
+      "data": "Data & AI",
+      "design": "Design",
+      "education": "Education & other",
+      "marketing": "Marketing & sales",
+      "people": "People & finance",
+      "product": "Product & management",
+      "tech": "Tech & dev"
+    },
+    "footer": "You can change it any time in your profile.",
+    "frequency": {
+      "biweekly": "Every two weeks",
+      "monthly": "Once a month",
+      "weekly": "Every week"
+    },
+    "groups": {
+      "expectations": "Expectations",
+      "profile": "Your profile",
+      "when": "When and where"
+    },
+    "guide": {
+      "days": {
+        "error": "This one we need – tick at least one day.",
+        "hint": "Tick as many as suit you.",
+        "problem": "Pick at least one day.",
+        "title": "Which days could you meet?"
+      },
+      "expectations": {
+        "hint": "Tick everything that fits.",
+        "title": "What do you expect from a kvintet?"
+      },
+      "frequency": {
+        "error": "This one we need – pick one and we're done.",
+        "hint": "Pick one. This one we need.",
+        "problem": "Pick how often you'd like to meet.",
+        "title": "How often would you like to meet?"
+      },
+      "interests": {
+        "hint": "It helps the five of you find something to talk about.",
+        "title": "What are you into outside work?"
+      },
+      "learn": {
+        "hint": "Again, as many as you like.",
+        "title": "And what would you like to learn?"
+      },
+      "note": {
+        "error": "Shorter, please – 300 characters at most.",
+        "hint": "That's entirely up to you.",
+        "problem": "Keep it to 300 characters.",
+        "title": "Anything else the group should know?"
+      },
+      "place": {
+        "error": "This one we need – tap the map to drop the pin.",
+        "hint": "Drag the pin and pick how far you'd travel. Others only see the distance.",
+        "problem": "Pick a place on the map.",
+        "title": "Where would you like to meet?"
+      },
+      "role": {
+        "error": "Pick at least one role so the others know what you do.",
+        "hint": "You can add more than one.",
+        "problem": "Pick at least one role.",
+        "title": "Start here: pick your field, then your role."
+      },
+      "summary": {
+        "hint": "Continue whenever it looks right to you.",
+        "title": "That's your profile!"
+      },
+      "teach": {
+        "hint": "Pick as many topics as you like.",
+        "title": "What could you teach the others?"
+      },
+      "time": {
+        "error": "This one we need – tick at least one time of day.",
+        "hint": "Tick as many as suit you.",
+        "problem": "Pick at least one time of day.",
+        "title": "And at what time of day?"
+      }
+    },
+    "note": {
+      "counter": "{{count}} / {{max}} · optional",
+      "label": "Anything else the group should know?",
+      "placeholder": "For example: I can only meet in English, or my dog comes along."
+    },
+    "place": {
       "geolocationDenied": "Location access was denied. You can select the center directly on the map.",
       "geolocationUnavailable": "Geolocation is not supported in this browser.",
       "locating": "Locating…",
-      "locationRequired": "Please select a location on the map.",
-      "mapHint": "Drag the pin. Others only see the distance.",
-      "mornings": "Mornings",
-      "radius": "How far can you travel?",
       "radiusOption": "Up to {{count}} km",
       "radiusSliderLabel": "Search radius",
       "selectedRadius": "{{count}} km radius",
-      "timeOfDayRequired": "Please select at least one time of day (morning, afternoon, or evening).",
-      "timeOfDayTitle": "Time of day",
-      "title": "When and where can you meet?",
-      "useCurrentLocation": "Use my location",
-      "weekdays": "Weekdays",
-      "weekends": "Weekends",
-      "whereTitle": "Where"
+      "useCurrentLocation": "Use my location"
     },
-    "step3": {
-      "description": "Almost done. No wrong answers.",
-      "expectations": {
-        "learn": "Learn something new",
-        "meet": "Meet new people",
-        "share": "Share what I know",
-        "solve": "Solve a specific problem"
-      },
-      "expectationsHint": "You can pick more than one.",
-      "expectationsTitle": "Why do you want to join a kvintet",
-      "finishHint": "Then we'll show you kvintets that suit you.",
-      "frequency": {
-        "biweekly": "Every two weeks",
-        "monthly": "Once a month",
-        "weekly": "Every week"
-      },
-      "frequencyRequired": "Select how often you want to meet",
-      "frequencyTitle": "How often do you want to meet",
-      "noteOptional": "Optional.",
-      "notePlaceholder": "e.g. I prefer to meet in English.",
-      "noteTitle": "Anything the group should know about you?",
-      "title": "What do you expect from the group?"
+    "role": {
+      "addRole": "Select role {{name}}",
+      "removeRole": "Remove role {{name}}",
+      "searchAllRoles": "Not here? Search all roles",
+      "searchRoleAria": "Search role",
+      "searchRolePlaceholder": "Search role…"
     },
+    "roleIn": "Role in {{field}}",
     "stepProgress": "Step {{current}} of {{total}}",
     "stepShort": "{{current}} / {{total}}",
+    "summary": {
+      "interests": "Interests",
+      "learn": "I want to learn",
+      "next": "On to step 2",
+      "none": "Nothing yet",
+      "role": "Role",
+      "teach": "I can teach"
+    },
+    "tags": {
+      "addTag": "Add tag {{name}}",
+      "none": "No topic found",
+      "removeTag": "Remove tag {{name}}",
+      "searchAria": "Search topics",
+      "searchPlaceholder": "Search topics…",
+      "suggested": "Suggested for you"
+    },
+    "time": {
+      "afternoons": "Afternoons",
+      "evenings": "Evenings",
+      "mornings": "Mornings"
+    },
     "title": "Profile setup"
   },
   "overview": {
@@ -747,21 +807,6 @@
     "feed": "Here you see kvintets ordered by how well they suit you. If none of them appeals to you, you can start your own.",
     "header": "That's it! I'm settling in next to your name. Open this menu any time to replay the tour.",
     "next": "Next",
-    "onboarding": {
-      "days": "Which days could you meet? Tick as many as suit you.",
-      "expectations": "What do you expect from a kvintet? Tick everything that fits.",
-      "frequency": "How often would you like to meet? This one we need.",
-      "interests": "Interests outside work help the five of you find something to talk about. Pick as many as you like.",
-      "learn": "And what would you like to learn? Again, as many as you like.",
-      "note": "Anything else the group should know? That's entirely up to you.",
-      "place": "Pick the place where you'd like to meet, and how far you'd travel.",
-      "role": "Start here: pick your field, then your role. You can add more than one.",
-      "step1Ready": "That's your profile. Continue whenever it looks right to you.",
-      "step2Ready": "Now we know when and where. On to the last step.",
-      "step3Ready": "That's everything! Finish up and I'll show you around.",
-      "teach": "What could you teach the others? Pick as many topics as you like.",
-      "time": "And at what time of day? Tick as many as suit you."
-    },
     "overview": "This is the home page. Right now you see the three kvintets that suit you best.",
     "replay": "Replay the tour",
     "showHint": "Show the tip"

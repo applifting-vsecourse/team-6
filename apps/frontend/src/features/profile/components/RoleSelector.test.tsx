@@ -20,7 +20,7 @@ describe("RoleSelector", () => {
   it("shows the roles of a field only after the field is picked", async () => {
     render(<Selector />)
 
-    expect(screen.queryByRole("button", { name: "Select role Copywriter" })).not.toBeInTheDocument()
+    expect(screen.queryByRole("checkbox", { name: "Copywriter" })).not.toBeInTheDocument()
 
     await userEvent.click(screen.getByRole("button", { name: "Marketing & sales" }))
 
@@ -28,27 +28,32 @@ describe("RoleSelector", () => {
       "aria-pressed",
       "true",
     )
-    expect(screen.getByRole("button", { name: "Select role Copywriter" })).toBeInTheDocument()
-    expect(
-      screen.queryByRole("button", { name: "Select role Software Engineer" }),
-    ).not.toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: "Copywriter" })).toBeInTheDocument()
+    expect(screen.queryByRole("checkbox", { name: "Software Engineer" })).not.toBeInTheDocument()
+    expect(screen.getByText("Role in Marketing & sales")).toBeInTheDocument()
   })
 
-  it("marks a chosen role as pressed and removes it on a second click", async () => {
+  it("ticks a role and unticks it on a second click", async () => {
     render(<Selector />)
 
     await userEvent.click(screen.getByRole("button", { name: "Design" }))
-    await userEvent.click(screen.getByRole("button", { name: "Select role UX Designer" }))
+    await userEvent.click(screen.getByRole("checkbox", { name: "UX Designer" }))
+    expect(screen.getByRole("checkbox", { name: "UX Designer" })).toBeChecked()
 
-    const chosen = screen.getByRole("button", { name: "Remove role UX Designer" })
-    expect(chosen).toHaveAttribute("aria-pressed", "true")
+    await userEvent.click(screen.getByRole("checkbox", { name: "UX Designer" }))
 
-    await userEvent.click(chosen)
+    expect(screen.getByRole("checkbox", { name: "UX Designer" })).not.toBeChecked()
+  })
 
-    expect(screen.getByRole("button", { name: "Select role UX Designer" })).toHaveAttribute(
-      "aria-pressed",
-      "false",
-    )
+  it("lets a person pick more than one role", async () => {
+    render(<Selector />)
+
+    await userEvent.click(screen.getByRole("button", { name: "Design" }))
+    await userEvent.click(screen.getByRole("checkbox", { name: "UX Designer" }))
+    await userEvent.click(screen.getByRole("checkbox", { name: "UI Designer" }))
+
+    expect(screen.getByRole("checkbox", { name: "UX Designer" })).toBeChecked()
+    expect(screen.getByRole("checkbox", { name: "UI Designer" })).toBeChecked()
   })
 
   it("opens on the field of an already chosen role", () => {
@@ -58,15 +63,16 @@ describe("RoleSelector", () => {
       "aria-pressed",
       "true",
     )
-    expect(screen.getByRole("button", { name: "Remove role Copywriter" })).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: "Copywriter" })).toBeChecked()
   })
 
-  it("keeps a chosen role visible when another field is open", async () => {
+  it("keeps a chosen role on the list when another field is open", async () => {
     render(<Selector initial={["copywriter"]} />)
 
     await userEvent.click(screen.getByRole("button", { name: "Design" }))
 
-    expect(screen.getByRole("button", { name: "Remove role Copywriter" })).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: "Copywriter" })).toBeChecked()
+    expect(screen.getByRole("checkbox", { name: "UX Designer" })).not.toBeChecked()
   })
 
   it("lists no role until something is typed in the search", async () => {
@@ -74,7 +80,7 @@ describe("RoleSelector", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Not here? Search all roles" }))
 
-    expect(screen.queryByRole("button", { name: /^Select role / })).not.toBeInTheDocument()
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument()
   })
 
   it("finds a role of any field with the search", async () => {
@@ -82,8 +88,27 @@ describe("RoleSelector", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Not here? Search all roles" }))
     await userEvent.type(screen.getByRole("textbox", { name: "Search role" }), "teacher")
-    await userEvent.click(screen.getByRole("button", { name: "Select role Teacher / Tutor" }))
+    await userEvent.click(screen.getByRole("checkbox", { name: "Teacher / Tutor" }))
 
-    expect(screen.getByRole("button", { name: "Remove role Teacher / Tutor" })).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: "Teacher / Tutor" })).toBeChecked()
+  })
+
+  it("does not continue the onboarding when Enter is pressed in the search", async () => {
+    let isSubmitted = false
+    render(
+      <form
+        onSubmit={(event) => {
+          event.preventDefault()
+          isSubmitted = true
+        }}
+      >
+        <Selector />
+      </form>,
+    )
+
+    await userEvent.click(screen.getByRole("button", { name: "Not here? Search all roles" }))
+    await userEvent.type(screen.getByRole("textbox", { name: "Search role" }), "teacher{Enter}")
+
+    expect(isSubmitted).toBe(false)
   })
 })

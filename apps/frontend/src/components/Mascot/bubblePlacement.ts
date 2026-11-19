@@ -9,8 +9,6 @@ const CHAR_WIDTH = 9
 const PADDING = 32
 // Room for the Skip and Next buttons side by side.
 const MIN_WIDTH_WITH_ACTIONS = 220
-// Narrower than this a bubble beside the mascot is a column of single words.
-const MIN_BESIDE_WIDTH = 200
 const GUTTER = 16
 const TAIL_ROOM = 14
 const TAIL_INSET = 16
@@ -37,7 +35,7 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 export function placeBubble(
   mascot: Rect,
   viewport: Viewport,
-  options: { preferredWidth?: number; slot?: Rect | null; prefer?: "above" | "beside" } = {},
+  options: { preferredWidth?: number; slot?: Rect | null; prefer?: "above" } = {},
 ): BubbleLayout {
   const { preferredWidth = MAX_WIDTH, slot, prefer } = options
   const centerX = mascot.left + mascot.width / 2
@@ -79,22 +77,6 @@ export function placeBubble(
       bottom: viewport.height - mascot.top + TAIL_ROOM,
       tailX,
       tailY: 0,
-    }
-  }
-
-  if (prefer === "beside") {
-    // The mascot sits on something the person is working in: the bubble goes to its right and
-    // takes the room there is, rather than cover it. A page with no room there shows no bubble.
-    const room = viewport.width - mascot.right - TAIL_ROOM - GUTTER
-    const narrowed = Math.max(Math.min(maxWidth, room), MIN_BESIDE_WIDTH)
-    return {
-      side: "right",
-      width: Math.min(width, narrowed),
-      maxWidth: narrowed,
-      left: mascot.right + TAIL_ROOM,
-      top: mascot.top,
-      tailX,
-      tailY: mascot.height / 2,
     }
   }
 

@@ -19,7 +19,7 @@ import { resolveTourStep, TOUR_ANCHOR, TOUR_PAGE_ANCHOR, type TourStepKey } from
 
 /**
  * Walks a new person through Home, the feed and finally the avatar in the header with the
- * mascot. (Onboarding is guided by its own cards, see `useOnboardingGuide`; this only says when
+ * mascot. (Onboarding has its own avatar at the top of every page, see `GuideAvatar`; this only says when
  * the tour is running.) Lives in `app/` because it ties several features together, which
  * features may not do among themselves.
  */
