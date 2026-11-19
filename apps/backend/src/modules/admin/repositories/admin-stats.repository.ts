@@ -15,17 +15,17 @@ export class AdminStatsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async getCounts(since: Date): Promise<AdminCounts> {
-    const [registered, onboarded, activeSessions, total, active, forming] =
+    const [registered, onboarded, activeToday, total, active, forming] =
       await Promise.all([
         this.prisma.user.count(),
         this.prisma.profile.count({
           where: { onboardingCompletedAt: { not: null } },
         }),
-        this.prisma.session.findMany({
-          where: { updatedAt: { gte: since } },
-          distinct: ['userId'],
-          select: { userId: true },
-        }),
+        // Counted in the database: Prisma's count() cannot do DISTINCT on a column.
+        this.prisma.$queryRaw<[{ count: number }]>`
+          SELECT COUNT(DISTINCT "userId")::int AS count
+          FROM "session" WHERE "updatedAt" >= ${since}
+        `.then(([row]) => row.count),
         this.prisma.kvintet.count(),
         this.prisma.kvintet.count({ where: { status: 'ACTIVE' } }),
         this.prisma.kvintet.findMany({
@@ -37,7 +37,7 @@ export class AdminStatsRepository {
     return {
       registered,
       onboarded,
-      activeToday: activeSessions.length,
+      activeToday,
       kvintets: { total, active },
       formingMemberCounts: forming.map((kvintet) => kvintet._count.members),
     };
