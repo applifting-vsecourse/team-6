@@ -46,6 +46,26 @@ describe("AdminStatsPage", () => {
     expect(valueOf("Forming, 3–4 people (can vote to start)")).toHaveTextContent("2")
   })
 
+  it("shows each figure as a share of everyone registered and copes with zero registrations", async () => {
+    respondWith(() => Promise.resolve(stats))
+    const { unmount } = renderPage()
+
+    expect(await screen.findByText("21")).toBeInTheDocument()
+    expect(valueOf("Finished their profile")).toHaveTextContent("71%")
+    expect(valueOf("Signed in today")).toHaveTextContent("19%")
+    unmount()
+
+    respondWith(() =>
+      Promise.resolve({
+        users: { registered: 0, onboarded: 0, activeToday: 0 },
+        kvintets: { total: 0, active: 0, formingSmall: 0, formingReady: 0 },
+      }),
+    )
+    renderPage()
+
+    expect(await screen.findAllByText("0%")).toHaveLength(2)
+  })
+
   it("says the numbers failed to load and retries on request", async () => {
     respondWith(() => Promise.reject(new Error("boom")))
     renderPage()

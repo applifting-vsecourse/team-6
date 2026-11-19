@@ -26,6 +26,7 @@
     "title": "Přehled pilotu",
     "users": {
       "activeToday": "Dnes přihlášení",
+      "hint": "Procenta jsou podíl ze všech registrovaných.",
       "onboarded": "Dokončili profil",
       "registered": "Registrovaní",
       "title": "Lidé"

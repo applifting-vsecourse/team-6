@@ -26,6 +26,7 @@
     "title": "Pilot overview",
     "users": {
       "activeToday": "Signed in today",
+      "hint": "Percentages are shares of everyone registered.",
       "onboarded": "Finished their profile",
       "registered": "Registered",
       "title": "People"
