@@ -62,11 +62,14 @@ export function OnboardingFrame({
         event.preventDefault()
         onContinue()
       }}
-      className="flex flex-col gap-7"
+      className="flex flex-col gap-5 md:gap-7"
     >
       <OnboardingProgress page={page} />
 
-      <div className="flex items-start gap-4.5">
+      {/* Sticky: on a long page (many topics, the map) the question and its avatar stay in view
+        under the header while the answers scroll. The background keeps them readable over what
+        passes behind, and the negative margin gives the padding back so nothing shifts. */}
+      <div className="sticky top-14 z-30 -my-2 flex items-start gap-3 bg-background py-2 md:top-16 md:gap-4.5">
         <GuideAvatar
           seed={seed}
           expression={expression}
@@ -74,22 +77,25 @@ export function OnboardingFrame({
         />
         <div
           role="status"
-          className="relative flex min-w-0 flex-1 flex-col gap-1.5 rounded-[20px] bg-card px-6 py-5"
+          className="relative flex min-w-0 flex-1 flex-col gap-1.5 rounded-[20px] bg-card px-4 py-3.5 md:px-6 md:py-5"
         >
           <span
             aria-hidden
-            className="absolute top-8 -left-2 size-4 rotate-45 bg-card"
+            className="absolute top-4.5 -left-2 size-4 rotate-45 bg-card md:top-8"
           />
-          <h1 className="text-h2 font-semibold text-foreground">{title}</h1>
+          <h1 className="text-h3 font-semibold text-foreground md:text-h2">{title}</h1>
           <p className={cn("text-compact", error ? "text-destructive" : "text-muted-foreground")}>
             {error?.hint ?? hint}
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-3.5">{children}</div>
+      <div className="flex flex-col gap-3 md:gap-3.5">{children}</div>
 
-      <div className="flex items-center gap-3 pt-2">
+      {/* A phone has no room beside the buttons: Back and Continue share the row (Continue takes the
+        rest), the note under the profile is left out, and an error is told by the bubble alone.
+        A failed save is still said, on a line of its own above them. */}
+      <div className="flex flex-wrap items-center gap-3 pt-2 md:flex-nowrap">
         {onBack ? (
           <Button
             type="button"
@@ -104,8 +110,11 @@ export function OnboardingFrame({
         <p
           role={problem ? "alert" : undefined}
           className={cn(
-            "min-w-0 flex-1 text-small",
+            "min-w-0 text-small",
             problem ? "text-destructive" : "text-muted-foreground",
+            saveError
+              ? "order-first basis-full md:order-none md:flex-1 md:basis-auto"
+              : "hidden md:block md:flex-1",
           )}
         >
           {problem ?? t("onboarding.footer")}
@@ -113,6 +122,7 @@ export function OnboardingFrame({
         <Button
           type="submit"
           disabled={isSaving}
+          className="min-w-0 flex-1 md:flex-none"
         >
           {isSaving ? t("common.saving") : continueLabel}
         </Button>

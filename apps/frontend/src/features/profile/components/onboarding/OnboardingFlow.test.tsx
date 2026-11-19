@@ -115,7 +115,7 @@ describe("OnboardingFlow", () => {
     await open()
 
     await press("Marketing & sales")
-    await userEvent.click(screen.getByRole("checkbox", { name: "Copywriter" }))
+    await userEvent.click(screen.getByRole("button", { name: "Select role Copywriter" }))
     await press("Continue")
     expect(saveProfile).toHaveBeenLastCalledWith({ roles: ["copywriter"], position: "copywriter" })
 
@@ -180,14 +180,16 @@ describe("OnboardingFlow", () => {
   it("goes back without asking anything, and keeps the answers", async () => {
     await open()
     await press("Design")
-    await userEvent.click(screen.getByRole("checkbox", { name: "UX Designer" }))
+    await userEvent.click(screen.getByRole("button", { name: "Select role UX Designer" }))
     await press("Continue")
     await screen.findByRole("heading", { name: "What could you teach the others?" })
     saveProfile.mockClear()
 
     await press("Back")
 
-    expect(await screen.findByRole("checkbox", { name: "UX Designer" })).toBeChecked()
+    expect(
+      await screen.findByRole("button", { name: "Remove role UX Designer" }),
+    ).toBeInTheDocument()
     expect(saveProfile).not.toHaveBeenCalled()
   })
 
@@ -232,7 +234,7 @@ describe("OnboardingFlow", () => {
       await press("Continue")
 
       await press("Design")
-      await userEvent.click(screen.getByRole("checkbox", { name: "UX Designer" }))
+      await userEvent.click(screen.getByRole("button", { name: "Select role UX Designer" }))
 
       expect(screen.queryByRole("alert")).not.toBeInTheDocument()
       expect(screen.getByText("You can add more than one.")).toBeInTheDocument()

@@ -61,7 +61,7 @@ describe("GuideAvatar", () => {
   it("keeps the spot, 96px, even with nothing in it", () => {
     const { container } = render(<GuideAvatar />)
 
-    expect(container.firstElementChild).toHaveClass("size-24")
+    expect(container.firstElementChild).toHaveClass("size-15", "md:size-24")
     expect(container.querySelector("svg")).toBeNull()
   })
 

@@ -489,12 +489,11 @@
     },
     "role": {
       "addRole": "Select role {{name}}",
+      "none": "No role found",
       "removeRole": "Remove role {{name}}",
-      "searchAllRoles": "Not here? Search all roles",
       "searchRoleAria": "Search role",
       "searchRolePlaceholder": "Search role…"
     },
-    "roleIn": "Role in {{field}}",
     "stepProgress": "Step {{current}} of {{total}}",
     "stepShort": "{{current}} / {{total}}",
     "summary": {

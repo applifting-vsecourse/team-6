@@ -37,6 +37,15 @@ describe("OnboardingFrame", () => {
     expect(screen.getByText("You can change it any time in your profile.")).toBeInTheDocument()
   })
 
+  it("keeps the avatar and its question in view under the header while the answers scroll", () => {
+    render(frame())
+
+    const guide = screen.getByRole("heading", { level: 1 }).closest(".sticky")
+    expect(guide).not.toBeNull()
+    expect(guide).toHaveClass("top-14", "bg-background")
+    expect(guide).toContainElement(screen.getByRole("status"))
+  })
+
   it("shows the progress of its page", () => {
     render(frame())
 

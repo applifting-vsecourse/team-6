@@ -495,12 +495,11 @@
     },
     "role": {
       "addRole": "Vybrat roli {{name}}",
+      "none": "Žádná role",
       "removeRole": "Odebrat roli {{name}}",
-      "searchAllRoles": "Není tu? Hledat ve všech rolích",
       "searchRoleAria": "Hledat roli",
       "searchRolePlaceholder": "Hledat roli…"
     },
-    "roleIn": "Role v oboru {{field}}",
     "stepProgress": "Krok {{current}} ze {{total}}",
     "stepShort": "{{current}} / {{total}}",
     "summary": {

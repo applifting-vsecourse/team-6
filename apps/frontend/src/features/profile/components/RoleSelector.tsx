@@ -1,12 +1,9 @@
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import { Input } from "@/components/ui/input"
 import { useSlugLabel } from "@/lib/useSlugLabel"
 
-import { ChoiceTile } from "@/features/profile/components/onboarding/ChoiceTile"
-import { chipClass, softFieldClass } from "@/features/profile/lib/optionStyles"
-import { fieldOfRole, ROLE_FIELDS, type RoleFieldId } from "@/features/profile/lib/roleFields"
+import { ChipPicker } from "@/features/profile/components/onboarding/ChipPicker"
+import { fieldOfRole, ROLE_FIELDS } from "@/features/profile/lib/roleFields"
 
 export const PREDEFINED_ROLES = [
   { id: "software-engineer", slug: "software-engineer" },
@@ -57,112 +54,33 @@ export const PREDEFINED_ROLES = [
   { id: "student", slug: "student" },
 ] as const
 
-export type RoleItem = (typeof PREDEFINED_ROLES)[number]
-
 type RoleSelectorProps = {
   selectedRoles: string[]
   onSelectRole: (role: string) => void
   onRemoveRole: (role: string) => void
 }
 
-/**
- * Pick a field of work, then roles in it (Figma B1). A role chosen in another field, or found by
- * search, stays on the list, so nothing chosen is ever hidden.
- */
+/** Roles, picked like topics: a field of work to browse, a search over all roles, chips (Figma B1). */
 export function RoleSelector({ selectedRoles, onSelectRole, onRemoveRole }: RoleSelectorProps) {
   const { t } = useTranslation()
-  const [search, setSearch] = useState("")
-  const [isSearching, setIsSearching] = useState(false)
-
-  // Opens on the field of the first chosen role, otherwise on none until a field is picked.
-  const [fieldId, setFieldId] = useState<RoleFieldId | undefined>(() =>
-    selectedRoles[0] ? fieldOfRole(selectedRoles[0]) : undefined,
-  )
-  const field = ROLE_FIELDS.find((item) => item.id === fieldId)
-
   const slugLabel = useSlugLabel()
-  const getRoleLabel = (slug: string) => slugLabel("roles", slug)
-
-  // Nothing until the person types, so opening the search does not dump all roles.
-  const lowerSearch = search.trim().toLowerCase()
-  const searchResults =
-    lowerSearch === ""
-      ? []
-      : PREDEFINED_ROLES.filter((role) => {
-          if (selectedRoles.includes(role.id) || selectedRoles.includes(role.slug)) return false
-          return (
-            getRoleLabel(role.slug).toLowerCase().includes(lowerSearch) ||
-            role.slug.toLowerCase().includes(lowerSearch)
-          )
-        }).map((role) => role.slug)
-
-  // The field's roles first, then the chosen ones from elsewhere, then what the search found.
-  const fieldRoles: readonly string[] = field?.roles ?? []
-  const elsewhere = selectedRoles.filter((role) => !fieldRoles.includes(role))
-  const listed = [...fieldRoles, ...elsewhere, ...searchResults]
 
   return (
-    <div className="flex flex-col gap-3.5">
-      <p className="text-label text-muted-foreground">{t("onboarding.fieldLabel")}</p>
-      <div className="flex flex-wrap gap-2">
-        {ROLE_FIELDS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            aria-pressed={item.id === fieldId}
-            onClick={() => setFieldId(item.id)}
-            className={chipClass(item.id === fieldId)}
-          >
-            {t(item.labelKey)}
-          </button>
-        ))}
-      </div>
-
-      {field ? (
-        <p className="text-label text-muted-foreground uppercase">
-          {t("onboarding.roleIn", { field: t(field.labelKey) })}
-        </p>
-      ) : null}
-
-      {listed.map((slug) => (
-        <ChoiceTile
-          key={slug}
-          kind="check"
-          label={getRoleLabel(slug)}
-          isChecked={selectedRoles.includes(slug)}
-          onCheckedChange={(isChecked) => {
-            if (isChecked) {
-              onSelectRole(slug)
-              setSearch("")
-            } else {
-              onRemoveRole(slug)
-            }
-          }}
-        />
-      ))}
-
-      {isSearching ? (
-        <Input
-          id="search-role"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          onKeyDown={(event) => {
-            // Enter in the search must not continue to the next page.
-            if (event.key === "Enter") event.preventDefault()
-          }}
-          placeholder={t("onboarding.role.searchRolePlaceholder")}
-          aria-label={t("onboarding.role.searchRoleAria")}
-          className={`h-12.75 ${softFieldClass}`}
-        />
-      ) : (
-        <button
-          type="button"
-          onClick={() => setIsSearching(true)}
-          className="w-fit cursor-pointer text-small text-highlight underline underline-offset-2"
-        >
-          {t("onboarding.role.searchAllRoles")}
-        </button>
-      )}
-    </div>
+    <ChipPicker
+      groups={ROLE_FIELDS.map((field) => ({ id: field.id, label: t(field.labelKey) }))}
+      groupLabel={t("onboarding.fieldLabel")}
+      items={PREDEFINED_ROLES.map(({ slug }) => {
+        const field = fieldOfRole(slug)
+        return { id: slug, slug, label: slugLabel("roles", slug), groupIds: field ? [field] : [] }
+      })}
+      selectedIds={selectedRoles}
+      onSelect={onSelectRole}
+      onRemove={onRemoveRole}
+      addLabel={(name) => t("onboarding.role.addRole", { name })}
+      removeLabel={(name) => t("onboarding.role.removeRole", { name })}
+      searchPlaceholder={t("onboarding.role.searchRolePlaceholder")}
+      searchAriaLabel={t("onboarding.role.searchRoleAria")}
+      noneLabel={t("onboarding.role.none")}
+    />
   )
 }

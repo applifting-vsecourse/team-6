@@ -188,7 +188,7 @@ export function OnboardingAnswers({
             aria-label={t("onboarding.note.label")}
             aria-invalid={isOver}
             rows={5}
-            className={cn("min-h-40 resize-none py-3.5", softFieldClass)}
+            className={cn("min-h-35 resize-none py-3.5 md:min-h-40", softFieldClass)}
           />
           <p
             className={cn(

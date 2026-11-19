@@ -124,4 +124,21 @@ describe("TagSelector", () => {
 
     expect(isSubmitted).toBe(false)
   })
+
+  it("draws a line between the groups and what the open group holds, and none before one is open", async () => {
+    const { container } = render(<Harness />)
+    expect(container.querySelector("[data-slot=separator]")).toBeNull()
+
+    await userEvent.click(screen.getByRole("button", { name: "Business" }))
+
+    const line = container.querySelector("[data-slot=separator]")
+    expect(line).not.toBeNull()
+    // Between the group chips above it and the items below it.
+    expect(
+      screen.getByRole("button", { name: "Business" }).compareDocumentPosition(line as Node),
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    expect(
+      line?.compareDocumentPosition(screen.getByRole("button", { name: "Add tag Excel" })),
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+  })
 })

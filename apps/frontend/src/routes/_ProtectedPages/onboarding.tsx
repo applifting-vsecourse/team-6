@@ -27,7 +27,7 @@ function OnboardingPage() {
   return (
     <>
       <Seo title={t("onboarding.title")} />
-      <div className="px-4 pt-7 pb-10 md:pt-12 md:pb-14">
+      <div className="px-4 pt-5 pb-7 md:pt-12 md:pb-14">
         <div className="mx-auto w-full max-w-160">
           <OnboardingFlow
             userId={user?.id}

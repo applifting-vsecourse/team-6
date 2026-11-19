@@ -218,7 +218,7 @@ export function LocationMapPicker({
   }
 
   return (
-    <div className="flex flex-col gap-3.5">
+    <div className="flex flex-col gap-3 md:gap-3.5">
       <Button
         type="button"
         variant="outline"
@@ -235,7 +235,7 @@ export function LocationMapPicker({
       <div
         ref={mapContainerRef}
         data-testid="location-map-container"
-        className="relative h-65 w-full overflow-hidden rounded-[10px] border border-border bg-secondary"
+        className="relative h-50 w-full overflow-hidden rounded-[10px] border border-border bg-secondary md:h-65"
         style={{ zIndex: 0 }}
       />
 

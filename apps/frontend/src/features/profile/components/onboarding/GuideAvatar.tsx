@@ -34,7 +34,7 @@ export function GuideAvatar({ seed, expression, shakeKey }: GuideAvatarProps) {
   return (
     <span
       ref={attach}
-      className="block size-24 shrink-0"
+      className="block size-15 shrink-0 md:size-24"
     >
       {seed && !isMascot ? (
         <MascotFace
