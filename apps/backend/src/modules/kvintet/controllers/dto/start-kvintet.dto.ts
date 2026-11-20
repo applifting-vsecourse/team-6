@@ -7,6 +7,7 @@ import {
   IsNotEmpty,
   IsString,
   MaxLength,
+  MinLength,
 } from 'class-validator';
 
 const trim = ({ value }: { value: unknown }): unknown =>
@@ -31,6 +32,7 @@ export class StartKvintetDto {
   @Transform(trim)
   @IsString()
   @IsNotEmpty()
+  @MinLength(10)
   @MaxLength(280)
   description!: string;
 }

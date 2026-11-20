@@ -23,7 +23,7 @@ const reference = {
 
 const typeTopicAndDescription = async () => {
   await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
-  await userEvent.type(screen.getByLabelText("Description"), "We talk.")
+  await userEvent.type(screen.getByLabelText("Description"), "We talk together.")
 }
 
 const renderDialog = (avatarSeed: string | undefined = "jana") =>
@@ -65,7 +65,7 @@ describe("StartKvintetDialog", () => {
 
     await waitFor(() =>
       expect(api.post).toHaveBeenCalledWith("kvintets", {
-        json: { title: "Topic", categorySlugs: ["languages"], description: "We talk." },
+        json: { title: "Topic", categorySlugs: ["languages"], description: "We talk together." },
       }),
     )
   })
@@ -91,7 +91,7 @@ describe("StartKvintetDialog", () => {
         json: {
           title: "Topic",
           categorySlugs: ["software-development", "languages", "leisure"],
-          description: "We talk.",
+          description: "We talk together.",
         },
       }),
     )
@@ -116,6 +116,20 @@ describe("StartKvintetDialog", () => {
     await userEvent.click(screen.getByRole("button", { name: "Start a kvintet" }))
 
     expect(await screen.findByText("Describe what the kvintet is about")).toBeInTheDocument()
+    expect(api.post).not.toHaveBeenCalled()
+  })
+
+  it("asks for at least 10 characters in the description", async () => {
+    renderDialog()
+    await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
+    await userEvent.click(screen.getByRole("button", { name: "Languages" }))
+    await userEvent.type(screen.getByLabelText("Description"), "Too short")
+
+    await userEvent.click(screen.getByRole("button", { name: "Start a kvintet" }))
+
+    expect(
+      await screen.findByText("The description must be at least 10 characters"),
+    ).toBeInTheDocument()
     expect(api.post).not.toHaveBeenCalled()
   })
 

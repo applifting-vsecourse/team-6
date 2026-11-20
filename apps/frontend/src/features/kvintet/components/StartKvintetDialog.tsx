@@ -40,6 +40,7 @@ import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
 
 // Same limits as the backend DTO; the server stays the authority.
 const TITLE_MAX = 120
+const DESCRIPTION_MIN = 10
 const DESCRIPTION_MAX = 280
 const CATEGORIES_MAX = 3
 
@@ -58,6 +59,7 @@ const createSchema = (t: TFunction) =>
       .string()
       .trim()
       .min(1, t("kvintet.validation.descriptionRequired"))
+      .min(DESCRIPTION_MIN, t("kvintet.validation.descriptionTooShort", { min: DESCRIPTION_MIN }))
       .max(DESCRIPTION_MAX, t("kvintet.validation.descriptionTooLong", { max: DESCRIPTION_MAX })),
   })
 

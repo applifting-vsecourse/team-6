@@ -296,6 +296,7 @@
       "categoryRequired": "Choose a category",
       "descriptionRequired": "Describe what the kvintet is about",
       "descriptionTooLong": "The description can be at most {{max}} characters",
+      "descriptionTooShort": "The description must be at least {{min}} characters",
       "titleRequired": "Enter a topic",
       "titleTooLong": "The topic can be at most {{max}} characters"
     },

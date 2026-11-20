@@ -38,12 +38,16 @@ describe('StartKvintetDto', () => {
     ['missing', undefined],
     ['empty', ''],
     ['only spaces', '   '],
+    ['fewer than 10 characters', 'a'.repeat(9)],
     ['281 characters long', 'a'.repeat(281)],
   ])('rejects a description that is %s', async (_label, description) => {
     await expect(errorsFor({ description })).resolves.toHaveLength(1);
   });
 
-  it('accepts a description of 280 characters', async () => {
+  it('accepts a description between 10 and 280 characters', async () => {
+    await expect(
+      errorsFor({ description: 'a'.repeat(10) }),
+    ).resolves.toHaveLength(0);
     await expect(
       errorsFor({ description: 'a'.repeat(280) }),
     ).resolves.toHaveLength(0);

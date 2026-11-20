@@ -300,6 +300,7 @@
       "categoryRequired": "Vyberte kategorii",
       "descriptionRequired": "Popište, o čem kvintet bude",
       "descriptionTooLong": "Popis může mít nejvýše {{max}} znaků",
+      "descriptionTooShort": "Popis musí mít alespoň {{min}} znaků",
       "titleRequired": "Zadejte téma",
       "titleTooLong": "Téma může mít nejvýše {{max}} znaků"
     },
