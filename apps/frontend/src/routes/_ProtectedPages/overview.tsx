@@ -28,6 +28,7 @@ import {
   kvintetFeedQueryOptions,
   type FeedKvintet,
 } from "@/features/kvintet/api/kvintetFeedQueryOptions"
+import { KvintetDescription } from "@/features/kvintet/components/KvintetDescription"
 import { LeaveKvintetDialog } from "@/features/kvintet/components/LeaveKvintetDialog"
 import { StartKvintetDialog } from "@/features/kvintet/components/StartKvintetDialog"
 import { useJoinKvintet } from "@/features/kvintet/hooks/useJoinKvintet"
@@ -698,6 +699,8 @@ function ProposalCard({
             {proposal.memberCount} / {proposal.capacity}
           </span>
         </div>
+
+        {proposal.description ? <KvintetDescription text={proposal.description} /> : null}
 
         {/* The feed never carries a name, so the faces are grey and seeded by the seat. */}
         <KvintetSeats

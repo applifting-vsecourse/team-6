@@ -166,10 +166,12 @@ describe('KvintetRepository (Postgres)', () => {
     expect(outcome.result).toBe('started');
     const id = outcome.result === 'started' ? outcome.id : '';
     const open = await repository.findOpenKvintets(categories[1].slug);
-    expect(open.find((p) => p.id === id)?.categories).toEqual([
+    const started = open.find((p) => p.id === id);
+    expect(started?.categories).toEqual([
       categories[0].slug,
       categories[1].slug,
     ]);
+    expect(started?.description).toBe('Short description');
   });
 
   it('refuses to start a kvintet when any category is unknown', async () => {

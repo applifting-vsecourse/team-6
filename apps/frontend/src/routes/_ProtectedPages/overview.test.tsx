@@ -231,6 +231,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
           {
             id: "k-1",
             title: "AI at work",
+            description: null,
             categories: ["software-development"],
             capacity: 5,
             memberCount: 3,
@@ -246,6 +247,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
           {
             id: "k-2",
             title: "Python for Data",
+            description: null,
             categories: ["data-ai"],
             capacity: 5,
             memberCount: 2,
@@ -278,13 +280,14 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(api.post).toHaveBeenCalledWith("kvintets/k-1/members")
     })
 
-    it("shows what every member shares and a labelled free seat on each card", async () => {
+    it("shows the description, what every member shares and a labelled free seat on each card", async () => {
       feedData = {
         fallback: false,
         items: [
           {
             id: "k-1",
             title: "AI at work",
+            description: "We swap prompts that save time.",
             categories: ["software-development", "business"],
             capacity: 5,
             memberCount: 2,
@@ -302,6 +305,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       renderWithClient(<OverviewPage />)
 
       expect(await screen.findByText("evenings · weekdays · every two weeks")).toBeInTheDocument()
+      expect(screen.getByText("We swap prompts that save time.")).toBeInTheDocument()
       expect(screen.getByText("Software development")).toBeInTheDocument()
       expect(screen.getByText("Business")).toBeInTheDocument()
       expect(screen.getAllByText("Free")).toHaveLength(3)
@@ -314,6 +318,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
           {
             id: "k-fail",
             title: "Full Kvintet",
+            description: null,
             categories: ["software-development"],
             capacity: 5,
             memberCount: 4,

@@ -32,7 +32,7 @@ export class StartKvintetDto {
   @IsOptional()
   @Transform(trim)
   @IsString()
-  @MaxLength(500)
+  @MaxLength(280)
   description?: string;
 }
 

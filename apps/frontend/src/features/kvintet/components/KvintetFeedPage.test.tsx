@@ -39,6 +39,7 @@ const commonAvailability = {
 const kvintet = (id: string, title: string, overrides: Partial<FeedKvintet> = {}): FeedKvintet => ({
   id,
   title,
+  description: null,
   categories: ["software-development"],
   capacity: 5,
   memberCount: 1,

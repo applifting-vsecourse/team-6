@@ -98,6 +98,24 @@ describe("StartKvintetDialog", () => {
     expect(api.post).not.toHaveBeenCalled()
   })
 
+  it("counts the description's characters and refuses more than 280", async () => {
+    renderDialog()
+    await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
+    await userEvent.click(screen.getByRole("button", { name: "Languages" }))
+    const description = screen.getByLabelText("A few more words (optional)")
+
+    expect(screen.getByText("0 / 280")).toBeInTheDocument()
+    await userEvent.click(description)
+    await userEvent.paste("a".repeat(281))
+    expect(screen.getByText("281 / 280")).toBeInTheDocument()
+    await userEvent.click(screen.getByRole("button", { name: "Start a kvintet" }))
+
+    expect(
+      await screen.findByText("The description can be at most 280 characters"),
+    ).toBeInTheDocument()
+    expect(api.post).not.toHaveBeenCalled()
+  })
+
   it("explains what the others will see, and shows the person starting it", () => {
     renderDialog()
 
@@ -106,7 +124,7 @@ describe("StartKvintetDialog", () => {
     ).toBeInTheDocument()
     expect(
       screen.getByText(
-        "Others will see the topic and your role. Your name only once the kvintet starts.",
+        "Others will see the topic, the description and your role. Your name only once the kvintet starts.",
       ),
     ).toBeInTheDocument()
     expect(screen.getByRole("dialog").querySelector("[data-slot='avatar']")).not.toBeNull()

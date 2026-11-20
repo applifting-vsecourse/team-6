@@ -26,4 +26,19 @@ describe('StartKvintetDto', () => {
   ])('rejects categories that are %s', async (_label, categorySlugs) => {
     await expect(errorsFor(categorySlugs)).resolves.toHaveLength(1);
   });
+
+  it.each([
+    [280, 0],
+    [281, 1],
+  ])(
+    'with a description of %i characters reports %i errors',
+    async (length, errors) => {
+      const dto = plainToInstance(StartKvintetDto, {
+        title: 'Topic',
+        categorySlugs: ['languages'],
+        description: 'a'.repeat(length),
+      });
+      await expect(validate(dto)).resolves.toHaveLength(errors);
+    },
+  );
 });

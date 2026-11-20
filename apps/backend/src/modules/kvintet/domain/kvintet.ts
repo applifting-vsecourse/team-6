@@ -15,6 +15,7 @@ export type MemberProfile = {
 export type OpenKvintet = {
   id: string;
   title: string;
+  description: string | null;
   categories: string[];
   /** `match` is for ranking only and never leaves the server. */
   members: (MemberProfile & { match: MatchProfile })[];
@@ -33,6 +34,7 @@ export type CommonAvailability = {
 export type FeedItem = {
   id: string;
   title: string;
+  description: string | null;
   categories: string[];
   capacity: number;
   memberCount: number;

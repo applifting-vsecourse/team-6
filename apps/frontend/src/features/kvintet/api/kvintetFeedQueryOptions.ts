@@ -8,6 +8,7 @@ import { kvintetKeys } from "@/features/kvintet/api/kvintetKeys"
 const feedKvintetSchema = z.object({
   id: z.string(),
   title: z.string(),
+  description: z.string().nullable(),
   categories: z.array(z.string()),
   capacity: z.number(),
   memberCount: z.number(),

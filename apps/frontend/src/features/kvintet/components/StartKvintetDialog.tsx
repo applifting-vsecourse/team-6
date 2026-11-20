@@ -29,6 +29,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { formatNumber } from "@/lib/date"
 import { getErrorMessage } from "@/lib/errorMessage"
 import { useMediaQuery } from "@/lib/useMediaQuery"
 
@@ -38,7 +39,7 @@ import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
 
 // Same limits as the backend DTO; the server stays the authority.
 const TITLE_MAX = 120
-const DESCRIPTION_MAX = 500
+const DESCRIPTION_MAX = 280
 const CATEGORIES_MAX = 3
 
 const createSchema = (t: TFunction) =>
@@ -205,6 +206,12 @@ export function StartKvintetDialog({ isOpen, onOpenChange, avatarSeed }: StartKv
                       {...field}
                     />
                   </FormControl>
+                  <FormDescription className="justify-self-end font-mono text-meta">
+                    {t("kvintet.dialog.detailsCount", {
+                      length: formatNumber(field.value.length),
+                      max: formatNumber(DESCRIPTION_MAX),
+                    })}
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

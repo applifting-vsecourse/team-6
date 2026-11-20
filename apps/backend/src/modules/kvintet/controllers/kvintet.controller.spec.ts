@@ -90,6 +90,7 @@ describe('KvintetController', () => {
       {
         id: 'kvintet-1',
         title: 'Using AI at work',
+        description: null,
         categories: ['software-development'],
         members: [
           {
@@ -124,6 +125,7 @@ describe('KvintetController', () => {
       'capacity',
       'categories',
       'commonAvailability',
+      'description',
       'id',
       'meetingFrequency',
       'memberCount',

@@ -129,6 +129,7 @@ export class KvintetRepository {
       select: {
         id: true,
         title: true,
+        description: true,
         categories: {
           orderBy: { category: { sortOrder: 'asc' } },
           select: { category: { select: { slug: true } } },
@@ -151,6 +152,7 @@ export class KvintetRepository {
     return kvintets.map((kvintet) => ({
       id: kvintet.id,
       title: kvintet.title,
+      description: kvintet.description,
       categories: kvintet.categories.map(({ category }) => category.slug),
       members: kvintet.members.map(({ user: { profile } }) => {
         const slugsOf = (kind: ProfileTagKind): string[] =>
