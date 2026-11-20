@@ -28,6 +28,17 @@ describe("placeBubble beside the mascot", () => {
     expect(placeBubble(rect(300, 120, 48), DESKTOP, { prefer: "above" }).side).toBe("right")
   })
 
+  it("opens below when asked to, so it stays off the text above the mascot", () => {
+    const layout = placeBubble(rect(300, 400, 48), DESKTOP, { prefer: "below" })
+
+    expect(layout.side).toBe("below")
+    expect(layout.top).toBe(448 + 14)
+  })
+
+  it("ignores that wish where there is no room below", () => {
+    expect(placeBubble(rect(300, 740, 48), DESKTOP, { prefer: "below" }).side).toBe("right")
+  })
+
   it("opens to the left when the mascot sits at the right edge", () => {
     expect(placeBubble(rect(1100, 400, 48), DESKTOP).side).toBe("left")
   })

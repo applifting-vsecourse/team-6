@@ -20,6 +20,8 @@ export const Route = createFileRoute("/")({
 // How long the greeting stays up where it cannot be hovered.
 const GREETING_MS = 4000
 const isTouchOnly = () => window.matchMedia?.("(hover: none)").matches ?? false
+// The width where the buttons sit side by side (`md:flex-row`).
+const isWide = () => window.matchMedia?.("(min-width: 768px)").matches ?? false
 
 function LandingPage() {
   const { t } = useTranslation()
@@ -55,7 +57,12 @@ function LandingPage() {
         : {
             anchorId: "landing-cta",
             bubble: isGreeting
-              ? { text: t("landing.mascot.getStarted"), prefer: "above" as const }
+              ? {
+                  text: t("landing.mascot.getStarted"),
+                  // Above would cover the subtitle. Below is clear next to the buttons, but on a
+                  // phone it would cover the stacked sign-in button, so there it stays above.
+                  prefer: isWide() ? ("below" as const) : ("above" as const),
+                }
               : undefined,
           },
     [user, isGreeting, t],

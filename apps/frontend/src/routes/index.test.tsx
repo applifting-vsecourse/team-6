@@ -32,7 +32,9 @@ function MascotProbe() {
   const stage = useMascotContext()?.stage
   return (
     <p data-testid="mascot">
-      {stage ? `${stage.anchorId}: ${stage.bubble?.text ?? "silent"}` : "none"}
+      {stage
+        ? `${stage.anchorId}: ${stage.bubble?.text ?? "silent"}${stage.bubble?.prefer ? ` (${stage.bubble.prefer})` : ""}`
+        : "none"}
     </p>
   )
 }
@@ -78,6 +80,31 @@ describe("LandingPage", () => {
     expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: silent")
   })
 
+  describe("on a wide screen", () => {
+    beforeEach(() => {
+      window.matchMedia = ((query: string) => ({
+        matches: query === "(min-width: 768px)",
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+      })) as unknown as typeof window.matchMedia
+    })
+    afterEach(() => void Reflect.deleteProperty(window, "matchMedia"))
+
+    it("greets below the mascot, off the subtitle above the buttons", async () => {
+      const user = userEvent.setup()
+      render(
+        <MascotProvider>
+          <MascotProbe />
+          <LandingPage />
+        </MascotProvider>,
+      )
+
+      await user.hover(screen.getByRole("link", { name: "Create account" }))
+
+      expect(screen.getByTestId("mascot")).toHaveTextContent("Let's get started! (below)")
+    })
+  })
+
   describe("on a phone, which has nothing to hover with", () => {
     beforeEach(() => {
       vi.useFakeTimers()
@@ -100,7 +127,8 @@ describe("LandingPage", () => {
           <LandingPage />
         </MascotProvider>,
       )
-      expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: Let's get started!")
+      // Below would cover the stacked sign-in button there.
+      expect(screen.getByTestId("mascot")).toHaveTextContent("Let's get started! (above)")
 
       act(() => void vi.advanceTimersByTime(4100))
 
