@@ -61,7 +61,8 @@ export function VideoPlayer({ sources, title, subtitle, artwork, className }: Vi
   // Someone who paused it does not want it back when the page scrolls.
   const userPaused = useRef(false)
   // Where to carry on after a new file replaces the current one (language or theme changed).
-  const resume = useRef({ time: 0, playing: false })
+  const pendingResume = useRef({ time: 0, isPlaying: false })
+  const src = source[theme]
 
   const [hasStarted, setStarted] = useState(false)
   const [isPlaying, setPlaying] = useState(false)
@@ -71,6 +72,15 @@ export function VideoPlayer({ sources, title, subtitle, artwork, className }: Vi
   const [time, setTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [shouldShowCaptions, setCaptionsOn] = useState(true)
+
+  // The file is swapped by hand rather than through the `src` prop: the position and whether it was
+  // playing have to be read from the element before it starts loading the new file.
+  useEffect(() => {
+    const media = video.current
+    if (!media || media.getAttribute("src") === src) return
+    pendingResume.current = { time: media.currentTime, isPlaying: !media.paused && !media.ended }
+    media.src = src
+  }, [src])
 
   useEffect(() => {
     const element = frame.current
@@ -147,36 +157,30 @@ export function VideoPlayer({ sources, title, subtitle, artwork, className }: Vi
       aria-label={title}
       className={className}
     >
-      <div className="relative aspect-video overflow-hidden rounded-2xl bg-highlight-soft md:rounded-3xl">
+      <div className="relative aspect-video overflow-hidden rounded-2xl border border-border bg-highlight-soft md:rounded-3xl">
         <video
           ref={video}
-          src={source[theme]}
           muted
           playsInline
           disablePictureInPicture
           preload="metadata"
           className="size-full object-cover [&::cue]:bg-overlay/70 [&::cue]:text-white"
           onPlay={() => {
-            resume.current.playing = true
             setPlaying(true)
             setEnded(false)
           }}
           onPlaying={() => setStarted(true)}
-          onPause={() => {
-            resume.current.playing = false
-            setPlaying(false)
-          }}
+          onPause={() => setPlaying(false)}
           onEnded={() => setEnded(true)}
-          onTimeUpdate={(event) => {
-            resume.current.time = event.currentTarget.currentTime
-            setTime(event.currentTarget.currentTime)
-          }}
+          onTimeUpdate={(event) => setTime(event.currentTarget.currentTime)}
           onLoadedMetadata={(event) => {
             const media = event.currentTarget
             setDuration(media.duration)
             showCaptions(media, shouldShowCaptions)
-            if (resume.current.time > 0) media.currentTime = resume.current.time
-            if (resume.current.playing) media.play().catch(() => undefined)
+            const { time: at, isPlaying: didPlay } = pendingResume.current
+            pendingResume.current = { time: 0, isPlaying: false }
+            if (at > 0) media.currentTime = at
+            if (didPlay) media.play().catch(() => undefined)
           }}
           onVolumeChange={(event) => {
             setMuted(event.currentTarget.muted)

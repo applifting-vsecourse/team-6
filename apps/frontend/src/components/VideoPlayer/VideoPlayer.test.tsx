@@ -177,19 +177,52 @@ describe("VideoPlayer", () => {
     expect(film.querySelector("track")).toHaveAttribute("srclang", "en")
   })
 
-  it("carries on from the same second when the file is swapped", () => {
+  // jsdom plays nothing, so the test says where the film is and whether it is playing.
+  function filmAt(film: HTMLVideoElement, seconds: number, isPaused: boolean) {
+    Object.defineProperty(film, "currentTime", {
+      configurable: true,
+      writable: true,
+      value: seconds,
+    })
+    Object.defineProperty(film, "paused", { configurable: true, value: isPaused })
+  }
+
+  it("carries on from the same second, still playing, when the theme changes mid-film", () => {
     const play = vi.spyOn(HTMLMediaElement.prototype, "play")
     const { film } = renderPlayer()
-    Object.defineProperty(film, "currentTime", { writable: true, value: 12 })
-    fireEvent.play(film)
-    fireEvent.timeUpdate(film)
+    filmAt(film, 12, false)
 
     act(() => setTheme("dark"))
-    film.currentTime = 0 // a new file starts from the top
+    expect(film).toHaveAttribute("src", "/en-dark.mp4")
+    film.currentTime = 0 // the new file starts from the top
     play.mockClear()
     fireEvent.loadedMetadata(film)
 
     expect(film.currentTime).toBe(12)
     expect(play).toHaveBeenCalled()
+  })
+
+  it("stays paused at the same second when it was paused before the swap", async () => {
+    const play = vi.spyOn(HTMLMediaElement.prototype, "play")
+    const { film } = renderPlayer()
+    filmAt(film, 12, true)
+
+    await act(() => i18n.changeLanguage("cs"))
+    film.currentTime = 0
+    play.mockClear()
+    fireEvent.loadedMetadata(film)
+
+    expect(film.currentTime).toBe(12)
+    expect(play).not.toHaveBeenCalled()
+  })
+
+  it("starts a new film from the top when nothing had been played", () => {
+    const { film } = renderPlayer()
+    filmAt(film, 0, true)
+
+    act(() => setTheme("dark"))
+    fireEvent.loadedMetadata(film)
+
+    expect(film.currentTime).toBe(0)
   })
 })
