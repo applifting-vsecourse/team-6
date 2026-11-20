@@ -29,6 +29,7 @@ import {
   type FeedKvintet,
 } from "@/features/kvintet/api/kvintetFeedQueryOptions"
 import { KvintetDescription } from "@/features/kvintet/components/KvintetDescription"
+import { KvintetDetailsDialog } from "@/features/kvintet/components/KvintetDetailsDialog"
 import { LeaveKvintetDialog } from "@/features/kvintet/components/LeaveKvintetDialog"
 import { StartKvintetDialog } from "@/features/kvintet/components/StartKvintetDialog"
 import { useJoinKvintet } from "@/features/kvintet/hooks/useJoinKvintet"
@@ -717,9 +718,16 @@ function ProposalCard({
         </p>
       </div>
 
+      <KvintetDetailsDialog
+        kvintet={proposal}
+        isJoining={isJoining}
+        isDisabled={isDisabled}
+        onJoin={onJoin}
+        triggerClassName="w-full sm:hidden"
+      />
       <Button
         variant="outline"
-        className="w-full"
+        className="w-full max-sm:hidden"
         onClick={() => onJoin(proposal.id)}
         disabled={isJoining || isDisabled}
       >

@@ -10,6 +10,7 @@ import { formatNumber } from "@/lib/date"
 
 import type { FeedKvintet, FeedReason } from "@/features/kvintet/api/kvintetFeedQueryOptions"
 import { KvintetDescription } from "@/features/kvintet/components/KvintetDescription"
+import { KvintetDetailsDialog } from "@/features/kvintet/components/KvintetDetailsDialog"
 import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
 
 type KvintetCardProps = {
@@ -129,9 +130,16 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
         ) : (
           <span className="sm:flex-1" />
         )}
+        <KvintetDetailsDialog
+          kvintet={kvintet}
+          isJoining={isJoining}
+          isDisabled={isDisabled}
+          onJoin={onJoin}
+          triggerClassName="w-full sm:hidden"
+        />
         <Button
           variant="outline"
-          className="h-11 max-sm:w-full"
+          className="h-11 max-sm:hidden"
           disabled={isDisabled}
           onClick={() => onJoin(kvintet.id)}
         >
