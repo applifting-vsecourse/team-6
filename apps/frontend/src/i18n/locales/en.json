@@ -423,7 +423,7 @@
       },
       "frequency": {
         "error": "This one we need – pick one and we're done.",
-        "hint": "Pick one. This one we need.",
+        "hint": "Pick one – we need this one.",
         "problem": "Pick how often you'd like to meet.",
         "title": "How often would you like to meet?"
       },
@@ -541,7 +541,8 @@
       "openChat": "Open chat",
       "openChatUnread_one": "Open chat ({{count}} new)",
       "openChatUnread_other": "Open chat ({{count}} new)",
-      "subtitle": "{{title}} · {{count}} people · since {{date}}",
+      "subtitle_one": "{{title}} · {{count}} person · since {{date}}",
+      "subtitle_other": "{{title}} · {{count}} people · since {{date}}",
       "tip": {
         "body": "Everyone shares one goal for the next 3 months.",
         "label": "Tip for the group"
@@ -549,7 +550,7 @@
     },
     "commonTime": "Times that suit everyone:",
     "error": {
-      "text": "Something broke on our side. Your kvintet is safe.",
+      "text": "Something broke on our side. Your data is safe.",
       "title": "We couldn't load your home page"
     },
     "forming": {
