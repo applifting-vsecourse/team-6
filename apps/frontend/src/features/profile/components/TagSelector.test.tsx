@@ -1,7 +1,9 @@
 import { useState } from "react"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it } from "vitest"
+
+import i18n from "@/i18n"
 
 import { TagSelector } from "./TagSelector"
 
@@ -12,6 +14,10 @@ const tags = [
   { id: "2", slug: "hiking", categories: ["leisure"] },
   { id: "3", slug: "sql", categories: ["software-development"] },
   { id: "4", slug: "bouldering", categories: [] },
+  { id: "5", slug: "cycling", categories: [] },
+  { id: "6", slug: "accounting", categories: [] },
+  // No translation: shown, and so found, by its slug.
+  { id: "7", slug: "underwater-basket-weaving", categories: [] },
 ]
 
 function Harness({ selectedAtStart = [] as string[] }) {
@@ -26,6 +32,8 @@ function Harness({ selectedAtStart = [] as string[] }) {
     />
   )
 }
+
+afterEach(() => i18n.changeLanguage("en"))
 
 describe("TagSelector", () => {
   it("shows the categories and the search, and no topic until a category is picked", () => {
@@ -145,5 +153,34 @@ describe("TagSelector", () => {
     expect(
       line?.compareDocumentPosition(screen.getByRole("button", { name: "Add tag Excel" })),
     ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+  })
+
+  it("searches the label the user sees, not the English slug behind it", async () => {
+    await i18n.changeLanguage("cs")
+    render(<Harness />)
+
+    await userEvent.type(screen.getByRole("textbox", { name: "Hledat témata" }), "g")
+
+    // "cycling" and "accounting" have a g in the slug, "Cyklistika" and "Účetnictví" in no way.
+    expect(screen.getByRole("button", { name: /Bouldering/ })).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: /Cyklistika/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: /Účetnictví/ })).not.toBeInTheDocument()
+  })
+
+  it("ignores diacritics and case", async () => {
+    await i18n.changeLanguage("cs")
+    render(<Harness />)
+
+    await userEvent.type(screen.getByRole("textbox", { name: "Hledat témata" }), "UCETNICTVI")
+
+    expect(screen.getByRole("button", { name: /Účetnictví/ })).toBeInTheDocument()
+  })
+
+  it("finds a topic without a translation by its slug", async () => {
+    render(<Harness />)
+
+    await userEvent.type(screen.getByRole("textbox", { name: "Search topics" }), "basket")
+
+    expect(screen.getByRole("button", { name: /underwater-basket-weaving/ })).toBeInTheDocument()
   })
 })

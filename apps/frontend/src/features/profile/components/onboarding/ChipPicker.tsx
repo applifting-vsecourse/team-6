@@ -8,8 +8,9 @@ import { chipClass, softFieldClass } from "@/features/profile/lib/optionStyles"
 
 export type PickerGroup = { id: string; label: string }
 // An item may sit in several groups; one in none is still found by the search.
-// `slug` is searched next to the label; `id` is not, as a tag id is a number.
-export type PickerItem = { id: string; slug: string; label: string; groupIds: readonly string[] }
+// The search looks at the `label` the user sees only (an untranslated item shows its slug as the
+// label, so it is found by that); `id` is not searched, as a tag id is a number.
+export type PickerItem = { id: string; label: string; groupIds: readonly string[] }
 
 type ChipPickerProps = {
   groups: PickerGroup[]
@@ -27,6 +28,13 @@ type ChipPickerProps = {
 }
 
 const SEARCH_RESULT_COUNT = 12
+
+// "Účetnictví" is found by "ucetnictvi", and by "ÚČET" in any case.
+const fold = (text: string) =>
+  text
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
 
 /**
  * Pick any number of items (Figma B1 to B1d): the groups to browse on top, then a search over all
@@ -54,16 +62,11 @@ export function ChipPicker({
   const selected = items.filter((item) => selectedIds.includes(item.id))
   const unselected = items.filter((item) => !selectedIds.includes(item.id))
 
-  const query = search.trim().toLowerCase()
+  const query = fold(search.trim())
   const found =
     query === ""
       ? []
-      : unselected
-          .filter(
-            (item) =>
-              item.label.toLowerCase().includes(query) || item.slug.toLowerCase().includes(query),
-          )
-          .slice(0, SEARCH_RESULT_COUNT)
+      : unselected.filter((item) => fold(item.label).includes(query)).slice(0, SEARCH_RESULT_COUNT)
   const ofGroup = groupId ? unselected.filter((item) => item.groupIds.includes(groupId)) : []
 
   const add = (item: PickerItem) => (

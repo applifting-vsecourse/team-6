@@ -71,7 +71,7 @@ export function RoleSelector({ selectedRoles, onSelectRole, onRemoveRole }: Role
       groupLabel={t("onboarding.fieldLabel")}
       items={PREDEFINED_ROLES.map(({ slug }) => {
         const field = fieldOfRole(slug)
-        return { id: slug, slug, label: slugLabel("roles", slug), groupIds: field ? [field] : [] }
+        return { id: slug, label: slugLabel("roles", slug), groupIds: field ? [field] : [] }
       })}
       selectedIds={selectedRoles}
       onSelect={onSelectRole}
