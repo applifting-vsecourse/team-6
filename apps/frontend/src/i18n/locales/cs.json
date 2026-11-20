@@ -25,11 +25,11 @@
     },
     "title": "Přehled pilotu",
     "users": {
-      "activeToday": "Dnes přihlášení",
+      "activeToday": "Dnes aktivní uživatelé",
       "hint": "Procenta jsou podíl ze všech registrovaných.",
       "onboarded": "Dokončili profil",
       "registered": "Registrovaní",
-      "title": "Lidé"
+      "title": "Uživatelé"
     }
   },
   "auth": {

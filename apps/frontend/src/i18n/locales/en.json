@@ -25,11 +25,11 @@
     },
     "title": "Pilot overview",
     "users": {
-      "activeToday": "Signed in today",
+      "activeToday": "Today's active users",
       "hint": "Percentages are shares of everyone registered.",
       "onboarded": "Finished their profile",
       "registered": "Registered",
-      "title": "People"
+      "title": "Users"
     }
   },
   "auth": {

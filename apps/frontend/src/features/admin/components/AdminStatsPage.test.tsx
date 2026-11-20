@@ -39,7 +39,7 @@ describe("AdminStatsPage", () => {
     expect(api.get).toHaveBeenCalledWith("admin/stats")
     expect(valueOf("Registered")).toHaveTextContent("21")
     expect(valueOf("Finished their profile")).toHaveTextContent("15")
-    expect(valueOf("Signed in today")).toHaveTextContent("4")
+    expect(valueOf("Today's active users")).toHaveTextContent("4")
     expect(valueOf("All kvintets")).toHaveTextContent("6")
     expect(valueOf("Started")).toHaveTextContent("1")
     expect(valueOf("Forming, 1–2 people")).toHaveTextContent("3")
@@ -52,7 +52,7 @@ describe("AdminStatsPage", () => {
 
     expect(await screen.findByText("21")).toBeInTheDocument()
     expect(valueOf("Finished their profile")).toHaveTextContent("71%")
-    expect(valueOf("Signed in today")).toHaveTextContent("19%")
+    expect(valueOf("Today's active users")).toHaveTextContent("19%")
     unmount()
 
     respondWith(() =>
