@@ -127,6 +127,33 @@ describe("SignUpForm username preview", () => {
   })
 })
 
+describe("SignUpForm password focus", () => {
+  it("tells the page when a password field has focus and when it loses it", async () => {
+    const user = userEvent.setup()
+    const onPasswordFocusChange = vi.fn()
+    await renderForm(vi.fn(), { onPasswordFocusChange })
+
+    await user.click(screen.getByLabelText("Password"))
+    expect(onPasswordFocusChange).toHaveBeenLastCalledWith(true)
+
+    await user.click(screen.getByLabelText("Confirm password"))
+    expect(onPasswordFocusChange).toHaveBeenLastCalledWith(true)
+
+    await user.click(screen.getByLabelText("Username"))
+    expect(onPasswordFocusChange).toHaveBeenLastCalledWith(false)
+  })
+
+  it("does not report the other fields", async () => {
+    const user = userEvent.setup()
+    const onPasswordFocusChange = vi.fn()
+    await renderForm(vi.fn(), { onPasswordFocusChange })
+
+    await user.click(screen.getByLabelText("Username"))
+
+    expect(onPasswordFocusChange).not.toHaveBeenCalledWith(true)
+  })
+})
+
 describe("SignUpForm taken e-mail", () => {
   it("shows the server's e-mail error under the field", async () => {
     await renderForm(vi.fn(), { emailError: "You already have an account with this email." })

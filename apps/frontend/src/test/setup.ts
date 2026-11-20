@@ -17,5 +17,12 @@ Object.assign(Element.prototype, {
   scrollIntoView: () => undefined,
 })
 
+// jsdom does not play media; the player calls these and a test can spy on them.
+Object.assign(HTMLMediaElement.prototype, {
+  play: () => Promise.resolve(),
+  pause: () => undefined,
+  load: () => undefined,
+})
+
 // Tests assert on English text regardless of the machine's locale.
 await i18n.changeLanguage("en")

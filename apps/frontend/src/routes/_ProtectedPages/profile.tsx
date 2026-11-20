@@ -19,6 +19,7 @@ import { useSession } from "@/features/auth/hooks/useSession"
 import { profileQueryOptions, type ProfileResponse } from "@/features/profile/api/profileApi"
 import { TagBadge } from "@/features/profile/components/TagBadge"
 import { useProfile } from "@/features/profile/hooks/useProfile"
+import { firstPageOfStep } from "@/features/profile/lib/onboardingPages"
 import { fieldOfRole, ROLE_FIELDS } from "@/features/profile/lib/roleFields"
 
 export function formatWhenAndWhere(
@@ -73,10 +74,10 @@ export function formatWhenAndWhere(
 }
 
 const EXPECTATION_LABELS = {
-  learn_new: "onboarding.step3.expectations.learn",
-  share_knowledge: "onboarding.step3.expectations.share",
-  meet_people: "onboarding.step3.expectations.meet",
-  solve_problem: "onboarding.step3.expectations.solve",
+  learn_new: "onboarding.expectations.learn",
+  share_knowledge: "onboarding.expectations.share",
+  meet_people: "onboarding.expectations.meet",
+  solve_problem: "onboarding.expectations.solve",
 } as const
 
 /** The "Edit" link of a section: it opens the onboarding step that holds those answers. */
@@ -90,7 +91,7 @@ function EditLink({ step }: { step: 1 | 2 | 3 }) {
     >
       <Link
         to={ROUTES.onboarding}
-        search={{ step }}
+        search={{ page: firstPageOfStep(step) }}
       >
         {t("common.edit")}
       </Link>

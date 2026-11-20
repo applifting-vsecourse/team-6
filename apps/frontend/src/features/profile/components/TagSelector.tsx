@@ -3,11 +3,9 @@ import { useTranslation } from "react-i18next"
 import { useSlugLabel } from "@/lib/useSlugLabel"
 
 import type { ReferenceTag } from "@/features/profile/api/profileApi"
-import { CategoryPicker } from "@/features/profile/components/CategoryPicker"
+import { ChipPicker } from "@/features/profile/components/onboarding/ChipPicker"
 
 type TagSelectorProps = {
-  title: string
-  hint?: string
   selectedTagIds: string[]
   allTags: ReferenceTag[]
   categories: { slug: string }[]
@@ -15,9 +13,11 @@ type TagSelectorProps = {
   onRemoveTag: (tagId: string) => void
 }
 
+/**
+ * Topics (Figma B1b to B1d, with the categories of #122). Topics are ours: the search finds them,
+ * it cannot create new ones.
+ */
 export function TagSelector({
-  title,
-  hint,
   selectedTagIds,
   allTags,
   categories,
@@ -28,10 +28,9 @@ export function TagSelector({
   const slugLabel = useSlugLabel()
 
   return (
-    <CategoryPicker
-      title={title}
-      hint={hint}
+    <ChipPicker
       groups={categories.map(({ slug }) => ({ id: slug, label: slugLabel("categories", slug) }))}
+      groupLabel={t("onboarding.tags.categoryLabel")}
       items={allTags.map((tag) => ({
         id: tag.id,
         slug: tag.slug,
@@ -41,11 +40,11 @@ export function TagSelector({
       selectedIds={selectedTagIds}
       onSelect={onSelectTag}
       onRemove={onRemoveTag}
-      addLabel={(name) => t("onboarding.step1.addTag", { name })}
-      removeLabel={(name) => t("onboarding.step1.removeTag", { name })}
-      searchLinkLabel={t("onboarding.step1.searchAllTags")}
-      searchPlaceholder={t("onboarding.step1.searchTagsPlaceholder")}
-      searchAriaLabel={t("onboarding.step1.searchTagsAria", { section: title })}
+      addLabel={(name) => t("onboarding.tags.addTag", { name })}
+      removeLabel={(name) => t("onboarding.tags.removeTag", { name })}
+      searchPlaceholder={t("onboarding.tags.searchPlaceholder")}
+      searchAriaLabel={t("onboarding.tags.searchAria")}
+      noneLabel={t("onboarding.tags.none")}
     />
   )
 }
