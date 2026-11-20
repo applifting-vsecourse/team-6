@@ -91,7 +91,7 @@ export function KvintetSeats({
         <ul
           role={label ? "img" : undefined}
           aria-label={label}
-          className={cn("grid grid-cols-5 gap-x-2 gap-y-3", className)}
+          className={cn("flex flex-wrap gap-x-4 gap-y-3", className)}
         >
           {Array.from({ length: SEATS }, (_, i) => {
             const member = members[i]
@@ -100,7 +100,7 @@ export function KvintetSeats({
                 key={i}
                 data-seat={member ? "member" : "free"}
                 className={cn(
-                  "flex min-w-0 flex-col items-center gap-1.5 text-small",
+                  "flex max-w-24 min-w-0 flex-col items-center gap-1.5 text-small",
                   member ? "text-foreground" : "text-muted-foreground",
                 )}
               >
