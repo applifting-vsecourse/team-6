@@ -1,32 +1,39 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react"
 import { happy, unsure } from "blobatar/expression"
-import { MapPin, Mic, Pause, Phone, Play, Video } from "lucide-react"
+import { Check } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { AnonymousBlobatar, Face } from "@/components/AnonymousBlobatar"
 import { GazeBlobatar } from "@/components/GazeBlobatar"
-import { Button } from "@/components/ui/button"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Wordmark } from "@/components/Wordmark"
 import type en from "@/i18n/locales/en.json"
 import { useMediaQuery } from "@/lib/useMediaQuery"
 import { cn } from "@/lib/utils"
 
-import { useCoreIdeaTimeline } from "./useCoreIdeaTimeline"
+import { stepMs, stepStart, useCoreIdeaTimeline } from "./useCoreIdeaTimeline"
 
 import "./core-idea.css"
 
-// The faces of the Figma frames, in seat order (top, then clockwise). Seat 0 is you.
+// The faces of the Figma frames, in seat order (top, then clockwise). Seat 0 is you. `teach` is
+// what the person can advise on; what they want to learn is what the next seat teaches, so the
+// five problems solve each other in a circle.
 const SEATS = [
-  { seed: "jana", role: "roleYou" },
-  { seed: "petr", role: "roleAnalyst", name: "namePetr" },
-  { seed: "eva", role: "roleMarketer", name: "nameEva" },
-  { seed: "ondrej", role: "roleDesigner", name: "nameOndrej" },
-  { seed: "lucie", role: "roleDeveloper", name: "nameLucie" },
+  { seed: "jana", role: "roleYou", teach: "excel" },
+  { seed: "petr", role: "roleAnalyst", name: "namePetr", teach: "python" },
+  { seed: "eva", role: "roleMarketer", name: "nameEva", teach: "copywriting" },
+  { seed: "ondrej", role: "roleDesigner", name: "nameOndrej", teach: "figma" },
+  { seed: "lucie", role: "roleDeveloper", name: "nameLucie", teach: "sql" },
 ] as const
 
-const STEPS = [0, 1, 2, 3, 4, 5] as const
-// The stages are drawn at a fixed size and zoomed down to whatever room the page has. The desktop
-// stage is 1120 wide but its steps and card only span 1008 of it; the 56 px margins are cropped.
-const STAGE_WIDTH = { desktop: 1008, phone: 360 }
+const STEPS = [0, 1, 2, 3] as const
+// The stages are drawn at a fixed size and zoomed to whatever room the page has: the phone one
+// only down, the desktop card up to a point. The step tabs under the stage take the rest.
+const STAGE = { desktop: { width: 404, height: 508 }, phone: { width: 360, height: 470 } }
+const MAX_DESKTOP_FIT = 1.1
+// The tabs under the stage: the bar and the title of the step, plus a little air.
+const MAX_PHONE_FIT = 300 / 360
+const TABS_HEIGHT = 90
 
 /** A blobatar stacked in a seat; CSS fades between the layers (grey, colour, happy). */
 function Layer({ kind, children }: { kind: "g" | "c" | "h" | "u"; children: ReactNode }) {
@@ -39,10 +46,12 @@ type Text = keyof typeof en.landing.animation
 
 function Seat({
   seat,
+  learn,
   index,
   isOn,
 }: {
   seat: (typeof SEATS)[number]
+  learn: (typeof SEATS)[number]["teach"]
   index: number
   isOn: boolean
 }) {
@@ -50,7 +59,6 @@ function Seat({
   return (
     <div className={cn(`ci-seat ci-s${index}`, isOn && "ci-on")}>
       <span className="ci-free" />
-      <i className="ci-melt" />
       <div className="ci-faces">
         {index > 0 ? (
           <Layer kind="g">
@@ -75,6 +83,22 @@ function Seat({
             expression={happy}
           />
         </Layer>
+      </div>
+      <div className="ci-tags">
+        <span className="ci-tag ci-teach">{t(`tags.${seat.teach}`)}</span>
+        <span className="ci-tag ci-learn">
+          <span>{t(`tags.${learn}`)}</span>
+          {/* A copy of the neighbour's tag that flies in; theirs stays where it is. */}
+          <span
+            aria-hidden="true"
+            className="ci-fly"
+          >
+            {t(`tags.${learn}`)}
+          </span>
+          <span className="ci-ok">
+            <Check aria-hidden="true" />
+          </span>
+        </span>
       </div>
       <div className="ci-lab">
         <span className="ci-role">{t(`landing.animation.${seat.role}`)}</span>
@@ -118,8 +142,8 @@ function FormCard({
 }
 
 /**
- * The core idea of Kvintet in six scenes: you hit a problem, tell us about you, pick a kvintet,
- * it starts, you arrange a meeting and meet. A phone stage and a desktop stage (a list of the
+ * The core idea of Kvintet in four scenes: you hit a problem, tell us about you, pick a kvintet,
+ * it starts and everyone solves someone else's problem. A phone stage and a desktop stage (a list of the
  * steps beside the same card, with a pointer instead of a tap), each drawn at a fixed size and
  * zoomed to fit its parent, so the parent sets how big it is. Only the one that matches the window
  * runs. Purely decorative.
@@ -128,9 +152,9 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
   const { t } = useTranslation()
   const isDesktop = useMediaQuery("(min-width: 768px)")
   const isReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)")
-  // Pausing shows the last meeting scene, the same still frame reduced motion gets (WCAG 2.2.2).
-  const [isPaused, setIsPaused] = useState(false)
-  const { flags, count } = useCoreIdeaTimeline(isDesktop, isReducedMotion || isPaused)
+  // Where the story starts: the beginning, or the step the visitor picked.
+  const [from, setFrom] = useState<{ at: number } | undefined>(undefined)
+  const { flags, count } = useCoreIdeaTimeline(isDesktop, isReducedMotion, from)
 
   const frameRef = useRef<HTMLDivElement>(null)
   const [fit, setFit] = useState(1)
@@ -138,11 +162,14 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
   useLayoutEffect(() => {
     const frame = frameRef.current
     if (!frame) return
-    // The desktop stage fills its parent, larger than drawn if need be, so its margins match the
-    // page's; the phone stage only shrinks.
+    // Zoom to the width of the parent and to the height of the screen, so the whole scene and its
+    // tabs fit in one view. clientHeight is the viewport with the browser bars showing, so it does
+    // not jump as they hide on scroll.
     const measure = () => {
-      const ratio = frame.clientWidth / STAGE_WIDTH[isDesktop ? "desktop" : "phone"]
-      setFit(isDesktop ? ratio : Math.min(1, ratio))
+      const { width, height } = STAGE[isDesktop ? "desktop" : "phone"]
+      const byWidth = frame.clientWidth / width
+      const byHeight = (document.documentElement.clientHeight - TABS_HEIGHT) / height
+      setFit(Math.min(byWidth, byHeight, isDesktop ? MAX_DESKTOP_FIT : MAX_PHONE_FIT))
     }
     measure()
     const observer = new ResizeObserver(measure)
@@ -153,41 +180,19 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
   const text = (key: Text) => t(`landing.animation.${key}`)
   const has = (flag: string) => flags.has(flag)
   const stateClasses = [...flags].map((flag) => `ci-${flag}`)
+  const step = STEPS.find((n) => has(`n${n}`)) ?? 0
 
   const ringItems = (
     <>
-      {SEATS.map((_, i) => (
-        <span
-          key={`tile${i}`}
-          className={`ci-tile ci-tl${i}`}
-        />
-      ))}
       {SEATS.map((seat, i) => (
         <Seat
           key={i}
           seat={seat}
+          learn={SEATS[(i + 1) % SEATS.length]!.teach}
           index={i}
           isOn={has(`on${i}`)}
         />
       ))}
-      {SEATS.map((_, i) => (
-        <span
-          key={`cup${i}`}
-          className={`ci-cup ci-cp${i}`}
-        />
-      ))}
-      <div className="ci-callbar">
-        <span className="ci-cb">
-          <Mic aria-hidden="true" />
-        </span>
-        <span className="ci-cb">
-          <Video aria-hidden="true" />
-        </span>
-        <span className="ci-cb ci-end">
-          <Phone aria-hidden="true" />
-        </span>
-      </div>
-      <div className="ci-wordmark">Kvintet</div>
       <div className="ci-solo">
         <span className="ci-u">
           <GazeBlobatar
@@ -207,10 +212,6 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
       <div className="ci-thought">{text("thought")}</div>
       <div className="ci-center">
         <span className="ci-count">{t("landing.animation.count", { n: count })}</span>
-        <p className="ci-title">
-          <span>{text("titleFive")}</span>
-          <span>{text("titleOne")}</span>
-        </p>
       </div>
     </>
   )
@@ -240,12 +241,6 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
 
   const tray = (
     <div className="ci-tray">
-      <div className="ci-where">
-        <span className="ci-wchip ci-wcafe">{text("whereCafe")}</span>
-        <span className="ci-wchip ci-wcall">{text("whereCall")}</span>
-        <span className="ci-wchip">{text("whereWalk")}</span>
-        <span className="ci-wchip">{text("whereAnywhere")}</span>
-      </div>
       <div className="ci-t-feed">
         <div>
           <p className="ci-feed-title">{text("feedTitle")}</p>
@@ -264,49 +259,16 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
         <p className="ci-feed-title">{text("sloganLead")}</p>
         <p className="ci-feed-title ci-accent">{text("sloganAsk")}</p>
       </div>
-      <div className="ci-t-call">
-        <p className="ci-feed-meta">{text("callMeta")}</p>
-        <p className="ci-feed-title">
-          <Video
-            className="ci-pin"
-            aria-hidden="true"
-          />
-          {text("callTitle")}
-        </p>
-      </div>
-      <div className="ci-t-meet">
-        <p className="ci-feed-meta">{text("cafeMeta")}</p>
-        <p className="ci-feed-title">
-          <MapPin
-            className="ci-pin"
-            aria-hidden="true"
-          />
-          {text("cafeTitle")}
-        </p>
-      </div>
-      <div className="ci-t-chat">
-        <p className="ci-sys">{text("chatSys")}</p>
-        <div className="ci-msg ci-msg1">
-          <span className="ci-face">
-            <Face
-              seed="eva"
-              motion="always"
-              className={FACE}
-            />
-          </span>
-          <span className="ci-bubble">{text("chatMsg1")}</span>
-        </div>
-        <div className="ci-msg ci-msg2">
-          <span className="ci-face">
-            <Face
-              seed="jana"
-              motion="always"
-              className={FACE}
-            />
-          </span>
-          <span className="ci-bubble">{text("chatMsg2")}</span>
-        </div>
-      </div>
+    </div>
+  )
+
+  // The ending: the five regroup into the logo's cluster and this appears under them.
+  const brand = (
+    <div
+      aria-hidden="true"
+      className="ci-brand"
+    >
+      <Wordmark className="text-[length:var(--ci-wordmark)] leading-none" />
     </div>
   )
 
@@ -323,28 +285,13 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
       >
         {isDesktop ? (
           <>
-            <div className="ci-steps">
-              <p className="ci-eyebrow">{t("landing.howItWorks")}</p>
-              {STEPS.map((n) => (
-                <div
-                  key={n}
-                  className={`ci-step ci-step${n}`}
-                >
-                  <span className="ci-dot">{n + 1}</span>
-                  <div>
-                    <h3>{text(`step${n}Title`)}</h3>
-                    <p>{text(`step${n}Text`)}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
             <div className="ci-card">
               <div className="ci-guide" />
-              <div className="ci-awning" />
               {ringItems}
               {form}
               {tray}
             </div>
+            {brand}
             <svg
               aria-hidden="true"
               className="ci-cursor"
@@ -359,48 +306,52 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
           </>
         ) : (
           <>
-            <div className="ci-caps">
-              {STEPS.map((n) => (
-                <div
-                  key={n}
-                  className={`ci-cap ci-cap${n}`}
-                >
-                  <p className="ci-num">{`0${n + 1}`}</p>
-                  <h3>{text(`step${n}Title`)}</h3>
-                  <p>{text(n === 2 ? "step2TextShort" : `step${n}Text`)}</p>
-                </div>
-              ))}
-            </div>
-            <div className="ci-dots">
-              {STEPS.map((n) => (
-                <i
-                  key={n}
-                  className={`ci-d${n}`}
-                />
-              ))}
-            </div>
             <div className="ci-ring">
-              <div className="ci-awning" />
               <div className="ci-guide" />
               {ringItems}
             </div>
             {form}
             {tray}
+            {brand}
           </>
         )}
       </div>
-      {isReducedMotion ? null : (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="mt-2"
-          onClick={() => setIsPaused((isPausedNow) => !isPausedNow)}
+      <div className="mx-auto mt-4 w-full md:mt-6">
+        <Tabs
+          value={String(step)}
+          onValueChange={(value) =>
+            setFrom({ at: stepStart(Number(value), isDesktop, isReducedMotion) })
+          }
         >
-          {isPaused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
-          {text(isPaused ? "play" : "pause")}
-        </Button>
-      )}
+          <TabsList
+            variant="line"
+            aria-label={t("landing.howItWorks")}
+            className="h-auto w-full items-start gap-2 p-0 group-data-[orientation=horizontal]/tabs:h-auto md:gap-4"
+          >
+            {STEPS.map((n) => (
+              <TabsTrigger
+                key={n}
+                value={String(n)}
+                className="h-auto cursor-pointer flex-col items-start justify-start gap-1.5 rounded-t-[2px] rounded-b-none border-0 border-t-[3px] border-border px-0 pt-2 pb-0 text-left whitespace-normal text-muted-foreground after:hidden not-data-[state=active]:hover:border-muted-foreground data-[state=active]:text-foreground md:gap-2"
+              >
+                {n === step ? (
+                  <span
+                    aria-hidden="true"
+                    className="ci-progress absolute inset-x-0 -top-[3px] h-[3px] rounded-[2px] bg-highlight"
+                    style={{ animationDuration: `${stepMs(n, isDesktop)}ms` }}
+                  />
+                ) : null}
+                <span className="font-mono text-meta tracking-[0.08em] text-muted-foreground uppercase group-data-[state=active]/tabs-list:text-highlight max-md:hidden">
+                  {`0${n + 1}`}
+                </span>
+                <span className="text-small font-normal md:text-compact md:font-medium">
+                  {text(`step${n}Title`)}
+                </span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      </div>
     </div>
   )
 }

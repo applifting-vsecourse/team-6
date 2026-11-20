@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next"
 
+import { ROUTES } from "@/app/routes"
 import { DisabledNavItem } from "@/components/Header/DisabledNavItem"
 import { HeaderNavLink } from "@/components/Header/HeaderNavLink"
 import { NAV_ITEMS, type NavDisabled } from "@/components/Header/nav"
@@ -8,9 +9,10 @@ import { cn } from "@/lib/utils"
 type HeaderNavProps = {
   className?: string
   disabledItems?: NavDisabled
+  isAdmin?: boolean
 }
 
-export function HeaderNav({ className, disabledItems }: HeaderNavProps) {
+export function HeaderNav({ className, disabledItems, isAdmin = false }: HeaderNavProps) {
   const { t } = useTranslation()
 
   return (
@@ -37,6 +39,7 @@ export function HeaderNav({ className, disabledItems }: HeaderNavProps) {
           </HeaderNavLink>
         )
       })}
+      {isAdmin ? <HeaderNavLink to={ROUTES.admin}>{t("nav.admin")}</HeaderNavLink> : null}
     </nav>
   )
 }

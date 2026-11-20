@@ -10,6 +10,28 @@
     },
     "deleteSuccess": "Váš účet byl úspěšně smazán."
   },
+  "admin": {
+    "description": "Jen součty. Žádná jména ani zprávy.",
+    "error": {
+      "retry": "Zkusit znovu",
+      "title": "Čísla se nepodařilo načíst"
+    },
+    "kvintets": {
+      "active": "Začaly",
+      "formingReady": "Skládají se, 3–4 lidé (mohou hlasovat pro start)",
+      "formingSmall": "Skládají se, 1–2 lidé",
+      "title": "Kvintety",
+      "total": "Všechny kvintety"
+    },
+    "title": "Přehled pilotu",
+    "users": {
+      "activeToday": "Dnes aktivní uživatelé",
+      "hint": "Procenta jsou podíl ze všech registrovaných.",
+      "onboarded": "Dokončili profil",
+      "registered": "Registrovaní",
+      "title": "Uživatelé"
+    }
+  },
   "auth": {
     "acceptCodeOfConduct": "Souhlasím s <coc>pravidly komunity</coc>",
     "confirmPassword": "Potvrzení hesla",
@@ -284,14 +306,7 @@
     "animation": {
       "aloneMeta": "Zaseknutí u problému",
       "aloneTitle": "Nikdo, s kým to probrat",
-      "ariaLabel": "Člověk, který si neví rady a nemá s kým to probrat, najde kvintet. Pět lidí se postupně sejde v jednom kvintetu, domluví se ve skupinovém chatu a potkají se v kavárně nebo přes videohovor.",
-      "cafeMeta": "Každý čtvrtek · 12:00",
-      "cafeTitle": "Sejdeme se v kavárně",
-      "callMeta": "Jednou za dva týdny · neděle 20:00",
-      "callTitle": "Nebo přes videohovor",
-      "chatMsg1": "Ahoj všem! Ve čtvrtek oběd?",
-      "chatMsg2": "Ve 12 se mi to hodí.",
-      "chatSys": "Kvintet začal. Pozdravte se!",
+      "ariaLabel": "Někdo s problémem, se kterým si nemá s kým promluvit, najde kvintet. Pět lidí postupně obsadí sedadla jednoho kvintetu a každý z nich vyřeší problém někomu jinému.",
       "count": "{{n}} / 5",
       "feedMeta": "Data a AI · Každý týden",
       "feedTitle": "Od Excelu k Pythonu",
@@ -303,8 +318,6 @@
       "nameLucie": "Lucie",
       "nameOndrej": "Ondřej",
       "namePetr": "Petr",
-      "pause": "Pozastavit animaci",
-      "play": "Spustit animaci",
       "roleAnalyst": "Analytik",
       "roleDesigner": "Designér",
       "roleDeveloper": "Vývojář",
@@ -312,26 +325,11 @@
       "roleYou": "Vy",
       "sloganAsk": "Zeptejte se těch, kdo tím prošli.",
       "sloganLead": "Nejste na to sami.",
-      "step0Text": "Nevíte si rady a nemáte s kým to probrat.",
       "step0Title": "Narazíte na problém",
-      "step1Text": "Co umíte a co se chcete naučit.",
       "step1Title": "Řekněte nám o sobě",
-      "step2Text": "Algoritmus vám najde kvintet přímo pro vás.",
-      "step2TextShort": "Jména zůstanou skrytá, dokud kvintet nezačne.",
       "step2Title": "Vyberte si kvintet",
-      "step3Text": "Při pěti lidech kvintet začne automaticky.",
-      "step3Title": "Kvintet začíná",
-      "step4Text": "Jakmile kvintet začne, domluvíte se ve skupinovém chatu.",
-      "step4Title": "Domluvte si setkání",
-      "step5Text": "V kavárně, nebo přes videohovor. Kde a jak často se potkáte, je na vás.",
-      "step5Title": "Sejděte se tváří v tvář",
-      "thought": "Jak tohle zautomatizuji?",
-      "titleFive": "Pět lidí.",
-      "titleOne": "Jeden kvintet.",
-      "whereAnywhere": "Kdekoli",
-      "whereCafe": "Kavárna",
-      "whereCall": "Videohovor",
-      "whereWalk": "Procházka"
+      "step3Title": "Vyřešte to společně",
+      "thought": "Jak tohle zautomatizuji?"
     },
     "createAccount": "Vytvořit účet",
     "goToOverview": "Přejít domů",
@@ -383,6 +381,7 @@
     "WEEKLY": "každý týden"
   },
   "nav": {
+    "admin": "Admin",
     "kvintetFeed": "Kvintety",
     "kvintetFeedDisabled": "Už jste v kvintetu, proto nemůžete procházet další.",
     "overview": "Domů",

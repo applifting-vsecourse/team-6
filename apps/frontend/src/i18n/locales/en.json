@@ -10,6 +10,28 @@
     },
     "deleteSuccess": "Your account has been deleted successfully."
   },
+  "admin": {
+    "description": "Totals only. No names and no messages.",
+    "error": {
+      "retry": "Try again",
+      "title": "The numbers could not be loaded"
+    },
+    "kvintets": {
+      "active": "Started",
+      "formingReady": "Forming, 3–4 people (can vote to start)",
+      "formingSmall": "Forming, 1–2 people",
+      "title": "Kvintets",
+      "total": "All kvintets"
+    },
+    "title": "Pilot overview",
+    "users": {
+      "activeToday": "Today's active users",
+      "hint": "Percentages are shares of everyone registered.",
+      "onboarded": "Finished their profile",
+      "registered": "Registered",
+      "title": "Users"
+    }
+  },
   "auth": {
     "acceptCodeOfConduct": "I agree to the <coc>community rules</coc>",
     "confirmPassword": "Confirm password",
@@ -280,14 +302,7 @@
     "animation": {
       "aloneMeta": "Stuck on a problem",
       "aloneTitle": "Nobody to talk it through with",
-      "ariaLabel": "Someone with a problem and nobody to talk to finds a kvintet. Five people fill the seats of one kvintet one by one, arrange a meeting in the group chat, then meet at a café table or on a video call.",
-      "cafeMeta": "Every Thursday · 12:00",
-      "cafeTitle": "See you at the café",
-      "callMeta": "Every other Sunday · 20:00",
-      "callTitle": "Or on a video call",
-      "chatMsg1": "Hi all! Thursday lunch?",
-      "chatMsg2": "12:00 works for me.",
-      "chatSys": "The kvintet has started. Say hello!",
+      "ariaLabel": "Someone with a problem and nobody to talk to finds a kvintet. Five people fill the seats of one kvintet one by one, and each of them solves someone else's problem.",
       "count": "{{n}} / 5",
       "feedMeta": "Data & AI · Every week",
       "feedTitle": "From Excel to Python",
@@ -299,8 +314,6 @@
       "nameLucie": "Lucy",
       "nameOndrej": "Andrew",
       "namePetr": "Peter",
-      "pause": "Pause animation",
-      "play": "Play animation",
       "roleAnalyst": "Analyst",
       "roleDesigner": "Designer",
       "roleDeveloper": "Developer",
@@ -308,26 +321,11 @@
       "roleYou": "You",
       "sloganAsk": "Ask those who've been there.",
       "sloganLead": "You're not the first to face this.",
-      "step0Text": "You don't know what to do, and there's nobody to talk to.",
       "step0Title": "You hit a problem",
-      "step1Text": "What you know and what you'd like to learn.",
       "step1Title": "Tell us about you",
-      "step2Text": "An algorithm finds the kvintet that fits you.",
-      "step2TextShort": "Names stay hidden until it starts.",
       "step2Title": "Pick a kvintet",
-      "step3Text": "With five people, it starts automatically.",
-      "step3Title": "The kvintet starts",
-      "step4Text": "Once your kvintet starts, you set it up in the group chat.",
-      "step4Title": "Arrange a meeting",
-      "step5Text": "In a café, or on a video call. Where and how often is up to you.",
-      "step5Title": "Meet face to face",
-      "thought": "How do I automate this report?",
-      "titleFive": "Five people.",
-      "titleOne": "One kvintet.",
-      "whereAnywhere": "Anywhere",
-      "whereCafe": "Café",
-      "whereCall": "Video call",
-      "whereWalk": "Walk"
+      "step3Title": "Solve it together",
+      "thought": "How do I automate this report?"
     },
     "createAccount": "Create account",
     "goToOverview": "Go to Home",
@@ -377,6 +375,7 @@
     "WEEKLY": "every week"
   },
   "nav": {
+    "admin": "Admin",
     "kvintetFeed": "Kvintets",
     "kvintetFeedDisabled": "You're already in a kvintet, so you can't browse others.",
     "overview": "Home",

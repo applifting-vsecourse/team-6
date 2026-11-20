@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next"
 import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Button } from "@/components/ui/button"
 import {
-  bottomSheetDialogContentClassName,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -40,11 +39,7 @@ export function DeleteAccountDialog({
       open={isOpen}
       onOpenChange={handleOpenChange}
     >
-      <DialogContent className={bottomSheetDialogContentClassName}>
-        <span
-          aria-hidden
-          className="mx-auto h-1 w-10 rounded-full bg-input sm:hidden"
-        />
+      <DialogContent isBottomSheet>
         {avatarSeed ? (
           <GazeBlobatar
             name={avatarSeed}

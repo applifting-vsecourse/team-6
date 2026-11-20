@@ -35,40 +35,76 @@ describe("CoreIdeaAnimation", () => {
     expect(screen.getByRole("img", { name: /Five people fill the seats/ })).toBeInTheDocument()
   })
 
-  it("draws the phone stage with step captions and dots", () => {
+  it("draws the phone stage with the ring and four step tabs under it", () => {
     stubMedia([])
     const { container } = render(<CoreIdeaAnimation />)
 
     expect(container.firstElementChild).toHaveClass("ci-m")
-    expect(container.querySelectorAll(".ci-cap")).toHaveLength(6)
-    expect(container.querySelectorAll(".ci-dots i")).toHaveLength(6)
-    expect(container.querySelector(".ci-steps")).toBeNull()
+    expect(container.querySelector(".ci-ring")).not.toBeNull()
+    expect(screen.getAllByRole("tab")).toHaveLength(4)
     expect(container.querySelector(".ci-cursor")).toBeNull()
   })
 
-  it("draws the desktop stage with the list of steps, the card and a pointer", () => {
+  it("draws the desktop stage as the card with a pointer, and the same tabs", () => {
     stubMedia(["min-width"])
     const { container } = render(<CoreIdeaAnimation />)
 
     expect(container.firstElementChild).toHaveClass("ci-d")
-    expect(container.querySelectorAll(".ci-step")).toHaveLength(6)
     expect(container.querySelector(".ci-card")).not.toBeNull()
     expect(container.querySelector(".ci-cursor")).not.toBeNull()
-    expect(container.querySelector(".ci-cap")).toBeNull()
+    expect(container.querySelector(".ci-ring")).toBeNull()
+    expect(screen.getAllByRole("tab")).toHaveLength(4)
   })
 
-  it("holds the last meeting scene for reduced motion, with all five seated", () => {
+  it("jumps to a step when its tab is picked and plays on from there", () => {
+    stubMedia([])
+    const { container } = render(<CoreIdeaAnimation />)
+    const at = (ms: number) => act(() => void vi.advanceTimersByTime(ms))
+
+    at(1_000)
+    expect(screen.getByRole("tab", { name: /01/ })).toHaveAttribute("aria-selected", "true")
+
+    fireEvent.mouseDown(screen.getByRole("tab", { name: /03/ }), { button: 0 })
+    at(100)
+    expect(stage(container)).toHaveClass("ci-n2", "ci-tray-feed")
+    expect(screen.getByRole("tab", { name: /03/ })).toHaveAttribute("aria-selected", "true")
+    expect(container.querySelectorAll(".ci-seat.ci-on")).toHaveLength(0)
+
+    at(1_200) // the neighbours take their seats, as in the story
+    expect(container.querySelectorAll(".ci-seat.ci-on")).toHaveLength(2)
+
+    fireEvent.mouseDown(screen.getByRole("tab", { name: /04/ }), { button: 0 })
+    at(100)
+    expect(stage(container)).toHaveClass("ci-n3", "ci-landed")
+    expect(container.querySelector(".ci-count")).toHaveTextContent("3 / 5")
+  })
+
+  it("lets reduced motion step through still scenes with the tabs", () => {
+    stubMedia(["reduced-motion"])
+    const { container } = render(<CoreIdeaAnimation />)
+
+    fireEvent.mouseDown(screen.getByRole("tab", { name: /01/ }), { button: 0 })
+
+    expect(stage(container)).toHaveClass("ci-n0", "ci-lonely")
+    expect(container.querySelectorAll(".ci-seat.ci-on")).toHaveLength(0)
+
+    fireEvent.mouseDown(screen.getByRole("tab", { name: /04/ }), { button: 0 })
+
+    expect(stage(container)).toHaveClass("ci-n3", "ci-solved")
+  })
+
+  it("holds the last scene for reduced motion, with all five seated", () => {
     stubMedia(["reduced-motion"])
     const { container } = render(<CoreIdeaAnimation />)
 
     act(() => void vi.advanceTimersByTime(60_000))
 
-    expect(stage(container)).toHaveClass("ci-n5", "ci-meet", "ci-landed")
+    expect(stage(container)).toHaveClass("ci-n3", "ci-solved", "ci-landed")
     expect(container.querySelectorAll(".ci-seat.ci-on")).toHaveLength(5)
     expect(container.querySelector(".ci-count")).toHaveTextContent("5 / 5")
   })
 
-  it("plays the story: alone, filling in, joining, then the logo", () => {
+  it("plays the story: alone, filling in, joining, then everyone solved", () => {
     stubMedia([])
     const { container } = render(<CoreIdeaAnimation />)
     const at = (ms: number) => act(() => void vi.advanceTimersByTime(ms))
@@ -77,7 +113,7 @@ describe("CoreIdeaAnimation", () => {
     expect(stage(container)).toHaveClass("ci-n0", "ci-lonely", "ci-think")
     expect(container.querySelectorAll(".ci-seat.ci-on")).toHaveLength(0)
 
-    at(4_000) // 5.0 s: filling in the onboarding
+    at(5_200) // 6.2 s: filling in the onboarding
     expect(stage(container)).toHaveClass("ci-n1", "ci-onb")
 
     at(5_000) // 10.0 s: two seats taken
@@ -89,18 +125,28 @@ describe("CoreIdeaAnimation", () => {
     expect(container.querySelector(".ci-s0")).toHaveClass("ci-on")
     expect(container.querySelector(".ci-count")).toHaveTextContent("3 / 5")
 
-    at(12_000) // 23.5 s: the five seats melt into the logo
-    expect(stage(container)).toHaveClass("ci-logo")
+    at(2_200) // 13.4 s: the kvintet is complete, every seat shows what it teaches and wants
+    expect(stage(container)).toHaveClass("ci-started", "ci-tagged")
+    expect(stage(container)).not.toHaveClass("ci-solved")
+
+    at(3_400) // 16.8 s: the wishes are filled from the others' tags
+    expect(stage(container)).toHaveClass("ci-solved")
+    expect(container.querySelectorAll(".ci-seat.ci-on")).toHaveLength(5)
+    expect(container.querySelector(".ci-count")).toHaveTextContent("5 / 5")
+
+    at(2_000) // 18.8 s: the five regroup into the logo, with the wordmark under them
+    expect(stage(container)).toHaveClass("ci-regroup")
+    expect(container.querySelector(".ci-brand")).toHaveTextContent("Kvintet")
   })
 
-  it("starts over after the logo", () => {
+  it("starts over after the ending", () => {
     stubMedia([])
     const { container } = render(<CoreIdeaAnimation />)
 
-    act(() => void vi.advanceTimersByTime(300 + 26_300 + 200))
+    act(() => void vi.advanceTimersByTime(300 + 25_200 + 200))
 
     expect(stage(container)).toHaveClass("ci-n0", "ci-lonely")
-    expect(stage(container)).not.toHaveClass("ci-logo")
+    expect(stage(container)).not.toHaveClass("ci-solved")
     expect(container.querySelector(".ci-count")).toHaveTextContent("0 / 5")
   })
 
@@ -109,7 +155,7 @@ describe("CoreIdeaAnimation", () => {
     const { container } = render(<CoreIdeaAnimation />)
     const at = (ms: number) => act(() => void vi.advanceTimersByTime(ms))
 
-    at(9_900) // the pointer sets off at 10.06 s
+    at(11_100) // the pointer sets off at 11.26 s
     expect(stage(container)).not.toHaveClass("ci-cursor-go")
 
     at(300) // 10.2 s: on its way to Join, nobody has joined yet
@@ -119,36 +165,12 @@ describe("CoreIdeaAnimation", () => {
     at(1_500) // 11.7 s: it clicked, the solo blobatar landed and the pointer is gone
     expect(stage(container)).toHaveClass("ci-cursor-done", "ci-landed")
 
-    // The phone loop restarts at 26.66 s; the desktop one is still on its logo.
-    at(15_000)
-    expect(stage(container)).toHaveClass("ci-logo", "ci-fade")
+    // The phone loop restarts at 24.36 s; the desktop one is still on its ending, fading out.
+    at(12_700) // 24.4 s
+    expect(stage(container)).toHaveClass("ci-regroup", "ci-fade")
 
-    at(700) // 27.4 s: restarted
+    at(700) // 25.1 s: restarted
     expect(stage(container)).toHaveClass("ci-n0", "ci-lonely")
-    expect(stage(container)).not.toHaveClass("ci-logo")
-  })
-
-  it("pauses on the button and plays again from the beginning", () => {
-    stubMedia([])
-    const { container } = render(<CoreIdeaAnimation />)
-
-    act(() => void vi.advanceTimersByTime(5_000))
-    fireEvent.click(screen.getByRole("button", { name: "Pause animation" }))
-
-    act(() => void vi.advanceTimersByTime(60_000))
-    expect(stage(container)).toHaveClass("ci-meet", "ci-landed")
-    expect(container.querySelector(".ci-count")).toHaveTextContent("5 / 5")
-
-    fireEvent.click(screen.getByRole("button", { name: "Play animation" }))
-    act(() => void vi.advanceTimersByTime(200))
-    expect(stage(container)).toHaveClass("ci-n0", "ci-lonely")
-    expect(screen.getByRole("button", { name: "Pause animation" })).toBeInTheDocument()
-  })
-
-  it("offers no pause button when reduced motion already holds a still frame", () => {
-    stubMedia(["reduced-motion"])
-    render(<CoreIdeaAnimation />)
-
-    expect(screen.queryByRole("button")).not.toBeInTheDocument()
+    expect(stage(container)).not.toHaveClass("ci-solved")
   })
 })

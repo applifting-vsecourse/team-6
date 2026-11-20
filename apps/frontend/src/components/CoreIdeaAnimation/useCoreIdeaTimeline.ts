@@ -9,35 +9,9 @@ import { useEffect, useRef, useState } from "react"
 type Draft = { flags: Set<string>; count: number }
 type Beat = readonly [at: number, apply: (draft: Draft) => void]
 
-const SCENES = [
-  "n0",
-  "n1",
-  "n2",
-  "n3",
-  "n4",
-  "n5",
-  "tray-alone",
-  "tray-slogan",
-  "tray-feed",
-  "tray-chat",
-  "tray-meet",
-  "tray-call",
-]
+const SCENES = ["n0", "n1", "n2", "n3", "tray-alone", "tray-slogan", "tray-feed"]
 
 const START: Draft = { flags: new Set(["n0", "tray-alone", "lonely", "waiting"]), count: 0 }
-
-// Reduced motion: the last meeting scene, everyone seated, no loop.
-const STATIC: Draft = {
-  flags: new Set([
-    "n5",
-    "tray-meet",
-    "started",
-    "meet",
-    "landed",
-    ...[0, 1, 2, 3, 4].map((i) => `on${i}`),
-  ]),
-  count: 5,
-}
 
 const scene = (d: Draft, n: number, tray?: string) => {
   SCENES.forEach((c) => d.flags.delete(c))
@@ -50,6 +24,10 @@ const seat = (d: Draft, i: number, count: number) => {
   add(d, `on${i}`)
   d.count = count
 }
+
+// Extra time on the slogan scene (the first step) so its line can be read; every later beat waits.
+const HOLD = 1200
+const SLOGAN_END = 4600
 
 function beats(isDesktop: boolean): Beat[] {
   const late = isDesktop ? 600 : 0
@@ -117,37 +95,53 @@ function beats(isDesktop: boolean): Beat[] {
         remove(d, "full")
       },
     ],
-    [late + 14200, (d) => scene(d, 4, "tray-chat")],
-    [late + 14900, (d) => add(d, "chat-msg")],
-    [late + 15800, (d) => add(d, "chat-msg2")],
-    [
-      late + 17600,
-      (d) => {
-        scene(d, 5, "tray-meet")
-        add(d, "meet")
-      },
-    ],
-    [
-      late + 20200,
-      (d) => {
-        scene(d, 5, "tray-call")
-        add(d, "call")
-      },
-    ],
-    // The five seats melt into the logo.
-    [late + 22600, (d) => add(d, "logo")],
-    [late + 25700, (d) => add(d, "fade")],
+    // Each seat shows what it can teach and what it wants to learn (still empty); then each
+    // empty one is filled by a copy of the next person's tag flying over, and the seat gets a tick.
+    [late + 13000, (d) => add(d, "tagged")],
+    [late + 14000, (d) => add(d, "solved")],
+    // The five regroup into the logo's cluster and the wordmark appears under them; then it all fades.
+    [late + 18200, (d) => add(d, "regroup")],
+    [late + 23400, (d) => add(d, "fade")],
   ]
   if (isDesktop) {
     list.push([9700, (d) => add(d, "cursor-go")], [late + 10600, (d) => add(d, "cursor-done")])
   }
-  return list
+  return list.map(([ms, apply]) => [ms >= SLOGAN_END ? ms + HOLD : ms, apply])
 }
 
-const LOOP_MS = 26300
+const LOOP_MS = 24000 + HOLD
 
-/** State classes (without the `ci-` prefix) and the seat count, advancing on a loop. */
-export function useCoreIdeaTimeline(isDesktop: boolean, isStatic: boolean) {
+/** How long the story stays on a step, for the bar that fills while it plays. */
+export const stepMs = (step: number, isDesktop: boolean) => {
+  const late = isDesktop ? 600 : 0
+  const starts = [0, 4600 + HOLD, 8200 + HOLD, late + 10600 + HOLD, late + 23400 + HOLD]
+  return (starts[step + 1] ?? 0) - (starts[step] ?? 0)
+}
+
+// Every beat before the fade: all five seated, tagged and solved.
+const END = 17000 + HOLD
+
+/** Where the story is when someone jumps to a step. Without motion the last step is the whole ending. */
+export const stepStart = (step: number, isDesktop: boolean, isStatic: boolean) =>
+  isStatic && step === 3
+    ? END
+    : ([0, 4600 + HOLD, 8200 + HOLD, (isDesktop ? 600 : 0) + 10760 + HOLD][step] ?? 0)
+
+/** The scene as it stands `from` ms into the loop, with no motion in between. */
+function sceneAt(isDesktop: boolean, from: number): Draft {
+  const draft: Draft = { flags: new Set(START.flags), count: 0 }
+  for (const [ms, apply] of beats(isDesktop).sort((a, b) => a[0] - b[0])) {
+    if (ms <= from) apply(draft)
+  }
+  return draft
+}
+
+/**
+ * State classes (without the `ci-` prefix) and the seat count, advancing on a loop. `from` is where
+ * to start, in ms: playing or jumping there restarts the loop from that point. Reduced motion
+ * plays nothing and holds the scene at `from`, the finished one unless a step was picked.
+ */
+export function useCoreIdeaTimeline(isDesktop: boolean, isStatic: boolean, from?: { at: number }) {
   const [state, setState] = useState<Draft>(START)
   const hasPlayed = useRef(false)
 
@@ -167,20 +161,24 @@ export function useCoreIdeaTimeline(isDesktop: boolean, isStatic: boolean) {
         ),
       )
 
-    const run = () => {
-      // `snap` switches every transition off for the frame that cuts back to the start.
-      setState({ flags: new Set(["snap", ...START.flags]), count: 0 })
+    const run = (offset: number) => {
+      // `snap` switches every transition off for the frame that cuts to the scene.
+      const first = sceneAt(isDesktop, offset)
+      first.flags.add("snap")
+      setState(first)
       at(60, (d) => remove(d, "snap"))
-      for (const [ms, apply] of beats(isDesktop)) at(ms + 60, apply)
-      timers.push(window.setTimeout(run, (isDesktop ? LOOP_MS + 600 : LOOP_MS) + 60))
+      for (const [ms, apply] of beats(isDesktop)) if (ms > offset) at(ms - offset + 60, apply)
+      timers.push(
+        window.setTimeout(() => run(0), (isDesktop ? LOOP_MS + 600 : LOOP_MS) - offset + 60),
+      )
     }
-    // The first start waits for the page to settle; playing again after a pause starts at once,
-    // from the beginning, whatever scene the loop stopped on.
-    timers.push(window.setTimeout(run, hasPlayed.current ? 0 : 300))
+    // The first start waits for the page to settle; a later one (a step was picked, the stage or
+    // reduced motion changed) starts at once.
+    timers.push(window.setTimeout(() => run(from?.at ?? 0), hasPlayed.current ? 0 : 300))
     hasPlayed.current = true
 
     return () => timers.forEach((id) => window.clearTimeout(id))
-  }, [isDesktop, isStatic])
+  }, [isDesktop, isStatic, from])
 
-  return isStatic ? STATIC : state
+  return isStatic ? sceneAt(isDesktop, from?.at ?? END) : state
 }

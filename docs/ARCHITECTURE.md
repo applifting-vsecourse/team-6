@@ -109,7 +109,9 @@ erDiagram
 
 **Reference data** (tags, categories, cities) is inserted by **migrations** with `INSERT … ON CONFLICT DO NOTHING`, so it reaches production through the normal deploy. The seed script is only for local demo users and must never run against production.
 
-**Admin account:** `user.role` already exists and users cannot set it through the API. The admin registers normally, then someone sets `role = 'admin'` in the database.
+**Admin account:** `user.role` already exists and users cannot set it through the API. The admin registers normally, then someone sets `role = 'admin'` in the database. The admin is otherwise a regular user: one extra page, no extra access. Chat stays behind `MemberGuard`, so an admin reads only the chat of a kvintet they joined themselves.
+
+**Admin stats:** `GET /admin/stats` returns seven integers and nothing else: `users { registered, onboarded, activeToday }` and `kvintets { total, active, formingSmall (1–2 members), formingReady (3–4) }`. "Active today" is derived, not stored: distinct users with a `session.updatedAt` since 00:00 UTC. BetterAuth's `session.updateAge` is one hour so that a returning user's session is refreshed on their first request of the day; someone who signs in and out again the same day is not counted. Board numbers join when the `board` module exists.
 
 **Sign-up consent:** `codeOfConductAcceptedAt` and `codeOfConductVersion` are BetterAuth additional fields with `input: false`, like `role`. A `databaseHooks.user.create.before` hook (`shared/auth/hooks/code-of-conduct.hook.ts`) rejects a sign-up whose body lacks `acceptCodeOfConduct: true` with `CODE_OF_CONDUCT_REQUIRED` and sets both values on the server; the current version is the `CODE_OF_CONDUCT_VERSION` constant in `shared/auth/code-of-conduct.ts` (bump it when the text changes). The client sends only the flag, never the timestamp or the version (BetterAuth answers 400 if it does). Any code that signs users up server-side, like the seed, must pass the flag too.
 
@@ -187,7 +189,7 @@ Member-only routes use `mine` instead of `:id`, so a client cannot address someo
 
 ## 4. Frontend
 
-Routes (TanStack Router, file-based). The `_ProtectedPages` layout route checks the session in its loader and redirects to `/login`. Home (`/overview`) is open to every signed-in user and tells those with an unfinished profile to finish it; there is no forced redirect to `/onboarding`. The pages the server serves only to onboarded users (`OnboardedGuard`, otherwise 403 `ONBOARDING_REQUIRED`) guard themselves with `requireOnboarded` (`src/app/requireOnboarded.ts`) as `beforeLoad`, which sends users with an unfinished or missing profile to Home. It is used by `/kvintet/feed`, `/kvintet/messages` and `/kvintet/begins`.
+Routes (TanStack Router, file-based). The `_ProtectedPages` layout route checks the session in its loader and redirects to `/login`. Home (`/overview`) is open to every signed-in user and tells those with an unfinished profile to finish it; there is no forced redirect to `/onboarding`. The pages the server serves only to onboarded users (`OnboardedGuard`, otherwise 403 `ONBOARDING_REQUIRED`) guard themselves with `requireOnboarded` (`src/app/requireOnboarded.ts`) as `beforeLoad`, which sends users with an unfinished or missing profile to Home. It is used by `/kvintet/feed`, `/kvintet/messages` and `/kvintet/begins`. `/admin` is a single page, so its own loader checks the role and shows the 404 page to non-admins.
 
 | Route                                                         | Access                            |
 | ------------------------------------------------------------- | --------------------------------- |

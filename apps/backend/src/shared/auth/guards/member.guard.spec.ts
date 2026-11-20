@@ -57,6 +57,15 @@ describe('MemberGuard', () => {
     });
   });
 
+  it('rejects an admin who is not in any kvintet with 403 Forbidden, so an admin cannot read messages', async (): Promise<void> => {
+    const session = { user: { id: 'u1', role: 'admin' } };
+    const { guard, context } = setup(session, null);
+
+    await expect(guard.canActivate(context)).rejects.toMatchObject({
+      response: expect.objectContaining({ code: 'forbidden' }),
+    });
+  });
+
   it('allows a member through and stores session and kvintetMember on request', async (): Promise<void> => {
     const session = { user: { id: 'u1' } };
     const membership = {

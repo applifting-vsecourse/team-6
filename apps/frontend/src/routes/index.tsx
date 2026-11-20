@@ -74,11 +74,11 @@ function LandingPage() {
       <Seo />
       <PageLayout header={<SiteHeader />}>
         <div className="px-4">
-          <div className="mx-auto flex w-full max-w-335 flex-col gap-5 pt-7 pb-10 md:gap-18 md:pt-18 md:pb-22">
-            <section className="flex flex-col gap-8 xl:flex-row xl:items-center xl:gap-12">
-              <div className="flex flex-col items-start gap-5 md:gap-5.5 xl:w-88 xl:shrink-0">
-                <h1 className="text-display-mobile md:text-display">{t("landing.heroTitle2")}</h1>
-                <p className="text-lead text-muted-foreground">
+          <div className="mx-auto flex w-full max-w-300 flex-col gap-5 pt-7 pb-10 md:gap-18 md:pt-18 md:pb-22">
+            <section className="flex flex-col gap-5 md:gap-8 xl:flex-row xl:items-center xl:justify-between xl:gap-16">
+              <div className="flex flex-col items-start gap-5 md:gap-5.5 xl:max-w-159 xl:flex-1">
+                <h1 className="text-h1-mobile md:text-display">{t("landing.heroTitle2")}</h1>
+                <p className="text-compact text-muted-foreground md:text-lead">
                   <span className="md:hidden">{t("landing.heroTextShort")}</span>
                   <span className="hidden md:inline">{t("landing.heroText")}</span>
                 </p>
@@ -122,9 +122,9 @@ function LandingPage() {
                 </div>
               </div>
 
-              {/* Decorative: the core idea in six scenes, with its own captions. Below the text on
-                a phone and a narrow window; beside it, scaled down, on a wide one. */}
-              <CoreIdeaAnimation className="xl:min-w-0 xl:flex-1" />
+              {/* Decorative: the core idea in four scenes with clickable step tabs. Below the text
+                on a phone and a narrow window; to its right, 500 px wide, on a wide one. */}
+              <CoreIdeaAnimation className="max-md:pt-3 xl:w-125 xl:flex-none" />
             </section>
 
             <section className="flex flex-col gap-4.5 border-t border-border pt-6 md:gap-7 md:pt-12">
