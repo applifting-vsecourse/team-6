@@ -16,6 +16,8 @@ const TAIL_INSET = 16
 const HEADER_HEIGHT = 80
 // A bubble above needs about this much room; closer to the top of the window it opens downwards.
 const ABOVE_ROOM = 200
+// A bubble below needs about this much room under the mascot.
+const BELOW_ROOM = 80
 
 type Rect = Pick<DOMRect, "left" | "right" | "top" | "bottom" | "width" | "height">
 type Viewport = { width: number; height: number }
@@ -35,7 +37,7 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 export function placeBubble(
   mascot: Rect,
   viewport: Viewport,
-  options: { preferredWidth?: number; slot?: Rect | null; prefer?: "above" } = {},
+  options: { preferredWidth?: number; slot?: Rect | null; prefer?: "above" | "below" } = {},
 ): BubbleLayout {
   const { preferredWidth = MAX_WIDTH, slot, prefer } = options
   const centerX = mascot.left + mascot.width / 2
@@ -75,6 +77,18 @@ export function placeBubble(
       maxWidth,
       left: centred,
       bottom: viewport.height - mascot.top + TAIL_ROOM,
+      tailX,
+      tailY: 0,
+    }
+  }
+
+  if (prefer === "below" && viewport.height - mascot.bottom >= BELOW_ROOM) {
+    return {
+      side: "below",
+      width,
+      maxWidth,
+      left: centred,
+      top: mascot.bottom + TAIL_ROOM,
       tailX,
       tailY: 0,
     }

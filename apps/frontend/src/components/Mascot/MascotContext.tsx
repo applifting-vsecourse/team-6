@@ -27,8 +27,8 @@ export type MascotBubble = {
   text: string
   /** Room a page set aside for this bubble (`MascotBubbleSlot`). Without it, it opens beside the mascot. */
   slotId?: string
-  /** Without a slot: open `above` the mascot instead of beside it. */
-  prefer?: "above"
+  /** Without a slot: open `above` or `below` the mascot instead of beside it. */
+  prefer?: "above" | "below"
   actions?: MascotAction[]
   /**
    * Shows a close cross in the top right corner. It only hides the bubble: the mascot stays, and a
