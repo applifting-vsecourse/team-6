@@ -113,7 +113,7 @@ describe("CoreIdeaAnimation", () => {
     expect(stage(container)).toHaveClass("ci-n0", "ci-lonely", "ci-think")
     expect(container.querySelectorAll(".ci-seat.ci-on")).toHaveLength(0)
 
-    at(4_000) // 5.0 s: filling in the onboarding
+    at(5_200) // 6.2 s: filling in the onboarding
     expect(stage(container)).toHaveClass("ci-n1", "ci-onb")
 
     at(5_000) // 10.0 s: two seats taken
@@ -143,7 +143,7 @@ describe("CoreIdeaAnimation", () => {
     stubMedia([])
     const { container } = render(<CoreIdeaAnimation />)
 
-    act(() => void vi.advanceTimersByTime(300 + 24_000 + 200))
+    act(() => void vi.advanceTimersByTime(300 + 25_200 + 200))
 
     expect(stage(container)).toHaveClass("ci-n0", "ci-lonely")
     expect(stage(container)).not.toHaveClass("ci-solved")
@@ -155,7 +155,7 @@ describe("CoreIdeaAnimation", () => {
     const { container } = render(<CoreIdeaAnimation />)
     const at = (ms: number) => act(() => void vi.advanceTimersByTime(ms))
 
-    at(9_900) // the pointer sets off at 10.06 s
+    at(11_100) // the pointer sets off at 11.26 s
     expect(stage(container)).not.toHaveClass("ci-cursor-go")
 
     at(300) // 10.2 s: on its way to Join, nobody has joined yet

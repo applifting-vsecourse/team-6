@@ -25,6 +25,10 @@ const seat = (d: Draft, i: number, count: number) => {
   d.count = count
 }
 
+// Extra time on the slogan scene (the first step) so its line can be read; every later beat waits.
+const HOLD = 1200
+const SLOGAN_END = 4600
+
 function beats(isDesktop: boolean): Beat[] {
   const late = isDesktop ? 600 : 0
   const list: Beat[] = [
@@ -102,24 +106,24 @@ function beats(isDesktop: boolean): Beat[] {
   if (isDesktop) {
     list.push([9700, (d) => add(d, "cursor-go")], [late + 10600, (d) => add(d, "cursor-done")])
   }
-  return list
+  return list.map(([ms, apply]) => [ms >= SLOGAN_END ? ms + HOLD : ms, apply])
 }
 
-const LOOP_MS = 24000
+const LOOP_MS = 24000 + HOLD
 
 /** How long the story stays on a step, for the bar that fills while it plays. */
 export const stepMs = (step: number, isDesktop: boolean) => {
   const late = isDesktop ? 600 : 0
-  const starts = [0, 4600, 8200, late + 10600, late + 23400]
+  const starts = [0, 4600 + HOLD, 8200 + HOLD, late + 10600 + HOLD, late + 23400 + HOLD]
   return (starts[step + 1] ?? 0) - (starts[step] ?? 0)
 }
 
 // Every beat before the fade: all five seated, tagged and solved.
-const END = 17000
+const END = 17000 + HOLD
 
 /** Where the story is when someone jumps to a step. Without motion the last step is the whole ending. */
 export const stepStart = (step: number, isDesktop: boolean, isStatic: boolean) =>
-  isStatic && step === 3 ? END : ([0, 4600, 8200, (isDesktop ? 600 : 0) + 10760][step] ?? 0)
+  isStatic && step === 3 ? END : ([0, 4600 + HOLD, 8200 + HOLD, (isDesktop ? 600 : 0) + 10760 + HOLD][step] ?? 0)
 
 /** The scene as it stands `from` ms into the loop, with no motion in between. */
 function sceneAt(isDesktop: boolean, from: number): Draft {
