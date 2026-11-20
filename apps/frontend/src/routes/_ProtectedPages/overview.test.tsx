@@ -440,9 +440,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(
         await screen.findByRole("heading", { name: /Your kvintet is forming/i }),
       ).toBeInTheDocument()
-      expect(
-        screen.getByText("Prompts that actually help with everyday work."),
-      ).toBeInTheDocument()
+      expect(screen.getByText("Prompts that actually help with everyday work.")).toBeInTheDocument()
       expect(screen.getByText(/3 OF 4 WANT TO START/i)).toBeInTheDocument()
 
       const voteButton = screen.getByRole("button", { name: "Start now" })
@@ -640,9 +638,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       renderWithClient(<OverviewPage />)
 
       expect(await screen.findByRole("heading", { name: "Your kvintet" })).toBeInTheDocument()
-      expect(
-        screen.getByText("Prompts that actually help with everyday work."),
-      ).toBeInTheDocument()
+      expect(screen.getByText("Prompts that actually help with everyday work.")).toBeInTheDocument()
       expect(await screen.findByText("Looking forward to our first meeting!")).toBeInTheDocument()
       expect(screen.getAllByText("Petr").length).toBeGreaterThanOrEqual(1)
 

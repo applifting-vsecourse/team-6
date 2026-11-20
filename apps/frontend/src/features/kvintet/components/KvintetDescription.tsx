@@ -34,7 +34,7 @@ export function KvintetDescription({ text, className }: KvintetDescriptionProps)
         ref={ref}
         // `wrap-anywhere`, not `wrap-break-word`: a long unbroken string must not widen the card.
         className={cn(
-          "w-full text-small whitespace-pre-line text-body wrap-anywhere",
+          "w-full text-small wrap-anywhere whitespace-pre-line text-body",
           !isExpanded && "line-clamp-3",
         )}
       >

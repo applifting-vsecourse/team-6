@@ -375,7 +375,10 @@ function OverviewPage() {
                     <p className="text-compact text-muted-foreground md:text-lead">
                       {kvintet.title}
                     </p>
-                    <KvintetDescription text={kvintet.description} className="max-w-prose" />
+                    <KvintetDescription
+                      text={kvintet.description}
+                      className="max-w-prose"
+                    />
                   </div>
 
                   <CommonTime kvintet={kvintet} />
@@ -519,7 +522,10 @@ function OverviewPage() {
                         date: formatDayAndMonth(new Date(kvintet.activatedAt ?? kvintet.createdAt)),
                       })}
                     </p>
-                    <KvintetDescription text={kvintet.description} className="max-w-prose" />
+                    <KvintetDescription
+                      text={kvintet.description}
+                      className="max-w-prose"
+                    />
                   </div>
 
                   <CommonTime kvintet={kvintet} />
