@@ -457,7 +457,7 @@ function OverviewPage() {
                     </div>
 
                     {/* Right Card: Who's here */}
-                    <div className="hidden w-full shrink-0 flex-col gap-3 rounded-lg border border-border bg-card p-5 md:flex lg:w-85">
+                    <div className="flex w-full shrink-0 flex-col gap-3 rounded-lg border border-border bg-card p-5 lg:w-85">
                       <div className="flex flex-col gap-0.5">
                         <h3 className="text-h3 font-semibold text-foreground">
                           {t("overview.forming.whoTitle")}
@@ -483,15 +483,6 @@ function OverviewPage() {
                       </button>
                     </div>
                   </div>
-
-                  {/* M5: no "Who's here" list on a phone, so Leave sits under the card. */}
-                  <button
-                    type="button"
-                    onClick={() => setIsLeaveDialogOpen(true)}
-                    className={`md:hidden ${LEAVE_BUTTON_CLASS}`}
-                  >
-                    {t("overview.forming.leaveKvintet")}
-                  </button>
 
                   <LeaveKvintetDialog
                     isOpen={isLeaveDialogOpen}
