@@ -9,11 +9,11 @@ const widths = () =>
   )
 
 describe("OnboardingProgress", () => {
-  it("names the step and counts its questions", () => {
+  it("names the step and shows no second counter next to the header's", () => {
     render(<OnboardingProgress page="time" />)
 
     expect(screen.getByText("When and where")).toBeInTheDocument()
-    expect(screen.getByText("2 / 3")).toBeInTheDocument()
+    expect(screen.queryByText(/\//)).not.toBeInTheDocument()
   })
 
   it("draws one bar per step, earlier ones full and the current one filling per question", () => {
@@ -26,7 +26,7 @@ describe("OnboardingProgress", () => {
     expect(widths().map((width) => Math.round(parseFloat(width)))).toEqual([100, 100, 67])
   })
 
-  it("is full, with a tick instead of a count, on the summary", () => {
+  it("is full, with a tick, on the summary", () => {
     render(<OnboardingProgress page="summary" />)
 
     expect(screen.getByText("✓")).toHaveClass("text-ok")

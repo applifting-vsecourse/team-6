@@ -61,6 +61,8 @@ export function OnboardingAnswers({
         selectedTagIds={draft[field]}
         allTags={allTags}
         categories={categories}
+        // Outside work, only Leisure fits, so that is where the interests page opens.
+        defaultCategory={key === "interests" ? "leisure" : undefined}
         onSelectTag={(id) => onChange({ [field]: toggle(draft[field], id, true) })}
         onRemoveTag={(id) => onChange({ [field]: toggle(draft[field], id, false) })}
       />

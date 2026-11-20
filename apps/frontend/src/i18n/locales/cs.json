@@ -431,7 +431,7 @@
       },
       "frequency": {
         "error": "Tohle potřebujeme – vyberte jednu možnost a jsme hotovi.",
-        "hint": "Vyberte jednu. Tohle potřebujeme.",
+        "hint": "Vyberte jednu – tohle potřebujeme.",
         "problem": "Vyberte, jak často se chcete scházet.",
         "title": "Jak často se chcete scházet?"
       },
@@ -506,7 +506,7 @@
       "next": "Na krok 2",
       "none": "Zatím nic",
       "role": "Role",
-      "teach": "Umím naučit"
+      "teach": "Poradím s"
     },
     "tags": {
       "addTag": "Přidat štítek {{name}}",
@@ -551,7 +551,10 @@
       "openChatUnread_many": "Otevřít chat ({{count}} nové)",
       "openChatUnread_one": "Otevřít chat ({{count}} nová)",
       "openChatUnread_other": "Otevřít chat ({{count}} nových)",
-      "subtitle": "{{title}} · {{count}} lidí · od {{date}}",
+      "subtitle_few": "{{title}} · {{count}} lidé · od {{date}}",
+      "subtitle_many": "{{title}} · {{count}} lidí · od {{date}}",
+      "subtitle_one": "{{title}} · {{count}} člověk · od {{date}}",
+      "subtitle_other": "{{title}} · {{count}} lidí · od {{date}}",
       "tip": {
         "body": "Každý sdílí jeden cíl na příští 3 měsíce.",
         "label": "Tip pro skupinu"
@@ -559,7 +562,7 @@
     },
     "commonTime": "Všem vyhovuje:",
     "error": {
-      "text": "Na naší straně se něco pokazilo. Váš kvintet je v bezpečí.",
+      "text": "Na naší straně se něco pokazilo. Vaše data jsou v bezpečí.",
       "title": "Domovskou stránku se nepodařilo načíst"
     },
     "forming": {
@@ -661,7 +664,7 @@
       "interests": "Zajímá mě",
       "learn": "Chci se naučit",
       "role": "Moje role",
-      "teach": "Umím naučit",
+      "teach": "Poradím s",
       "whenAndWhere": "Kdy a kde"
     },
     "title": "Profil",

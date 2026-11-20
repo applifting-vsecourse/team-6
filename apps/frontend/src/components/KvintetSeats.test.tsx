@@ -92,6 +92,9 @@ describe("KvintetSeats", () => {
     // A long role is cut with an ellipsis (and a tooltip), never broken mid-word.
     expect(screen.getByText(longRole)).toHaveAttribute("title", longRole)
     expect(screen.getByText(longRole)).toHaveClass("truncate")
+    // Seats wrap like the feed card's, so a label gets up to 6rem rather than a fifth of the card.
+    expect(screen.getByText(longRole).closest("li")).toHaveClass("max-w-24")
+    expect(screen.getByText(longRole).closest("ul")).toHaveClass("flex-wrap")
     const free = screen.getAllByText("Free")
     expect(free).toHaveLength(4)
     free.forEach((seat) => expect(seat).not.toHaveAttribute("title"))

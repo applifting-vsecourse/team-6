@@ -20,13 +20,17 @@ const tags = [
   { id: "7", slug: "underwater-basket-weaving", categories: [] },
 ]
 
-function Harness({ selectedAtStart = [] as string[] }) {
+function Harness({
+  selectedAtStart = [] as string[],
+  defaultCategory = undefined as string | undefined,
+}) {
   const [selected, setSelected] = useState(selectedAtStart)
   return (
     <TagSelector
       selectedTagIds={selected}
       allTags={tags}
       categories={categories}
+      defaultCategory={defaultCategory}
       onSelectTag={(id) => setSelected((prev) => [...prev, id])}
       onRemoveTag={(id) => setSelected((prev) => prev.filter((x) => x !== id))}
     />
@@ -42,6 +46,34 @@ describe("TagSelector", () => {
     expect(screen.getByText("Category")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Software development" })).toBeInTheDocument()
     expect(screen.getByRole("textbox", { name: "Search topics" })).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: /^Add tag / })).not.toBeInTheDocument()
+  })
+
+  it("opens on the default category, which can still be switched", async () => {
+    render(<Harness defaultCategory="leisure" />)
+
+    expect(screen.getByRole("button", { name: "Leisure" })).toHaveAttribute("aria-pressed", "true")
+    expect(screen.getByRole("button", { name: "Add tag Hiking" })).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole("button", { name: "Business" }))
+    expect(screen.queryByRole("button", { name: "Add tag Hiking" })).not.toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Add tag Excel" })).toBeInTheDocument()
+  })
+
+  it("opens on the chosen topic's category rather than the default, and ignores an unknown default", () => {
+    const { unmount } = render(
+      <Harness
+        selectedAtStart={["1"]}
+        defaultCategory="leisure"
+      />,
+    )
+    expect(screen.getByRole("button", { name: "Software development" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    )
+    unmount()
+
+    render(<Harness defaultCategory="nope" />)
     expect(screen.queryByRole("button", { name: /^Add tag / })).not.toBeInTheDocument()
   })
 
