@@ -379,6 +379,7 @@
     "profile": "Profile"
   },
   "onboarding": {
+    "backToProfile": "Back to profile",
     "days": {
       "weekdays": "Weekdays",
       "weekends": "Weekends"
@@ -490,6 +491,7 @@
       "searchRoleAria": "Search role",
       "searchRolePlaceholder": "Search role…"
     },
+    "saveAndReturn": "Save",
     "stepProgress": "Step {{current}} of {{total}}",
     "stepShort": "{{current}} / {{total}}",
     "summary": {

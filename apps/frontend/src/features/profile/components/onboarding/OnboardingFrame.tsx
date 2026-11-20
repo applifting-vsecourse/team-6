@@ -25,6 +25,8 @@ type OnboardingFrameProps = {
   shakeKey?: number
   /** Not on the first page. */
   onBack?: () => void
+  /** Replaces "Back" when it leads somewhere other than the previous page. */
+  backLabel?: string
   onContinue: () => void
   continueLabel: string
   isSaving?: boolean
@@ -46,6 +48,7 @@ export function OnboardingFrame({
   expression,
   shakeKey,
   onBack,
+  backLabel,
   onContinue,
   continueLabel,
   isSaving = false,
@@ -104,7 +107,7 @@ export function OnboardingFrame({
             className="bg-card"
           >
             <ArrowLeft />
-            {t("common.back")}
+            {backLabel ?? t("common.back")}
           </Button>
         ) : null}
         <p

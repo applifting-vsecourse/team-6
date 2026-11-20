@@ -385,6 +385,7 @@
     "profile": "Profil"
   },
   "onboarding": {
+    "backToProfile": "Zpět na profil",
     "days": {
       "weekdays": "Všední dny",
       "weekends": "Víkendy"
@@ -496,6 +497,7 @@
       "searchRoleAria": "Hledat roli",
       "searchRolePlaceholder": "Hledat roli…"
     },
+    "saveAndReturn": "Uložit",
     "stepProgress": "Krok {{current}} ze {{total}}",
     "stepShort": "{{current}} / {{total}}",
     "summary": {

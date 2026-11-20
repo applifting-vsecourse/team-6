@@ -22,11 +22,11 @@ vi.mock("@tanstack/react-router", () => ({
   }: {
     children?: ReactNode
     to: string
-    search?: { page: string }
+    search?: { page: string; from?: string }
     className?: string
   }) => (
     <a
-      href={search ? `${to}?page=${search.page}` : to}
+      href={search ? `${to}?${new URLSearchParams(search)}` : to}
       className={className}
     >
       {children}
@@ -167,14 +167,14 @@ describe("ProfilePage", () => {
     expect(role).not.toHaveTextContent("marketing-specialist")
     expect(within(role).getByRole("link", { name: "Edit" })).toHaveAttribute(
       "href",
-      "/onboarding?page=role",
+      "/onboarding?page=role&from=profile",
     )
 
     const expects = screen.getByRole("heading", { name: "What you expect" }).closest("section")!
     expect(expects).toHaveTextContent("Learn something new · Share what I know")
     expect(within(expects).getByRole("link", { name: "Edit" })).toHaveAttribute(
       "href",
-      "/onboarding?page=expectations",
+      "/onboarding?page=expectations&from=profile",
     )
   })
 
@@ -203,12 +203,12 @@ describe("ProfilePage", () => {
     const links = screen.getAllByRole("link", { name: "Edit" })
     expect(links.length).toBe(6) // role, 3 tag sections, when & where, expectations
     expect(links.map((link) => link.getAttribute("href"))).toEqual([
-      "/onboarding?page=role",
-      "/onboarding?page=teach",
-      "/onboarding?page=learn",
-      "/onboarding?page=interests",
-      "/onboarding?page=days",
-      "/onboarding?page=expectations",
+      "/onboarding?page=role&from=profile",
+      "/onboarding?page=teach&from=profile",
+      "/onboarding?page=learn&from=profile",
+      "/onboarding?page=interests&from=profile",
+      "/onboarding?page=days&from=profile",
+      "/onboarding?page=expectations&from=profile",
     ])
   })
 

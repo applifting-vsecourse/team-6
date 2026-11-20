@@ -38,6 +38,8 @@ type OnboardingFlowProps = {
   seed?: string
   /** The page lives in the URL (the header shows its step too), so the route owns it. */
   page: OnboardingPageId
+  /** Came from the profile's "Edit": this one page is edited, then the person returns there. */
+  from?: "profile"
   onPageChange: (page: OnboardingPageId) => void
 }
 
@@ -50,7 +52,7 @@ const hasErrorText = (page: OnboardingPageId): page is PageWithError =>
 // The API client puts the server's `{ code }` body on `error.data` (see `lib/api-client.ts`).
 const serverCodeOf = (error: unknown) => (error as { data?: { code?: unknown } } | null)?.data?.code
 
-export function OnboardingFlow({ userId, seed, page, onPageChange }: OnboardingFlowProps) {
+export function OnboardingFlow({ userId, seed, page, from, onPageChange }: OnboardingFlowProps) {
   const referenceQuery = useQuery(referenceQueryOptions())
   const profileQuery = useQuery(profileQueryOptions(userId))
 
@@ -82,6 +84,7 @@ export function OnboardingFlow({ userId, seed, page, onPageChange }: OnboardingF
       userId={userId}
       seed={seed}
       page={page}
+      from={from}
       onPageChange={onPageChange}
       profile={profileQuery.data ?? null}
       allTags={referenceQuery.data?.tags ?? []}
@@ -100,6 +103,7 @@ function OnboardingFlowPages({
   userId,
   seed,
   page,
+  from,
   onPageChange,
   profile,
   allTags,
@@ -153,6 +157,11 @@ function OnboardingFlowPages({
       }
     }
 
+    if (from === "profile") {
+      await navigate({ to: ROUTES.profile })
+      return
+    }
+
     const next = nextPage(page)
     if (next) goTo(next)
     else await navigate({ to: ROUTES.overview })
@@ -174,11 +183,13 @@ function OnboardingFlowPages({
       : t(`onboarding.guide.${page}.hint`)
 
   const continueLabel =
-    page === "summary"
-      ? t("onboarding.summary.next")
-      : page === LAST_ONBOARDING_PAGE
-        ? t("common.finish")
-        : t("common.continue")
+    from === "profile"
+      ? t("onboarding.saveAndReturn")
+      : page === "summary"
+        ? t("onboarding.summary.next")
+        : page === LAST_ONBOARDING_PAGE
+          ? t("common.finish")
+          : t("common.continue")
 
   return (
     <OnboardingFrame
@@ -190,7 +201,14 @@ function OnboardingFlowPages({
       saveError={saveError}
       expression={page === "summary" ? happy : undefined}
       shakeKey={shakeKey}
-      onBack={previous ? () => goTo(previous) : undefined}
+      onBack={
+        from === "profile"
+          ? () => void navigate({ to: ROUTES.profile })
+          : previous
+            ? () => goTo(previous)
+            : undefined
+      }
+      backLabel={from === "profile" ? t("onboarding.backToProfile") : undefined}
       onContinue={() => void handleContinue()}
       continueLabel={continueLabel}
       isSaving={saveProfile.isPending}

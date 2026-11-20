@@ -74,20 +74,27 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 )
 
 // The route owns the page (it lives in the URL); this stands in for it.
-function Flow({ start = "role" }: { start?: OnboardingPageId }) {
+function Flow({ start = "role", from }: { start?: OnboardingPageId; from?: "profile" }) {
   const [page, setPage] = useState<OnboardingPageId>(start)
   return (
     <OnboardingFlow
       userId="u1"
       seed="jana"
       page={page}
+      from={from}
       onPageChange={setPage}
     />
   )
 }
 
-const open = async (start: OnboardingPageId = "role") => {
-  render(<Flow start={start} />, { wrapper })
+const open = async (start: OnboardingPageId = "role", from?: "profile") => {
+  render(
+    <Flow
+      start={start}
+      from={from}
+    />,
+    { wrapper },
+  )
   await screen.findByRole("heading", { level: 1 })
 }
 const heading = () => screen.getByRole("heading", { level: 1 })
@@ -191,6 +198,49 @@ describe("OnboardingFlow", () => {
       await screen.findByRole("button", { name: "Remove role UX Designer" }),
     ).toBeInTheDocument()
     expect(saveProfile).not.toHaveBeenCalled()
+  })
+
+  describe("when it was opened from the profile's Edit", () => {
+    it("saves just that page and returns to the profile", async () => {
+      await open("teach", "profile")
+      await press("Business")
+      await userEvent.click(await screen.findByRole("button", { name: "Add tag Excel" }))
+
+      await press("Save")
+
+      expect(saveProfile).toHaveBeenCalledTimes(1)
+      expect(saveProfile).toHaveBeenCalledWith({ teachTagIds: ["1"] })
+      expect(navigate).toHaveBeenCalledWith({ to: "/profile" })
+      expect(heading()).toHaveTextContent("What could you teach the others?")
+    })
+
+    it("offers a way back to the profile, also on the first page, without saving", async () => {
+      await open("role", "profile")
+
+      await press("Back to profile")
+
+      expect(saveProfile).not.toHaveBeenCalled()
+      expect(navigate).toHaveBeenCalledWith({ to: "/profile" })
+    })
+
+    it("still asks for a missing required answer and stays", async () => {
+      await open("days", "profile")
+
+      await press("Save")
+
+      expect(screen.getByRole("alert")).toHaveTextContent("Pick at least one day.")
+      expect(saveProfile).not.toHaveBeenCalled()
+      expect(navigate).not.toHaveBeenCalled()
+    })
+
+    it("stays on the page when saving fails", async () => {
+      saveProfile.mockRejectedValue(new Error("boom"))
+      await open("teach", "profile")
+
+      await press("Save")
+
+      expect(navigate).not.toHaveBeenCalled()
+    })
   })
 
   describe("when a required answer is missing", () => {

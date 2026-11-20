@@ -91,7 +91,7 @@ function EditLink({ page }: { page: OnboardingPageId }) {
     >
       <Link
         to={ROUTES.onboarding}
-        search={{ page }}
+        search={{ page, from: "profile" }}
       >
         {t("common.edit")}
       </Link>
