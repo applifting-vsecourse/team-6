@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import {
   HeaderMenu,
   MobileAccount,
+  MobileReplayTour,
   MobileSignOut,
   OnboardingSignOut,
 } from "@/features/auth/components/HeaderMenu"
@@ -62,7 +63,13 @@ export function AppHeader({
       hasLearnMore={!user}
       userMenu={isOnboarding ? <OnboardingSignOut /> : <HeaderMenu />}
       mobileTop={<MobileAccount />}
-      mobileBottom={<MobileSignOut />}
+      mobileBottom={
+        <>
+          {/* The tour starts from Home; onboarding has no such page behind it, as with the desktop menu. */}
+          {isOnboarding ? null : <MobileReplayTour />}
+          <MobileSignOut />
+        </>
+      }
     />
   )
 }

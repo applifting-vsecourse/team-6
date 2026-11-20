@@ -226,6 +226,27 @@ export function MobileAccount() {
   )
 }
 
+/** The desktop user menu's "Replay the tour", for the phone; signed in only. */
+export function MobileReplayTour() {
+  const { t } = useTranslation()
+  const { user } = useSession()
+  const replayTour = useMascotContext()?.replayTour
+
+  if (!user || !replayTour) return null
+
+  return (
+    <SheetClose asChild>
+      <Button
+        variant="outline"
+        onClick={replayTour}
+      >
+        <Sparkles className="size-4" />
+        {t("tour.replay")}
+      </Button>
+    </SheetClose>
+  )
+}
+
 /** Bottom of the mobile menu, signed in only. */
 export function MobileSignOut() {
   const { t } = useTranslation()
