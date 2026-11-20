@@ -26,6 +26,12 @@ type VideoPlayerProps = {
 const clock = (seconds: number) =>
   `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`
 
+// Dragging the volume to 0 mutes it and leaves the volume at 0, so unmuting must raise it too.
+function unmute(media: HTMLVideoElement) {
+  if (media.volume === 0) media.volume = 1
+  media.muted = false
+}
+
 // A track that is "hidden" still loads its cues, so switching captions back on is instant.
 function showCaptions(media: HTMLVideoElement | null, isOn: boolean) {
   const track = media?.textTracks[0]
@@ -110,13 +116,16 @@ export function VideoPlayer({ sources, title, subtitle, artwork, className }: Vi
   const startWithSound = () => {
     const media = video.current
     if (!media) return
-    media.muted = false
+    unmute(media)
     userPaused.current = false
     media.play().catch(() => undefined)
   }
 
   const toggleMute = () => {
-    if (video.current) video.current.muted = !video.current.muted
+    const media = video.current
+    if (!media) return
+    if (media.muted) unmute(media)
+    else media.muted = true
   }
 
   const setLevel = (level: number) => {

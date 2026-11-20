@@ -110,6 +110,27 @@ describe("VideoPlayer", () => {
     expect(screen.getByRole("button", { name: "Mute" })).toBeInTheDocument()
   })
 
+  it("turns the sound on again after the volume slider was dragged to zero", () => {
+    const { film } = renderPlayer()
+    fireEvent.playing(film)
+    film.volume = 0
+    film.muted = true
+    fireEvent.volumeChange(film)
+
+    fireEvent.click(screen.getByRole("button", { name: "Unmute" }))
+
+    expect(film.muted).toBe(false)
+    expect(film.volume).toBe(1)
+
+    film.volume = 0
+    film.muted = true
+    fireEvent.volumeChange(film)
+    fireEvent.click(screen.getByRole("button", { name: "Turn on sound" }))
+
+    expect(film.muted).toBe(false)
+    expect(film.volume).toBe(1)
+  })
+
   it("switches between play, pause and replay", () => {
     const pause = vi.spyOn(HTMLMediaElement.prototype, "pause")
     const { film } = renderPlayer()
