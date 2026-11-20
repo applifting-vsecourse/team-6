@@ -29,15 +29,14 @@ import {
   type FeedKvintet,
 } from "@/features/kvintet/api/kvintetFeedQueryOptions"
 import { KvintetDescription } from "@/features/kvintet/components/KvintetDescription"
+import { KvintetDetailsDialog } from "@/features/kvintet/components/KvintetDetailsDialog"
 import { LeaveKvintetDialog } from "@/features/kvintet/components/LeaveKvintetDialog"
 import { StartKvintetDialog } from "@/features/kvintet/components/StartKvintetDialog"
 import { useJoinKvintet } from "@/features/kvintet/hooks/useJoinKvintet"
 import { useMyKvintet } from "@/features/kvintet/hooks/useMyKvintet"
 import { formatSharedPreferences } from "@/features/kvintet/lib/formatPreferences"
-import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
+import { roleLabel, useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
 import { profileQueryOptions } from "@/features/profile/api/profileApi"
-
-type SlugLabel = ReturnType<typeof useSlugLabel>
 
 const ICEBREAKER_KEYS = [
   "overview.active.icebreaker.q1",
@@ -457,7 +456,7 @@ function OverviewPage() {
                     </div>
 
                     {/* Right Card: Who's here */}
-                    <div className="hidden w-full shrink-0 flex-col gap-3 rounded-lg border border-border bg-card p-5 md:flex lg:w-85">
+                    <div className="flex w-full shrink-0 flex-col gap-3 rounded-lg border border-border bg-card p-5 lg:w-85">
                       <div className="flex flex-col gap-0.5">
                         <h3 className="text-h3 font-semibold text-foreground">
                           {t("overview.forming.whoTitle")}
@@ -483,15 +482,6 @@ function OverviewPage() {
                       </button>
                     </div>
                   </div>
-
-                  {/* M5: no "Who's here" list on a phone, so Leave sits under the card. */}
-                  <button
-                    type="button"
-                    onClick={() => setIsLeaveDialogOpen(true)}
-                    className={`md:hidden ${LEAVE_BUTTON_CLASS}`}
-                  >
-                    {t("overview.forming.leaveKvintet")}
-                  </button>
 
                   <LeaveKvintetDialog
                     isOpen={isLeaveDialogOpen}
@@ -710,25 +700,35 @@ function ProposalCard({
 
         <KvintetDescription text={proposal.description} />
 
-        {/* The feed never carries a name, so the faces are grey and seeded by the seat. */}
-        <KvintetSeats
-          layout="row"
-          freeLabel={t("kvintet.vacancy")}
-          members={proposal.members.map((member, idx) => ({
-            seed: `${proposal.id}-seat-${idx}`,
-            anonymous: true,
-            label: member.position ? roleLabel(member.position, label) : t("kvintet.member"),
-          }))}
-        />
+        {/* The feed never carries a name, so the faces are grey and seeded by the seat. A phone
+            shows them in the sheet behind the View button. */}
+        <div className="max-sm:hidden">
+          <KvintetSeats
+            layout="row"
+            freeLabel={t("kvintet.vacancy")}
+            members={proposal.members.map((member, idx) => ({
+              seed: `${proposal.id}-seat-${idx}`,
+              anonymous: true,
+              label: member.position ? roleLabel(member.position, label) : t("kvintet.member"),
+            }))}
+          />
+        </div>
 
         <p className="text-small text-muted-foreground">
           {formatSharedPreferences(proposal, t) || "—"}
         </p>
       </div>
 
+      <KvintetDetailsDialog
+        kvintet={proposal}
+        isJoining={isJoining}
+        isDisabled={isDisabled}
+        onJoin={onJoin}
+        triggerClassName="w-full sm:hidden"
+      />
       <Button
         variant="outline"
-        className="w-full"
+        className="w-full max-sm:hidden"
         onClick={() => onJoin(proposal.id)}
         disabled={isJoining || isDisabled}
       >
@@ -800,13 +800,6 @@ function OverviewError({
       </Button>
     </StateAlert>
   )
-}
-
-function roleLabel(role: string, label: SlugLabel) {
-  return role
-    .split(", ")
-    .map((slug) => label("roles", slug))
-    .join(", ")
 }
 
 /** The days and parts of the day that suit every member, never a place. */

@@ -269,6 +269,8 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       const joinButtons = screen.getAllByRole("button", { name: "Join" })
       expect(joinButtons).toHaveLength(2)
+      // On a phone each card opens a sheet with the people instead (CSS swaps the two buttons).
+      expect(screen.getAllByRole("button", { name: /^View / })).toHaveLength(2)
 
       expect(screen.getByRole("link", { name: "See all" })).toHaveAttribute("href", "/kvintet/feed")
       expect(screen.getByRole("button", { name: "Start your own" })).toBeInTheDocument()
@@ -546,16 +548,25 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(screen.queryByRole("button", { name: "Start now" })).not.toBeInTheDocument()
     })
 
+    it("shows who is here on every screen size while forming (#145)", async () => {
+      myKvintetData = formingKvintet
+
+      renderWithClient(<OverviewPage />)
+
+      // jsdom applies no CSS, so assert the card carries no `hidden` utility.
+      const card = (await screen.findByRole("heading", { name: "Who's here" })).closest(
+        "div.rounded-lg",
+      )
+      expect(card).not.toHaveClass("hidden")
+      expect(card).not.toHaveClass("md:flex")
+    })
+
     it("allows leaving forming kvintet and shows post-leave notice in State 2", async () => {
       myKvintetData = formingKvintet
 
       renderWithClient(<OverviewPage />)
 
-      // Two buttons, one per layout (beside "Who's here" on desktop, under the card on a phone);
-      // jsdom applies no CSS, so both exist here.
-      const [leaveButton] = await screen.findAllByRole("button", { name: "Leave kvintet" })
-      if (!leaveButton) throw new Error("Leave button missing")
-      await userEvent.click(leaveButton)
+      await userEvent.click(await screen.findByRole("button", { name: "Leave kvintet" }))
 
       // Dialog opens
       expect(
