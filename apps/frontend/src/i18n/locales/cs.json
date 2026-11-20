@@ -304,6 +304,7 @@
       "titleTooLong": "Téma může mít nejvýše {{max}} znaků"
     },
     "view": "Zobrazit",
+    "viewNamed": "Zobrazit {{title}}",
     "vote": {
       "voted": "Hlasováno",
       "voting": "Odesílání…"

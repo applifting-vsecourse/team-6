@@ -54,6 +54,8 @@ export function KvintetDetailsDialog({
       <DialogTrigger asChild>
         <Button
           variant="outline"
+          // Every card has one, so a screen reader needs the topic to tell them apart.
+          aria-label={t("kvintet.viewNamed", { title: kvintet.title })}
           className={cn("h-11", triggerClassName)}
         >
           {t("kvintet.view")}

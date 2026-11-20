@@ -47,7 +47,7 @@ describe("KvintetDetailsDialog", () => {
     renderDialog()
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
 
-    await userEvent.click(screen.getByRole("button", { name: "View" }))
+    await userEvent.click(screen.getByRole("button", { name: /^View / }))
 
     const dialog = await screen.findByRole("dialog", { name: "Using AI at work" })
     expect(within(dialog).getByText("Software development · 2 / 5")).toBeInTheDocument()
@@ -62,7 +62,7 @@ describe("KvintetDetailsDialog", () => {
   it("joins the kvintet from the dialog", async () => {
     const onJoin = renderDialog()
 
-    await userEvent.click(screen.getByRole("button", { name: "View" }))
+    await userEvent.click(screen.getByRole("button", { name: /^View / }))
     await userEvent.click(await screen.findByRole("button", { name: "Join" }))
 
     expect(onJoin).toHaveBeenCalledWith("k1")
@@ -71,7 +71,7 @@ describe("KvintetDetailsDialog", () => {
   it("disables Join while another join is in flight", async () => {
     renderDialog(vi.fn(), true)
 
-    await userEvent.click(screen.getByRole("button", { name: "View" }))
+    await userEvent.click(screen.getByRole("button", { name: /^View / }))
 
     expect(await screen.findByRole("button", { name: "Join" })).toBeDisabled()
   })
@@ -79,7 +79,7 @@ describe("KvintetDetailsDialog", () => {
   it("disables Join while this kvintet is being joined, so a second tap cannot join twice", async () => {
     renderDialog(vi.fn(), false, true)
 
-    await userEvent.click(screen.getByRole("button", { name: "View" }))
+    await userEvent.click(screen.getByRole("button", { name: /^View / }))
 
     expect(await screen.findByRole("button", { name: "Join" })).toBeDisabled()
   })

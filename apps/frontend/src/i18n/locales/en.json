@@ -300,6 +300,7 @@
       "titleTooLong": "The topic can be at most {{max}} characters"
     },
     "view": "View",
+    "viewNamed": "View {{title}}",
     "vote": {
       "voted": "Voted",
       "voting": "Submitting…"

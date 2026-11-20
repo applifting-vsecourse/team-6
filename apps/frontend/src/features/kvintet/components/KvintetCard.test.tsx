@@ -54,7 +54,7 @@ describe("KvintetCard", () => {
   it("offers the sheet with the people on a phone next to Join (CSS shows one of the two)", () => {
     renderCard()
 
-    expect(screen.getByRole("button", { name: "View" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /^View / })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Join" })).toBeInTheDocument()
   })
 
