@@ -1,7 +1,7 @@
 import { Loader2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
-import { KvintetSeats } from "@/components/KvintetSeats"
+import { AnonymousBlobatar, FreeSeat } from "@/components/AnonymousBlobatar"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -40,6 +40,7 @@ export function KvintetDetailsDialog({
 }: KvintetDetailsDialogProps) {
   const { t } = useTranslation()
   const label = useSlugLabel()
+  const freeSeats = Math.max(kvintet.capacity - kvintet.members.length, 0)
   const subtitle = [
     ...kvintet.categories.map((slug) => label("categories", slug)),
     t("kvintet.seatCount", {
@@ -72,15 +73,32 @@ export function KvintetDetailsDialog({
         </DialogHeader>
 
         {/* The feed never carries a name, so the faces are grey and seeded by the seat. */}
-        <KvintetSeats
-          layout="row"
-          freeLabel={t("kvintet.vacancy")}
-          members={kvintet.members.map((member, index) => ({
-            seed: `${kvintet.id}-seat-${index}`,
-            anonymous: true,
-            label: member.position ?? t("kvintet.member"),
-          }))}
-        />
+        <ul className="flex flex-col divide-y divide-border">
+          {kvintet.members.map((member, index) => (
+            <li
+              key={index}
+              className="flex items-center gap-3 py-2.5 text-compact font-medium text-foreground"
+            >
+              <AnonymousBlobatar
+                seed={`${kvintet.id}-seat-${index}`}
+                motion="hover"
+                className="size-8 shrink-0"
+              />
+              {member.position ?? t("kvintet.member")}
+            </li>
+          ))}
+          {Array.from({ length: freeSeats }, (_, index) => (
+            <li
+              key={`free-${index}`}
+              className="flex items-center gap-3 py-2.5 text-compact text-muted-foreground"
+            >
+              <span className="grid size-8 shrink-0 place-items-center">
+                <FreeSeat className="size-7" />
+              </span>
+              {t("kvintet.vacancy")}
+            </li>
+          ))}
+        </ul>
 
         <DialogFooter>
           <Button
