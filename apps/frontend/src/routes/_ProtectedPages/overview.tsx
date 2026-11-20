@@ -550,7 +550,9 @@ function OverviewPage() {
                             <div className="flex w-full flex-col gap-1 rounded-md bg-secondary p-3 text-small">
                               <div className="flex items-baseline justify-between gap-2">
                                 <span className="font-medium text-foreground">
-                                  {lastMessage.authorName ?? t("chat.deletedMember")}
+                                  {lastMessage.authorId === user?.id
+                                    ? t("chat.you")
+                                    : (lastMessage.authorName ?? t("chat.deletedMember"))}
                                 </span>
                                 <span className="text-meta text-muted-foreground">
                                   {formatDate(new Date(lastMessage.createdAt))}

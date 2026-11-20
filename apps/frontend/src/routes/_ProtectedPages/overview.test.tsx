@@ -646,6 +646,27 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(chatLink).toHaveAttribute("href", "/kvintet/messages")
     })
 
+    it('calls your own last message "You", as the chat does, not by your name', async () => {
+      myKvintetData = activeKvintet
+      messagesData = [
+        {
+          id: 1,
+          kind: "USER",
+          authorId: "u1",
+          authorName: "Jana",
+          authorUsername: "jana",
+          body: "See you on Thursday!",
+          createdAt: "2026-10-22T13:00:00Z",
+        },
+      ]
+
+      renderWithClient(<OverviewPage />)
+
+      await screen.findByText("See you on Thursday!")
+      expect(screen.getByText("You")).toBeInTheDocument()
+      expect(screen.queryByText("Jana")).not.toBeInTheDocument()
+    })
+
     it("lists the members with what they teach, and when everyone can meet", async () => {
       myKvintetData = {
         ...activeKvintet,
