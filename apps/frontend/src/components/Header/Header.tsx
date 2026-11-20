@@ -11,6 +11,8 @@ import { ThemeSwitcher } from "@/components/Header/ThemeSwitcher"
 type HeaderProps = {
   // Navigation is for signed-in users only; signed out there is nothing to list yet.
   hasNav?: boolean
+  // Adds the "Admin" link to the navigation.
+  isAdmin?: boolean
   // Items that stay visible but can't be used right now, with the reason for a tooltip.
   navDisabled?: NavDisabled
   // Onboarding: shows "Step 1 of 3" next to the logo.
@@ -28,6 +30,7 @@ type HeaderProps = {
 
 export function Header({
   hasNav = false,
+  isAdmin = false,
   navDisabled,
   step,
   chat,
@@ -58,6 +61,7 @@ export function Header({
           <HeaderNav
             className="hidden md:flex"
             disabledItems={navDisabled}
+            isAdmin={isAdmin}
           />
         ) : null}
         <div className="ml-auto flex items-center gap-3 md:gap-4.5">
@@ -66,6 +70,7 @@ export function Header({
           {userMenu}
           <MobileMenu
             hasNav={hasNav}
+            isAdmin={isAdmin}
             navDisabled={navDisabled}
             chat={chat}
             hasLearnMore={hasLearnMore}

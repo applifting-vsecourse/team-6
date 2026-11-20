@@ -10,4 +10,5 @@ export const ROUTES = {
   kvintetMessages: "/kvintet/messages",
   kvintetBegins: "/kvintet/begins",
   onboarding: "/onboarding",
+  admin: "/admin",
 } as const
