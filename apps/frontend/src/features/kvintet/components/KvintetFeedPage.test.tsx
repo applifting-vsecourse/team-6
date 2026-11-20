@@ -335,7 +335,7 @@ describe("starting a kvintet", () => {
 
     await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
     await pickCategory("Software development")
-    await userEvent.type(screen.getByLabelText("Description"), "We talk.")
+    await userEvent.type(screen.getByLabelText("Description"), "We talk together.")
     await userEvent.click(within(dialog).getByRole("button", { name: "Start a kvintet" }))
 
     expect(await screen.findByText("You are already in a kvintet.")).toBeInTheDocument()
