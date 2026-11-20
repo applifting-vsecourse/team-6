@@ -24,7 +24,12 @@ const kvintet: FeedKvintet = {
     evenings: true,
   },
   members: [
-    { position: "Backend developer", teach: ["python"], learn: ["ux-design"], interests: [] },
+    {
+      position: "backend-developer, data-analyst",
+      teach: ["python"],
+      learn: ["ux-design"],
+      interests: [],
+    },
     { position: null, teach: [], learn: [], interests: ["startups"] },
   ],
   reasons: [],
@@ -51,7 +56,7 @@ describe("KvintetDetailsDialog", () => {
 
     const dialog = await screen.findByRole("dialog", { name: "Using AI at work" })
     expect(within(dialog).getByText("Software development · 2 / 5")).toBeInTheDocument()
-    expect(within(dialog).getByText("Backend developer")).toBeInTheDocument()
+    expect(within(dialog).getByText("Backend Developer, Data Analyst")).toBeInTheDocument()
     expect(within(dialog).getByText("Member")).toBeInTheDocument()
     expect(within(dialog).getAllByText("Free")).toHaveLength(3)
     // The card's own information is not repeated, and a member's tags were never on the card.

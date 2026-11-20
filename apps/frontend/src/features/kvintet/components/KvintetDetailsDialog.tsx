@@ -16,7 +16,7 @@ import { formatNumber } from "@/lib/date"
 import { cn } from "@/lib/utils"
 
 import type { FeedKvintet } from "@/features/kvintet/api/kvintetFeedQueryOptions"
-import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
+import { roleLabel, useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
 
 type KvintetDetailsDialogProps = {
   kvintet: FeedKvintet
@@ -86,7 +86,7 @@ export function KvintetDetailsDialog({
                 motion="hover"
                 className="size-8 shrink-0"
               />
-              {member.position ?? t("kvintet.member")}
+              {member.position ? roleLabel(member.position, label) : t("kvintet.member")}
             </li>
           ))}
           {Array.from({ length: freeSeats }, (_, index) => (

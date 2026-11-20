@@ -35,10 +35,8 @@ import { StartKvintetDialog } from "@/features/kvintet/components/StartKvintetDi
 import { useJoinKvintet } from "@/features/kvintet/hooks/useJoinKvintet"
 import { useMyKvintet } from "@/features/kvintet/hooks/useMyKvintet"
 import { formatSharedPreferences } from "@/features/kvintet/lib/formatPreferences"
-import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
+import { roleLabel, useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
 import { profileQueryOptions } from "@/features/profile/api/profileApi"
-
-type SlugLabel = ReturnType<typeof useSlugLabel>
 
 const ICEBREAKER_KEYS = [
   "overview.active.icebreaker.q1",
@@ -802,13 +800,6 @@ function OverviewError({
       </Button>
     </StateAlert>
   )
-}
-
-function roleLabel(role: string, label: SlugLabel) {
-  return role
-    .split(", ")
-    .map((slug) => label("roles", slug))
-    .join(", ")
 }
 
 /** The days and parts of the day that suit every member, never a place. */
