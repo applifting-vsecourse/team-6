@@ -221,7 +221,8 @@ export const seedDatabase = async (
   await createDemoKvintets(prisma, [
     {
       title: 'Using AI at work – what really works',
-      description: 'We bring one real task from our week, try it with an AI assistant together and compare notes: which prompts saved time, where it made things up, and what we would never hand over to it. No hype, no slides, just honest examples and a shared list of what works.',
+      description:
+        'We bring one real task from our week, try it with an AI assistant together and compare notes: which prompts saved time, where it made things up, and what we would never hand over to it. No hype, no slides, just honest examples and a shared list of what works.',
       categories: ['data-ai'],
       members: [
         {
@@ -262,7 +263,8 @@ export const seedDatabase = async (
     },
     {
       title: 'From Excel to Python',
-      description: 'Turning spreadsheet habits into small Python scripts, one report at a time.',
+      description:
+        'Turning spreadsheet habits into small Python scripts, one report at a time.',
       categories: ['data-ai', 'software-development', 'business'],
       members: [
         {
@@ -277,7 +279,8 @@ export const seedDatabase = async (
     },
     {
       title: 'Spanish conversation over lunch',
-      description: 'Relaxed Spanish practice for A2–B1 speakers. No grammar drills, just talking.',
+      description:
+        'Relaxed Spanish practice for A2–B1 speakers. No grammar drills, just talking.',
       categories: ['languages'],
       members: [
         {
@@ -294,7 +297,8 @@ export const seedDatabase = async (
     },
     {
       title: 'Negotiating your first client deal',
-      description: 'Role-play pricing talks and swap stories from real negotiations.',
+      description:
+        'Role-play pricing talks and swap stories from real negotiations.',
       categories: ['business'],
       members: [
         {
@@ -311,7 +315,8 @@ export const seedDatabase = async (
     },
     {
       title: 'Cooking together on Sundays',
-      description: 'Each month one of us picks a cuisine and we cook it together.',
+      description:
+        'Each month one of us picks a cuisine and we cook it together.',
       categories: ['leisure'],
       members: [
         {
