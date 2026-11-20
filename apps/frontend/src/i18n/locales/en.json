@@ -331,21 +331,12 @@
     "goToOverview": "Go to Home",
     "heroText": "Kvintet connects you with people who care about the same topic.",
     "heroTextShort": "Meet four people who care about the same topic. Everyone teaches, everyone learns.",
+    "heroTitle1": "Five people. One kvintet.",
     "heroTitle2": "Learn from each other.",
     "howItWorks": "How it works",
     "mascot": {
       "getStarted": "Let's get started!"
-    },
-    "rulesLead": "The same rules apply to everyone.",
-    "rulesLink": "Read the rules",
-    "step1Text": "What you know and what you'd like to learn. 3 minutes.",
-    "step1TextShort": "What you know and what you'd like to learn.",
-    "step1Title": "Tell us about you",
-    "step2Text": "An algorithm finds the kvintet that fits you.",
-    "step2TextShort": "Names stay hidden until it starts.",
-    "step2Title": "Pick a kvintet",
-    "step3Text": "Once your kvintet starts, the group chat opens.",
-    "step3Title": "Meet up"
+    }
   },
   "layout": {
     "closeMenu": "Close menu",
@@ -627,6 +618,11 @@
     "subtitleMember": "You are in a kvintet. See how it's going.",
     "title": "Home"
   },
+  "productVideo": {
+    "heading": "See how it works",
+    "posterSubtitle": "Your story · with voice-over",
+    "posterTitle": "Kvintet in one minute"
+  },
   "profile": {
     "dangerZone": {
       "button": "Delete account",
@@ -819,5 +815,16 @@
     "maxLength": "Value is too long",
     "minLength": "Value is too short",
     "whitelistValidation": "Unexpected field"
+  },
+  "videoPlayer": {
+    "captions": "Captions",
+    "mute": "Mute",
+    "pause": "Pause",
+    "play": "Play",
+    "replay": "Replay",
+    "seek": "Position in the video",
+    "soundOff": "Turn on sound",
+    "unmute": "Unmute",
+    "volume": "Volume"
   }
 }

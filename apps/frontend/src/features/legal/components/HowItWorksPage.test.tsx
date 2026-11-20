@@ -14,6 +14,14 @@ describe("HowItWorksPage", () => {
     expect(steps[3]).toHaveTextContent("Meeting up")
   })
 
+  it("shows the product film above the steps", () => {
+    render(<HowItWorksPage />)
+
+    const film = screen.getByRole("group", { name: "Kvintet in one minute" })
+    const steps = screen.getByRole("list")
+    expect(film.compareDocumentPosition(steps) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
   it("numbers the steps", () => {
     render(<HowItWorksPage />)
 

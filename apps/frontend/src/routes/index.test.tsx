@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode } from "react"
-import { act, fireEvent, render, screen, within } from "@testing-library/react"
+import { act, fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -165,37 +165,15 @@ describe("LandingPage", () => {
     expect(screen.queryByRole("link", { name: "Sign in" })).not.toBeInTheDocument()
   })
 
-  it("shows the headline, the core-idea animation and the three steps", () => {
+  it("shows the two-line headline, the core-idea animation and the video", () => {
     render(<LandingPage />)
 
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Learn from each other.")
+    const title = screen.getByRole("heading", { level: 1 })
+    expect(title).toHaveTextContent("Five people. One kvintet.")
+    expect(title).toHaveTextContent("Learn from each other.")
     expect(screen.getByRole("img", { name: /find(s)? a kvintet/i })).toBeInTheDocument()
-    const steps = within(screen.getByRole("list")).getAllByRole("listitem")
-    expect(steps).toHaveLength(3)
-    expect(steps[0]).toHaveTextContent("Tell us about you")
-    expect(steps[2]).toHaveTextContent("Meet up")
-  })
-
-  it("carries the shorter phone copy next to the desktop copy", () => {
-    render(<LandingPage />)
-    // The animation repeats some of this copy in its captions; the steps are the list.
-    const steps = within(screen.getByRole("list"))
-
-    // CSS picks one of the two; jsdom has no CSS, so both are in the page.
-    expect(steps.getByText("What you know and what you'd like to learn.")).toBeInTheDocument()
-    expect(
-      steps.getByText("What you know and what you'd like to learn. 3 minutes."),
-    ).toBeInTheDocument()
-    expect(steps.getByText("Names stay hidden until it starts.")).toBeInTheDocument()
-    expect(steps.getByText("An algorithm finds the kvintet that fits you.")).toBeInTheDocument()
-  })
-
-  it("links to the rules", () => {
-    render(<LandingPage />)
-
-    expect(screen.getByRole("link", { name: "Read the rules" })).toHaveAttribute(
-      "href",
-      "/code-of-conduct",
-    )
+    expect(screen.getByRole("heading", { level: 2, name: "See how it works" })).toBeInTheDocument()
+    expect(screen.getByRole("group", { name: "Kvintet in one minute" })).toBeInTheDocument()
+    expect(screen.queryByText("Tell us about you", { selector: "h3" })).not.toBeInTheDocument()
   })
 })
