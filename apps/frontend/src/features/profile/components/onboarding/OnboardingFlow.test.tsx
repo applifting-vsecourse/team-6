@@ -239,6 +239,7 @@ describe("OnboardingFlow", () => {
 
       await press("Save")
 
+      expect(await screen.findByRole("alert")).toHaveTextContent("An unexpected error occurred.")
       expect(navigate).not.toHaveBeenCalled()
     })
   })

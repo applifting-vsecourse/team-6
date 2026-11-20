@@ -22,56 +22,35 @@ import { useProfile } from "@/features/profile/hooks/useProfile"
 import type { OnboardingPageId } from "@/features/profile/lib/onboardingPages"
 import { fieldOfRole, ROLE_FIELDS } from "@/features/profile/lib/roleFields"
 
-export function formatWhenAndWhere(
-  profile: ProfileResponse | null | undefined,
-  t: TFunction,
-): string | null {
-  if (!profile) return null
+type Profile = ProfileResponse | null | undefined
 
-  // 1. Days and times
-  const hasWeekdays = profile.weekdays
-  const hasWeekends = profile.weekends
-
-  let daysStr = ""
-  if (hasWeekdays && hasWeekends) {
-    daysStr = t("profile.when.allDays")
-  } else if (hasWeekdays) {
-    daysStr = t("profile.when.weekdays")
-  } else if (hasWeekends) {
-    daysStr = t("profile.when.weekends")
-  }
-
-  const timesList: string[] = []
-  if (profile.mornings) timesList.push(t("profile.when.mornings"))
-  if (profile.afternoons) timesList.push(t("profile.when.afternoons"))
-  if (profile.evenings) timesList.push(t("profile.when.evenings"))
-
-  let timePart = ""
-  if (daysStr && timesList.length > 0) {
-    timePart = `${daysStr} ${timesList.join(", ")}`
-  } else if (daysStr) {
-    timePart = daysStr
-  } else if (timesList.length > 0) {
-    timePart = timesList.join(", ")
-  }
-
-  // 2. City and radius (onboarding stores only the radius, so the city name is often missing)
-  const radiusPart =
-    profile.radiusKm !== null && profile.radiusKm !== undefined && profile.radiusKm > 0
-      ? t("profile.withinRadius", { count: profile.radiusKm })
-      : ""
-  const placePart = [profile.cityName, radiusPart].filter(Boolean).join(", ")
-
-  // 3. Frequency
-  let freqPart = ""
-  if (profile.meetingFrequency) {
-    freqPart = t(`meetingFrequency.${profile.meetingFrequency}`)
-  }
-
-  const parts = [timePart, placePart, freqPart].filter(Boolean)
-  if (parts.length === 0) return null
-  return parts.join(" · ")
+/** The days, times and place as separate values: each has its own page, so its own Edit. */
+export const formatDays = (profile: Profile, t: TFunction) => {
+  if (profile?.weekdays && profile.weekends) return t("profile.when.allDays")
+  if (profile?.weekdays) return t("onboarding.days.weekdays")
+  if (profile?.weekends) return t("onboarding.days.weekends")
+  return ""
 }
+
+export const formatTimes = (profile: Profile, t: TFunction) =>
+  [
+    profile?.mornings && t("onboarding.time.mornings"),
+    profile?.afternoons && t("onboarding.time.afternoons"),
+    profile?.evenings && t("onboarding.time.evenings"),
+  ]
+    .filter(Boolean)
+    .join(", ")
+
+// Onboarding stores only the radius, so the city name is often missing.
+export const formatPlace = (profile: Profile, t: TFunction) =>
+  [
+    profile?.cityName,
+    profile?.radiusKm && profile.radiusKm > 0
+      ? t("profile.withinRadius", { count: profile.radiusKm })
+      : "",
+  ]
+    .filter(Boolean)
+    .join(", ")
 
 const EXPECTATION_LABELS = {
   learn_new: "onboarding.expectations.learn",
@@ -116,6 +95,29 @@ function TextSection({
       </div>
       <p className="text-compact text-muted-foreground md:text-body">{text}</p>
     </section>
+  )
+}
+
+/** One answer of a section with its own "Edit": rows are split by a hairline, not by cards. */
+function ValueRow({
+  label,
+  page,
+  value,
+  emptyText,
+}: {
+  label: string
+  page: OnboardingPageId
+  value: string
+  emptyText: string
+}) {
+  return (
+    <div className="flex items-center justify-between gap-2 py-2.5 first:pt-0 last:pb-0">
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <dt className="text-small font-semibold text-foreground">{label}</dt>
+        <dd className="text-compact text-muted-foreground md:text-body">{value || emptyText}</dd>
+      </div>
+      <EditLink page={page} />
+    </div>
   )
 }
 
@@ -216,7 +218,7 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
   const subtitleParts = [user?.username ? `@${user.username}` : undefined, roleText].filter(Boolean)
   const subtitle = subtitleParts.join(" · ")
 
-  const whenAndWhere = formatWhenAndWhere(profile, t) ?? t("profile.empty.whenAndWhere")
+  const notSet = t("profile.empty.whenAndWhere")
 
   // The field and the role, e.g. "Marketing & sales · Marketing specialist".
   const field = ROLE_FIELDS.find((f) => f.id === fieldOfRole(profile?.roles?.[0] ?? ""))
@@ -225,14 +227,17 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
       .filter(Boolean)
       .join(" · ") || t("profile.empty.role")
 
-  const expectations =
-    (profile?.expectations ?? [])
-      .map((id) =>
-        id in EXPECTATION_LABELS
-          ? t(EXPECTATION_LABELS[id as keyof typeof EXPECTATION_LABELS])
-          : id,
+  const expectations = (profile?.expectations ?? [])
+    .map((id) =>
+      id in EXPECTATION_LABELS ? t(EXPECTATION_LABELS[id as keyof typeof EXPECTATION_LABELS]) : id,
+    )
+    .join(" · ")
+
+  const frequency = profile?.meetingFrequency
+    ? t(
+        `onboarding.frequency.${profile.meetingFrequency.toLowerCase()}` as "onboarding.frequency.weekly",
       )
-      .join(" · ") || t("profile.empty.expectations")
+    : ""
 
   const tagSections = [
     {
@@ -307,22 +312,58 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
         </section>
       ))}
 
-      {/* 3. When and where (Kdy a kde) */}
-      <section className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4 md:gap-1.5 md:p-5">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-h3 font-semibold text-foreground">
-            {t("profile.sections.whenAndWhere")}
-          </h2>
-          <EditLink page="days" />
-        </div>
-        <p className="text-compact text-muted-foreground md:text-body">{whenAndWhere}</p>
+      {/* 3. When and where (Kdy a kde): every answer has its own page, so its own Edit */}
+      <section className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 md:p-5">
+        <h2 className="text-h3 font-semibold text-foreground">
+          {t("profile.sections.whenAndWhere")}
+        </h2>
+        <dl className="flex flex-col divide-y divide-border">
+          <ValueRow
+            label={t("profile.rows.days")}
+            page="days"
+            value={formatDays(profile, t)}
+            emptyText={notSet}
+          />
+          <ValueRow
+            label={t("profile.rows.time")}
+            page="time"
+            value={formatTimes(profile, t)}
+            emptyText={notSet}
+          />
+          <ValueRow
+            label={t("profile.rows.place")}
+            page="place"
+            value={formatPlace(profile, t)}
+            emptyText={notSet}
+          />
+        </dl>
       </section>
 
-      <TextSection
-        title={t("profile.sections.expectations")}
-        page="expectations"
-        text={expectations}
-      />
+      <section className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 md:p-5">
+        <h2 className="text-h3 font-semibold text-foreground">
+          {t("profile.sections.expectations")}
+        </h2>
+        <dl className="flex flex-col divide-y divide-border">
+          <ValueRow
+            label={t("profile.rows.expectations")}
+            page="expectations"
+            value={expectations}
+            emptyText={t("profile.empty.expectations")}
+          />
+          <ValueRow
+            label={t("profile.rows.frequency")}
+            page="frequency"
+            value={frequency}
+            emptyText={notSet}
+          />
+          <ValueRow
+            label={t("profile.rows.note")}
+            page="note"
+            value={profile?.note?.trim() ?? ""}
+            emptyText={t("profile.empty.note")}
+          />
+        </dl>
+      </section>
 
       {/* 6. Danger zone (Delete account) */}
       <section className="flex flex-col items-start gap-2.5 border-t border-border pt-5 md:pt-6">

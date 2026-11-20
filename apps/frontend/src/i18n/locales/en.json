@@ -641,12 +641,21 @@
       "expectations": "Nothing added yet",
       "interests": "Nothing added yet",
       "learn": "Nothing added yet",
+      "note": "Nothing added yet",
       "role": "No role added yet",
       "teach": "Nothing added yet",
       "whenAndWhere": "No preferences set yet"
     },
     "error": {
       "title": "Couldn't load profile"
+    },
+    "rows": {
+      "days": "Days",
+      "expectations": "Expectations",
+      "frequency": "How often",
+      "note": "Note",
+      "place": "Place",
+      "time": "Time of day"
     },
     "sections": {
       "expectations": "What you expect",
@@ -658,12 +667,7 @@
     },
     "title": "Profile",
     "when": {
-      "afternoons": "afternoons",
-      "allDays": "Weekdays and weekends",
-      "evenings": "evenings",
-      "mornings": "mornings",
-      "weekdays": "Weekday",
-      "weekends": "Weekend"
+      "allDays": "Weekdays and weekends"
     },
     "withinRadius": "within {{count}} km"
   },
