@@ -15,6 +15,8 @@ type ChipPickerProps = {
   groups: PickerGroup[]
   /** The word above the group chips ("Field", "Category"). */
   groupLabel: string
+  /** The group to open when nothing chosen yet says otherwise; ignored if it is not in `groups`. */
+  defaultGroupId?: string
   items: PickerItem[]
   selectedIds: string[]
   onSelect: (id: string) => void
@@ -35,6 +37,7 @@ const SEARCH_RESULT_COUNT = 12
 export function ChipPicker({
   groups,
   groupLabel,
+  defaultGroupId,
   items,
   selectedIds,
   onSelect,
@@ -46,9 +49,11 @@ export function ChipPicker({
   noneLabel,
 }: ChipPickerProps) {
   const [search, setSearch] = useState("")
-  // Opens on the group of the first chosen item, otherwise on none until a group is picked.
+  // Opens on the group of the first chosen item, else on the default one, else on none.
   const [groupId, setGroupId] = useState<string | undefined>(
-    () => items.find((item) => item.id === selectedIds[0])?.groupIds[0],
+    () =>
+      items.find((item) => item.id === selectedIds[0])?.groupIds[0] ??
+      groups.find((group) => group.id === defaultGroupId)?.id,
   )
 
   const selected = items.filter((item) => selectedIds.includes(item.id))

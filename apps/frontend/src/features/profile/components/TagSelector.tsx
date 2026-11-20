@@ -9,6 +9,8 @@ type TagSelectorProps = {
   selectedTagIds: string[]
   allTags: ReferenceTag[]
   categories: { slug: string }[]
+  /** The category to open when no topic is chosen yet, e.g. "leisure" for interests. */
+  defaultCategory?: string
   onSelectTag: (tagId: string) => void
   onRemoveTag: (tagId: string) => void
 }
@@ -21,6 +23,7 @@ export function TagSelector({
   selectedTagIds,
   allTags,
   categories,
+  defaultCategory,
   onSelectTag,
   onRemoveTag,
 }: TagSelectorProps) {
@@ -31,6 +34,7 @@ export function TagSelector({
     <ChipPicker
       groups={categories.map(({ slug }) => ({ id: slug, label: slugLabel("categories", slug) }))}
       groupLabel={t("onboarding.tags.categoryLabel")}
+      defaultGroupId={defaultCategory}
       items={allTags.map((tag) => ({
         id: tag.id,
         slug: tag.slug,
