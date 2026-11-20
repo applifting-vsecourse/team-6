@@ -35,12 +35,27 @@ vi.mock("@/features/profile/api/profileApi", () => ({
   profileKeys: { me: () => ["profile", "me"] },
 }))
 
+const kvintet = vi.hoisted(() => ({ mine: null as object | null, feedSize: 3 }))
+vi.mock("@/features/kvintet/api/kvintetApi", () => ({
+  myKvintetQueryOptions: () => ({
+    queryKey: ["kvintet", "mine"],
+    queryFn: () => Promise.resolve(kvintet.mine),
+  }),
+}))
+vi.mock("@/features/kvintet/api/kvintetFeedQueryOptions", () => ({
+  kvintetFeedQueryOptions: () => ({
+    queryKey: ["kvintet", "feed"],
+    queryFn: () => Promise.resolve({ items: Array.from({ length: kvintet.feedSize }, () => ({})) }),
+  }),
+}))
+
 function Probe() {
   const mascot = useMascotContext()
   return (
     <>
       <p data-testid="tour">{mascot?.isTourActive ? "running" : "idle"}</p>
       <p data-testid="stage">{mascot?.stage?.anchorId ?? "none"}</p>
+      <p data-testid="text">{mascot?.stage?.bubble?.text ?? ""}</p>
       {mascot?.stage?.bubble?.onClose ? (
         <button onClick={mascot.stage.bubble.onClose}>cross</button>
       ) : null}
@@ -74,6 +89,9 @@ describe("TourController", () => {
     session.user = { id: "u1", username: "zong" }
     profile.current = null
     markTourCompleted.mockClear()
+    router.navigate.mockClear()
+    kvintet.mine = null
+    kvintet.feedSize = 3
   })
 
   it("runs the tour for a new person who has no profile yet", async () => {
@@ -134,6 +152,69 @@ describe("TourController", () => {
       expect(screen.getByTestId("tour")).toHaveTextContent("idle")
       // Saved once, when it flew home; "Done" has nothing left to save.
       expect(markTourCompleted).toHaveBeenCalledOnce()
+    })
+  })
+  describe("the first words, from the Home the person has", () => {
+    beforeEach(() => {
+      profile.current = { tourCompletedAt: null, onboardingCompletedAt: "2026-11-10T10:00:00.000Z" }
+      router.pathname = "/overview"
+    })
+
+    it("counts the kvintets Home really shows", async () => {
+      kvintet.feedSize = 2
+      renderController()
+
+      await waitFor(() =>
+        expect(screen.getByTestId("text")).toHaveTextContent("you see the 2 kvintets"),
+      )
+    })
+
+    it("does not skip the feed for someone with no kvintet", async () => {
+      renderController()
+      await waitFor(() => expect(screen.getByTestId("text")).toHaveTextContent("3 kvintets"))
+
+      await userEvent.click(screen.getByRole("button", { name: "Next" }))
+
+      expect(router.navigate).toHaveBeenCalledWith({ to: "/kvintet/feed" })
+    })
+
+    it("shows a member their own Home and skips the feed step", async () => {
+      kvintet.mine = { id: "k1" }
+      renderController()
+      await waitFor(() => expect(screen.getByTestId("text")).toHaveTextContent("your kvintet"))
+
+      await userEvent.click(screen.getByRole("button", { name: "Next" }))
+
+      expect(router.navigate).not.toHaveBeenCalledWith({ to: "/kvintet/feed" })
+      expect(screen.getByTestId("stage")).toHaveTextContent("header-avatar")
+      expect(markTourCompleted).toHaveBeenCalledOnce()
+    })
+
+    it("does not save a replayed tour of a member as done again", async () => {
+      profile.current = { tourCompletedAt: "2026-11-10T10:00:00.000Z", onboardingCompletedAt: "x" }
+      kvintet.mine = { id: "k1" }
+      router.pathname = "/overview"
+      function Replay() {
+        const mascot = useMascotContext()
+        return <button onClick={mascot?.replayTour}>replay</button>
+      }
+      render(
+        <QueryClientProvider client={new QueryClient()}>
+          <MascotProvider>
+            <Probe />
+            <Replay />
+            <TourController />
+          </MascotProvider>
+        </QueryClientProvider>,
+      )
+      await userEvent.click(screen.getByRole("button", { name: "replay" }))
+      await waitFor(() => expect(screen.getByTestId("text")).toHaveTextContent("your kvintet"))
+
+      await userEvent.click(screen.getByRole("button", { name: "Next" }))
+
+      expect(screen.getByTestId("stage")).toHaveTextContent("header-avatar")
+      expect(router.navigate).not.toHaveBeenCalledWith({ to: "/kvintet/feed" })
+      expect(markTourCompleted).not.toHaveBeenCalled()
     })
   })
 })

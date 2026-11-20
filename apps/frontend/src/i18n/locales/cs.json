@@ -823,7 +823,12 @@
     "feed": "Tady vidíte kvintety seřazené podle toho, jak moc se k vám hodí. Pokud se vám žádný nezamlouvá, můžete si založit vlastní.",
     "header": "To je vše! Usadím se u vašeho jména. Z tohoto menu můžete prohlídku kdykoli zopakovat.",
     "next": "Dál",
-    "overview": "Toto je domovská stránka, teď tu vidíte tři kvintety, které se k vám hodí nejvíce.",
+    "overviewMember": "Toto je domovská stránka. Tady vidíte svůj kvintet: lidi, chat i to, co vás čeká.",
+    "overviewNoCount": "Toto je domovská stránka. Tady vidíte kvintety, které se k vám hodí nejvíce.",
+    "overview_few": "Toto je domovská stránka, teď tu vidíte {{count}} kvintety, které se k vám hodí nejvíce.",
+    "overview_many": "Toto je domovská stránka, teď tu vidíte {{count}} kvintetu, které se k vám hodí nejvíce.",
+    "overview_one": "Toto je domovská stránka, teď tu vidíte kvintet, který se k vám hodí nejvíce.",
+    "overview_other": "Toto je domovská stránka, teď tu vidíte {{count}} kvintetů, které se k vám hodí nejvíce.",
     "replay": "Zopakovat prohlídku",
     "showHint": "Zobrazit nápovědu"
   },
