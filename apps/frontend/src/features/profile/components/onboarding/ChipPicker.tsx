@@ -29,8 +29,8 @@ type ChipPickerProps = {
 const SEARCH_RESULT_COUNT = 12
 
 /**
- * Pick any number of items (Figma B1 to B1d): the chosen ones as chips, a search over all of them,
- * and the groups to browse, one of which shows its items as chips. The same for roles and topics.
+ * Pick any number of items (Figma B1 to B1d): the groups to browse on top, then a search over all
+ * of them, and under it the chosen ones as chips and the items of the open group. The same for roles and topics.
  */
 export function ChipPicker({
   groups,
@@ -81,6 +81,36 @@ export function ChipPicker({
 
   return (
     <div className="flex flex-col gap-3 md:gap-3.5">
+      {/* The groups come first, as the guide's question says: the field, then what is in it. */}
+      <p className="text-label text-muted-foreground">{groupLabel}</p>
+      <div className="flex flex-wrap gap-2">
+        {groups.map((group) => (
+          <button
+            key={group.id}
+            type="button"
+            aria-pressed={group.id === groupId}
+            onClick={() => setGroupId(group.id)}
+            className={chipClass(group.id === groupId)}
+          >
+            {group.label}
+          </button>
+        ))}
+      </div>
+      {/* What the open group holds is told apart from the groups above it. */}
+      {ofGroup.length > 0 ? <Separator /> : null}
+
+      <Input
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+        onKeyDown={(event) => {
+          // Enter in the search must not continue to the next page.
+          if (event.key === "Enter") event.preventDefault()
+        }}
+        placeholder={searchPlaceholder}
+        aria-label={searchAriaLabel}
+        className={`h-12.75 ${softFieldClass}`}
+      />
+
       {selected.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {selected.map((item) => (
@@ -95,49 +125,15 @@ export function ChipPicker({
         </div>
       )}
 
-      <Input
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-        onKeyDown={(event) => {
-          // Enter in the search must not continue to the next page.
-          if (event.key === "Enter") event.preventDefault()
-        }}
-        placeholder={searchPlaceholder}
-        aria-label={searchAriaLabel}
-        className={`h-12.75 ${softFieldClass}`}
-      />
-
       {query !== "" ? (
         found.length > 0 ? (
           <div className="flex flex-wrap gap-2">{found.map(add)}</div>
         ) : (
           <p className="text-small text-muted-foreground">{noneLabel}</p>
         )
-      ) : (
-        <>
-          <p className="text-label text-muted-foreground">{groupLabel}</p>
-          <div className="flex flex-wrap gap-2">
-            {groups.map((group) => (
-              <button
-                key={group.id}
-                type="button"
-                aria-pressed={group.id === groupId}
-                onClick={() => setGroupId(group.id)}
-                className={chipClass(group.id === groupId)}
-              >
-                {group.label}
-              </button>
-            ))}
-          </div>
-          {ofGroup.length > 0 ? (
-            <>
-              {/* What the open group holds is told apart from the groups above it. */}
-              <Separator />
-              <div className="flex flex-wrap gap-2">{ofGroup.map(add)}</div>
-            </>
-          ) : null}
-        </>
-      )}
+      ) : ofGroup.length > 0 ? (
+        <div className="flex flex-wrap gap-2">{ofGroup.map(add)}</div>
+      ) : null}
     </div>
   )
 }

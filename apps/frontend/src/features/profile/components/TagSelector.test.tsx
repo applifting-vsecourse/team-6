@@ -76,12 +76,17 @@ describe("TagSelector", () => {
     expect(screen.getByRole("button", { name: "Remove tag Bouldering" })).toBeInTheDocument()
   })
 
-  it("puts the categories away while it searches, and empties the search after a pick", async () => {
+  it("lists the categories above the search, which stays put, and empties after a pick", async () => {
     render(<Harness />)
     const search = screen.getByRole("textbox", { name: "Search topics" })
 
+    expect(
+      screen.getByText("Category").compareDocumentPosition(search) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+
     await userEvent.type(search, "py")
-    expect(screen.queryByText("Category")).not.toBeInTheDocument()
+    expect(screen.getByText("Category")).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole("button", { name: "Add tag Python" }))
 
