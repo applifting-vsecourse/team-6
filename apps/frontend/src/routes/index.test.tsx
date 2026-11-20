@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode } from "react"
-import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react"
+import { act, fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -45,10 +45,7 @@ describe("LandingPage", () => {
   it("offers an account and sign-in to someone signed out", () => {
     render(<LandingPage />)
 
-    // Once in the hero and once under the video.
-    const create = screen.getAllByRole("link", { name: "Create account" })
-    expect(create).toHaveLength(2)
-    create.forEach((link) => expect(link).toHaveAttribute("href", "/signup"))
+    expect(screen.getByRole("link", { name: "Create account" })).toHaveAttribute("href", "/signup")
     expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/login")
     expect(screen.queryByRole("link", { name: "Go to Home" })).not.toBeInTheDocument()
   })
@@ -72,7 +69,7 @@ describe("LandingPage", () => {
         <LandingPage />
       </MascotProvider>,
     )
-    const button = screen.getAllByRole("link", { name: "Create account" })[0]! // the hero one, the first on the page
+    const button = screen.getByRole("link", { name: "Create account" })
 
     await user.hover(button)
     expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: Let's get started!")
@@ -118,7 +115,7 @@ describe("LandingPage", () => {
         </MascotProvider>,
       )
       act(() => void vi.advanceTimersByTime(4100))
-      const button = screen.getAllByRole("link", { name: "Create account" })[0]! // the hero one, the first on the page
+      const button = screen.getByRole("link", { name: "Create account" })
 
       fireEvent.pointerEnter(button, { pointerType: "touch" })
       expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: Let's get started!")
@@ -178,38 +175,5 @@ describe("LandingPage", () => {
     expect(screen.getByRole("heading", { level: 2, name: "See how it works" })).toBeInTheDocument()
     expect(screen.getByRole("group", { name: "Kvintet in one minute" })).toBeInTheDocument()
     expect(screen.queryByText("Tell us about you", { selector: "h3" })).not.toBeInTheDocument()
-  })
-
-  it("links the hero to the video", () => {
-    render(<LandingPage />)
-
-    const watch = screen.getByRole("link", { name: "Watch the 1-minute video" })
-    expect(watch).toHaveAttribute("href", "#video")
-    expect(document.getElementById("video")).toContainElement(
-      screen.getByRole("group", { name: "Kvintet in one minute" }),
-    )
-  })
-
-  it("asks only a signed-out visitor to create an account under the video", () => {
-    const video = () => document.getElementById("video")!
-    render(<LandingPage />)
-    expect(within(video()).getByRole("link", { name: "Create account" })).toHaveAttribute(
-      "href",
-      "/signup",
-    )
-
-    cleanup()
-    session.user = { id: "u1" }
-    render(<LandingPage />)
-    expect(within(video()).queryByRole("link", { name: "Create account" })).not.toBeInTheDocument()
-  })
-
-  it("links to the rules", () => {
-    render(<LandingPage />)
-
-    expect(screen.getByRole("link", { name: "Read the rules" })).toHaveAttribute(
-      "href",
-      "/code-of-conduct",
-    )
   })
 })

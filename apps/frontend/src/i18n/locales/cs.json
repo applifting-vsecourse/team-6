@@ -340,9 +340,7 @@
     "howItWorks": "Jak to funguje",
     "mascot": {
       "getStarted": "Pojďme na to!"
-    },
-    "rulesLead": "Pro všechny platí stejná pravidla.",
-    "rulesLink": "Přečtěte si pravidla"
+    }
   },
   "layout": {
     "closeMenu": "Zavřít menu",
@@ -630,10 +628,8 @@
   },
   "productVideo": {
     "heading": "Podívejte se, jak to funguje",
-    "meta": "1 min · {{languages}} · titulky",
     "posterSubtitle": "Váš příběh · s komentářem",
-    "posterTitle": "Kvintet za minutu",
-    "watchLink": "Podívejte se na video (1 minuta)"
+    "posterTitle": "Kvintet za minutu"
   },
   "profile": {
     "dangerZone": {

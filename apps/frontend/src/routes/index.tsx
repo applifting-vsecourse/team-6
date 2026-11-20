@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react"
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { Play } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
@@ -8,10 +7,9 @@ import { SiteHeader } from "@/app/SiteHeader"
 import { CoreIdeaAnimation } from "@/components/CoreIdeaAnimation/CoreIdeaAnimation"
 import { useMascotAnchor, useMascotStage } from "@/components/Mascot/MascotContext"
 import { PageLayout } from "@/components/PageLayout"
-import { PRODUCT_VIDEO_SOURCES, ProductVideo } from "@/components/ProductVideo/ProductVideo"
+import { ProductVideo } from "@/components/ProductVideo/ProductVideo"
 import { Seo } from "@/components/Seo"
 import { Button } from "@/components/ui/button"
-import { useMediaQuery } from "@/lib/useMediaQuery"
 
 import { useSession } from "@/features/auth/hooks/useSession"
 
@@ -26,10 +24,6 @@ const isTouchOnly = () => window.matchMedia?.("(hover: none)").matches ?? false
 function LandingPage() {
   const { t } = useTranslation()
   const { user } = useSession()
-  const isReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)")
-  const languages = Object.keys(PRODUCT_VIDEO_SOURCES)
-    .map((code) => code.toUpperCase())
-    .join(" / ")
   const [mascotAnchorRef] = useMascotAnchor("landing-cta")
   // The greeting would cover the sign-in button or the text above, so it speaks only while the
   // button or the mascot is pointed at (or focused), and never takes a click itself. A phone has
@@ -123,22 +117,6 @@ function LandingPage() {
                     </>
                   )}
                 </div>
-                <a
-                  href="#video"
-                  onClick={(event) => {
-                    event.preventDefault()
-                    document
-                      .getElementById("video")
-                      ?.scrollIntoView({ behavior: isReducedMotion ? "auto" : "smooth" })
-                  }}
-                  className="inline-flex items-center gap-2 text-compact font-medium text-highlight underline max-md:hidden"
-                >
-                  <Play
-                    aria-hidden="true"
-                    className="size-2.5 fill-current"
-                  />
-                  {t("productVideo.watchLink")}
-                </a>
               </div>
 
               {/* Decorative: the core idea in four scenes with clickable step tabs. Below the text
@@ -146,36 +124,10 @@ function LandingPage() {
               <CoreIdeaAnimation className="max-md:pt-3 xl:w-125 xl:flex-none" />
             </section>
 
-            <section
-              id="video"
-              className="flex scroll-mt-20 flex-col gap-3.5 max-md:pt-5 md:gap-6"
-            >
-              <div className="flex flex-col gap-3.5 md:flex-row md:items-end md:justify-between md:gap-4">
-                <h2 className="text-h2">{t("productVideo.heading")}</h2>
-                <p className="text-small text-muted-foreground">
-                  {t("productVideo.meta", { languages })}
-                </p>
-              </div>
+            <section className="flex flex-col gap-3.5 max-md:pt-5 md:gap-6">
+              <h2 className="text-h2">{t("productVideo.heading")}</h2>
               <ProductVideo />
-              {user ? null : (
-                <Button
-                  asChild
-                  className="max-md:mt-1 max-md:w-full md:self-start"
-                >
-                  <Link to={ROUTES.signup}>{t("landing.createAccount")}</Link>
-                </Button>
-              )}
             </section>
-
-            <p className="flex flex-col gap-0.5 text-compact text-muted-foreground md:flex-row md:gap-1.5">
-              {t("landing.rulesLead")}
-              <Link
-                to={ROUTES.codeOfConduct}
-                className="text-foreground underline"
-              >
-                {t("landing.rulesLink")}
-              </Link>
-            </p>
           </div>
         </div>
       </PageLayout>

@@ -336,9 +336,7 @@
     "howItWorks": "How it works",
     "mascot": {
       "getStarted": "Let's get started!"
-    },
-    "rulesLead": "The same rules apply to everyone.",
-    "rulesLink": "Read the rules"
+    }
   },
   "layout": {
     "closeMenu": "Close menu",
@@ -622,10 +620,8 @@
   },
   "productVideo": {
     "heading": "See how it works",
-    "meta": "1 min · {{languages}} · captions",
     "posterSubtitle": "Your story · with voice-over",
-    "posterTitle": "Kvintet in one minute",
-    "watchLink": "Watch the 1-minute video"
+    "posterTitle": "Kvintet in one minute"
   },
   "profile": {
     "dangerZone": {
