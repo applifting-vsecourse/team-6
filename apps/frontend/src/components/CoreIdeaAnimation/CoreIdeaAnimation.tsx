@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next"
 import { AnonymousBlobatar, Face } from "@/components/AnonymousBlobatar"
 import { GazeBlobatar } from "@/components/GazeBlobatar"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Wordmark } from "@/components/Wordmark"
 import type en from "@/i18n/locales/en.json"
 import { useMediaQuery } from "@/lib/useMediaQuery"
 import { cn } from "@/lib/utils"
@@ -261,6 +262,16 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
     </div>
   )
 
+  // The ending: the five regroup into the logo's cluster and this appears under them.
+  const brand = (
+    <div
+      aria-hidden="true"
+      className="ci-brand"
+    >
+      <Wordmark className="text-[length:var(--ci-wordmark)] leading-none" />
+    </div>
+  )
+
   return (
     <div
       ref={frameRef}
@@ -280,6 +291,7 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
               {form}
               {tray}
             </div>
+            {brand}
             <svg
               aria-hidden="true"
               className="ci-cursor"
@@ -300,6 +312,7 @@ export function CoreIdeaAnimation({ className }: { className?: string }) {
             </div>
             {form}
             {tray}
+            {brand}
           </>
         )}
       </div>

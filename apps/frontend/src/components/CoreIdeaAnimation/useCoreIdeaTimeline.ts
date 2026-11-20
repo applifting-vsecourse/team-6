@@ -95,7 +95,9 @@ function beats(isDesktop: boolean): Beat[] {
     // empty one is filled by a copy of the next person's tag flying over, and the seat gets a tick.
     [late + 13000, (d) => add(d, "tagged")],
     [late + 14000, (d) => add(d, "solved")],
-    [late + 18400, (d) => add(d, "fade")],
+    // The five regroup into the logo's cluster and the wordmark appears under them; then it all fades.
+    [late + 18200, (d) => add(d, "regroup")],
+    [late + 23400, (d) => add(d, "fade")],
   ]
   if (isDesktop) {
     list.push([9700, (d) => add(d, "cursor-go")], [late + 10600, (d) => add(d, "cursor-done")])
@@ -103,12 +105,12 @@ function beats(isDesktop: boolean): Beat[] {
   return list
 }
 
-const LOOP_MS = 19000
+const LOOP_MS = 24000
 
 /** How long the story stays on a step, for the bar that fills while it plays. */
 export const stepMs = (step: number, isDesktop: boolean) => {
   const late = isDesktop ? 600 : 0
-  const starts = [0, 4600, 8200, late + 10600, late + 18400]
+  const starts = [0, 4600, 8200, late + 10600, late + 23400]
   return (starts[step + 1] ?? 0) - (starts[step] ?? 0)
 }
 

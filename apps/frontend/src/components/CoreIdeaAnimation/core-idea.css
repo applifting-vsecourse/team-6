@@ -1402,3 +1402,120 @@ and a tick lands when it does. */
     animation: none;
   }
 }
+
+/* ---------- The last scene: the five regroup into the logo, the wordmark under them ---------- */
+/* Each seat travels (--bx, --by) and grows (--bs) to its place in the cluster of the logo: you, the
+   big yellow one, in front. The stage is drawn at a fixed size, so these are plain pixels. */
+.ci .ci-seat {
+  transition: transform 1.3s cubic-bezier(0.5, 0, 0.2, 1) calc(var(--i, 0) * 0.07s);
+}
+.ci .ci-regroup .ci-seat {
+  transform: translate(var(--bx), var(--by)) scale(var(--bs));
+}
+.ci .ci-regroup .ci-s0 {
+  z-index: 3;
+}
+.ci .ci-regroup .ci-s1 {
+  z-index: 2;
+}
+.ci .ci-s1 {
+  --i: 1;
+}
+.ci .ci-s2 {
+  --i: 2;
+}
+.ci .ci-s3 {
+  --i: 3;
+}
+.ci .ci-s4 {
+  --i: 4;
+}
+/* What belonged to the story steps aside while they move. */
+.ci .ci-regroup .ci-guide,
+.ci .ci-regroup .ci-lab,
+.ci .ci-regroup .ci-tags {
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.ci .ci-brand {
+  position: absolute;
+  inset-inline: 0;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.6s,
+    transform 0.8s var(--spring);
+}
+.ci .ci-regroup .ci-brand {
+  opacity: 1;
+  transform: none;
+  transition-delay: 1.1s;
+}
+.ci .ci-fade .ci-brand {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  transition-delay: 0s;
+}
+.ci-m {
+  --ci-wordmark: 84px;
+}
+.ci-d {
+  --ci-wordmark: 98px;
+}
+.ci-m .ci-brand {
+  top: 262px;
+}
+.ci-d .ci-brand {
+  top: 296px;
+}
+.ci-m .ci-s0 {
+  --bx: -1.3px;
+  --by: 124.3px;
+  --bs: 2.1;
+}
+.ci-m .ci-s1 {
+  --bx: -3.9px;
+  --by: 35.6px;
+  --bs: 1.35;
+}
+.ci-m .ci-s2 {
+  --bx: -16.6px;
+  --by: -118.6px;
+  --bs: 1.35;
+}
+.ci-m .ci-s3 {
+  --bx: 10.7px;
+  --by: -118.6px;
+  --bs: 1.35;
+}
+.ci-m .ci-s4 {
+  --bx: 0.1px;
+  --by: 36.9px;
+  --bs: 1.35;
+}
+.ci-d .ci-s0 {
+  --bx: -1.4px;
+  --by: 160.4px;
+  --bs: 2.04;
+}
+.ci-d .ci-s1 {
+  --bx: -12.4px;
+  --by: 56px;
+  --bs: 1.32;
+}
+.ci-d .ci-s2 {
+  --bx: -23.7px;
+  --by: -124px;
+  --bs: 1.32;
+}
+.ci-d .ci-s3 {
+  --bx: 17.1px;
+  --by: -124px;
+  --bs: 1.32;
+}
+.ci-d .ci-s4 {
+  --bx: 8.1px;
+  --by: 57.4px;
+  --bs: 1.32;
+}

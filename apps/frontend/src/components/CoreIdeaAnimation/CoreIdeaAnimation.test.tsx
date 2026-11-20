@@ -133,13 +133,17 @@ describe("CoreIdeaAnimation", () => {
     expect(stage(container)).toHaveClass("ci-solved")
     expect(container.querySelectorAll(".ci-seat.ci-on")).toHaveLength(5)
     expect(container.querySelector(".ci-count")).toHaveTextContent("5 / 5")
+
+    at(2_000) // 18.8 s: the five regroup into the logo, with the wordmark under them
+    expect(stage(container)).toHaveClass("ci-regroup")
+    expect(container.querySelector(".ci-brand")).toHaveTextContent("Kvintet")
   })
 
   it("starts over after the ending", () => {
     stubMedia([])
     const { container } = render(<CoreIdeaAnimation />)
 
-    act(() => void vi.advanceTimersByTime(300 + 19_000 + 200))
+    act(() => void vi.advanceTimersByTime(300 + 24_000 + 200))
 
     expect(stage(container)).toHaveClass("ci-n0", "ci-lonely")
     expect(stage(container)).not.toHaveClass("ci-solved")
@@ -161,11 +165,11 @@ describe("CoreIdeaAnimation", () => {
     at(1_500) // 11.7 s: it clicked, the solo blobatar landed and the pointer is gone
     expect(stage(container)).toHaveClass("ci-cursor-done", "ci-landed")
 
-    // The phone loop restarts at 19.36 s; the desktop one is still on its ending, fading out.
-    at(7_700) // 19.4 s
-    expect(stage(container)).toHaveClass("ci-solved", "ci-fade")
+    // The phone loop restarts at 24.36 s; the desktop one is still on its ending, fading out.
+    at(12_700) // 24.4 s
+    expect(stage(container)).toHaveClass("ci-regroup", "ci-fade")
 
-    at(700) // 20.1 s: restarted
+    at(700) // 25.1 s: restarted
     expect(stage(container)).toHaveClass("ci-n0", "ci-lonely")
     expect(stage(container)).not.toHaveClass("ci-solved")
   })
