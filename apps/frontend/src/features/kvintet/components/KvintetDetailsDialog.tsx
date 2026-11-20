@@ -103,7 +103,7 @@ export function KvintetDetailsDialog({
         <DialogFooter>
           <Button
             className="h-11"
-            disabled={isDisabled}
+            disabled={isJoining || isDisabled}
             onClick={() => onJoin(kvintet.id)}
           >
             {isJoining ? <Loader2 className="animate-spin" /> : null}

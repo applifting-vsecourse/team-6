@@ -30,11 +30,11 @@ const kvintet: FeedKvintet = {
   reasons: [],
 }
 
-const renderDialog = (onJoin = vi.fn(), isDisabled = false) => {
+const renderDialog = (onJoin = vi.fn(), isDisabled = false, isJoining = false) => {
   render(
     <KvintetDetailsDialog
       kvintet={kvintet}
-      isJoining={false}
+      isJoining={isJoining}
       isDisabled={isDisabled}
       onJoin={onJoin}
     />,
@@ -70,6 +70,14 @@ describe("KvintetDetailsDialog", () => {
 
   it("disables Join while another join is in flight", async () => {
     renderDialog(vi.fn(), true)
+
+    await userEvent.click(screen.getByRole("button", { name: "View" }))
+
+    expect(await screen.findByRole("button", { name: "Join" })).toBeDisabled()
+  })
+
+  it("disables Join while this kvintet is being joined, so a second tap cannot join twice", async () => {
+    renderDialog(vi.fn(), false, true)
 
     await userEvent.click(screen.getByRole("button", { name: "View" }))
 
