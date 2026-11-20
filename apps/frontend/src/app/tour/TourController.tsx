@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { useNavigate, useRouterState } from "@tanstack/react-router"
+import type { TFunction } from "i18next"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
@@ -12,10 +13,19 @@ import {
 } from "@/components/Mascot/MascotContext"
 
 import { useSession } from "@/features/auth/hooks/useSession"
+import { myKvintetQueryOptions } from "@/features/kvintet/api/kvintetApi"
+import { kvintetFeedQueryOptions } from "@/features/kvintet/api/kvintetFeedQueryOptions"
 import { profileQueryOptions } from "@/features/profile/api/profileApi"
 import { useMarkTourCompleted } from "@/features/profile/hooks/useMarkTourCompleted"
 
 import { resolveTourStep, TOUR_ANCHOR, TOUR_PAGE_ANCHOR, type TourStepKey } from "./tourSteps"
+
+function overviewText(t: TFunction, isMember: boolean, suggestedCount: number): string {
+  if (isMember) return t("tour.overviewMember")
+  return suggestedCount > 0
+    ? t("tour.overview", { count: suggestedCount })
+    : t("tour.overviewNoCount")
+}
 
 /**
  * Walks a new person through Home, the feed and finally the avatar in the header with the
@@ -33,6 +43,19 @@ export function TourController() {
   const [pageAnchorRef] = useMascotAnchor(TOUR_PAGE_ANCHOR)
   const location = useRouterState({ select: (state) => state.location })
   const profileQuery = useQuery({ ...profileQueryOptions(user?.id), enabled: Boolean(user) })
+  const isOnboarded = Boolean(profileQuery.data?.onboardingCompletedAt)
+  // The same queries as Home, so asking again costs nothing. A member's Home shows their own
+  // kvintet and the feed is closed to them, so the tour must not send them there.
+  const myKvintetQuery = useQuery({ ...myKvintetQueryOptions(), enabled: isOnboarded })
+  const isMember = Boolean(myKvintetQuery.data)
+  const feedQuery = useQuery({
+    ...kvintetFeedQueryOptions(),
+    enabled: isOnboarded && myKvintetQuery.isSuccess && !isMember,
+  })
+  // Home lists at most three; the text says how many there really are.
+  const suggestedCount = Math.min(3, feedQuery.data?.items.length ?? 0)
+  // Which Home the person has is not known yet: the first words must fit it.
+  const isMembershipPending = isOnboarded && myKvintetQuery.isPending
   // `mutate` is stable; the mutation object is not, and the stage below must not change every render.
   const { mutate: markTourDone } = useMarkTourCompleted(user?.id)
   const [isReplay, setIsReplay] = useState(false)
@@ -70,7 +93,7 @@ export function TourController() {
   }, [isActive, setTourActive])
 
   const stage = useMemo(() => {
-    if (!user || !stepKey) return null
+    if (!user || !stepKey || (stepKey === "overview" && isMembershipPending)) return null
 
     // The mascot flies home to the header. The tour is saved as done right here, not at "Done":
     // a person who walks away from the goodbye must not get the whole tour again.
@@ -85,7 +108,8 @@ export function TourController() {
     }
     const next = (onClick: () => void): MascotAction => ({ label: t("tour.next"), onClick })
     const actions: Record<TourStepKey, MascotAction[]> = {
-      overview: [next(() => void navigate({ to: ROUTES.kvintetFeed }))],
+      // A member has no feed to see: Next skips that step.
+      overview: [next(isMember ? goHome : () => void navigate({ to: ROUTES.kvintetFeed }))],
       feed: [next(goHome)],
       header: [{ label: t("tour.done"), onClick: finish }],
     }
@@ -95,13 +119,25 @@ export function TourController() {
       // From here on the mascot is this person's own avatar, seeded like the header and the menus.
       seed: user.username || user.id,
       bubble: {
-        text: t(`tour.${stepKey}`),
+        text:
+          stepKey === "overview" ? overviewText(t, isMember, suggestedCount) : t(`tour.${stepKey}`),
         actions: actions[stepKey],
         // The cross ends the tour: nobody has to click through it to be rid of it.
         onClose: stepKey === "header" ? finish : goHome,
       },
     }
-  }, [user, stepKey, isReplay, markTourDone, setStage, navigate, t])
+  }, [
+    user,
+    stepKey,
+    isReplay,
+    isMember,
+    isMembershipPending,
+    suggestedCount,
+    markTourDone,
+    setStage,
+    navigate,
+    t,
+  ])
   useMascotStage(stage)
 
   return (

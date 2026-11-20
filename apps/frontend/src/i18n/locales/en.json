@@ -817,7 +817,10 @@
     "feed": "Here you see kvintets ordered by how well they suit you. If none of them appeals to you, you can start your own.",
     "header": "That's it! I'm settling in next to your name. Open this menu any time to replay the tour.",
     "next": "Next",
-    "overview": "This is the home page. Right now you see the three kvintets that suit you best.",
+    "overviewMember": "This is the home page. Here you see your kvintet: the people, the chat and what's coming up.",
+    "overviewNoCount": "This is the home page. Here you see the kvintets that suit you best.",
+    "overview_one": "This is the home page. Right now you see the kvintet that suits you best.",
+    "overview_other": "This is the home page. Right now you see the {{count}} kvintets that suit you best.",
     "replay": "Replay the tour",
     "showHint": "Show the tip"
   },
