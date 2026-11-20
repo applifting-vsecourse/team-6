@@ -52,6 +52,7 @@ describe('KvintetRepository (Postgres)', () => {
     const kvintet = await prisma.kvintet.create({
       data: {
         title: `${prefix} kvintet`,
+        description: `${prefix} description`,
         categories: { create: { categoryId } },
         members: { create: memberIds.map((userId) => ({ userId })) },
       },
@@ -136,7 +137,7 @@ describe('KvintetRepository (Postgres)', () => {
             })
           ).slug,
         ],
-        description: null,
+        description: `${prefix} description`,
       }),
     ).resolves.toEqual({ result: 'already_member' });
   });
@@ -184,7 +185,7 @@ describe('KvintetRepository (Postgres)', () => {
       repository.start(user, {
         title: `${prefix} nope`,
         categorySlugs: [slug, 'does-not-exist'],
-        description: null,
+        description: `${prefix} description`,
       }),
     ).resolves.toEqual({ result: 'unknown_category' });
     await expect(repository.isMember(user)).resolves.toBe(false);
@@ -318,6 +319,7 @@ describe('KvintetRepository (Postgres)', () => {
     const details = await repository.findKvintetDetailsByUserId(users[0]);
     expect(details).not.toBeNull();
     expect(details?.id).toBe(kvintetId);
+    expect(details?.description).toBe(`${prefix} description`);
     expect(details?.status).toBe('FORMING');
     expect(details?.members).toHaveLength(3);
     expect(details?.voteStatus.canVote).toBe(true);

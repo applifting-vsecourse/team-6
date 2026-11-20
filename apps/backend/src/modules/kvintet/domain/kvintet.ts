@@ -15,7 +15,7 @@ export type MemberProfile = {
 export type OpenKvintet = {
   id: string;
   title: string;
-  description: string | null;
+  description: string;
   categories: string[];
   /** `match` is for ranking only and never leaves the server. */
   members: (MemberProfile & { match: MatchProfile })[];
@@ -34,7 +34,7 @@ export type CommonAvailability = {
 export type FeedItem = {
   id: string;
   title: string;
-  description: string | null;
+  description: string;
   categories: string[];
   capacity: number;
   memberCount: number;
@@ -59,7 +59,7 @@ export const FEED_REASONS = 3;
 export type NewKvintet = {
   title: string;
   categorySlugs: string[];
-  description: string | null;
+  description: string;
 };
 
 export type StartOutcome =
@@ -105,6 +105,7 @@ export interface CommonPreferences {
 export interface KvintetDetails {
   id: string;
   title: string;
+  description: string;
   status: KvintetStatusType;
   createdAt: Date;
   activatedAt: Date | null;

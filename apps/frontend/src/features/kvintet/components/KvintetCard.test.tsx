@@ -16,7 +16,7 @@ const commonAvailability = {
 const kvintet: FeedKvintet = {
   id: "k1",
   title: "Using AI at work",
-  description: null,
+  description: "We swap prompts that save time.",
   categories: ["software-development", "business"],
   capacity: 5,
   memberCount: 2,
@@ -60,20 +60,10 @@ describe("KvintetCard", () => {
     expect(screen.getByText("2 / 5")).toBeInTheDocument()
   })
 
-  it("shows the description only when there is one", () => {
-    const { unmount } = render(
-      <KvintetCard
-        kvintet={{ ...kvintet, description: "We swap prompts that save time." }}
-        isJoining={false}
-        isDisabled={false}
-        onJoin={vi.fn()}
-      />,
-    )
-    expect(screen.getByText("We swap prompts that save time.")).toBeInTheDocument()
-    unmount()
-
+  it("shows the description", () => {
     renderCard()
-    expect(screen.queryByText("We swap prompts that save time.")).not.toBeInTheDocument()
+
+    expect(screen.getByText("We swap prompts that save time.")).toBeInTheDocument()
   })
 
   it("says why the kvintet suits the user, in one line with translated tags and categories", () => {

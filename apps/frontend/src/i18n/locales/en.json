@@ -213,7 +213,7 @@
       "confirmLeave": "Leave",
       "confirmLeaveActive": "Leave kvintet",
       "description": "You'll be its first member. Others join by topic.",
-      "details": "A few more words (optional)",
+      "details": "Description",
       "detailsCount": "{{length}} / {{max}}",
       "detailsPlaceholder": "e.g. I run a 10-person agency and want to share what works for us.",
       "leaveActiveDescription": "Others will see that you left. Then you can join another kvintet.",
@@ -294,6 +294,7 @@
     "vacancy": "Free",
     "validation": {
       "categoryRequired": "Choose a category",
+      "descriptionRequired": "Describe what the kvintet is about",
       "descriptionTooLong": "The description can be at most {{max}} characters",
       "titleRequired": "Enter a topic",
       "titleTooLong": "The topic can be at most {{max}} characters"

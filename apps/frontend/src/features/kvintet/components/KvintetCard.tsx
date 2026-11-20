@@ -79,7 +79,7 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
         </div>
       </div>
 
-      {kvintet.description ? <KvintetDescription text={kvintet.description} /> : null}
+      <KvintetDescription text={kvintet.description} />
 
       <ul className="grid grid-cols-5 gap-x-2 gap-y-4 sm:flex sm:flex-wrap sm:gap-x-7">
         {kvintet.members.map((member, index) => (

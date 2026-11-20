@@ -32,6 +32,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { formatNumber } from "@/lib/date"
 import { getErrorMessage } from "@/lib/errorMessage"
 import { useMediaQuery } from "@/lib/useMediaQuery"
+import { cn } from "@/lib/utils"
 
 import { referenceQueryOptions } from "@/features/kvintet/api/referenceQueryOptions"
 import { useStartKvintet } from "@/features/kvintet/hooks/useStartKvintet"
@@ -56,6 +57,7 @@ const createSchema = (t: TFunction) =>
     description: z
       .string()
       .trim()
+      .min(1, t("kvintet.validation.descriptionRequired"))
       .max(DESCRIPTION_MAX, t("kvintet.validation.descriptionTooLong", { max: DESCRIPTION_MAX })),
   })
 
@@ -92,7 +94,7 @@ export function StartKvintetDialog({ isOpen, onOpenChange, avatarSeed }: StartKv
     start.mutate({
       title: values.title,
       categorySlugs: values.categorySlugs,
-      description: values.description || undefined,
+      description: values.description,
     })
 
   return (
@@ -196,25 +198,38 @@ export function StartKvintetDialog({ isOpen, onOpenChange, avatarSeed }: StartKv
             <FormField
               control={form.control}
               name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("kvintet.dialog.details")}</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      className="resize-none bg-card"
-                      placeholder={t("kvintet.dialog.detailsPlaceholder")}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription className="justify-self-end font-mono text-meta">
-                    {t("kvintet.dialog.detailsCount", {
-                      length: formatNumber(field.value.length),
-                      max: formatNumber(DESCRIPTION_MAX),
-                    })}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const isAtLimit = field.value.length >= DESCRIPTION_MAX
+                return (
+                  <FormItem>
+                    <FormLabel>{t("kvintet.dialog.details")}</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        className={cn(
+                          "resize-none bg-card",
+                          isAtLimit &&
+                            "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20",
+                        )}
+                        placeholder={t("kvintet.dialog.detailsPlaceholder")}
+                        maxLength={DESCRIPTION_MAX}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription
+                      className={cn(
+                        "justify-self-end font-mono text-meta",
+                        isAtLimit && "text-destructive",
+                      )}
+                    >
+                      {t("kvintet.dialog.detailsCount", {
+                        length: formatNumber(field.value.length),
+                        max: formatNumber(DESCRIPTION_MAX),
+                      })}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )
+              }}
             />
 
             <p className="text-small text-muted-foreground">{t("kvintet.dialog.note")}</p>

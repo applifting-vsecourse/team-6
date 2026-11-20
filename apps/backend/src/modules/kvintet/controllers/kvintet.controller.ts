@@ -72,7 +72,7 @@ export class KvintetController {
     return this.service.start(user.id, {
       title: dto.title,
       categorySlugs: dto.categorySlugs,
-      description: dto.description || null,
+      description: dto.description,
     });
   }
 

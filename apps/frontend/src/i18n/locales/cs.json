@@ -217,7 +217,7 @@
       "confirmLeave": "Opustit",
       "confirmLeaveActive": "Opustit kvintet",
       "description": "Budete v něm první. Další se přidají podle tématu.",
-      "details": "Pár slov navíc (nepovinné)",
+      "details": "Popis",
       "detailsCount": "{{length}} / {{max}}",
       "detailsPlaceholder": "např. Vedu agenturu s 10 lidmi a chci sdílet, co nám funguje.",
       "leaveActiveDescription": "Ostatní uvidí, že jste odešli. Pak se můžete přidat do jiného kvintetu.",
@@ -298,6 +298,7 @@
     "vacancy": "Volné",
     "validation": {
       "categoryRequired": "Vyberte kategorii",
+      "descriptionRequired": "Popište, o čem kvintet bude",
       "descriptionTooLong": "Popis může mít nejvýše {{max}} znaků",
       "titleRequired": "Zadejte téma",
       "titleTooLong": "Téma může mít nejvýše {{max}} znaků"

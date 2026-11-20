@@ -21,6 +21,11 @@ const reference = {
   ],
 }
 
+const typeTopicAndDescription = async () => {
+  await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
+  await userEvent.type(screen.getByLabelText("Description"), "We talk.")
+}
+
 const renderDialog = (avatarSeed: string | undefined = "jana") =>
   render(
     <QueryClientProvider
@@ -43,7 +48,7 @@ beforeEach(() => {
 describe("StartKvintetDialog", () => {
   it("offers the categories as chips and sends the chosen ones as a list", async () => {
     renderDialog()
-    await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
+    await typeTopicAndDescription()
 
     const group = screen.getByRole("group", { name: "Categories (1–3)" })
     expect(
@@ -60,14 +65,14 @@ describe("StartKvintetDialog", () => {
 
     await waitFor(() =>
       expect(api.post).toHaveBeenCalledWith("kvintets", {
-        json: { title: "Topic", categorySlugs: ["languages"] },
+        json: { title: "Topic", categorySlugs: ["languages"], description: "We talk." },
       }),
     )
   })
 
   it("lets you pick up to three categories and disables the rest", async () => {
     renderDialog()
-    await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
+    await typeTopicAndDescription()
 
     const group = screen.getByRole("group", { name: "Categories (1–3)" })
     for (const name of ["Software development", "Business", "Languages"]) {
@@ -83,14 +88,18 @@ describe("StartKvintetDialog", () => {
 
     await waitFor(() =>
       expect(api.post).toHaveBeenCalledWith("kvintets", {
-        json: { title: "Topic", categorySlugs: ["software-development", "languages", "leisure"] },
+        json: {
+          title: "Topic",
+          categorySlugs: ["software-development", "languages", "leisure"],
+          description: "We talk.",
+        },
       }),
     )
   })
 
   it("asks for at least one category", async () => {
     renderDialog()
-    await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
+    await typeTopicAndDescription()
 
     await userEvent.click(screen.getByRole("button", { name: "Start a kvintet" }))
 
@@ -98,22 +107,32 @@ describe("StartKvintetDialog", () => {
     expect(api.post).not.toHaveBeenCalled()
   })
 
-  it("counts the description's characters and refuses more than 280", async () => {
+  it("asks for a description", async () => {
     renderDialog()
     await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
     await userEvent.click(screen.getByRole("button", { name: "Languages" }))
-    const description = screen.getByLabelText("A few more words (optional)")
+    await userEvent.type(screen.getByLabelText("Description"), "   ")
 
-    expect(screen.getByText("0 / 280")).toBeInTheDocument()
-    await userEvent.click(description)
-    await userEvent.paste("a".repeat(281))
-    expect(screen.getByText("281 / 280")).toBeInTheDocument()
     await userEvent.click(screen.getByRole("button", { name: "Start a kvintet" }))
 
-    expect(
-      await screen.findByText("The description can be at most 280 characters"),
-    ).toBeInTheDocument()
+    expect(await screen.findByText("Describe what the kvintet is about")).toBeInTheDocument()
     expect(api.post).not.toHaveBeenCalled()
+  })
+
+  it("counts the description's characters, stops at 280 and turns red there", async () => {
+    renderDialog()
+    const description = screen.getByLabelText("Description")
+
+    expect(screen.getByText("0 / 280")).not.toHaveClass("text-destructive")
+    await userEvent.click(description)
+    await userEvent.paste("a".repeat(279))
+    expect(screen.getByText("279 / 280")).not.toHaveClass("text-destructive")
+    expect(description).not.toHaveClass("border-destructive")
+
+    await userEvent.paste("bcd")
+    expect(description).toHaveValue(`${"a".repeat(279)}b`)
+    expect(screen.getByText("280 / 280")).toHaveClass("text-destructive")
+    expect(description).toHaveClass("border-destructive")
   })
 
   it("explains what the others will see, and shows the person starting it", () => {

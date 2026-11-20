@@ -28,12 +28,13 @@ export function KvintetDescription({ text, className }: KvintetDescriptionProps)
   }, [text, isExpanded])
 
   return (
-    <div className={cn("flex flex-col items-start gap-1", className)}>
+    <div className={cn("flex min-w-0 flex-col items-start gap-1", className)}>
       <p
         id={id}
         ref={ref}
+        // `wrap-anywhere`, not `wrap-break-word`: a long unbroken string must not widen the card.
         className={cn(
-          "text-small whitespace-pre-line text-body wrap-break-word",
+          "w-full text-small whitespace-pre-line text-body wrap-anywhere",
           !isExpanded && "line-clamp-3",
         )}
       >

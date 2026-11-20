@@ -292,7 +292,7 @@ describe('KvintetService.start', () => {
   const input = {
     title: 'Topic',
     categorySlugs: ['leisure'],
-    description: null,
+    description: 'Prompts that actually help with everyday work.',
   };
 
   it('returns the new kvintet id', async () => {
@@ -357,6 +357,7 @@ describe('KvintetService.getMyKvintet', () => {
   const mockDetails: KvintetDetails = {
     id: 'k1',
     title: 'AI v práci',
+    description: 'Sdílíme prompty, které nám šetří čas.',
     status: 'FORMING',
     createdAt: new Date('2026-10-21T10:00:00Z'),
     activatedAt: null,
@@ -417,6 +418,7 @@ describe('KvintetService.vote', () => {
   const mockDetails: KvintetDetails = {
     id: 'k1',
     title: 'AI v práci',
+    description: 'Sdílíme prompty, které nám šetří čas.',
     status: 'FORMING',
     createdAt: new Date('2026-10-21T10:00:00Z'),
     activatedAt: null,

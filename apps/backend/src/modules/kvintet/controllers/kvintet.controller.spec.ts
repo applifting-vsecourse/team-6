@@ -90,7 +90,7 @@ describe('KvintetController', () => {
       {
         id: 'kvintet-1',
         title: 'Using AI at work',
-        description: null,
+        description: 'Prompts that actually help with everyday work.',
         categories: ['software-development'],
         members: [
           {
@@ -159,6 +159,7 @@ describe('KvintetController', () => {
     const mockDetails: KvintetDetails = {
       id: 'k1',
       title: 'AI v práci',
+      description: 'Sdílíme prompty, které nám šetří čas.',
       status: 'FORMING',
       createdAt: new Date('2026-10-21T10:00:00Z'),
       activatedAt: null,
@@ -227,6 +228,7 @@ describe('KvintetController', () => {
 
       expect(service.getMyKvintet).toHaveBeenCalledWith('u1');
       expect(result.id).toBe('k1');
+      expect(result.description).toBe('Sdílíme prompty, které nám šetří čas.');
       expect(result.createdAt).toBe('2026-10-21T10:00:00.000Z');
       expect(result.activatedAt).toBeNull();
     });
