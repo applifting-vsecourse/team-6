@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react"
+import { act, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 
@@ -44,6 +44,32 @@ describe("OnboardingFrame", () => {
     expect(guide).not.toBeNull()
     expect(guide).toHaveClass("top-14", "bg-background")
     expect(guide).toContainElement(screen.getByRole("status"))
+  })
+
+  it("shrinks the bubble to the title on a phone once the guide is stuck, but keeps a red hint", () => {
+    let report: IntersectionObserverCallback = vi.fn()
+    vi.stubGlobal(
+      "IntersectionObserver",
+      class {
+        observe = vi.fn()
+        disconnect = vi.fn()
+        constructor(callback: IntersectionObserverCallback) {
+          report = callback
+        }
+      },
+    )
+    const scrolledPast = [
+      { isIntersecting: false, boundingClientRect: { top: -80 } },
+    ] as unknown as IntersectionObserverEntry[]
+    const { rerender } = render(frame())
+
+    expect(screen.getByText("Pick as many topics as you like.")).not.toHaveClass("max-md:hidden")
+    act(() => report(scrolledPast, {} as IntersectionObserver))
+    expect(screen.getByText("Pick as many topics as you like.")).toHaveClass("max-md:hidden")
+
+    rerender(frame({ error: { hint: "Pick at least one topic.", problem: "Pick a topic." } }))
+    expect(screen.getByText("Pick at least one topic.")).not.toHaveClass("max-md:hidden")
+    vi.unstubAllGlobals()
   })
 
   it("shows the progress of its page", () => {
