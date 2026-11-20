@@ -19,7 +19,7 @@ import { useSession } from "@/features/auth/hooks/useSession"
 import { profileQueryOptions, type ProfileResponse } from "@/features/profile/api/profileApi"
 import { TagBadge } from "@/features/profile/components/TagBadge"
 import { useProfile } from "@/features/profile/hooks/useProfile"
-import { firstPageOfStep } from "@/features/profile/lib/onboardingPages"
+import type { OnboardingPageId } from "@/features/profile/lib/onboardingPages"
 import { fieldOfRole, ROLE_FIELDS } from "@/features/profile/lib/roleFields"
 
 export function formatWhenAndWhere(
@@ -80,8 +80,8 @@ const EXPECTATION_LABELS = {
   solve_problem: "onboarding.expectations.solve",
 } as const
 
-/** The "Edit" link of a section: it opens the onboarding step that holds those answers. */
-function EditLink({ step }: { step: 1 | 2 | 3 }) {
+/** The "Edit" link of a section: it opens the onboarding page that asks for those answers. */
+function EditLink({ page }: { page: OnboardingPageId }) {
   const { t } = useTranslation()
   return (
     <Button
@@ -91,7 +91,7 @@ function EditLink({ step }: { step: 1 | 2 | 3 }) {
     >
       <Link
         to={ROUTES.onboarding}
-        search={{ page: firstPageOfStep(step) }}
+        search={{ page }}
       >
         {t("common.edit")}
       </Link>
@@ -99,12 +99,20 @@ function EditLink({ step }: { step: 1 | 2 | 3 }) {
   )
 }
 
-function TextSection({ title, step, text }: { title: string; step: 1 | 2 | 3; text: string }) {
+function TextSection({
+  title,
+  page,
+  text,
+}: {
+  title: string
+  page: OnboardingPageId
+  text: string
+}) {
   return (
     <section className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4 md:p-5">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-h3 font-semibold text-foreground">{title}</h2>
-        <EditLink step={step} />
+        <EditLink page={page} />
       </div>
       <p className="text-compact text-muted-foreground md:text-body">{text}</p>
     </section>
@@ -269,7 +277,7 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
 
       <TextSection
         title={t("profile.sections.role")}
-        step={1}
+        page="role"
         text={roleSummary}
       />
 
@@ -281,7 +289,7 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
         >
           <div className="flex items-center justify-between gap-2">
             <h2 className="text-h3 font-semibold text-foreground">{section.title}</h2>
-            <EditLink step={1} />
+            <EditLink page={section.key} />
           </div>
           <div className="flex flex-wrap gap-2">
             {section.tags && section.tags.length > 0 ? (
@@ -305,14 +313,14 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
           <h2 className="text-h3 font-semibold text-foreground">
             {t("profile.sections.whenAndWhere")}
           </h2>
-          <EditLink step={2} />
+          <EditLink page="days" />
         </div>
         <p className="text-compact text-muted-foreground md:text-body">{whenAndWhere}</p>
       </section>
 
       <TextSection
         title={t("profile.sections.expectations")}
-        step={3}
+        page="expectations"
         text={expectations}
       />
 

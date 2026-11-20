@@ -178,7 +178,7 @@ describe("ProfilePage", () => {
     )
   })
 
-  it("renders teach, learn and interest tag sections with edit links to the first page of step 1", () => {
+  it("renders teach, learn and interest tag sections with an edit link to its own onboarding page", () => {
     mockUseProfile.mockReturnValue(mockProfileData())
 
     render(<ProfilePage user={defaultUser} />)
@@ -199,14 +199,14 @@ describe("ProfilePage", () => {
     expect(screen.getByText("Running")).toBeInTheDocument()
     expect(screen.getByText("Reading")).toBeInTheDocument()
 
-    // Edit buttons link to onboarding step 1
+    // Each Edit link opens the page of its own section
     const links = screen.getAllByRole("link", { name: "Edit" })
     expect(links.length).toBe(6) // role, 3 tag sections, when & where, expectations
     expect(links.map((link) => link.getAttribute("href"))).toEqual([
       "/onboarding?page=role",
-      "/onboarding?page=role",
-      "/onboarding?page=role",
-      "/onboarding?page=role",
+      "/onboarding?page=teach",
+      "/onboarding?page=learn",
+      "/onboarding?page=interests",
       "/onboarding?page=days",
       "/onboarding?page=expectations",
     ])
