@@ -6,7 +6,7 @@ import {
 } from '@/modules/profile/domain/profile.entity';
 import { ProfileService } from '@/modules/profile/services/profile.service';
 import { Identity } from '@/shared/auth/domain/identity';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import type { Response } from 'express';
 import { ProfileController } from './profile.controller';
 
@@ -22,6 +22,7 @@ describe('ProfileController', () => {
   let service: {
     getProfile: jest.Mock;
     saveProfile: jest.Mock;
+    markTourCompleted: jest.Mock;
   };
 
   const mockUser: Identity = {
@@ -42,6 +43,7 @@ describe('ProfileController', () => {
     service = {
       getProfile: jest.fn(),
       saveProfile: jest.fn(),
+      markTourCompleted: jest.fn(),
     };
     controller = new ProfileController(service as unknown as ProfileService);
   });
@@ -108,6 +110,7 @@ describe('ProfileController', () => {
         radiusKm: 10,
         note: 'Note',
         onboardingCompletedAt: new Date('2026-10-21T10:00:00Z'),
+        tourCompletedAt: null,
         teaches: [{ id: 't1', slug: 'excel' }],
         learns: [{ id: 't2', slug: 'python' }],
         interests: [{ id: 't3', slug: 'hiking' }],
@@ -263,6 +266,49 @@ describe('ProfileController', () => {
         expect.objectContaining({
           completeOnboarding: true,
         }),
+      );
+    });
+  });
+
+  describe('markTourCompleted', () => {
+    it('returns the profile response with tourCompletedAt set', async (): Promise<void> => {
+      const done = new Date('2026-11-10T12:00:00Z');
+      service.markTourCompleted.mockResolvedValue(
+        new ProfileEntity(
+          'u1',
+          null,
+          [],
+          null,
+          false,
+          false,
+          false,
+          false,
+          false,
+          null,
+          null,
+          null,
+          null,
+          null,
+          [],
+          [],
+          null,
+          null,
+          done,
+        ),
+      );
+
+      const result = await controller.markTourCompleted(mockUser);
+
+      expect(service.markTourCompleted).toHaveBeenCalledWith('u1');
+      expect(result.userId).toBe('u1');
+      expect(result.tourCompletedAt).toBe(done);
+    });
+
+    it('propagates the service error', async (): Promise<void> => {
+      service.markTourCompleted.mockRejectedValue(new NotFoundException());
+
+      await expect(controller.markTourCompleted(mockUser)).rejects.toThrow(
+        NotFoundException,
       );
     });
   });

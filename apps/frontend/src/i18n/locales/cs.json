@@ -40,6 +40,9 @@
     "email": "E-mail",
     "emailPlaceholder": "např. jana@firma.cz",
     "haveAccount": "Už máte účet?",
+    "mascot": {
+      "avatar": "Ahoj, jsem váš avatar! Vznikám z vašeho uživatelského jména."
+    },
     "name": "Jméno",
     "nameHint": "Ostatní ho uvidí, až váš kvintet začne.",
     "noAccountYet": "Ještě nemáte účet?",
@@ -47,9 +50,6 @@
     "passwordHint_few": "Alespoň {{count}} znaky",
     "passwordHint_one": "Alespoň {{count}} znak",
     "passwordHint_other": "Alespoň {{count}} znaků",
-    "preview": {
-      "title": "To jste vy!"
-    },
     "signIn": "Přihlásit se",
     "signInDescription": "Přihlaste se e-mailem a heslem.",
     "signInTitle": "Vítejte zpět",
@@ -310,6 +310,9 @@
       "count": "{{n}} / 5",
       "feedMeta": "Data a AI · Každý týden",
       "feedTitle": "Od Excelu k Pythonu",
+      "formLearn": "Co se chci naučit",
+      "formRole": "Čemu se věnujete?",
+      "formTeach": "Co umím naučit",
       "join": "Přidat se",
       "nameEva": "Eva",
       "nameLucie": "Lucie",
@@ -335,6 +338,9 @@
     "heroTitle1": "Pět lidí. Jeden kvintet.",
     "heroTitle2": "Učte se jeden od druhého.",
     "howItWorks": "Jak to funguje",
+    "mascot": {
+      "getStarted": "Pojďme na to!"
+    },
     "rulesLead": "Pro všechny platí stejná pravidla.",
     "rulesLink": "Přečtěte si pravidla"
   },
@@ -375,86 +381,140 @@
     "profile": "Profil"
   },
   "onboarding": {
-    "step1": {
-      "addRole": "Vybrat roli {{name}}",
-      "addTag": "Přidat štítek {{name}}",
-      "description": "Ostatní uvidí vaši roli a štítky. Jméno až po startu kvintetu.",
-      "fields": {
-        "data": "Data a AI",
-        "design": "Design",
-        "education": "Vzdělávání a ostatní",
-        "marketing": "Marketing a prodej",
-        "people": "Lidé a finance",
-        "product": "Produkt a management",
-        "tech": "Technologie a vývoj"
-      },
-      "interestsTitle": "Zájmy",
-      "learnTitle": "Co se chci naučit",
-      "removeRole": "Odebrat roli {{name}}",
-      "removeTag": "Odebrat štítek {{name}}",
-      "role": "Čemu se věnujete?",
-      "roleHint": "Vyberte obor a pak roli.",
-      "rolePlaceholder": "např. Softwarový inženýr",
-      "roleRequired": "Vyberte alespoň jednu roli",
-      "searchAllRoles": "Není tu? Hledat ve všech rolích",
-      "searchAllTags": "Není tu? Hledat ve všech štítcích",
-      "searchRoleAria": "Hledat roli",
-      "searchRolePlaceholder": "Hledat roli…",
-      "searchTagsAria": "Hledat štítky v sekci {{section}}",
-      "searchTagsPlaceholder": "Hledat štítky…",
-      "teachHint": "Vyberte libovolný počet štítků.",
-      "teachTitle": "Co umím naučit",
-      "title": "Řekněte nám něco o sobě"
+    "days": {
+      "weekdays": "Všední dny",
+      "weekends": "Víkendy"
     },
-    "step2": {
-      "afternoons": "Odpoledne",
-      "daysRequired": "Vyberte alespoň jednu možnost (všední dny nebo víkendy).",
-      "daysTitle": "Dny",
-      "description": "Ať se potkáte s lidmi poblíž.",
-      "evenings": "Večery",
+    "expectations": {
+      "learn": "Naučit se něco nového",
+      "meet": "Poznat nové lidi",
+      "share": "Předat, co umím",
+      "solve": "Vyřešit konkrétní problém"
+    },
+    "fieldLabel": "Obor",
+    "fields": {
+      "data": "Data a AI",
+      "design": "Design",
+      "education": "Vzdělávání a ostatní",
+      "marketing": "Marketing a prodej",
+      "people": "Lidé a finance",
+      "product": "Produkt a management",
+      "tech": "Technologie a vývoj"
+    },
+    "footer": "Můžete to kdykoli změnit ve svém profilu.",
+    "frequency": {
+      "biweekly": "Jednou za 14 dní",
+      "monthly": "Jednou za měsíc",
+      "weekly": "Každý týden"
+    },
+    "groups": {
+      "expectations": "Očekávání",
+      "profile": "Váš profil",
+      "when": "Kdy a kde"
+    },
+    "guide": {
+      "days": {
+        "error": "Tohle potřebujeme – zaškrtněte aspoň jeden den.",
+        "hint": "Zaškrtněte všechny, které vám sedí.",
+        "problem": "Vyberte aspoň jeden den.",
+        "title": "Ve které dny se můžete scházet?"
+      },
+      "expectations": {
+        "hint": "Zaškrtněte všechno, co sedí.",
+        "title": "Co od kvintetu čekáte?"
+      },
+      "frequency": {
+        "error": "Tohle potřebujeme – vyberte jednu možnost a jsme hotovi.",
+        "hint": "Vyberte jednu. Tohle potřebujeme.",
+        "problem": "Vyberte, jak často se chcete scházet.",
+        "title": "Jak často se chcete scházet?"
+      },
+      "interests": {
+        "hint": "Pomůže to vám pěti najít, o čem si povídat.",
+        "title": "Co vás baví mimo práci?"
+      },
+      "learn": {
+        "hint": "Zase tolik, kolik chcete.",
+        "title": "A co byste se chtěli naučit?"
+      },
+      "note": {
+        "error": "Zkraťte to prosím, nejvýš 300 znaků.",
+        "hint": "Je to jen na vás.",
+        "problem": "Nejvýš 300 znaků.",
+        "title": "Chcete skupině ještě něco sdělit?"
+      },
+      "place": {
+        "error": "Tohle potřebujeme – klepněte na mapu a umístěte špendlík.",
+        "hint": "Posuňte špendlík a vyberte, jak daleko jste ochotni dojet. Ostatní uvidí jen vzdálenost.",
+        "hintBeforePick": "Klikněte do mapy nebo použijte svou polohu. Ostatní uvidí jen vzdálenost.",
+        "problem": "Vyberte místo na mapě.",
+        "title": "Kde byste se chtěli scházet?"
+      },
+      "role": {
+        "error": "Vyberte aspoň jednu roli, ať ostatní vědí, čemu se věnujete.",
+        "hint": "Můžete jich přidat víc.",
+        "problem": "Vyberte aspoň jednu roli.",
+        "title": "Začněte tady: vyberte obor a pak roli."
+      },
+      "summary": {
+        "hint": "Pokračujte, kdykoli vám přijde v pořádku.",
+        "title": "Tohle je váš profil!"
+      },
+      "teach": {
+        "hint": "Vyberte tolik témat, kolik chcete.",
+        "title": "Co byste mohli naučit ostatní?"
+      },
+      "time": {
+        "error": "Tohle potřebujeme – zaškrtněte aspoň jednu denní dobu.",
+        "hint": "Zaškrtněte všechny, které vám sedí.",
+        "problem": "Vyberte aspoň jednu denní dobu.",
+        "title": "A v jakou denní dobu?"
+      }
+    },
+    "note": {
+      "counter": "{{count}} / {{max}} · nepovinné",
+      "label": "Chcete skupině ještě něco sdělit?",
+      "placeholder": "Například: můžu se scházet jen anglicky, nebo přijdu se psem."
+    },
+    "place": {
       "geolocationDenied": "Přístup k poloze byl zamítnut. Střed můžete zvolit přímo na mapě.",
       "geolocationUnavailable": "Geolokace není v tomto prohlížeči podporována.",
       "locating": "Zjišťuji polohu…",
-      "locationRequired": "Zvolte polohu na mapě.",
-      "mapHint": "Klikněte do mapy nebo použijte svou polohu. Ostatní uvidí jen vzdálenost.",
-      "mornings": "Dopoledne",
-      "radius": "Jak daleko můžete dojet?",
       "radiusOption": "Do {{count}} km",
       "radiusSliderLabel": "Okruh hledání",
       "selectedRadius": "Okruh {{count}} km",
-      "timeOfDayRequired": "Vyberte alespoň jednu denní dobu (dopoledne, odpoledne nebo večer).",
-      "timeOfDayTitle": "Denní doba",
-      "title": "Kdy a kde se můžete potkávat?",
-      "useCurrentLocation": "Použít moji polohu",
-      "weekdays": "Všední dny",
-      "weekends": "Víkendy",
-      "whereTitle": "Kde"
+      "useCurrentLocation": "Použít moji polohu"
     },
-    "step3": {
-      "description": "Už jen kousek. Špatné odpovědi neexistují.",
-      "expectations": {
-        "learn": "Naučit se něco nového",
-        "meet": "Poznat nové lidi",
-        "share": "Předat, co umím",
-        "solve": "Vyřešit konkrétní problém"
-      },
-      "expectationsHint": "Můžete vybrat více možností.",
-      "expectationsTitle": "Proč se chcete přidat ke kvintetu",
-      "finishHint": "Pak vám ukážeme kvintety, které vám sednou.",
-      "frequency": {
-        "biweekly": "Jednou za 14 dní",
-        "monthly": "Jednou za měsíc",
-        "weekly": "Každý týden"
-      },
-      "frequencyRequired": "Vyberte, jak často se chcete setkávat",
-      "frequencyTitle": "Jak často se chcete potkávat",
-      "noteOptional": "Nepovinné.",
-      "notePlaceholder": "např. Raději se potkávám v angličtině.",
-      "noteTitle": "Má o vás skupina něco vědět?",
-      "title": "Co očekáváte od skupiny?"
+    "role": {
+      "addRole": "Vybrat roli {{name}}",
+      "none": "Žádná role",
+      "removeRole": "Odebrat roli {{name}}",
+      "searchRoleAria": "Hledat roli",
+      "searchRolePlaceholder": "Hledat roli…"
     },
     "stepProgress": "Krok {{current}} ze {{total}}",
     "stepShort": "{{current}} / {{total}}",
+    "summary": {
+      "interests": "Zájmy",
+      "learn": "Chci se naučit",
+      "next": "Na krok 2",
+      "none": "Zatím nic",
+      "role": "Role",
+      "teach": "Umím naučit"
+    },
+    "tags": {
+      "addTag": "Přidat štítek {{name}}",
+      "categoryLabel": "Kategorie",
+      "none": "Žádné téma",
+      "removeTag": "Odebrat štítek {{name}}",
+      "searchAria": "Hledat témata",
+      "searchPlaceholder": "Hledat témata…"
+    },
+    "time": {
+      "afternoons": "Odpoledne",
+      "evenings": "Večery",
+      "mornings": "Dopoledne"
+    },
     "title": "Nastavení profilu"
   },
   "overview": {
@@ -748,6 +808,16 @@
     "vue": "Vue.js",
     "web-development": "Vývoj webu",
     "yoga": "Jóga"
+  },
+  "tour": {
+    "close": "Zavřít",
+    "done": "Hotovo",
+    "feed": "Tady vidíte kvintety seřazené podle toho, jak moc se k vám hodí. Pokud se vám žádný nezamlouvá, můžete si založit vlastní.",
+    "header": "To je vše! Usadím se u vašeho jména. Z tohoto menu můžete prohlídku kdykoli zopakovat.",
+    "next": "Dál",
+    "overview": "Toto je domovská stránka, teď tu vidíte tři kvintety, které se k vám hodí nejvíce.",
+    "replay": "Zopakovat prohlídku",
+    "showHint": "Zobrazit nápovědu"
   },
   "validation": {
     "invalid": "Neplatná hodnota",

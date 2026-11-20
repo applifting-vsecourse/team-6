@@ -21,7 +21,10 @@ describe("LocationMapPicker", () => {
     )
 
     expect(screen.getByTestId("location-map-container")).toBeInTheDocument()
-    expect(screen.getByText("25 km radius")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Up to 25 km" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    )
 
     // Click 50 km preset button
     const preset50Btn = screen.getByRole("button", { name: "Up to 50 km" })
@@ -34,7 +37,46 @@ describe("LocationMapPicker", () => {
         radiusKm: 50,
       }),
     )
-    expect(screen.getByText("50 km radius")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Up to 50 km" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    )
+    expect(screen.getByRole("button", { name: "Up to 25 km" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    )
+  })
+
+  it("offers the four presets of the design and keeps the slider for longer radii", () => {
+    render(
+      <LocationMapPicker
+        latitude={50}
+        longitude={15}
+        radiusKm={25}
+        onChange={vi.fn()}
+      />,
+    )
+
+    expect(
+      screen.getAllByRole("button", { name: /^Up to \d+ km$/ }).map((b) => b.textContent),
+    ).toEqual(["Up to 5 km", "Up to 10 km", "Up to 25 km", "Up to 50 km"])
+    expect(screen.getByRole("slider", { name: "Search radius" })).toBeInTheDocument()
+  })
+
+  it("names a radius that no preset has, so it is not lost", () => {
+    render(
+      <LocationMapPicker
+        latitude={50}
+        longitude={15}
+        radiusKm={100}
+        onChange={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText("Up to 100 km")).toBeInTheDocument()
+    for (const preset of screen.getAllByRole("button", { name: /^Up to \d+ km$/ })) {
+      expect(preset).toHaveAttribute("aria-pressed", "false")
+    }
   })
 
   it("does not automatically request geolocation on mount when latitude and longitude are null", () => {
@@ -143,7 +185,6 @@ describe("LocationMapPicker", () => {
       expect(map.querySelector(".kvinted-map-pin")).toBeNull()
       expect(map.querySelector("path.leaflet-interactive")).toBeNull()
       expect(screen.queryByText(/50\.0000/)).not.toBeInTheDocument()
-      expect(screen.queryByText("25 km radius")).not.toBeInTheDocument()
 
       // Changing the radius must not report the default point as a selection
       await userEvent.click(screen.getByRole("button", { name: "Up to 50 km" }))
@@ -165,7 +206,10 @@ describe("LocationMapPicker", () => {
         screen.getByTestId("location-map-container").querySelector(".kvinted-map-pin"),
       ).not.toBeNull()
       expect(screen.getByText(/50\.0700/)).toBeInTheDocument()
-      expect(screen.getByText("25 km radius")).toBeInTheDocument()
+      expect(screen.getByRole("button", { name: "Up to 25 km" })).toHaveAttribute(
+        "aria-pressed",
+        "true",
+      )
     })
 
     it("shows the pin after 'Use my location' picks a place", async () => {

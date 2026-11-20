@@ -8,7 +8,7 @@ import { Seo } from "@/components/Seo"
 
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
 import { encodeRedirectUri } from "@/features/auth/lib/redirect"
-import { ONBOARDING_TOTAL_STEPS } from "@/features/profile/components/OnboardingWizard"
+import { ONBOARDING_TOTAL_STEPS, pageOf } from "@/features/profile/lib/onboardingPages"
 
 export const Route = createFileRoute("/_ProtectedPages")({
   loader: async ({ context, location }) => {
@@ -37,7 +37,7 @@ function Layout() {
           <SiteHeader
             onboardingStep={
               onboarding
-                ? { current: onboarding.search.step, total: ONBOARDING_TOTAL_STEPS }
+                ? { current: pageOf(onboarding.search.page).step, total: ONBOARDING_TOTAL_STEPS }
                 : undefined
             }
           />

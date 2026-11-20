@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 
+import { HOLDER_ATTRIBUTE } from "@/components/Mascot/stickyRect"
 import { PageLayout } from "@/components/PageLayout"
 import { cn } from "@/lib/utils"
 
@@ -14,6 +15,8 @@ type AuthLayoutProps = {
   aside?: ReactNode
   /** Small element beside the title, below `lg`, where the aside is hidden. */
   titleAccessory?: ReactNode
+  /** Below `lg`, under the title: room for something that must not cover the form (mascot bubble). */
+  belowTitle?: ReactNode
 }
 
 /**
@@ -28,6 +31,7 @@ export function AuthLayout({
   header,
   aside,
   titleAccessory,
+  belowTitle,
 }: AuthLayoutProps) {
   return (
     <PageLayout header={header}>
@@ -37,7 +41,11 @@ export function AuthLayout({
           aside ? "max-w-6xl lg:flex lg:gap-16" : "max-w-lg",
         )}
       >
-        <div className="mx-auto w-full max-w-105 lg:mx-0 lg:flex-1">
+        {/* A mascot pinned beside the title (sign-up on a phone) stays for as long as this column is on screen. */}
+        <div
+          {...{ [HOLDER_ATTRIBUTE]: "" }}
+          className="mx-auto w-full max-w-105 lg:mx-0 lg:flex-1"
+        >
           <div className="flex items-start justify-between gap-4">
             <div className="flex flex-col gap-5 md:gap-2">
               <h1 className="text-h1-mobile md:text-h1">{title}</h1>
@@ -48,6 +56,8 @@ export function AuthLayout({
             {titleAccessory ? <div className="shrink-0 lg:hidden">{titleAccessory}</div> : null}
           </div>
 
+          {belowTitle ? <div className="mt-4 lg:hidden">{belowTitle}</div> : null}
+
           <div className="mt-5 md:mt-4.5">{children}</div>
 
           <p className="mt-5 flex flex-wrap gap-x-1.5 text-small text-muted-foreground md:mt-4.5">
@@ -55,7 +65,11 @@ export function AuthLayout({
           </p>
         </div>
 
-        {aside ? <div className="hidden lg:block lg:flex-1">{aside}</div> : null}
+        {/* Sticky: the form is long, and the avatar beside it should stay in view while it is filled in.
+          top-24 clears the 64px header. */}
+        {aside ? (
+          <div className="hidden lg:sticky lg:top-24 lg:block lg:flex-1 lg:self-start">{aside}</div>
+        ) : null}
       </section>
     </PageLayout>
   )
