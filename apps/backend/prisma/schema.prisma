@@ -206,7 +206,7 @@ model Kvintet {
   id          String            @id @default(uuid()) @db.Uuid
   status      KvintetStatus     @default(FORMING)
   title       String
-  description String?
+  description String
   categories  KvintetCategory[]
   createdAt   DateTime          @default(now())
   activatedAt DateTime?

@@ -204,6 +204,10 @@
     "count_many": "{{formatted}} kvintetu · nejlepší shoda první",
     "count_one": "{{formatted}} kvintet · nejlepší shoda první",
     "count_other": "{{formatted}} kvintetů · nejlepší shoda první",
+    "description": {
+      "showLess": "Zobrazit méně",
+      "showMore": "Zobrazit více"
+    },
     "diagram": {
       "memberNumber": "Člen {{number}}"
     },
@@ -213,7 +217,8 @@
       "confirmLeave": "Opustit",
       "confirmLeaveActive": "Opustit kvintet",
       "description": "Budete v něm první. Další se přidají podle tématu.",
-      "details": "Pár slov navíc (nepovinné)",
+      "details": "Popis",
+      "detailsCount": "{{length}} / {{max}}",
       "detailsPlaceholder": "např. Vedu agenturu s 10 lidmi a chci sdílet, co nám funguje.",
       "leaveActiveDescription": "Ostatní uvidí, že jste odešli. Pak se můžete přidat do jiného kvintetu.",
       "leaveActiveNotice": "Ostatní pokračují bez vás.",
@@ -222,7 +227,7 @@
       "leaveProposalConfirm": "Opustíte tento kvintet. Když někdo přijde nebo odejde, hlasy všech se vynulují.",
       "leaveTitle": "Opravdu chcete odejít?",
       "leaving": "Odcházím…",
-      "note": "Ostatní uvidí téma a vaši roli. Vaše jméno až po zahájení kvintetu.",
+      "note": "Ostatní uvidí téma, popis a vaši roli. Vaše jméno až po zahájení kvintetu.",
       "stay": "Zůstat",
       "submit": "Založit kvintet",
       "title": "Založit kvintet",
@@ -293,6 +298,7 @@
     "vacancy": "Volné",
     "validation": {
       "categoryRequired": "Vyberte kategorii",
+      "descriptionRequired": "Popište, o čem kvintet bude",
       "descriptionTooLong": "Popis může mít nejvýše {{max}} znaků",
       "titleRequired": "Zadejte téma",
       "titleTooLong": "Téma může mít nejvýše {{max}} znaků"

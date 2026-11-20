@@ -200,6 +200,10 @@
     },
     "count_one": "{{formatted}} kvintet · best match first",
     "count_other": "{{formatted}} kvintets · best match first",
+    "description": {
+      "showLess": "Show less",
+      "showMore": "Show more"
+    },
     "diagram": {
       "memberNumber": "Member {{number}}"
     },
@@ -209,7 +213,8 @@
       "confirmLeave": "Leave",
       "confirmLeaveActive": "Leave kvintet",
       "description": "You'll be its first member. Others join by topic.",
-      "details": "A few more words (optional)",
+      "details": "Description",
+      "detailsCount": "{{length}} / {{max}}",
       "detailsPlaceholder": "e.g. I run a 10-person agency and want to share what works for us.",
       "leaveActiveDescription": "Others will see that you left. Then you can join another kvintet.",
       "leaveActiveNotice": "The others carry on without you.",
@@ -218,7 +223,7 @@
       "leaveProposalConfirm": "You'll leave this kvintet. When someone joins or leaves, everyone's votes are reset.",
       "leaveTitle": "Are you sure you want to leave?",
       "leaving": "Leaving…",
-      "note": "Others will see the topic and your role. Your name only once the kvintet starts.",
+      "note": "Others will see the topic, the description and your role. Your name only once the kvintet starts.",
       "stay": "Stay",
       "submit": "Start a kvintet",
       "title": "Start a kvintet",
@@ -289,6 +294,7 @@
     "vacancy": "Free",
     "validation": {
       "categoryRequired": "Choose a category",
+      "descriptionRequired": "Describe what the kvintet is about",
       "descriptionTooLong": "The description can be at most {{max}} characters",
       "titleRequired": "Enter a topic",
       "titleTooLong": "The topic can be at most {{max}} characters"

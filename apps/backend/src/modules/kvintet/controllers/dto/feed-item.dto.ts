@@ -30,6 +30,8 @@ export class CommonAvailabilityDto {
 export class FeedItemDto {
   id!: string;
   title!: string;
+  /** Free text from whoever started it. */
+  description!: string;
   /** Category slugs, 1–3, in reference order. */
   categories!: string[];
   capacity!: number;

@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card"
 import { formatNumber } from "@/lib/date"
 
 import type { FeedKvintet, FeedReason } from "@/features/kvintet/api/kvintetFeedQueryOptions"
+import { KvintetDescription } from "@/features/kvintet/components/KvintetDescription"
 import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
 
 type KvintetCardProps = {
@@ -77,6 +78,8 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
           <span className="sm:ml-auto">{seatCount}</span>
         </div>
       </div>
+
+      <KvintetDescription text={kvintet.description} />
 
       <ul className="grid grid-cols-5 gap-x-2 gap-y-4 sm:flex sm:flex-wrap sm:gap-x-7">
         {kvintet.members.map((member, index) => (

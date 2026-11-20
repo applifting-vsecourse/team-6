@@ -60,6 +60,7 @@ describe('AdminStatsRepository integration against Postgres', () => {
     await prisma.kvintet.create({
       data: {
         title: `${prefix}-${name}`,
+        description: `${prefix} description`,
         status,
         categories: { create: [{ categoryId }] },
         members: { create: memberIds.map((userId) => ({ userId })) },

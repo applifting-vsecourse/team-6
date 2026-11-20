@@ -48,6 +48,7 @@ describe('MessageRepository (Postgres)', () => {
     const kvintet = await prisma.kvintet.create({
       data: {
         title: `${prefix} kvintet`,
+        description: `${prefix} description`,
         status,
         categories: { create: { categoryId } },
         members: { create: memberIds.map((userId) => ({ userId })) },

@@ -231,6 +231,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
           {
             id: "k-1",
             title: "AI at work",
+            description: "We meet and learn together.",
             categories: ["software-development"],
             capacity: 5,
             memberCount: 3,
@@ -246,6 +247,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
           {
             id: "k-2",
             title: "Python for Data",
+            description: "We meet and learn together.",
             categories: ["data-ai"],
             capacity: 5,
             memberCount: 2,
@@ -278,13 +280,14 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(api.post).toHaveBeenCalledWith("kvintets/k-1/members")
     })
 
-    it("shows what every member shares and a labelled free seat on each card", async () => {
+    it("shows the description, what every member shares and a labelled free seat on each card", async () => {
       feedData = {
         fallback: false,
         items: [
           {
             id: "k-1",
             title: "AI at work",
+            description: "We swap prompts that save time.",
             categories: ["software-development", "business"],
             capacity: 5,
             memberCount: 2,
@@ -302,6 +305,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       renderWithClient(<OverviewPage />)
 
       expect(await screen.findByText("evenings · weekdays · every two weeks")).toBeInTheDocument()
+      expect(screen.getByText("We swap prompts that save time.")).toBeInTheDocument()
       expect(screen.getByText("Software development")).toBeInTheDocument()
       expect(screen.getByText("Business")).toBeInTheDocument()
       expect(screen.getAllByText("Free")).toHaveLength(3)
@@ -314,6 +318,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
           {
             id: "k-fail",
             title: "Full Kvintet",
+            description: "We meet and learn together.",
             categories: ["software-development"],
             capacity: 5,
             memberCount: 4,
@@ -365,6 +370,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
     const formingKvintet: KvintetDetails = {
       id: "k-forming",
       title: "AI at work – what really works",
+      description: "Prompts that actually help with everyday work.",
       status: "FORMING",
       createdAt: "2026-10-25T10:00:00Z",
       activatedAt: null,
@@ -434,6 +440,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(
         await screen.findByRole("heading", { name: /Your kvintet is forming/i }),
       ).toBeInTheDocument()
+      expect(screen.getByText("Prompts that actually help with everyday work.")).toBeInTheDocument()
       expect(screen.getByText(/3 OF 4 WANT TO START/i)).toBeInTheDocument()
 
       const voteButton = screen.getByRole("button", { name: "Start now" })
@@ -574,6 +581,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
     const activeKvintet: KvintetDetails = {
       id: "k-active",
       title: "AI at work – what really works",
+      description: "Prompts that actually help with everyday work.",
       status: "ACTIVE",
       createdAt: "2026-10-20T10:00:00Z",
       activatedAt: "2026-10-22T12:00:00Z",
@@ -630,6 +638,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       renderWithClient(<OverviewPage />)
 
       expect(await screen.findByRole("heading", { name: "Your kvintet" })).toBeInTheDocument()
+      expect(screen.getByText("Prompts that actually help with everyday work.")).toBeInTheDocument()
       expect(await screen.findByText("Looking forward to our first meeting!")).toBeInTheDocument()
       expect(screen.getAllByText("Petr").length).toBeGreaterThanOrEqual(1)
 

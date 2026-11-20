@@ -28,6 +28,7 @@ import {
   kvintetFeedQueryOptions,
   type FeedKvintet,
 } from "@/features/kvintet/api/kvintetFeedQueryOptions"
+import { KvintetDescription } from "@/features/kvintet/components/KvintetDescription"
 import { LeaveKvintetDialog } from "@/features/kvintet/components/LeaveKvintetDialog"
 import { StartKvintetDialog } from "@/features/kvintet/components/StartKvintetDialog"
 import { useJoinKvintet } from "@/features/kvintet/hooks/useJoinKvintet"
@@ -374,6 +375,10 @@ function OverviewPage() {
                     <p className="text-compact text-muted-foreground md:text-lead">
                       {kvintet.title}
                     </p>
+                    <KvintetDescription
+                      text={kvintet.description}
+                      className="max-w-prose"
+                    />
                   </div>
 
                   <CommonTime kvintet={kvintet} />
@@ -517,6 +522,10 @@ function OverviewPage() {
                         date: formatDayAndMonth(new Date(kvintet.activatedAt ?? kvintet.createdAt)),
                       })}
                     </p>
+                    <KvintetDescription
+                      text={kvintet.description}
+                      className="max-w-prose"
+                    />
                   </div>
 
                   <CommonTime kvintet={kvintet} />
@@ -698,6 +707,8 @@ function ProposalCard({
             {proposal.memberCount} / {proposal.capacity}
           </span>
         </div>
+
+        <KvintetDescription text={proposal.description} />
 
         {/* The feed never carries a name, so the faces are grey and seeded by the seat. */}
         <KvintetSeats

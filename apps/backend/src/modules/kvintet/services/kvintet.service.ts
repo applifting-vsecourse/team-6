@@ -69,6 +69,7 @@ export class KvintetService {
         return {
           id: kvintet.id,
           title: kvintet.title,
+          description: kvintet.description,
           categories: kvintet.categories,
           capacity: KVINTET_CAPACITY,
           memberCount: kvintet.members.length,

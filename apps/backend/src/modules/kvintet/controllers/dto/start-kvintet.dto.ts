@@ -5,7 +5,6 @@ import {
   ArrayUnique,
   IsArray,
   IsNotEmpty,
-  IsOptional,
   IsString,
   MaxLength,
 } from 'class-validator';
@@ -29,11 +28,11 @@ export class StartKvintetDto {
   @IsNotEmpty({ each: true })
   categorySlugs!: string[];
 
-  @IsOptional()
   @Transform(trim)
   @IsString()
-  @MaxLength(500)
-  description?: string;
+  @IsNotEmpty()
+  @MaxLength(280)
+  description!: string;
 }
 
 export class StartedKvintetDto {

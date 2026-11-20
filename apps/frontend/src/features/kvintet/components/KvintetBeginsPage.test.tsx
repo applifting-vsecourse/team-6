@@ -45,6 +45,7 @@ const kvintet = (
   ({
     id: "k1",
     title: "AI v práci – co opravdu funguje",
+    description: "Sdílíme prompty, které nám šetří čas.",
     status,
     createdAt: "2026-10-21T10:00:00.000Z",
     activatedAt: "2026-10-22T16:00:00.000Z",
