@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode } from "react"
-import { render, screen, within } from "@testing-library/react"
+import { cleanup, render, screen, within } from "@testing-library/react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { Route } from "@/routes/index"
@@ -34,7 +34,10 @@ describe("LandingPage", () => {
   it("offers an account and sign-in to someone signed out", () => {
     render(<LandingPage />)
 
-    expect(screen.getByRole("link", { name: "Create account" })).toHaveAttribute("href", "/signup")
+    // Once in the hero and once under the video.
+    const create = screen.getAllByRole("link", { name: "Create account" })
+    expect(create).toHaveLength(2)
+    create.forEach((link) => expect(link).toHaveAttribute("href", "/signup"))
     expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/login")
     expect(screen.queryByRole("link", { name: "Go to Home" })).not.toBeInTheDocument()
   })
@@ -48,29 +51,40 @@ describe("LandingPage", () => {
     expect(screen.queryByRole("link", { name: "Sign in" })).not.toBeInTheDocument()
   })
 
-  it("shows the headline, the core-idea animation and the three steps", () => {
+  it("shows the two-line headline, the core-idea animation and the video", () => {
     render(<LandingPage />)
 
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Learn from each other.")
+    const title = screen.getByRole("heading", { level: 1 })
+    expect(title).toHaveTextContent("Five people. One kvintet.")
+    expect(title).toHaveTextContent("Learn from each other.")
     expect(screen.getByRole("img", { name: /find(s)? a kvintet/i })).toBeInTheDocument()
-    const steps = within(screen.getByRole("list")).getAllByRole("listitem")
-    expect(steps).toHaveLength(3)
-    expect(steps[0]).toHaveTextContent("Tell us about you")
-    expect(steps[2]).toHaveTextContent("Meet up")
+    expect(screen.getByRole("heading", { level: 2, name: "See how it works" })).toBeInTheDocument()
+    expect(screen.getByRole("group", { name: "Kvintet in one minute" })).toBeInTheDocument()
+    expect(screen.queryByText("Tell us about you", { selector: "h3" })).not.toBeInTheDocument()
   })
 
-  it("carries the shorter phone copy next to the desktop copy", () => {
+  it("links the hero to the video", () => {
     render(<LandingPage />)
-    // The animation repeats some of this copy in its captions; the steps are the list.
-    const steps = within(screen.getByRole("list"))
 
-    // CSS picks one of the two; jsdom has no CSS, so both are in the page.
-    expect(steps.getByText("What you know and what you'd like to learn.")).toBeInTheDocument()
-    expect(
-      steps.getByText("What you know and what you'd like to learn. 3 minutes."),
-    ).toBeInTheDocument()
-    expect(steps.getByText("Names stay hidden until it starts.")).toBeInTheDocument()
-    expect(steps.getByText("An algorithm finds the kvintet that fits you.")).toBeInTheDocument()
+    const watch = screen.getByRole("link", { name: "Watch the 1-minute video" })
+    expect(watch).toHaveAttribute("href", "#video")
+    expect(document.getElementById("video")).toContainElement(
+      screen.getByRole("group", { name: "Kvintet in one minute" }),
+    )
+  })
+
+  it("asks only a signed-out visitor to create an account under the video", () => {
+    const video = () => document.getElementById("video")!
+    render(<LandingPage />)
+    expect(within(video()).getByRole("link", { name: "Create account" })).toHaveAttribute(
+      "href",
+      "/signup",
+    )
+
+    cleanup()
+    session.user = { id: "u1" }
+    render(<LandingPage />)
+    expect(within(video()).queryByRole("link", { name: "Create account" })).not.toBeInTheDocument()
   })
 
   it("links to the rules", () => {

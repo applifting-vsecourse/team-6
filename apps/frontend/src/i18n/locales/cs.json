@@ -332,18 +332,11 @@
     "goToOverview": "Přejít domů",
     "heroText": "Kvintet vás spojí s lidmi, které zajímá stejné téma.",
     "heroTextShort": "Kvintet vás spojí se čtyřmi lidmi, které zajímá stejné téma. Každý učí, každý se učí.",
+    "heroTitle1": "Pět lidí. Jeden kvintet.",
     "heroTitle2": "Učte se jeden od druhého.",
     "howItWorks": "Jak to funguje",
     "rulesLead": "Pro všechny platí stejná pravidla.",
-    "rulesLink": "Přečtěte si pravidla",
-    "step1Text": "Co umíte a co se chcete naučit. Zabere to 3 minuty.",
-    "step1TextShort": "Co umíte a co se chcete naučit.",
-    "step1Title": "Řekněte nám o sobě",
-    "step2Text": "Algoritmus vám najde kvintet přímo pro vás.",
-    "step2TextShort": "Jména zůstanou skrytá, dokud kvintet nezačne.",
-    "step2Title": "Vyberte si kvintet",
-    "step3Text": "Jakmile kvintet začne, otevře se skupinový chat.",
-    "step3Title": "Sejděte se"
+    "rulesLink": "Přečtěte si pravidla"
   },
   "layout": {
     "closeMenu": "Zavřít menu",
@@ -575,6 +568,13 @@
     "subtitleMember": "Jste v kvintetu. Podívejte se, jak se mu daří.",
     "title": "Domů"
   },
+  "productVideo": {
+    "heading": "Podívejte se, jak to funguje",
+    "meta": "1 min · {{languages}} · titulky",
+    "posterSubtitle": "Váš příběh · s komentářem",
+    "posterTitle": "Kvintet za minutu",
+    "watchLink": "Podívejte se na video (1 minuta)"
+  },
   "profile": {
     "dangerZone": {
       "button": "Smazat účet",
@@ -757,5 +757,16 @@
     "maxLength": "Hodnota je příliš dlouhá",
     "minLength": "Hodnota je příliš krátká",
     "whitelistValidation": "Neočekávané pole"
+  },
+  "videoPlayer": {
+    "captions": "Titulky",
+    "mute": "Ztlumit",
+    "pause": "Pozastavit",
+    "play": "Přehrát",
+    "replay": "Přehrát znovu",
+    "seek": "Pozice ve videu",
+    "soundOff": "Zapnout zvuk",
+    "unmute": "Zrušit ztlumení",
+    "volume": "Hlasitost"
   }
 }
