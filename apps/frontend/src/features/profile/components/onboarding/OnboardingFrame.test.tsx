@@ -49,7 +49,7 @@ describe("OnboardingFrame", () => {
   it("shows the progress of its page", () => {
     render(frame())
 
-    expect(screen.getByText("2 / 4")).toBeInTheDocument()
+    expect(screen.queryByText("2 / 4")).not.toBeInTheDocument()
     expect(screen.getByRole("progressbar", { name: "Your profile" })).toBeInTheDocument()
   })
 

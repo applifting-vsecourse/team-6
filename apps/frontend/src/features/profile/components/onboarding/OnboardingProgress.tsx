@@ -1,7 +1,5 @@
 import { useTranslation } from "react-i18next"
 
-import { formatNumber } from "@/lib/date"
-
 import { progressOf, type OnboardingPageId } from "@/features/profile/lib/onboardingPages"
 
 const GROUP_KEYS = {
@@ -10,7 +8,7 @@ const GROUP_KEYS = {
   3: "onboarding.groups.expectations",
 } as const
 
-/** The name of the step, "2 / 4" (or a tick on the summary) and one bar per step, filling per question. */
+/** The name of the step (a tick on the summary) and one bar per step, filling per question. */
 export function OnboardingProgress({ page }: { page: OnboardingPageId }) {
   const { t } = useTranslation()
   const { step, position, fills } = progressOf(page)
@@ -20,11 +18,7 @@ export function OnboardingProgress({ page }: { page: OnboardingPageId }) {
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
         <p className="text-label text-muted-foreground uppercase">{t(GROUP_KEYS[step])}</p>
-        {position ? (
-          <p className="font-mono text-meta tracking-meta text-muted-foreground uppercase">
-            {formatNumber(position.current)} / {formatNumber(position.total)}
-          </p>
-        ) : (
+        {!position && (
           <p
             aria-hidden
             className="font-mono text-meta text-ok"

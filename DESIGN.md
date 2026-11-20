@@ -95,7 +95,7 @@ A conversation, not a form (Figma #126): **one question per page**, eleven pages
 - **A missing required answer** (role, days, time of day, place, frequency) is not a red frame: the bubble's hint becomes red text, the same is said once more in red next to Continue, and the avatar shakes its head once. It goes away as soon as the person answers. The pages that ask nothing (topics, expectations, the note) can be left empty.
 - **The avatar and its question are sticky** under the header, so on a long page (many topics, the map) they stay in view while the answers scroll.
 - **On a phone** (Figma M3…M17d, below `md`) it is the same page, tighter: a 60px avatar, a 17px title, the guide still sticky, chips and tiles at full width, a 200px map. Back and Continue sit in one row under the answers (not pinned to the bottom); the "change it any time" note is hidden, and a save error moves above the buttons.
-- **Progress**: the name of the step and "2 / 4" (a green tick on the summary), one bar per step that fills per question. The header keeps "Step N of 3".
+- **Progress**: the name of the step (a green tick on the summary) and one bar per step that fills per question. The header keeps "Step N of 3". There is no second "2 / 4" counter next to it: two counters on one screen read as a contradiction.
 - **Each Continue saves** that page's answers, so a reload, Back or an edit from the profile page keeps them. Step 1 ends with a summary (Edit goes back to a question), and the avatar is happy there.
 - **The avatar** is the mascot while the tour runs (its overlay stands on the avatar's spot, so after "Done" it can fly on to Home) and the page's own face otherwise, as on a repeat of onboarding. It shows the same expression and shake either way (`MascotFace`).
 
