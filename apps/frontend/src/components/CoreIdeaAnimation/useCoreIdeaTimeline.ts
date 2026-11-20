@@ -123,7 +123,9 @@ const END = 17000 + HOLD
 
 /** Where the story is when someone jumps to a step. Without motion the last step is the whole ending. */
 export const stepStart = (step: number, isDesktop: boolean, isStatic: boolean) =>
-  isStatic && step === 3 ? END : ([0, 4600 + HOLD, 8200 + HOLD, (isDesktop ? 600 : 0) + 10760 + HOLD][step] ?? 0)
+  isStatic && step === 3
+    ? END
+    : ([0, 4600 + HOLD, 8200 + HOLD, (isDesktop ? 600 : 0) + 10760 + HOLD][step] ?? 0)
 
 /** The scene as it stands `from` ms into the loop, with no motion in between. */
 function sceneAt(isDesktop: boolean, from: number): Draft {
