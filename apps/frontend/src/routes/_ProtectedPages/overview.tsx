@@ -702,16 +702,19 @@ function ProposalCard({
 
         <KvintetDescription text={proposal.description} />
 
-        {/* The feed never carries a name, so the faces are grey and seeded by the seat. */}
-        <KvintetSeats
-          layout="row"
-          freeLabel={t("kvintet.vacancy")}
-          members={proposal.members.map((member, idx) => ({
-            seed: `${proposal.id}-seat-${idx}`,
-            anonymous: true,
-            label: member.position ? roleLabel(member.position, label) : t("kvintet.member"),
-          }))}
-        />
+        {/* The feed never carries a name, so the faces are grey and seeded by the seat. A phone
+            shows them in the sheet behind the View button. */}
+        <div className="max-sm:hidden">
+          <KvintetSeats
+            layout="row"
+            freeLabel={t("kvintet.vacancy")}
+            members={proposal.members.map((member, idx) => ({
+              seed: `${proposal.id}-seat-${idx}`,
+              anonymous: true,
+              label: member.position ? roleLabel(member.position, label) : t("kvintet.member"),
+            }))}
+          />
+        </div>
 
         <p className="text-small text-muted-foreground">
           {formatSharedPreferences(proposal, t) || "—"}

@@ -204,9 +204,6 @@
       "showLess": "Show less",
       "showMore": "Show more"
     },
-    "detail": {
-      "members": "Who is in it"
-    },
     "diagram": {
       "memberNumber": "Member {{number}}"
     },
@@ -288,7 +285,6 @@
       "topic": "Your topic: {{category}}"
     },
     "seatCount": "{{filled}} / {{total}}",
-    "seeDetails": "See who's in",
     "startOwn": {
       "button": "Start a kvintet"
     },
@@ -303,6 +299,7 @@
       "titleRequired": "Enter a topic",
       "titleTooLong": "The topic can be at most {{max}} characters"
     },
+    "view": "View",
     "vote": {
       "voted": "Voted",
       "voting": "Submitting…"

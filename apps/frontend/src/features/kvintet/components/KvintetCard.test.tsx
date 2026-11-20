@@ -51,10 +51,10 @@ const renderCard = (overrides: Partial<FeedKvintet> = {}, onJoin = vi.fn()) => {
 }
 
 describe("KvintetCard", () => {
-  it("offers the member list on a phone next to Join (CSS shows one of the two)", () => {
+  it("offers the sheet with the people on a phone next to Join (CSS shows one of the two)", () => {
     renderCard()
 
-    expect(screen.getByRole("button", { name: "See who's in" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "View" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Join" })).toBeInTheDocument()
   })
 

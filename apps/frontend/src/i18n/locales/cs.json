@@ -208,9 +208,6 @@
       "showLess": "Zobrazit méně",
       "showMore": "Zobrazit více"
     },
-    "detail": {
-      "members": "Kdo v něm je"
-    },
     "diagram": {
       "memberNumber": "Člen {{number}}"
     },
@@ -292,7 +289,6 @@
       "topic": "Vaše téma: {{category}}"
     },
     "seatCount": "{{filled}} / {{total}}",
-    "seeDetails": "Zobrazit, kdo v něm je",
     "startOwn": {
       "button": "Založit kvintet"
     },
@@ -307,6 +303,7 @@
       "titleRequired": "Zadejte téma",
       "titleTooLong": "Téma může mít nejvýše {{max}} znaků"
     },
+    "view": "Zobrazit",
     "vote": {
       "voted": "Hlasováno",
       "voting": "Odesílání…"

@@ -82,7 +82,8 @@ export function KvintetCard({ kvintet, isJoining, isDisabled, onJoin }: KvintetC
 
       <KvintetDescription text={kvintet.description} />
 
-      <ul className="grid grid-cols-5 gap-x-2 gap-y-4 sm:flex sm:flex-wrap sm:gap-x-7">
+      {/* A phone shows them in the sheet behind the View button. */}
+      <ul className="hidden sm:flex sm:flex-wrap sm:gap-x-7">
         {kvintet.members.map((member, index) => (
           <li
             key={index}

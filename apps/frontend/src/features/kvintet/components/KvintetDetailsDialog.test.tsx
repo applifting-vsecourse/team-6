@@ -43,29 +43,26 @@ const renderDialog = (onJoin = vi.fn(), isDisabled = false) => {
 }
 
 describe("KvintetDetailsDialog", () => {
-  it("opens from the card with each member's role and what they teach, want to learn and like", async () => {
+  it("opens from the card with the topic, each member by role and the free seats, nothing more", async () => {
     renderDialog()
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
 
-    await userEvent.click(screen.getByRole("button", { name: "See who's in" }))
+    await userEvent.click(screen.getByRole("button", { name: "View" }))
 
     const dialog = await screen.findByRole("dialog", { name: "Using AI at work" })
-    expect(within(dialog).getByText("We swap prompts that save time.")).toBeInTheDocument()
+    expect(within(dialog).getByText("Software development · 2 / 5")).toBeInTheDocument()
     expect(within(dialog).getByText("Backend developer")).toBeInTheDocument()
     expect(within(dialog).getByText("Member")).toBeInTheDocument()
-    expect(within(dialog).getByText("Teaches").parentElement).toHaveTextContent(/Teaches\s*Python/)
-    expect(within(dialog).getByText("Interests").parentElement).toHaveTextContent(
-      /Interests\s*Startups/,
-    )
-    expect(within(dialog).getByText("Times that suit everyone:").parentElement).toHaveTextContent(
-      "evenings · weekdays · every week",
-    )
+    expect(within(dialog).getAllByText("Free")).toHaveLength(3)
+    // The card's own information is not repeated, and a member's tags were never on the card.
+    expect(within(dialog).queryByText("We swap prompts that save time.")).not.toBeInTheDocument()
+    expect(within(dialog).queryByText(/Teaches/)).not.toBeInTheDocument()
   })
 
   it("joins the kvintet from the dialog", async () => {
     const onJoin = renderDialog()
 
-    await userEvent.click(screen.getByRole("button", { name: "See who's in" }))
+    await userEvent.click(screen.getByRole("button", { name: "View" }))
     await userEvent.click(await screen.findByRole("button", { name: "Join" }))
 
     expect(onJoin).toHaveBeenCalledWith("k1")
@@ -74,7 +71,7 @@ describe("KvintetDetailsDialog", () => {
   it("disables Join while another join is in flight", async () => {
     renderDialog(vi.fn(), true)
 
-    await userEvent.click(screen.getByRole("button", { name: "See who's in" }))
+    await userEvent.click(screen.getByRole("button", { name: "View" }))
 
     expect(await screen.findByRole("button", { name: "Join" })).toBeDisabled()
   })

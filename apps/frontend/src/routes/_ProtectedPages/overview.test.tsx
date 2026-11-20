@@ -269,8 +269,8 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       const joinButtons = screen.getAllByRole("button", { name: "Join" })
       expect(joinButtons).toHaveLength(2)
-      // On a phone each card opens a sheet with the members instead (CSS swaps the two buttons).
-      expect(screen.getAllByRole("button", { name: "See who's in" })).toHaveLength(2)
+      // On a phone each card opens a sheet with the people instead (CSS swaps the two buttons).
+      expect(screen.getAllByRole("button", { name: "View" })).toHaveLength(2)
 
       expect(screen.getByRole("link", { name: "See all" })).toHaveAttribute("href", "/kvintet/feed")
       expect(screen.getByRole("button", { name: "Start your own" })).toBeInTheDocument()

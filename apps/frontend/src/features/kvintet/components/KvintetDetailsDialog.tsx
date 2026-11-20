@@ -1,7 +1,7 @@
 import { Loader2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
-import { AnonymousBlobatar } from "@/components/AnonymousBlobatar"
+import { KvintetSeats } from "@/components/KvintetSeats"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -12,12 +12,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { formatList, formatNumber } from "@/lib/date"
+import { formatNumber } from "@/lib/date"
 import { cn } from "@/lib/utils"
 
 import type { FeedKvintet } from "@/features/kvintet/api/kvintetFeedQueryOptions"
-import { KvintetDescription } from "@/features/kvintet/components/KvintetDescription"
-import { formatSharedPreferences } from "@/features/kvintet/lib/formatPreferences"
 import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
 
 type KvintetDetailsDialogProps = {
@@ -30,8 +28,8 @@ type KvintetDetailsDialogProps = {
 }
 
 /**
- * A phone has no room for each member's role and tags inside an offer card, so the card shows this
- * button instead of Join: a bottom sheet with the members and the Join button.
+ * A phone has no room for the people inside an offer card, so the card shows this button instead
+ * of them and of Join: a bottom sheet with who is in the kvintet and the Join button.
  */
 export function KvintetDetailsDialog({
   kvintet,
@@ -42,7 +40,6 @@ export function KvintetDetailsDialog({
 }: KvintetDetailsDialogProps) {
   const { t } = useTranslation()
   const label = useSlugLabel()
-  const shared = formatSharedPreferences(kvintet, t)
   const subtitle = [
     ...kvintet.categories.map((slug) => label("categories", slug)),
     t("kvintet.seatCount", {
@@ -58,7 +55,7 @@ export function KvintetDetailsDialog({
           variant="outline"
           className={cn("h-11", triggerClassName)}
         >
-          {t("kvintet.seeDetails")}
+          {t("kvintet.view")}
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -74,52 +71,16 @@ export function KvintetDetailsDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <KvintetDescription text={kvintet.description} />
-        {shared ? (
-          <p className="text-compact text-muted-foreground">
-            {t("overview.commonTime")} <span className="font-medium text-foreground">{shared}</span>
-          </p>
-        ) : null}
-
-        <div className="flex flex-col gap-1">
-          <h3 className="text-h3 font-semibold">{t("kvintet.detail.members")}</h3>
-          <ul className="flex flex-col divide-y divide-border">
-            {kvintet.members.map((member, index) => {
-              const lines = [
-                { heading: t("kvintet.members.teaches"), slugs: member.teach },
-                { heading: t("kvintet.members.wantsToLearn"), slugs: member.learn },
-                { heading: t("kvintet.members.interests"), slugs: member.interests },
-              ].filter((line) => line.slugs.length > 0)
-              return (
-                <li
-                  key={index}
-                  className="flex items-start gap-3 py-3"
-                >
-                  {/* The feed never carries a name, so the face is seeded by the seat. */}
-                  <AnonymousBlobatar
-                    seed={`${kvintet.id}-seat-${index}`}
-                    motion="hover"
-                    className="size-8 shrink-0"
-                  />
-                  <div className="flex min-w-0 flex-col">
-                    <p className="text-compact font-medium text-foreground">
-                      {member.position ?? t("kvintet.member")}
-                    </p>
-                    {lines.map(({ heading, slugs }) => (
-                      <p
-                        key={heading}
-                        className="text-small text-muted-foreground"
-                      >
-                        <span className="font-medium text-foreground">{heading} </span>
-                        {formatList(slugs.map((slug) => label("tags", slug)))}
-                      </p>
-                    ))}
-                  </div>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
+        {/* The feed never carries a name, so the faces are grey and seeded by the seat. */}
+        <KvintetSeats
+          layout="row"
+          freeLabel={t("kvintet.vacancy")}
+          members={kvintet.members.map((member, index) => ({
+            seed: `${kvintet.id}-seat-${index}`,
+            anonymous: true,
+            label: member.position ?? t("kvintet.member"),
+          }))}
+        />
 
         <DialogFooter>
           <Button
