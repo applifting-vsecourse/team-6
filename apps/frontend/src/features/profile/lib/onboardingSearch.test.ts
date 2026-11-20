@@ -21,8 +21,16 @@ describe("onboardingSearchSchema", () => {
     },
   )
 
+  it("keeps `from=profile` and drops any other `from`", () => {
+    const fromOf = (search: unknown) => onboardingSearchSchema.parse(search).from
+    expect(fromOf({ page: "teach", from: "profile" })).toBe("profile")
+    expect(fromOf({ page: "teach" })).toBeUndefined()
+    expect(fromOf({ page: "teach", from: "/overview" })).toBeUndefined()
+    expect(pageOf({ page: "teach", from: "/overview" })).toBe("teach")
+  })
+
   it("ignores unrelated search params, the old `step` included", () => {
-    expect(pageOf({ page: "days", step: 2, from: "/overview" })).toBe("days")
+    expect(pageOf({ page: "days", step: 2, other: "x" })).toBe("days")
     expect(pageOf({ step: 2 })).toBe("role")
   })
 })
