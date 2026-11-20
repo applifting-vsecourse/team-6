@@ -33,7 +33,6 @@ export function TagSelector({
       groupLabel={t("onboarding.tags.categoryLabel")}
       items={allTags.map((tag) => ({
         id: tag.id,
-        slug: tag.slug,
         label: slugLabel("tags", tag.slug),
         groupIds: tag.categories,
       }))}
