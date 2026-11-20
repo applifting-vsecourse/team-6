@@ -3,9 +3,15 @@ import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
+import { MascotProvider, useMascotContext } from "@/components/Mascot/MascotContext"
 import { Sheet } from "@/components/ui/sheet"
 
-import { HeaderMenu, MobileAccount, MobileSignOut } from "@/features/auth/components/HeaderMenu"
+import {
+  HeaderMenu,
+  MobileAccount,
+  MobileReplayTour,
+  MobileSignOut,
+} from "@/features/auth/components/HeaderMenu"
 
 // The gaze driver needs browser APIs jsdom lacks (matchMedia, ResizeObserver).
 vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
@@ -78,6 +84,40 @@ describe("MobileSignOut", () => {
     await userEvent.click(screen.getByRole("button", { name: "Sign out" }))
 
     expect(signOut).toHaveBeenCalledOnce()
+  })
+})
+
+describe("MobileReplayTour", () => {
+  beforeEach(() => useSession.mockReset())
+
+  // The provider's own counter is what the tour controller watches for a replay.
+  function ReplayCount() {
+    return <p>replays: {useMascotContext()?.replayToken}</p>
+  }
+  const renderInSheet = () =>
+    render(
+      <MascotProvider>
+        <Sheet>
+          <MobileReplayTour />
+        </Sheet>
+        <ReplayCount />
+      </MascotProvider>,
+    )
+
+  it("renders nothing when signed out", () => {
+    useSession.mockReturnValue({ user: null })
+    renderInSheet()
+
+    expect(screen.queryByRole("button", { name: "Replay the tour" })).not.toBeInTheDocument()
+  })
+
+  it("replays the tour on click", async () => {
+    useSession.mockReturnValue({ user: { id: "u1", name: "Jana Nováková", username: "jana" } })
+    renderInSheet()
+
+    await userEvent.click(screen.getByRole("button", { name: "Replay the tour" }))
+
+    expect(screen.getByText("replays: 1")).toBeInTheDocument()
   })
 })
 
