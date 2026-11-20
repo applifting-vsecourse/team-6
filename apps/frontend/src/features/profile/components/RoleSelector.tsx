@@ -2,8 +2,8 @@ import { useTranslation } from "react-i18next"
 
 import { useSlugLabel } from "@/lib/useSlugLabel"
 
-import { CategoryPicker } from "@/features/profile/components/CategoryPicker"
-import { ROLE_FIELDS } from "@/features/profile/lib/roleFields"
+import { ChipPicker } from "@/features/profile/components/onboarding/ChipPicker"
+import { fieldOfRole, ROLE_FIELDS } from "@/features/profile/lib/roleFields"
 
 export const PREDEFINED_ROLES = [
   { id: "software-engineer", slug: "software-engineer" },
@@ -54,53 +54,33 @@ export const PREDEFINED_ROLES = [
   { id: "student", slug: "student" },
 ] as const
 
-export type RoleItem = (typeof PREDEFINED_ROLES)[number]
-
 type RoleSelectorProps = {
-  selectedRoles?: string[]
-  selectedRole?: string
+  selectedRoles: string[]
   onSelectRole: (role: string) => void
-  onRemoveRole?: (role: string) => void
-  onClearRole?: () => void
-  error?: string | null
+  onRemoveRole: (role: string) => void
 }
 
-export function RoleSelector({
-  selectedRoles,
-  selectedRole,
-  onSelectRole,
-  onRemoveRole,
-  onClearRole,
-  error,
-}: RoleSelectorProps) {
+/** Roles, picked like topics: a field of work to browse, a search over all roles, chips (Figma B1). */
+export function RoleSelector({ selectedRoles, onSelectRole, onRemoveRole }: RoleSelectorProps) {
   const { t } = useTranslation()
   const slugLabel = useSlugLabel()
 
-  const groups = ROLE_FIELDS.map((field) => ({ id: field.id, label: t(field.labelKey) }))
-  const items = ROLE_FIELDS.flatMap((field) =>
-    field.roles.map((slug) => ({
-      id: slug,
-      slug,
-      label: slugLabel("roles", slug),
-      groupIds: [field.id],
-    })),
-  )
-
   return (
-    <CategoryPicker
-      title={t("onboarding.step1.role")}
-      hint={t("onboarding.step1.roleHint")}
-      groups={groups}
-      items={items}
-      selectedIds={selectedRoles ?? (selectedRole ? [selectedRole] : [])}
+    <ChipPicker
+      groups={ROLE_FIELDS.map((field) => ({ id: field.id, label: t(field.labelKey) }))}
+      groupLabel={t("onboarding.fieldLabel")}
+      items={PREDEFINED_ROLES.map(({ slug }) => {
+        const field = fieldOfRole(slug)
+        return { id: slug, slug, label: slugLabel("roles", slug), groupIds: field ? [field] : [] }
+      })}
+      selectedIds={selectedRoles}
       onSelect={onSelectRole}
-      onRemove={(role) => (onRemoveRole ? onRemoveRole(role) : onClearRole?.())}
-      addLabel={(name) => t("onboarding.step1.addRole", { name })}
-      removeLabel={(name) => t("onboarding.step1.removeRole", { name })}
-      searchLinkLabel={t("onboarding.step1.searchAllRoles")}
-      searchPlaceholder={t("onboarding.step1.searchRolePlaceholder")}
-      searchAriaLabel={t("onboarding.step1.searchRoleAria")}
-      error={error}
+      onRemove={onRemoveRole}
+      addLabel={(name) => t("onboarding.role.addRole", { name })}
+      removeLabel={(name) => t("onboarding.role.removeRole", { name })}
+      searchPlaceholder={t("onboarding.role.searchRolePlaceholder")}
+      searchAriaLabel={t("onboarding.role.searchRoleAria")}
+      noneLabel={t("onboarding.role.none")}
     />
   )
 }

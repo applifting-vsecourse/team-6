@@ -1,9 +1,11 @@
+import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
 import { SiteHeader } from "@/app/SiteHeader"
 import { CoreIdeaAnimation } from "@/components/CoreIdeaAnimation/CoreIdeaAnimation"
+import { useMascotAnchor, useMascotStage } from "@/components/Mascot/MascotContext"
 import { PageLayout } from "@/components/PageLayout"
 import { Seo } from "@/components/Seo"
 import { StepBlobatar } from "@/components/StepBlobatar"
@@ -22,9 +24,50 @@ const STEPS = [
   { seed: "eva", n: 3, hasShort: false },
 ] as const
 
+// How long the greeting stays up where it cannot be hovered.
+const GREETING_MS = 4000
+const isTouchOnly = () => window.matchMedia?.("(hover: none)").matches ?? false
+
 function LandingPage() {
   const { t } = useTranslation()
   const { user } = useSession()
+  const [mascotAnchorRef] = useMascotAnchor("landing-cta")
+  // The greeting would cover the sign-in button or the text above, so it speaks only while the
+  // button or the mascot is pointed at (or focused), and never takes a click itself. A phone has
+  // nothing to point with: there it speaks for a moment when the page opens and after a tap.
+  const [isGreeting, setIsGreeting] = useState(isTouchOnly)
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const hideSoon = () => {
+    clearTimeout(hideTimer.current)
+    hideTimer.current = setTimeout(() => setIsGreeting(false), GREETING_MS)
+  }
+  useEffect(() => {
+    if (isTouchOnly()) hideSoon()
+    return () => clearTimeout(hideTimer.current)
+  }, [])
+  const onPointerEnter = (event: PointerEvent) => {
+    setIsGreeting(true)
+    // A finger "enters" with a tap and never leaves the way a mouse does.
+    if (event.pointerType === "mouse") clearTimeout(hideTimer.current)
+    else hideSoon()
+  }
+  const onPointerLeave = (event: PointerEvent) => {
+    if (event.pointerType === "mouse") setIsGreeting(false)
+  }
+  // The yellow mascot greets visitors only; someone with an account has no use for it here.
+  const stage = useMemo(
+    () =>
+      user
+        ? null
+        : {
+            anchorId: "landing-cta",
+            bubble: isGreeting
+              ? { text: t("landing.mascot.getStarted"), prefer: "above" as const }
+              : undefined,
+          },
+    [user, isGreeting, t],
+  )
+  useMascotStage(stage)
 
   return (
     <>
@@ -48,9 +91,26 @@ function LandingPage() {
                     </Button>
                   ) : (
                     <>
-                      <Button asChild>
-                        <Link to={ROUTES.signup}>{t("landing.createAccount")}</Link>
-                      </Button>
+                      <div
+                        className="relative"
+                        onPointerEnter={onPointerEnter}
+                        onPointerLeave={onPointerLeave}
+                        onFocus={() => setIsGreeting(true)}
+                        onBlur={() => setIsGreeting(false)}
+                      >
+                        <Button
+                          asChild
+                          className="w-full"
+                        >
+                          <Link to={ROUTES.signup}>{t("landing.createAccount")}</Link>
+                        </Button>
+                        {/* Where the mascot sits: on the corner of the button, like a sticker. */}
+                        <span
+                          ref={mascotAnchorRef}
+                          aria-hidden
+                          className="absolute -top-5 right-2 size-12 md:-right-5"
+                        />
+                      </div>
                       <Button
                         asChild
                         variant="outline"

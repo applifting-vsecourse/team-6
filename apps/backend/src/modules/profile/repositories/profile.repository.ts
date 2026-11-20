@@ -75,7 +75,17 @@ export class ProfileRepository {
       roles,
       profile.latitude,
       profile.longitude,
+      profile.tourCompletedAt,
     );
+  }
+
+  // Only sets the mark when it is empty, so repeated calls keep the first time.
+  async markTourCompleted(userId: string): Promise<ProfileEntity | null> {
+    await this.prisma.profile.updateMany({
+      where: { userId, tourCompletedAt: null },
+      data: { tourCompletedAt: new Date() },
+    });
+    return this.findByUserId(userId);
   }
 
   async saveProfile(
