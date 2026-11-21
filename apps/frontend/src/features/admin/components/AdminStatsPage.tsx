@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 import { StateAlert } from "@/components/StateAlert"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { env } from "@/config/env"
 import { formatNumber } from "@/lib/date"
 import { getErrorMessage } from "@/lib/errorMessage"
 
@@ -121,6 +122,33 @@ function StatGroup({
   )
 }
 
+// The CSV files the backend serves under `admin/export/:dataset`.
+const EXPORTS = ["feed", "memberships", "kvintets", "users"] as const
+
+/** Plain links: the browser sends the session cookie and the backend answers with a download. */
+function ExportGroup() {
+  const { t } = useTranslation()
+
+  return (
+    <section className="flex flex-col gap-2">
+      <h2 className="text-h3">{t("admin.export.title")}</h2>
+      <div className="flex flex-wrap gap-2">
+        {EXPORTS.map((dataset) => (
+          <Button
+            key={dataset}
+            variant="outline"
+            asChild
+          >
+            <a href={`${env.VITE_API_URL}/admin/export/${dataset}`}>
+              {t(`admin.export.${dataset}`)}
+            </a>
+          </Button>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 export function AdminStatsPage() {
   const { t } = useTranslation()
   const stats = useQuery(adminStatsQueryOptions())
@@ -198,6 +226,8 @@ export function AdminStatsPage() {
           />
         </div>
       )}
+
+      <ExportGroup />
     </div>
   )
 }

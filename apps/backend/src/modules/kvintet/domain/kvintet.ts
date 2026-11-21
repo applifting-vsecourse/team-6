@@ -56,6 +56,12 @@ export type Feed = {
 /** How many reasons a feed item shows. */
 export const FEED_REASONS = 3;
 
+/** One kvintet as a feed load ranked it. The score is internal data, never sent to a client. */
+export type FeedSnapshotItem = { kvintetId: string; score: number };
+
+/** How many feed loads are kept per user; older ones are pruned when a new one is written. */
+export const FEED_SNAPSHOTS_KEPT = 50;
+
 export type NewKvintet = {
   title: string;
   categorySlugs: string[];
