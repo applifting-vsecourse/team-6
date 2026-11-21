@@ -85,8 +85,6 @@ describe("getErrorMessage", () => {
 
   it("follows the active language", async () => {
     await i18n.changeLanguage("cs")
-    expect(getErrorMessage(httpError({ code: "unauthorized" }))).toBe(
-      "Nejdřív se musíš přihlásit.",
-    )
+    expect(getErrorMessage(httpError({ code: "unauthorized" }))).toBe("Nejdřív se musíš přihlásit.")
   })
 })
