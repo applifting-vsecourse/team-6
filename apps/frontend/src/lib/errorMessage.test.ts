@@ -69,24 +69,22 @@ describe("getErrorMessage", () => {
 
     await i18n.changeLanguage("cs")
     expect(getErrorMessage(httpError({ code: "PROFILE_ROLE_REQUIRED" }))).toBe(
-      "Vyberte alespoň jednu roli.",
+      "Vyber alespoň jednu roli.",
     )
     expect(getErrorMessage(httpError({ code: "PROFILE_LOCATION_REQUIRED" }))).toBe(
-      "Zvolte místo na mapě.",
+      "Zvol místo na mapě.",
     )
     expect(getErrorMessage(httpError({ code: "PROFILE_AVAILABILITY_REQUIRED" }))).toBe(
-      "Vyberte alespoň jeden den a denní dobu.",
+      "Vyber alespoň jeden den a denní dobu.",
     )
     expect(getErrorMessage(httpError({ code: "CITY_NOT_FOUND" }))).toBe("Toto město jsme nenašli.")
     expect(getErrorMessage(httpError({ code: "TAGS_NOT_FOUND" }))).toBe(
-      "Některé vybrané štítky už neexistují. Vyberte je prosím znovu.",
+      "Některé vybrané štítky už neexistují. Vyber je prosím znovu.",
     )
   })
 
   it("follows the active language", async () => {
     await i18n.changeLanguage("cs")
-    expect(getErrorMessage(httpError({ code: "unauthorized" }))).toBe(
-      "Nejdřív se musíte přihlásit.",
-    )
+    expect(getErrorMessage(httpError({ code: "unauthorized" }))).toBe("Nejdřív se musíš přihlásit.")
   })
 })
