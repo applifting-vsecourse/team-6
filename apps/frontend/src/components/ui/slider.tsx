@@ -42,6 +42,8 @@ function Slider({
         <SliderPrimitive.Thumb
           data-slot="slider-thumb"
           key={index}
+          // Radix puts the label on the root; the thumb is the control a screen reader lands on.
+          aria-label={props["aria-label"]}
           className="block size-4 shrink-0 rounded-full border-2 border-highlight bg-card ring-ring/50 transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
         />
       ))}

@@ -30,6 +30,7 @@
   --color-highlight: var(--highlight);
   --color-highlight-foreground: var(--highlight-foreground);
   --color-highlight-soft: var(--highlight-soft);
+  --color-ok: var(--ok);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -150,6 +151,8 @@
   --highlight-foreground: #ffffff;
   /* accent-soft: fill of a selected chip */
   --highlight-soft: #e3ebff;
+  /* Figma `ok`: a step that is done (the tick on the onboarding summary) */
+  --ok: #1e8a5a;
   /* line */
   --border: #dde2ec;
   /* line-strong */
@@ -204,6 +207,7 @@
   --highlight: #8db4ff;
   --highlight-foreground: #0d1220;
   --highlight-soft: #1c2a4a;
+  --ok: #6fd3a5;
   /* line */
   --border: #27304a;
   /* line-strong */

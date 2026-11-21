@@ -40,6 +40,7 @@ const kvintet = (
 ): OpenKvintet => ({
   id,
   title: 'Using AI at work',
+  description: 'Prompts that actually help with everyday work.',
   categories,
   members,
 });
@@ -161,7 +162,7 @@ describe('KvintetService.feed', () => {
     });
   });
 
-  it('counts the members and sends only role and tags for each', async () => {
+  it('counts the members, sends the description and only role and tags for each member', async () => {
     const { repository, service } = setup();
     repository.isMember.mockResolvedValue(false);
     // A leaked field on the domain object must not reach the response.
@@ -176,6 +177,7 @@ describe('KvintetService.feed', () => {
     expect(item).toEqual({
       id: 'kvintet-1',
       title: 'Using AI at work',
+      description: 'Prompts that actually help with everyday work.',
       categories: ['software-development'],
       capacity: 5,
       memberCount: 1,
@@ -261,6 +263,26 @@ describe('KvintetService.feed', () => {
       expect(feed.items.map((item) => item.id)).toEqual(['boundary']);
     });
 
+    it('records the ranked list with scores, and still answers when recording fails', async () => {
+      const { repository, service } = setup();
+      repository.isMember.mockResolvedValue(false);
+      repository.findMatchProfile.mockResolvedValue(me);
+      repository.findOpenKvintets.mockResolvedValue([
+        kvintet([member(null, teacher)], 'strong', ['data-ai']),
+      ]);
+
+      await service.feed('u1');
+
+      expect(repository.recordFeedSnapshot).toHaveBeenCalledWith('u1', false, [
+        { kvintetId: 'strong', score: expect.any(Number) as number },
+      ]);
+
+      repository.recordFeedSnapshot.mockRejectedValue(new Error('db down'));
+      await expect(service.feed('u1')).resolves.toMatchObject({
+        items: [{ id: 'strong' }],
+      });
+    });
+
     it('lists every kvintet, flagged as fallback, when none reaches the threshold', async () => {
       const { repository, service } = setup();
       repository.isMember.mockResolvedValue(false);
@@ -290,7 +312,7 @@ describe('KvintetService.start', () => {
   const input = {
     title: 'Topic',
     categorySlugs: ['leisure'],
-    description: null,
+    description: 'Prompts that actually help with everyday work.',
   };
 
   it('returns the new kvintet id', async () => {
@@ -355,6 +377,7 @@ describe('KvintetService.getMyKvintet', () => {
   const mockDetails: KvintetDetails = {
     id: 'k1',
     title: 'AI v práci',
+    description: 'Sdílíme prompty, které nám šetří čas.',
     status: 'FORMING',
     createdAt: new Date('2026-10-21T10:00:00Z'),
     activatedAt: null,
@@ -415,6 +438,7 @@ describe('KvintetService.vote', () => {
   const mockDetails: KvintetDetails = {
     id: 'k1',
     title: 'AI v práci',
+    description: 'Sdílíme prompty, které nám šetří čas.',
     status: 'FORMING',
     createdAt: new Date('2026-10-21T10:00:00Z'),
     activatedAt: null,

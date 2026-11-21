@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { ProfileResponse } from "@/features/profile/api/profileApi"
 import type { useProfile } from "@/features/profile/hooks/useProfile"
 
-import { formatWhenAndWhere, ProfilePage, Route } from "./profile"
+import { formatDays, formatPlace, formatTimes, ProfilePage, Route } from "./profile"
 
 vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
 
@@ -22,11 +22,11 @@ vi.mock("@tanstack/react-router", () => ({
   }: {
     children?: ReactNode
     to: string
-    search?: { step: number }
+    search?: { page: string; from?: string }
     className?: string
   }) => (
     <a
-      href={search ? `${to}?step=${search.step}` : to}
+      href={search ? `${to}?${new URLSearchParams(search)}` : to}
       className={className}
     >
       {children}
@@ -138,7 +138,19 @@ describe("ProfilePage", () => {
     render(<ProfilePage user={defaultUser} />)
 
     expect(screen.getByRole("heading", { name: "Jana Nováková" })).toBeInTheDocument()
-    expect(screen.getByText(/@jana.novakova · Marketing specialist/)).toBeInTheDocument()
+    expect(screen.getByText(/@jana.novakova · Marketing Specialist/)).toBeInTheDocument()
+    expect(screen.queryByText(/marketing-specialist/)).not.toBeInTheDocument()
+  })
+
+  it("labels the position when the profile has no roles", () => {
+    mockUseProfile.mockReturnValue(
+      mockProfileData({ profile: { ...mockProfile, roles: [], position: "qa-engineer" } }),
+    )
+
+    render(<ProfilePage user={defaultUser} />)
+
+    expect(screen.getByText(/@jana.novakova · QA/)).toBeInTheDocument()
+    expect(screen.queryByText(/qa-engineer/)).not.toBeInTheDocument()
   })
 
   it("shows the role and the expectations, each with an edit link to its onboarding step", () => {
@@ -151,21 +163,22 @@ describe("ProfilePage", () => {
     render(<ProfilePage user={defaultUser} />)
 
     const role = screen.getByRole("heading", { name: "My role" }).closest("section")!
-    expect(role).toHaveTextContent("Marketing Specialist · Marketing specialist")
+    expect(role).toHaveTextContent("Marketing & sales · Marketing Specialist")
+    expect(role).not.toHaveTextContent("marketing-specialist")
     expect(within(role).getByRole("link", { name: "Edit" })).toHaveAttribute(
       "href",
-      "/onboarding?step=1",
+      "/onboarding?page=role&from=profile",
     )
 
     const expects = screen.getByRole("heading", { name: "What you expect" }).closest("section")!
     expect(expects).toHaveTextContent("Learn something new · Share what I know")
-    expect(within(expects).getByRole("link", { name: "Edit" })).toHaveAttribute(
+    expect(within(expects).getAllByRole("link", { name: "Edit" })[0]).toHaveAttribute(
       "href",
-      "/onboarding?step=3",
+      "/onboarding?page=expectations&from=profile",
     )
   })
 
-  it("renders teach, learn and interest tag sections with edit links to step 1", () => {
+  it("renders teach, learn and interest tag sections with an edit link to its own onboarding page", () => {
     mockUseProfile.mockReturnValue(mockProfileData())
 
     render(<ProfilePage user={defaultUser} />)
@@ -186,28 +199,41 @@ describe("ProfilePage", () => {
     expect(screen.getByText("Running")).toBeInTheDocument()
     expect(screen.getByText("Reading")).toBeInTheDocument()
 
-    // Edit buttons link to onboarding step 1
+    // Each Edit link opens the page of its own section
     const links = screen.getAllByRole("link", { name: "Edit" })
-    expect(links.length).toBe(6) // role, 3 tag sections, when & where, expectations
+    expect(links.length).toBe(10) // every onboarding page except the summary has one
     expect(links.map((link) => link.getAttribute("href"))).toEqual([
-      "/onboarding?step=1",
-      "/onboarding?step=1",
-      "/onboarding?step=1",
-      "/onboarding?step=1",
-      "/onboarding?step=2",
-      "/onboarding?step=3",
+      "/onboarding?page=role&from=profile",
+      "/onboarding?page=teach&from=profile",
+      "/onboarding?page=learn&from=profile",
+      "/onboarding?page=interests&from=profile",
+      "/onboarding?page=days&from=profile",
+      "/onboarding?page=time&from=profile",
+      "/onboarding?page=place&from=profile",
+      "/onboarding?page=expectations&from=profile",
+      "/onboarding?page=frequency&from=profile",
+      "/onboarding?page=note&from=profile",
     ])
   })
 
-  it("renders when and where formatted string", () => {
-    mockUseProfile.mockReturnValue(mockProfileData())
+  it("shows days, time, place, frequency and note, each in a row with its own edit link", () => {
+    mockUseProfile.mockReturnValue(
+      mockProfileData({ profile: { ...mockProfile, note: "I bring my dog" } }),
+    )
 
     render(<ProfilePage user={defaultUser} />)
 
+    const row = (label: string) => screen.getByText(label).closest("div")!.parentElement!
     expect(screen.getByRole("heading", { name: "When and where" })).toBeInTheDocument()
-    expect(
-      screen.getByText(/Weekday evenings · Prague, within 10 km · every two weeks/i),
-    ).toBeInTheDocument()
+    expect(row("Days")).toHaveTextContent("Weekdays")
+    expect(row("Time of day")).toHaveTextContent("Evenings")
+    expect(row("Place")).toHaveTextContent("Prague, within 10 km")
+    expect(row("How often")).toHaveTextContent("Every two weeks")
+    expect(row("Note")).toHaveTextContent("I bring my dog")
+    expect(within(row("Note")).getByRole("link", { name: "Edit" })).toHaveAttribute(
+      "href",
+      "/onboarding?page=note&from=profile",
+    )
   })
 
   it("renders empty state messages when profile tags are empty", () => {
@@ -224,6 +250,7 @@ describe("ProfilePage", () => {
           afternoons: false,
           evenings: false,
           cityName: null,
+          radiusKm: null,
           meetingFrequency: null,
         },
       }),
@@ -232,8 +259,8 @@ describe("ProfilePage", () => {
     render(<ProfilePage user={defaultUser} />)
 
     const emptyTags = screen.getAllByText("Nothing added yet")
-    expect(emptyTags.length).toBe(4) // teach, learn, interests, expectations
-    expect(screen.getByText("No preferences set yet")).toBeInTheDocument()
+    expect(emptyTags.length).toBe(5) // teach, learn, interests, expectations, note
+    expect(screen.getAllByText("No preferences set yet").length).toBe(4) // days, time, place, how often
   })
 
   it("opens real delete account dialog and confirms account deletion", async () => {
@@ -368,73 +395,56 @@ describe("ProfilePage", () => {
   })
 })
 
-describe("formatWhenAndWhere", () => {
+describe("row values", () => {
   const tMock = ((key: string, options?: { count?: number }) => {
     const translations: Record<string, string> = {
       "profile.when.allDays": "All days",
-      "profile.when.weekdays": "Weekdays",
-      "profile.when.weekends": "Weekends",
-      "profile.when.mornings": "mornings",
-      "profile.when.afternoons": "afternoons",
-      "profile.when.evenings": "evenings",
-      "meetingFrequency.BIWEEKLY": "every two weeks",
-      "meetingFrequency.WEEKLY": "weekly",
+      "onboarding.days.weekdays": "Weekdays",
+      "onboarding.days.weekends": "Weekends",
+      "onboarding.time.mornings": "Mornings",
+      "onboarding.time.afternoons": "Afternoons",
+      "onboarding.time.evenings": "Evenings",
     }
-    if (key === "profile.withinRadius") {
-      return `within ${options?.count ?? 0} km`
-    }
+    if (key === "profile.withinRadius") return `within ${options?.count ?? 0} km`
     return translations[key] ?? key
   }) as unknown as TFunction
+  const none = {
+    ...mockProfile,
+    weekdays: false,
+    weekends: false,
+    mornings: false,
+    afternoons: false,
+    evenings: false,
+    cityName: null,
+    radiusKm: null,
+  }
 
-  it("returns null if profile is null", () => {
-    expect(formatWhenAndWhere(null, tMock)).toBeNull()
+  it("is empty when nothing is set, also without a profile", () => {
+    for (const profile of [null, none]) {
+      expect(formatDays(profile, tMock)).toBe("")
+      expect(formatTimes(profile, tMock)).toBe("")
+      expect(formatPlace(profile, tMock)).toBe("")
+    }
   })
 
-  it("returns null if no when and where fields are present", () => {
-    const empty = {
-      ...mockProfile,
-      weekdays: false,
-      weekends: false,
-      mornings: false,
-      afternoons: false,
-      evenings: false,
-      cityName: null,
-      radiusKm: null,
-      meetingFrequency: null,
-    }
-    expect(formatWhenAndWhere(empty, tMock)).toBeNull()
+  it("names the days, with both as all days", () => {
+    expect(formatDays({ ...none, weekdays: true }, tMock)).toBe("Weekdays")
+    expect(formatDays({ ...none, weekends: true }, tMock)).toBe("Weekends")
+    expect(formatDays({ ...none, weekdays: true, weekends: true }, tMock)).toBe("All days")
   })
 
-  it("formats weekdays and weekends as all days with times, city with radius and frequency", () => {
-    const full = {
-      ...mockProfile,
-      weekdays: true,
-      weekends: true,
-      mornings: true,
-      afternoons: false,
-      evenings: true,
-      cityName: "Brno",
-      radiusKm: 15,
-      meetingFrequency: "WEEKLY" as const,
-    }
-    expect(formatWhenAndWhere(full, tMock)).toBe(
-      "All days mornings, evenings · Brno, within 15 km · weekly",
+  it("lists the times of day in order", () => {
+    expect(formatTimes({ ...none, mornings: true, evenings: true }, tMock)).toBe(
+      "Mornings, Evenings",
     )
   })
 
-  it("formats city without radius when radius is 0 or null", () => {
-    const withoutRadius = {
-      ...mockProfile,
-      weekdays: false,
-      weekends: true,
-      mornings: false,
-      afternoons: true,
-      evenings: false,
-      cityName: "Ostrava",
-      radiusKm: 0,
-      meetingFrequency: null,
-    }
-    expect(formatWhenAndWhere(withoutRadius, tMock)).toBe("Weekends afternoons · Ostrava")
+  it("shows the city with its radius, or just one of them", () => {
+    expect(formatPlace({ ...none, cityName: "Brno", radiusKm: 15 }, tMock)).toBe(
+      "Brno, within 15 km",
+    )
+    expect(formatPlace({ ...none, cityName: "Ostrava", radiusKm: 0 }, tMock)).toBe("Ostrava")
+    expect(formatPlace({ ...none, radiusKm: 10 }, tMock)).toBe("within 10 km")
   })
 })
 

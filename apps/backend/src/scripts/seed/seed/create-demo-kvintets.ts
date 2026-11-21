@@ -31,6 +31,7 @@ const PLACES = {
 
 type DemoKvintet = {
   title: string;
+  description: string;
   categories: string[];
   members: DemoMember[];
   // Full and agreed on.
@@ -114,7 +115,7 @@ export async function createDemoKvintets(
     const created = await prisma.kvintet.create({
       data: {
         title: kvintet.title,
-        categoryId: categoryIds[0],
+        description: kvintet.description,
         categories: {
           create: categoryIds.map((categoryId) => ({ categoryId })),
         },

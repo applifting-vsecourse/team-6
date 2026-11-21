@@ -15,6 +15,7 @@ import { Route as CodeOfConductRouteImport } from './routes/code-of-conduct'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ProtectedPagesAdminRouteImport } from './routes/_ProtectedPages/admin'
 import { Route as ProtectedPagesOnboardingRouteImport } from './routes/_ProtectedPages/onboarding'
 import { Route as ProtectedPagesOverviewRouteImport } from './routes/_ProtectedPages/overview'
 import { Route as ProtectedPagesProfileRouteImport } from './routes/_ProtectedPages/profile'
@@ -51,6 +52,11 @@ const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedPagesAdminRoute = ProtectedPagesAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => ProtectedPagesRoute,
 } as any)
 const ProtectedPagesOnboardingRoute =
   ProtectedPagesOnboardingRouteImport.update({
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/admin': typeof ProtectedPagesAdminRoute
   '/onboarding': typeof ProtectedPagesOnboardingRoute
   '/overview': typeof ProtectedPagesOverviewRoute
   '/profile': typeof ProtectedPagesProfileRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/admin': typeof ProtectedPagesAdminRoute
   '/onboarding': typeof ProtectedPagesOnboardingRoute
   '/overview': typeof ProtectedPagesOverviewRoute
   '/profile': typeof ProtectedPagesProfileRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/_ProtectedPages/admin': typeof ProtectedPagesAdminRoute
   '/_ProtectedPages/onboarding': typeof ProtectedPagesOnboardingRoute
   '/_ProtectedPages/overview': typeof ProtectedPagesOverviewRoute
   '/_ProtectedPages/profile': typeof ProtectedPagesProfileRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/login'
     | '/signup'
+    | '/admin'
     | '/onboarding'
     | '/overview'
     | '/profile'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/login'
     | '/signup'
+    | '/admin'
     | '/onboarding'
     | '/overview'
     | '/profile'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/login'
     | '/signup'
+    | '/_ProtectedPages/admin'
     | '/_ProtectedPages/onboarding'
     | '/_ProtectedPages/overview'
     | '/_ProtectedPages/profile'
@@ -236,6 +248,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_ProtectedPages/admin': {
+      id: '/_ProtectedPages/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof ProtectedPagesAdminRouteImport
+      parentRoute: typeof ProtectedPagesRoute
+    }
     '/_ProtectedPages/onboarding': {
       id: '/_ProtectedPages/onboarding'
       path: '/onboarding'
@@ -289,6 +308,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface ProtectedPagesRouteChildren {
+  ProtectedPagesAdminRoute: typeof ProtectedPagesAdminRoute
   ProtectedPagesOnboardingRoute: typeof ProtectedPagesOnboardingRoute
   ProtectedPagesOverviewRoute: typeof ProtectedPagesOverviewRoute
   ProtectedPagesProfileRoute: typeof ProtectedPagesProfileRoute
@@ -299,6 +319,7 @@ interface ProtectedPagesRouteChildren {
 }
 
 const ProtectedPagesRouteChildren: ProtectedPagesRouteChildren = {
+  ProtectedPagesAdminRoute: ProtectedPagesAdminRoute,
   ProtectedPagesOnboardingRoute: ProtectedPagesOnboardingRoute,
   ProtectedPagesOverviewRoute: ProtectedPagesOverviewRoute,
   ProtectedPagesProfileRoute: ProtectedPagesProfileRoute,

@@ -87,6 +87,30 @@ Kvintet shows no photos, so every person is represented by a generated avatar fr
 - **Decorative by default** (no alt text) because the name is written next to it. If an avatar stands alone, pass `blobatar={{ title: name }}`.
 - **Tests:** jsdom lacks `matchMedia`/`ResizeObserver`, so a test that renders `GazeBlobatar` mocks `@blobatar/react/gaze` (see `SignUpForm.test.tsx`).
 
+## Onboarding
+
+A conversation, not a form (Figma #126): **one question per page**, eleven pages in three steps (`features/profile/lib/onboardingPages.ts` is the one list of them). At the top the person's own avatar (96px) with the question in its speech bubble (title, and a hint under it); the answers right below it; Back / Continue under the answers. The column is 640px, centred.
+
+- **No cards and no frames.** Answers are soft shapes: a **chip** (a field of work, a topic: white with an edge, chosen = `highlight-soft` with a `highlight` edge and text) or a **tile** (one answer of a list: white, no edge, `rounded-2xl`, chosen = `highlight-soft`; a 22px indicator, a square for "as many as you like" and a round one for "pick one"). The search fields and the note are white with no edge. All of it is in `lib/optionStyles.ts`.
+- **A missing required answer** (role, days, time of day, place, frequency) is not a red frame: the bubble's hint becomes red text, the same is said once more in red next to Continue, and the avatar shakes its head once. It goes away as soon as the person answers. The pages that ask nothing (topics, expectations, the note) can be left empty.
+- **The avatar and its question are sticky** under the header, so on a long page (many topics, the map) they stay in view while the answers scroll.
+- **On a phone** (Figma M3…M17d, below `md`) it is the same page, tighter: a 60px avatar, a 17px title, the guide still sticky (once stuck under the header, its bubble shrinks to the title alone, so it covers little of the answers; a red hint stays), chips and tiles at full width, a 200px map. Back and Continue sit in one row under the answers (not pinned to the bottom); the "change it any time" note is hidden, and a save error moves above the buttons.
+- **Progress**: the name of the step (a green tick on the summary) and one bar per step that fills per question. The header keeps "Step N of 3". There is no second "2 / 4" counter next to it: two counters on one screen read as a contradiction.
+- **Each Continue saves** that page's answers, so a reload, Back or an edit from the profile page keeps them. Step 1 ends with a summary (Edit goes back to a question), and the avatar is happy there.
+- **The avatar** is the mascot while the tour runs (its overlay stands on the avatar's spot, so after "Done" it can fly on to Home) and the page's own face otherwise, as on a repeat of onboarding. It shows the same expression and shake either way (`MascotFace`).
+
+## The mascot
+
+One yellow blobatar, seed `jana` (the "you" of the landing animation), guides a new person: it sits on the corner of "Create account", flies to the avatar slot on sign-up, turns into that person's own avatar as the username is typed, is the avatar at the top of every onboarding page (see Onboarding), then walks Home and the feed, and finally flies into the header avatar. Everything lives in `components/Mascot/`; the tour is `app/tour/`.
+
+- **One mascot at a time.** It is a single overlay above the router (`z-45`: over the header, under dialogs and menus). A page never draws its own: it declares a place with `useMascotAnchor(id)` and asks for the stage with `useMascotStage({ anchorId, seed?, expression?, shakeKey?, bubble? })` (memoize it). Leave out `seed` for the yellow mascot; give a person's seed and it cross-fades into that face (it cannot morph between two seeds). While the mascot is on screen as a person, every other copy of that person's avatar steps aside (`invisible`, not removed): the header avatar (and, in onboarding, the avatar's own spot, which the mascot stands on).
+- **It never rides over the header.** An anchor that scrolls under the sticky header takes the mascot out of sight with it; only an anchor inside the header shows it there. A sticky anchor (`data-mascot-sticky`, as the pinned sign-up avatar has) instead stays just under the header while its holder is on screen.
+- **The bubble covers nothing.** On landing it shows only while the button or the mascot is hovered or focused, below the mascot (above it on a phone, where below would cover the sign-in button), and takes no clicks; where there is nothing to hover with (a phone) it shows for four seconds when the page opens and after a tap. On sign-up it sits in room the page reserved (`MascotBubbleSlot`, named by `bubble.slotId`). It is as wide as its text and appears once the mascot has landed.
+- **Sign-up on a phone.** The avatar stays pinned, small and silent, under the header while the form scrolls, so the face changing with the username stays in view.
+- **The cross.** On Home and the feed it ends the tour: the mascot flies to the header, says where the tour can be replayed, and the tour is saved as done at that moment (`tourCompletedAt`), not at "Done". A replay from the avatar menu writes nothing.
+- **It looks away from a password.** While a password field has focus on sign-up its eyes shut (`isEyesClosed`, the `sleepy` pose) and look the other way from the cursor.
+- **Words and motion.** The face is `aria-hidden`; the words are `role="status"`. Copy comes from `landing.mascot.*`, `auth.mascot.*` and `tour.*`, in the first person, and never names the mascot. Movement is a spring flight with `motion`; under `prefers-reduced-motion` it only appears on its target.
+
 ## Every list has three states
 
 Loading, empty, and error — all three, always. An empty list renders an empty state with one sentence saying what would appear here, not a blank area. An error renders the message and a way to retry.

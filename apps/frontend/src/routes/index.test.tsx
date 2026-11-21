@@ -1,7 +1,9 @@
 import type { ComponentType, ReactNode } from "react"
-import { render, screen, within } from "@testing-library/react"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { act, fireEvent, render, screen } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
+import { MascotProvider, useMascotContext } from "@/components/Mascot/MascotContext"
 import { Route } from "@/routes/index"
 
 // The gaze driver needs browser APIs jsdom lacks (matchMedia, ResizeObserver).
@@ -26,6 +28,17 @@ vi.mock("@tanstack/react-router", () => ({
 
 const LandingPage = Route.options.component as ComponentType
 
+function MascotProbe() {
+  const stage = useMascotContext()?.stage
+  return (
+    <p data-testid="mascot">
+      {stage
+        ? `${stage.anchorId}: ${stage.bubble?.text ?? "silent"}${stage.bubble?.prefer ? ` (${stage.bubble.prefer})` : ""}`
+        : "none"}
+    </p>
+  )
+}
+
 describe("LandingPage", () => {
   beforeEach(() => {
     session.user = null
@@ -39,6 +52,138 @@ describe("LandingPage", () => {
     expect(screen.queryByRole("link", { name: "Go to Home" })).not.toBeInTheDocument()
   })
 
+  it("puts the yellow mascot on the corner of the button, silent until it is pointed at", () => {
+    render(
+      <MascotProvider>
+        <MascotProbe />
+        <LandingPage />
+      </MascotProvider>,
+    )
+
+    expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: silent")
+  })
+
+  it("greets while the button is hovered and goes quiet when the pointer leaves", async () => {
+    const user = userEvent.setup()
+    render(
+      <MascotProvider>
+        <MascotProbe />
+        <LandingPage />
+      </MascotProvider>,
+    )
+    const button = screen.getByRole("link", { name: "Create account" })
+
+    await user.hover(button)
+    expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: Let's get started!")
+
+    await user.unhover(button)
+    expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: silent")
+  })
+
+  describe("on a wide screen", () => {
+    beforeEach(() => {
+      window.matchMedia = ((query: string) => ({
+        matches: query === "(min-width: 768px)",
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+      })) as unknown as typeof window.matchMedia
+    })
+    afterEach(() => void Reflect.deleteProperty(window, "matchMedia"))
+
+    it("greets below the mascot, off the subtitle above the buttons", async () => {
+      const user = userEvent.setup()
+      render(
+        <MascotProvider>
+          <MascotProbe />
+          <LandingPage />
+        </MascotProvider>,
+      )
+
+      await user.hover(screen.getByRole("link", { name: "Create account" }))
+
+      expect(screen.getByTestId("mascot")).toHaveTextContent("Let's get started! (below)")
+    })
+  })
+
+  describe("on a phone, which has nothing to hover with", () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+      window.matchMedia = ((query: string) => ({
+        matches: query === "(hover: none)",
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+      })) as unknown as typeof window.matchMedia
+    })
+    afterEach(() => {
+      vi.useRealTimers()
+      // jsdom has none of its own.
+      Reflect.deleteProperty(window, "matchMedia")
+    })
+
+    it("greets for a moment when the page opens, then goes quiet", () => {
+      render(
+        <MascotProvider>
+          <MascotProbe />
+          <LandingPage />
+        </MascotProvider>,
+      )
+      // Below would cover the stacked sign-in button there.
+      expect(screen.getByTestId("mascot")).toHaveTextContent("Let's get started! (above)")
+
+      act(() => void vi.advanceTimersByTime(4100))
+
+      expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: silent")
+    })
+
+    it("greets again for a moment after a tap", () => {
+      render(
+        <MascotProvider>
+          <MascotProbe />
+          <LandingPage />
+        </MascotProvider>,
+      )
+      act(() => void vi.advanceTimersByTime(4100))
+      const button = screen.getByRole("link", { name: "Create account" })
+
+      fireEvent.pointerEnter(button, { pointerType: "touch" })
+      expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: Let's get started!")
+
+      // A finger never "leaves" the way a mouse does, so the greeting must go by itself.
+      act(() => void vi.advanceTimersByTime(4100))
+      expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: silent")
+    })
+  })
+
+  it("greets a keyboard user who focuses the button too", async () => {
+    const user = userEvent.setup()
+    render(
+      <MascotProvider>
+        <MascotProbe />
+        <LandingPage />
+      </MascotProvider>,
+    )
+
+    await user.tab()
+    // The page's first stop may be another control; tab on until the button has focus.
+    for (let i = 0; i < 5 && document.activeElement?.textContent !== "Create account"; i++) {
+      await user.tab()
+    }
+
+    expect(screen.getByTestId("mascot")).toHaveTextContent("landing-cta: Let's get started!")
+  })
+
+  it("keeps the mascot away from someone who already has an account", () => {
+    session.user = { id: "u1" }
+    render(
+      <MascotProvider>
+        <MascotProbe />
+        <LandingPage />
+      </MascotProvider>,
+    )
+
+    expect(screen.getByTestId("mascot")).toHaveTextContent("none")
+  })
+
   it("sends someone signed in to the overview and offers no account", () => {
     session.user = { id: "u1" }
     render(<LandingPage />)
@@ -48,37 +193,15 @@ describe("LandingPage", () => {
     expect(screen.queryByRole("link", { name: "Sign in" })).not.toBeInTheDocument()
   })
 
-  it("shows the headline, a table of five and the three steps", () => {
-    const { container } = render(<LandingPage />)
-
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Five people. One kvintet. Learn from each other.",
-    )
-    expect(container.querySelectorAll('[data-seat="member"]')).toHaveLength(5)
-    const steps = within(screen.getByRole("list")).getAllByRole("listitem")
-    expect(steps).toHaveLength(3)
-    expect(steps[0]).toHaveTextContent("Tell us about you")
-    expect(steps[2]).toHaveTextContent("Meet up")
-  })
-
-  it("carries the shorter phone copy next to the desktop copy", () => {
+  it("shows the two-line headline, the core-idea animation and the video", () => {
     render(<LandingPage />)
 
-    // CSS picks one of the two; jsdom has no CSS, so both are in the page.
-    expect(screen.getByText("What you know and what you'd like to learn.")).toBeInTheDocument()
-    expect(
-      screen.getByText("What you know and what you'd like to learn. 3 minutes."),
-    ).toBeInTheDocument()
-    expect(screen.getByText("Names stay hidden until it starts.")).toBeInTheDocument()
-    expect(screen.getByText("An algorithm finds the kvintet that fits you.")).toBeInTheDocument()
-  })
-
-  it("links to the rules", () => {
-    render(<LandingPage />)
-
-    expect(screen.getByRole("link", { name: "Read the rules" })).toHaveAttribute(
-      "href",
-      "/code-of-conduct",
-    )
+    const title = screen.getByRole("heading", { level: 1 })
+    expect(title).toHaveTextContent("Five people. One kvintet.")
+    expect(title).toHaveTextContent("Learn from each other.")
+    expect(screen.getByRole("img", { name: /find(s)? a kvintet/i })).toBeInTheDocument()
+    expect(screen.getByRole("heading", { level: 2, name: "See how it works" })).toBeInTheDocument()
+    expect(screen.getByRole("group", { name: "Kvintet in one minute" })).toBeInTheDocument()
+    expect(screen.queryByText("Tell us about you", { selector: "h3" })).not.toBeInTheDocument()
   })
 })

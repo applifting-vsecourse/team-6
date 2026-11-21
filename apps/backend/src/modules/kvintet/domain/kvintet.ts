@@ -15,6 +15,7 @@ export type MemberProfile = {
 export type OpenKvintet = {
   id: string;
   title: string;
+  description: string;
   categories: string[];
   /** `match` is for ranking only and never leaves the server. */
   members: (MemberProfile & { match: MatchProfile })[];
@@ -33,6 +34,7 @@ export type CommonAvailability = {
 export type FeedItem = {
   id: string;
   title: string;
+  description: string;
   categories: string[];
   capacity: number;
   memberCount: number;
@@ -54,10 +56,16 @@ export type Feed = {
 /** How many reasons a feed item shows. */
 export const FEED_REASONS = 3;
 
+/** One kvintet as a feed load ranked it. The score is internal data, never sent to a client. */
+export type FeedSnapshotItem = { kvintetId: string; score: number };
+
+/** How many feed loads are kept per user; older ones are pruned when a new one is written. */
+export const FEED_SNAPSHOTS_KEPT = 50;
+
 export type NewKvintet = {
   title: string;
   categorySlugs: string[];
-  description: string | null;
+  description: string;
 };
 
 export type StartOutcome =
@@ -103,6 +111,7 @@ export interface CommonPreferences {
 export interface KvintetDetails {
   id: string;
   title: string;
+  description: string;
   status: KvintetStatusType;
   createdAt: Date;
   activatedAt: Date | null;

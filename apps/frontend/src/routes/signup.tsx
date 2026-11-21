@@ -1,9 +1,11 @@
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
 import { AuthLayout } from "@/components/AuthLayout"
+import { MascotBubbleSlot } from "@/components/Mascot/MascotBubbleSlot"
+import { useMascotStage } from "@/components/Mascot/MascotContext"
 import { Seo } from "@/components/Seo"
 import { getErrorMessage } from "@/lib/errorMessage"
 
@@ -22,6 +24,9 @@ export const Route = createFileRoute("/signup")({
   },
 })
 
+// The mascot swaps faces as the username settles, not on every key press.
+const AVATAR_DEBOUNCE_MS = 250
+
 const EMAIL_TAKEN_CODES = ["USER_ALREADY_EXISTS", "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL"]
 
 function SignUpPage() {
@@ -29,8 +34,31 @@ function SignUpPage() {
   const navigate = useNavigate()
   const signUp = useSignUp()
   const [username, setUsername] = useState("")
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [emailError, setEmailError] = useState<string | null>(null)
+  // BetterAuth stores usernames lowercase, and the avatar is seeded from the stored value.
+  const [seed, setSeed] = useState<string | undefined>(undefined)
+
+  useEffect(() => {
+    const timer = setTimeout(
+      () => setSeed(username.trim().toLowerCase() || undefined),
+      AVATAR_DEBOUNCE_MS,
+    )
+    return () => clearTimeout(timer)
+  }, [username])
+
+  const stage = useMemo(
+    () => ({
+      anchorId: "signup-avatar",
+      seed,
+      // Nobody should see a password, not even the avatar.
+      isEyesClosed: isPasswordFocused,
+      bubble: { text: t("auth.mascot.avatar"), slotId: "signup-bubble" },
+    }),
+    [seed, isPasswordFocused, t],
+  )
+  useMascotStage(stage)
 
   const handleSubmit = async (values: {
     email: string
@@ -73,6 +101,12 @@ function SignUpPage() {
             variant="inline"
           />
         }
+        belowTitle={
+          <MascotBubbleSlot
+            id="signup-bubble"
+            className="min-h-20 w-full"
+          />
+        }
         aside={
           <SignUpPreview
             username={username}
@@ -96,6 +130,7 @@ function SignUpPage() {
           errorMessage={errorMessage}
           emailError={emailError}
           onUsernameChange={setUsername}
+          onPasswordFocusChange={setIsPasswordFocused}
           onSubmit={handleSubmit}
         />
       </AuthLayout>

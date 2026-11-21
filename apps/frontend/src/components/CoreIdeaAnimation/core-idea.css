@@ -1,0 +1,1521 @@
+/*
+ * "Core idea" landing animation, in two sizes: `.ci-m` is the phone stage (360x470), `.ci-d` the
+ * desktop stage (404x508, the card with a pointer). The step tabs under the stage are markup, not CSS. Every class carries a `ci-` prefix
+ * because `.ring` and friends are Tailwind utilities. Colours come from the tokens in global.css.
+ */
+
+.ci {
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-family: var(--font-sans);
+  color: var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+.ci-stage {
+  margin-inline: auto;
+}
+@keyframes ci-tap {
+  from {
+    opacity: 0.9;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+.ci-m .ci-stage {
+  position: relative;
+  width: 360px;
+  height: 470px;
+  overflow: hidden;
+  zoom: var(--fit, 1);
+}
+.ci-m .ci-snap,
+.ci-m .ci-snap * {
+  transition: none !important;
+}
+.ci-m .ci-ring {
+  position: absolute;
+  left: 30px;
+  top: 40px;
+  width: 300px;
+  height: 300px;
+  transition: opacity 0.5s ease-in-out;
+}
+.ci-m .ci-fade .ci-ring,
+.ci-m .ci-fade .ci-tray {
+  opacity: 0;
+}
+.ci-m .ci-guide {
+  position: absolute;
+  left: 44px;
+  top: 44px;
+  width: 212px;
+  height: 212px;
+  border: 1px solid var(--input);
+  border-radius: 50%;
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring);
+}
+.ci-m .ci-full .ci-guide {
+  border-color: var(--highlight);
+  transform: scale(1.06);
+}
+.ci-m .ci-started .ci-guide {
+  border-color: var(--border);
+  transform: none;
+}
+.ci-m .ci-seat {
+  position: absolute;
+  width: 84px;
+  height: 84px;
+}
+.ci-m .ci-s0 {
+  left: 108px;
+  top: 2px;
+}
+.ci-m .ci-s1 {
+  left: 209px;
+  top: 75px;
+}
+.ci-m .ci-s2 {
+  left: 170px;
+  top: 194px;
+}
+.ci-m .ci-s3 {
+  left: 46px;
+  top: 194px;
+}
+.ci-m .ci-s4 {
+  left: 7px;
+  top: 75px;
+}
+.ci-m .ci-free {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px dashed var(--input);
+  transition: opacity 0.3s;
+}
+.ci-m .ci-faces {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.4);
+  transition:
+    transform 0.2s ease-in,
+    opacity 0.2s,
+    visibility 0s 0.2s;
+}
+.ci-m .ci-on .ci-free {
+  opacity: 0;
+}
+.ci-m .ci-on .ci-faces {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    transform 0.6s var(--spring),
+    opacity 0.3s,
+    visibility 0s;
+}
+.ci-m .ci-faces > span {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.7s ease-in-out;
+}
+.ci-m .ci-faces .ci-c {
+  opacity: 0;
+}
+.ci-m .ci-s0 .ci-faces .ci-c,
+.ci-m .ci-started .ci-faces .ci-c {
+  opacity: 1;
+}
+.ci-m .ci-started .ci-faces .ci-g {
+  opacity: 0;
+}
+.ci-m .ci-lab {
+  position: absolute;
+  top: 87px;
+  left: -13px;
+  width: 110px;
+  text-align: center;
+  display: grid;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--foreground);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.ci-m .ci-on .ci-lab {
+  opacity: 1;
+  transition-delay: 0.25s;
+}
+.ci-m .ci-lab > span {
+  grid-area: 1 / 1;
+  justify-self: center;
+  padding: 0 4px;
+  transition: opacity 0.4s;
+}
+.ci-m .ci-lab .ci-role {
+  color: var(--muted-foreground);
+}
+.ci-m .ci-lab .ci-name {
+  opacity: 0;
+}
+.ci-m .ci-started .ci-lab .ci-role {
+  opacity: 0;
+}
+.ci-m .ci-started .ci-lab .ci-name {
+  opacity: 1;
+}
+.ci-m .ci-s0 .ci-lab .ci-name {
+  display: none;
+}
+.ci-m .ci-s0 .ci-lab .ci-role {
+  color: var(--foreground);
+}
+.ci-m .ci-s0 .ci-lab .ci-role,
+.ci-m .ci-started .ci-s0 .ci-lab .ci-role {
+  opacity: 1;
+}
+.ci-m .ci-center {
+  position: absolute;
+  left: 90px;
+  top: 110px;
+  width: 120px;
+  height: 80px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.ci-m .ci-count {
+  font: 500 20px/1 var(--font-mono);
+  color: var(--foreground);
+  transition: opacity 0.4s;
+}
+.ci-m .ci-started .ci-count {
+  opacity: 0;
+}
+.ci-m .ci-tray {
+  position: absolute;
+  left: 0;
+  top: 346px;
+  width: 360px;
+  height: 120px;
+  transition: opacity 0.5s ease-in-out;
+}
+.ci-m .ci-tray > div {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s,
+    visibility 0s 0.3s;
+}
+.ci-m .ci-tray-feed .ci-t-feed {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s,
+    transform 0.5s var(--spring),
+    visibility 0s;
+}
+.ci-m .ci-t-feed {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  padding-top: 0;
+}
+.ci-m .ci-feed-title {
+  font-size: 17px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-top: 8px;
+}
+.ci-m .ci-feed-meta {
+  font: 500 11px/1.4 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  margin-top: 2px;
+}
+.ci-m .ci-join {
+  position: relative;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 15px;
+  font-weight: 600;
+  transition: transform 0.15s;
+  margin-top: 8px;
+}
+.ci-m .ci-clicking .ci-join {
+  transform: scale(0.95);
+}
+.ci-m .ci-tap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border-radius: 50%;
+  border: 2px solid var(--highlight);
+  opacity: 0;
+  pointer-events: none;
+}
+.ci-m .ci-clicking .ci-tap {
+  animation: ci-tap 0.5s ease-out;
+}
+.ci-m .ci-seat {
+  transition:
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out;
+}
+.ci-m .ci-guide {
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring),
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out,
+    width 0.9s ease-in-out,
+    height 0.9s ease-in-out,
+    background 0.6s;
+}
+.ci-m .ci-faces .ci-h {
+  opacity: 0;
+}
+.ci-m .ci-t-alone,
+.ci-m .ci-t-slogan {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+.ci-m .ci-guide {
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring),
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out,
+    width 0.9s ease-in-out,
+    height 0.9s ease-in-out,
+    background 0.6s,
+    border-width 0.6s;
+}
+.ci-m .ci-guide {
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring),
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out,
+    width 0.9s ease-in-out,
+    height 0.9s ease-in-out,
+    background 0.6s,
+    border-width 0.6s,
+    opacity 0.4s;
+}
+.ci-m .ci-lonely .ci-s0 .ci-faces .ci-c {
+  opacity: 0;
+}
+.ci-m .ci-lonely .ci-count {
+  opacity: 0;
+}
+.ci-m .ci-thought {
+  position: absolute;
+  left: 212px;
+  top: 26px;
+  width: 100px;
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  line-height: 1.4;
+  opacity: 0;
+  transform: scale(0.8);
+  transform-origin: 0 100%;
+  transition:
+    opacity 0.3s,
+    transform 0.5s var(--spring);
+}
+.ci-m .ci-thought::before,
+.ci-m .ci-thought::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+.ci-m .ci-thought::before {
+  width: 9px;
+  height: 9px;
+  left: -12px;
+  bottom: 8px;
+}
+.ci-m .ci-thought::after {
+  width: 5px;
+  height: 5px;
+  left: -20px;
+  bottom: 0;
+}
+.ci-m .ci-think .ci-thought {
+  opacity: 1;
+  transform: none;
+}
+.ci-m .ci-tray-alone .ci-t-alone {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s 0.3s,
+    transform 0.5s 0.3s var(--spring),
+    visibility 0s;
+}
+.ci-m .ci-solo {
+  position: absolute;
+  left: 90px;
+  top: 90px;
+  width: 120px;
+  height: 120px;
+  transition:
+    left 0.6s ease-in-out,
+    top 0.6s ease-in-out,
+    width 0.6s ease-in-out,
+    height 0.6s ease-in-out;
+}
+.ci-m .ci-solo > span {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.35s;
+}
+.ci-m .ci-solo .ci-c {
+  opacity: 0;
+}
+.ci-m .ci-go .ci-solo {
+  transition-duration: 0.35s;
+  left: 108px;
+  top: 2px;
+  width: 84px;
+  height: 84px;
+}
+.ci-m .ci-go .ci-solo .ci-u {
+  opacity: 0;
+}
+.ci-m .ci-go .ci-solo .ci-c {
+  opacity: 1;
+}
+.ci-m .ci-landed .ci-solo {
+  opacity: 0;
+  visibility: hidden;
+}
+.ci-m .ci-seat.ci-arrive .ci-faces {
+  transition: none !important;
+}
+.ci-m .ci-lonely .ci-free,
+.ci-m .ci-lonely .ci-guide {
+  opacity: 0;
+}
+.ci-m .ci-waiting .ci-count {
+  opacity: 0;
+}
+.ci-m .ci-t-slogan .ci-accent {
+  color: var(--highlight);
+}
+.ci-m .ci-tray-slogan .ci-t-slogan {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s 0.3s,
+    transform 0.5s 0.3s var(--spring),
+    visibility 0s;
+}
+.ci-m .ci-form {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  visibility: hidden;
+  transition: visibility 0s 0.3s;
+  left: 0;
+  top: 96px;
+  width: 360px;
+}
+.ci-m .ci-onb .ci-form {
+  visibility: visible;
+  transition: visibility 0s;
+}
+.ci-m .ci-fcard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.ci-m .ci-onb .ci-fcard {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.4s 0.3s,
+    transform 0.5s 0.3s var(--spring);
+}
+.ci-m .ci-onb .ci-fc2 {
+  transition-delay: 0.45s, 0.45s;
+}
+.ci-m .ci-onb .ci-fc3 {
+  transition-delay: 0.6s, 0.6s;
+}
+.ci-m .ci-fcard h4 {
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.ci-m .ci-frow {
+  display: flex;
+  gap: 6px;
+  height: 26px;
+}
+.ci-m .ci-fchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px;
+  max-width: 160px;
+  overflow: hidden;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-size: 12px;
+  color: var(--foreground);
+  white-space: nowrap;
+  transition:
+    max-width 0.4s ease-in-out,
+    padding 0.4s,
+    margin 0.4s,
+    opacity 0.3s,
+    border-width 0.4s,
+    transform 0.5s var(--spring);
+}
+.ci-m .ci-fchip.ci-s::before {
+  content: "+";
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+.ci-m .ci-fchip.ci-on {
+  border-color: var(--highlight);
+  background: var(--highlight-soft);
+  color: var(--highlight);
+  max-width: 0;
+  padding: 0;
+  border-width: 0;
+  opacity: 0;
+  transform: scale(0.8);
+}
+.ci-m .ci-fchip.ci-on::after {
+  content: "\00d7";
+  font-weight: 600;
+}
+.ci-m .ci-pick1 .ci-p1,
+.ci-m .ci-pick2 .ci-p2,
+.ci-m .ci-pick3 .ci-p3 {
+  max-width: 160px;
+  padding: 0 10px;
+  border-width: 1px;
+  opacity: 1;
+  transform: none;
+}
+.ci-m .ci-pick1 .ci-p1s,
+.ci-m .ci-pick2 .ci-p2s,
+.ci-m .ci-pick3 .ci-p3s {
+  max-width: 0;
+  padding: 0;
+  margin-left: -6px;
+  border-width: 0;
+  opacity: 0;
+}
+.ci-m .ci-onb .ci-solo {
+  left: 254px;
+  top: -10px;
+  width: 52px;
+  height: 52px;
+}
+.ci-m .ci-onb .ci-free,
+.ci-m .ci-onb .ci-guide {
+  opacity: 0;
+}
+.ci-m .ci-filled .ci-solo .ci-u {
+  opacity: 0;
+}
+.ci-m .ci-filled .ci-solo .ci-c {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ci-m .ci-clicking .ci-tap {
+    animation: none;
+  }
+  .ci-m * {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}
+.ci-d .ci-stage {
+  position: relative;
+  width: 404px;
+  height: 508px;
+  zoom: var(--fit, 1);
+}
+.ci-d .ci-snap,
+.ci-d .ci-snap * {
+  transition: none !important;
+}
+.ci-d .ci-card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 404px;
+  height: 508px;
+  transition: opacity 0.5s ease-in-out;
+}
+.ci-d .ci-fade .ci-card {
+  opacity: 0;
+}
+.ci-d .ci-guide {
+  position: absolute;
+  left: 76px;
+  top: 64px;
+  width: 252px;
+  height: 252px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring);
+}
+.ci-d .ci-full .ci-guide {
+  border-color: var(--highlight);
+  transform: scale(1.06);
+}
+.ci-d .ci-started .ci-guide {
+  border-color: var(--border);
+  transform: none;
+}
+.ci-d .ci-seat {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+}
+.ci-d .ci-s0 {
+  left: 154px;
+  top: 16px;
+}
+.ci-d .ci-s1 {
+  left: 274px;
+  top: 103px;
+}
+.ci-d .ci-s2 {
+  left: 228px;
+  top: 244px;
+}
+.ci-d .ci-s3 {
+  left: 80px;
+  top: 244px;
+}
+.ci-d .ci-s4 {
+  left: 34px;
+  top: 103px;
+}
+.ci-d .ci-free {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px dashed var(--input);
+  transition: opacity 0.3s;
+}
+.ci-d .ci-faces {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.4);
+  transition:
+    transform 0.2s ease-in,
+    opacity 0.2s,
+    visibility 0s 0.2s;
+}
+.ci-d .ci-on .ci-free {
+  opacity: 0;
+}
+.ci-d .ci-on .ci-faces {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    transform 0.6s var(--spring),
+    opacity 0.3s,
+    visibility 0s;
+}
+.ci-d .ci-faces > span {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.7s ease-in-out;
+}
+.ci-d .ci-faces .ci-c {
+  opacity: 0;
+}
+.ci-d .ci-s0 .ci-faces .ci-c,
+.ci-d .ci-started .ci-faces .ci-c {
+  opacity: 1;
+}
+.ci-d .ci-started .ci-faces .ci-g {
+  opacity: 0;
+}
+.ci-d .ci-lab {
+  position: absolute;
+  top: 100px;
+  left: -8px;
+  width: 112px;
+  text-align: center;
+  display: grid;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--foreground);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.ci-d .ci-on .ci-lab {
+  opacity: 1;
+  transition-delay: 0.25s;
+}
+.ci-d .ci-lab > span {
+  grid-area: 1 / 1;
+  justify-self: center;
+  padding: 0 4px;
+  transition: opacity 0.4s;
+}
+.ci-d .ci-lab .ci-role {
+  color: var(--muted-foreground);
+}
+.ci-d .ci-lab .ci-name {
+  opacity: 0;
+}
+.ci-d .ci-s0 .ci-lab .ci-role {
+  color: var(--foreground);
+}
+.ci-d .ci-started .ci-lab .ci-role {
+  opacity: 0;
+}
+.ci-d .ci-started .ci-lab .ci-name {
+  opacity: 1;
+}
+.ci-d .ci-s0 .ci-lab .ci-name {
+  display: none;
+}
+.ci-d .ci-s0 .ci-lab .ci-role {
+  opacity: 1;
+}
+.ci-d .ci-center {
+  position: absolute;
+  left: 127px;
+  top: 140px;
+  width: 150px;
+  height: 100px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.ci-d .ci-count {
+  font: 500 22px/1 var(--font-mono);
+  color: var(--foreground);
+  transition: opacity 0.4s;
+}
+.ci-d .ci-started .ci-count {
+  opacity: 0;
+}
+.ci-d .ci-tray {
+  position: absolute;
+  left: 24px;
+  top: 386px;
+  width: 356px;
+  height: 100px;
+  transition: opacity 0.5s ease-in-out;
+}
+.ci-d .ci-fade .ci-tray {
+  opacity: 0;
+}
+.ci-d .ci-tray > div {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s,
+    visibility 0s 0.3s;
+}
+.ci-d .ci-tray-feed .ci-t-feed {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s,
+    transform 0.5s var(--spring),
+    visibility 0s;
+}
+.ci-d .ci-t-feed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+}
+.ci-d .ci-feed-title {
+  font-size: 17px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.ci-d .ci-feed-meta {
+  font: 500 11px/1.4 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  margin-top: 2px;
+}
+.ci-d .ci-join {
+  position: relative;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 15px;
+  font-weight: 600;
+  transition: transform 0.15s;
+}
+.ci-d .ci-clicking .ci-join {
+  transform: scale(0.95);
+}
+.ci-d .ci-tap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border-radius: 50%;
+  border: 2px solid var(--highlight);
+  opacity: 0;
+  pointer-events: none;
+}
+.ci-d .ci-clicking .ci-tap {
+  animation: ci-tap 0.5s ease-out;
+}
+.ci-d .ci-cursor {
+  position: absolute;
+  left: 410px;
+  top: 514px;
+  width: 22px;
+  height: 22px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 5;
+}
+.ci-d .ci-cursor-go .ci-cursor {
+  left: 336px;
+  top: 436px;
+  opacity: 1;
+  transition:
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out,
+    opacity 0.3s;
+}
+.ci-d .ci-clicking .ci-cursor {
+  transform: scale(0.88);
+}
+.ci-d .ci-cursor-done .ci-cursor {
+  opacity: 0;
+}
+.ci-d .ci-seat {
+  transition:
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out;
+}
+.ci-d .ci-guide {
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring),
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out,
+    width 0.9s ease-in-out,
+    height 0.9s ease-in-out,
+    background 0.6s;
+}
+.ci-d .ci-faces .ci-h {
+  opacity: 0;
+}
+.ci-d .ci-t-alone,
+.ci-d .ci-t-slogan {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+.ci-d .ci-guide {
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring),
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out,
+    width 0.9s ease-in-out,
+    height 0.9s ease-in-out,
+    background 0.6s,
+    border-width 0.6s;
+}
+.ci-d .ci-guide {
+  transition:
+    border-color 0.4s,
+    transform 0.5s var(--spring),
+    left 0.9s ease-in-out,
+    top 0.9s ease-in-out,
+    width 0.9s ease-in-out,
+    height 0.9s ease-in-out,
+    background 0.6s,
+    border-width 0.6s,
+    opacity 0.4s;
+}
+.ci-d .ci-lonely .ci-s0 .ci-faces .ci-c {
+  opacity: 0;
+}
+.ci-d .ci-lonely .ci-count {
+  opacity: 0;
+}
+.ci-d .ci-thought {
+  position: absolute;
+  left: 266px;
+  top: 62px;
+  width: 120px;
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  line-height: 1.4;
+  opacity: 0;
+  transform: scale(0.8);
+  transform-origin: 0 100%;
+  transition:
+    opacity 0.3s,
+    transform 0.5s var(--spring);
+}
+.ci-d .ci-thought::before,
+.ci-d .ci-thought::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+}
+.ci-d .ci-thought::before {
+  width: 9px;
+  height: 9px;
+  left: -12px;
+  bottom: 8px;
+}
+.ci-d .ci-thought::after {
+  width: 5px;
+  height: 5px;
+  left: -20px;
+  bottom: 0;
+}
+.ci-d .ci-think .ci-thought {
+  opacity: 1;
+  transform: none;
+}
+.ci-d .ci-tray-alone .ci-t-alone {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s 0.3s,
+    transform 0.5s 0.3s var(--spring),
+    visibility 0s;
+}
+.ci-d .ci-solo {
+  position: absolute;
+  left: 138px;
+  top: 126px;
+  width: 128px;
+  height: 128px;
+  transition:
+    left 0.6s ease-in-out,
+    top 0.6s ease-in-out,
+    width 0.6s ease-in-out,
+    height 0.6s ease-in-out;
+}
+.ci-d .ci-solo > span {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.35s;
+}
+.ci-d .ci-solo .ci-c {
+  opacity: 0;
+}
+.ci-d .ci-go .ci-solo {
+  transition-duration: 0.35s;
+  left: 154px;
+  top: 16px;
+  width: 96px;
+  height: 96px;
+}
+.ci-d .ci-go .ci-solo .ci-u {
+  opacity: 0;
+}
+.ci-d .ci-go .ci-solo .ci-c {
+  opacity: 1;
+}
+.ci-d .ci-landed .ci-solo {
+  opacity: 0;
+  visibility: hidden;
+}
+.ci-d .ci-seat.ci-arrive .ci-faces {
+  transition: none !important;
+}
+.ci-d .ci-lonely .ci-free,
+.ci-d .ci-lonely .ci-guide {
+  opacity: 0;
+}
+.ci-d .ci-waiting .ci-count {
+  opacity: 0;
+}
+.ci-d .ci-t-slogan .ci-accent {
+  color: var(--highlight);
+}
+.ci-d .ci-tray-slogan .ci-t-slogan {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.4s 0.3s,
+    transform 0.5s 0.3s var(--spring),
+    visibility 0s;
+}
+.ci-d .ci-form {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  visibility: hidden;
+  transition: visibility 0s 0.3s;
+  left: 24px;
+  top: 88px;
+  width: 356px;
+}
+.ci-d .ci-onb .ci-form {
+  visibility: visible;
+  transition: visibility 0s;
+}
+.ci-d .ci-fcard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.ci-d .ci-onb .ci-fcard {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.4s 0.3s,
+    transform 0.5s 0.3s var(--spring);
+}
+.ci-d .ci-onb .ci-fc2 {
+  transition-delay: 0.45s, 0.45s;
+}
+.ci-d .ci-onb .ci-fc3 {
+  transition-delay: 0.6s, 0.6s;
+}
+.ci-d .ci-fcard h4 {
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.ci-d .ci-frow {
+  display: flex;
+  gap: 6px;
+  height: 28px;
+}
+.ci-d .ci-fchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  max-width: 160px;
+  overflow: hidden;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-size: 13px;
+  color: var(--foreground);
+  white-space: nowrap;
+  transition:
+    max-width 0.4s ease-in-out,
+    padding 0.4s,
+    margin 0.4s,
+    opacity 0.3s,
+    border-width 0.4s,
+    transform 0.5s var(--spring);
+}
+.ci-d .ci-fchip.ci-s::before {
+  content: "+";
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+.ci-d .ci-fchip.ci-on {
+  border-color: var(--highlight);
+  background: var(--highlight-soft);
+  color: var(--highlight);
+  max-width: 0;
+  padding: 0;
+  border-width: 0;
+  opacity: 0;
+  transform: scale(0.8);
+}
+.ci-d .ci-fchip.ci-on::after {
+  content: "\00d7";
+  font-weight: 600;
+}
+.ci-d .ci-pick1 .ci-p1,
+.ci-d .ci-pick2 .ci-p2,
+.ci-d .ci-pick3 .ci-p3 {
+  max-width: 160px;
+  padding: 0 10px;
+  border-width: 1px;
+  opacity: 1;
+  transform: none;
+}
+.ci-d .ci-pick1 .ci-p1s,
+.ci-d .ci-pick2 .ci-p2s,
+.ci-d .ci-pick3 .ci-p3s {
+  max-width: 0;
+  padding: 0;
+  margin-left: -6px;
+  border-width: 0;
+  opacity: 0;
+}
+.ci-d .ci-onb .ci-solo {
+  left: 324px;
+  top: 20px;
+  width: 56px;
+  height: 56px;
+}
+.ci-d .ci-onb .ci-free,
+.ci-d .ci-onb .ci-guide {
+  opacity: 0;
+}
+.ci-d .ci-filled .ci-solo .ci-u {
+  opacity: 0;
+}
+.ci-d .ci-filled .ci-solo .ci-c {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ci-d .ci-clicking .ci-tap {
+    animation: none;
+  }
+  .ci-d * {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}
+.ci-d .ci-cursor path {
+  fill: var(--foreground);
+  stroke: var(--card);
+}
+/* ---------- The end: everyone solves someone else's problem ---------- */
+/* Each seat shows what it can teach (full) and what it wants to learn (empty,
+dashed). The empty
+   one fills with what the next seat teaches,
+seat after seat,
+and a tick lands when it does. */
+.ci-s0 {
+  --fill: 0s;
+}
+.ci-s1 {
+  --fill: 0.5s;
+}
+.ci-s2 {
+  --fill: 1s;
+}
+.ci-s3 {
+  --fill: 1.5s;
+}
+.ci-s4 {
+  --fill: 2s;
+}
+.ci .ci-solved .ci-faces .ci-h {
+  opacity: 1;
+}
+.ci .ci-solved .ci-faces .ci-c {
+  opacity: 0;
+}
+.ci-tags {
+  position: absolute;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s,
+    visibility 0s 0.3s;
+}
+.ci-tags .ci-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 9999px;
+  border: 1px solid var(--highlight-soft);
+  background: var(--highlight-soft);
+  color: var(--highlight);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.ci-tags .ci-learn {
+  border: 1px dashed var(--input);
+  background: transparent;
+  position: relative;
+  transition:
+    border-color 0.3s calc(var(--fill) + 0.85s),
+    background 0.3s calc(var(--fill) + 0.85s);
+}
+.ci-tags .ci-learn > span:first-child {
+  opacity: 0;
+  transition: opacity 0.3s calc(var(--fill) + 0.85s);
+}
+.ci-solved .ci-tags .ci-learn {
+  border: 1px solid var(--highlight);
+  background: var(--card);
+}
+.ci-solved .ci-tags .ci-learn > span:first-child {
+  opacity: 1;
+}
+.ci-fly {
+  position: absolute;
+  inset: -1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--highlight-soft);
+  color: var(--highlight);
+  opacity: 0;
+  pointer-events: none;
+}
+.ci-solved .ci-fly {
+  animation: ci-fly 1.1s var(--fill) ease-in-out both;
+}
+/* The seat it flies into rides above its neighbours while it travels. */
+.ci-solved .ci-seat {
+  animation: ci-lift 1.1s var(--fill);
+}
+@keyframes ci-fly {
+  0% {
+    opacity: 0;
+    transform: translate(var(--fx), var(--fy)) scale(0.9);
+  }
+  12% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+@keyframes ci-lift {
+  from,
+  to {
+    z-index: 5;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ci .ci-fly,
+  .ci .ci-seat {
+    animation: none;
+  }
+}
+.ci-ok {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 4px);
+  margin-top: -10px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--highlight);
+  color: var(--highlight-foreground);
+  opacity: 0;
+  transform: scale(0.3);
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+.ci-ok svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 3;
+}
+.ci-solved .ci-ok {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.3s calc(var(--fill) + 1.1s),
+    transform 0.5s calc(var(--fill) + 1.1s) var(--spring);
+}
+/* Names and roles make way for the tags. */
+.ci .ci-tagged .ci-lab {
+  opacity: 0;
+}
+.ci .ci-tagged .ci-tags {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.4s 0.2s;
+}
+.ci-m .ci-tags {
+  top: 87px;
+  left: -13px;
+  width: 110px;
+}
+.ci-d .ci-tags {
+  top: 100px;
+  left: -8px;
+  width: 112px;
+}
+.ci-d .ci-tags .ci-tag {
+  height: 24px;
+  font-size: 12px;
+}
+.ci-m .ci-s0 {
+  --fx: 101px;
+  --fy: 47px;
+}
+.ci-m .ci-s1 {
+  --fx: -39px;
+  --fy: 93px;
+}
+.ci-m .ci-s2 {
+  --fx: -124px;
+  --fy: -26px;
+}
+.ci-m .ci-s3 {
+  --fx: -39px;
+  --fy: -145px;
+}
+.ci-m .ci-s4 {
+  --fx: 101px;
+  --fy: -99px;
+}
+.ci-d .ci-s0 {
+  --fx: 120px;
+  --fy: 59px;
+}
+.ci-d .ci-s1 {
+  --fx: -46px;
+  --fy: 113px;
+}
+.ci-d .ci-s2 {
+  --fx: -148px;
+  --fy: -28px;
+}
+.ci-d .ci-s3 {
+  --fx: -46px;
+  --fy: -169px;
+}
+.ci-d .ci-s4 {
+  --fx: 120px;
+  --fy: -115px;
+}
+
+/* The bar on the active step fills while the story plays it; a still scene shows it full. */
+.ci-progress {
+  transform-origin: left;
+  animation: ci-progress linear both;
+}
+@keyframes ci-progress {
+  from {
+    transform: scaleX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ci-progress {
+    animation: none;
+  }
+}
+
+/* ---------- The last scene: the five regroup into the logo, the wordmark under them ---------- */
+/* Each seat travels (--bx, --by) and grows (--bs) to its place in the cluster of the logo: you, the
+   big yellow one, in front. The stage is drawn at a fixed size, so these are plain pixels. */
+.ci .ci-seat {
+  transition: transform 1.3s cubic-bezier(0.5, 0, 0.2, 1) calc(var(--i, 0) * 0.07s);
+}
+.ci .ci-regroup .ci-seat {
+  transform: translate(var(--bx), var(--by)) scale(var(--bs));
+}
+.ci .ci-regroup .ci-s0 {
+  z-index: 3;
+}
+.ci .ci-regroup .ci-s1 {
+  z-index: 2;
+}
+.ci .ci-s1 {
+  --i: 1;
+}
+.ci .ci-s2 {
+  --i: 2;
+}
+.ci .ci-s3 {
+  --i: 3;
+}
+.ci .ci-s4 {
+  --i: 4;
+}
+/* What belonged to the story steps aside while they move. */
+.ci .ci-regroup .ci-guide,
+.ci .ci-regroup .ci-lab,
+.ci .ci-regroup .ci-tags {
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.ci .ci-brand {
+  position: absolute;
+  inset-inline: 0;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.6s,
+    transform 0.8s var(--spring);
+}
+.ci .ci-regroup .ci-brand {
+  opacity: 1;
+  transform: none;
+  transition-delay: 1.1s;
+}
+.ci .ci-fade .ci-brand {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  transition-delay: 0s;
+}
+.ci-m {
+  --ci-wordmark: 84px;
+}
+.ci-d {
+  --ci-wordmark: 98px;
+}
+.ci-m .ci-brand {
+  top: 262px;
+}
+.ci-d .ci-brand {
+  top: 296px;
+}
+.ci-m .ci-s0 {
+  --bx: -1.3px;
+  --by: 124.3px;
+  --bs: 2.1;
+}
+.ci-m .ci-s1 {
+  --bx: -3.9px;
+  --by: 35.6px;
+  --bs: 1.35;
+}
+.ci-m .ci-s2 {
+  --bx: -16.6px;
+  --by: -118.6px;
+  --bs: 1.35;
+}
+.ci-m .ci-s3 {
+  --bx: 10.7px;
+  --by: -118.6px;
+  --bs: 1.35;
+}
+.ci-m .ci-s4 {
+  --bx: 0.1px;
+  --by: 36.9px;
+  --bs: 1.35;
+}
+.ci-d .ci-s0 {
+  --bx: -1.4px;
+  --by: 160.4px;
+  --bs: 2.04;
+}
+.ci-d .ci-s1 {
+  --bx: -12.4px;
+  --by: 56px;
+  --bs: 1.32;
+}
+.ci-d .ci-s2 {
+  --bx: -23.7px;
+  --by: -124px;
+  --bs: 1.32;
+}
+.ci-d .ci-s3 {
+  --bx: 17.1px;
+  --by: -124px;
+  --bs: 1.32;
+}
+.ci-d .ci-s4 {
+  --bx: 8.1px;
+  --by: 57.4px;
+  --bs: 1.32;
+}

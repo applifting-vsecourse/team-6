@@ -33,6 +33,10 @@ export default defineConfig(({ mode }) => {
       strictPort: true,
       allowedHosts: env.VITE_ALLOWED_HOSTS ? env.VITE_ALLOWED_HOSTS.split(",") : [],
     },
-    build: { outDir: "build" },
+    build: {
+      outDir: "build",
+      // Small files are inlined as data: URLs by default; a subtitle track must stay a real file.
+      assetsInlineLimit: (file) => (file.endsWith(".vtt") ? false : undefined),
+    },
   }
 })

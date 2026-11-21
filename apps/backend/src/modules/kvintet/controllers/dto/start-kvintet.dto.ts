@@ -5,9 +5,9 @@ import {
   ArrayUnique,
   IsArray,
   IsNotEmpty,
-  IsOptional,
   IsString,
   MaxLength,
+  MinLength,
 } from 'class-validator';
 
 const trim = ({ value }: { value: unknown }): unknown =>
@@ -29,11 +29,12 @@ export class StartKvintetDto {
   @IsNotEmpty({ each: true })
   categorySlugs!: string[];
 
-  @IsOptional()
   @Transform(trim)
   @IsString()
-  @MaxLength(500)
-  description?: string;
+  @IsNotEmpty()
+  @MinLength(10)
+  @MaxLength(280)
+  description!: string;
 }
 
 export class StartedKvintetDto {

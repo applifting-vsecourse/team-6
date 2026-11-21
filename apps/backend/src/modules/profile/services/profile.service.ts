@@ -3,7 +3,11 @@ import {
   SaveProfileData,
 } from '@/modules/profile/domain/profile.entity';
 import { ProfileRepository } from '@/modules/profile/repositories/profile.repository';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 @Injectable()
 export class ProfileService {
@@ -11,6 +15,17 @@ export class ProfileService {
 
   async getProfile(userId: string): Promise<ProfileEntity | null> {
     return this.profileRepository.findByUserId(userId);
+  }
+
+  async markTourCompleted(userId: string): Promise<ProfileEntity> {
+    const profile = await this.profileRepository.markTourCompleted(userId);
+    if (!profile) {
+      throw new NotFoundException({
+        code: 'PROFILE_NOT_FOUND',
+        message: 'Profile does not exist',
+      });
+    }
+    return profile;
   }
 
   async saveProfile(

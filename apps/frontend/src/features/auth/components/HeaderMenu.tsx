@@ -1,10 +1,11 @@
 import { Link } from "@tanstack/react-router"
 import { sleepy } from "blobatar/expression"
-import { LogOut, User } from "lucide-react"
+import { ChevronRight, LogOut, Sparkles, User } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
 import { GazeBlobatar } from "@/components/GazeBlobatar"
+import { useMascotAnchor, useMascotContext } from "@/components/Mascot/MascotContext"
 import { Blobatar } from "@/components/ui/blobatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SheetClose } from "@/components/ui/sheet"
+import { cn } from "@/lib/utils"
 
 import { useSession } from "@/features/auth/hooks/useSession"
 import { useSignOut } from "@/features/auth/hooks/useSignOut"
@@ -31,6 +33,12 @@ export function HeaderMenu() {
   const { t } = useTranslation()
   const { user } = useSession()
   const signOut = useSignOut()
+  const [anchorRef, isOccupied] = useMascotAnchor("header-avatar")
+  const mascot = useMascotContext()
+  const replayTour = mascot?.replayTour
+  // While the mascot is on screen as this person's avatar (in onboarding, on the tour, and when
+  // it lands here at the end), the real one steps aside so the face is never shown twice.
+  const avatarClass = cn((isOccupied || mascot?.stage?.seed) && "invisible")
 
   if (!user) {
     return (
@@ -54,23 +62,33 @@ export function HeaderMenu() {
   return (
     <>
       {/* On a phone the avatar only says who is signed in; the menu holds everything else. */}
-      <GazeBlobatar
-        name={seedOf(user)}
-        animate="always"
-        className="size-8 md:hidden"
-      />
+      <span
+        ref={anchorRef}
+        className={cn("block size-8 md:hidden", avatarClass)}
+      >
+        <GazeBlobatar
+          name={seedOf(user)}
+          animate="always"
+          className="size-full"
+        />
+      </span>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
             className="hidden h-auto gap-2.5 p-0 text-label font-medium text-foreground hover:bg-transparent has-[>svg]:px-0 md:inline-flex"
           >
-            <GazeBlobatar
-              name={seedOf(user)}
-              animate="always"
-              travel={7}
-              className="size-7.5"
-            />
+            <span
+              ref={anchorRef}
+              className={cn("block size-7.5", avatarClass)}
+            >
+              <GazeBlobatar
+                name={seedOf(user)}
+                animate="always"
+                travel={7}
+                className="size-full"
+              />
+            </span>
             {user.name.split(" ")[0]}
             <span
               aria-hidden
@@ -106,6 +124,12 @@ export function HeaderMenu() {
               {t("nav.profile")}
             </Link>
           </DropdownMenuItem>
+          {replayTour ? (
+            <DropdownMenuItem onSelect={replayTour}>
+              <Sparkles className="size-4" />
+              {t("tour.replay")}
+            </DropdownMenuItem>
+          ) : null}
           <DropdownMenuItem
             onSelect={() => signOut.mutate()}
             disabled={signOut.isPending}
@@ -177,20 +201,49 @@ export function MobileAccount() {
     )
   }
 
+  // The card is the way to the profile on a phone: the desktop user menu is hidden there.
   return (
-    <div className="flex items-center gap-4 rounded-lg border border-border bg-card p-4">
-      <GazeBlobatar
-        name={seedOf(user)}
-        animate="always"
-        className="size-12 shrink-0"
-      />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <p className="truncate font-semibold text-foreground">{user.name}</p>
-        {user.username ? (
-          <p className="truncate text-sm text-muted-foreground">@{user.username}</p>
-        ) : null}
-      </div>
-    </div>
+    <SheetClose asChild>
+      <Link
+        to={ROUTES.profile}
+        className="flex items-center gap-4 rounded-lg border border-border bg-card p-4"
+      >
+        <GazeBlobatar
+          name={seedOf(user)}
+          animate="always"
+          className="size-12 shrink-0"
+        />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <p className="truncate font-semibold text-foreground">{user.name}</p>
+          <p className="truncate text-sm text-muted-foreground">{t("layout.viewProfile")}</p>
+        </div>
+        <ChevronRight
+          aria-hidden
+          className="size-4 text-muted-foreground"
+        />
+      </Link>
+    </SheetClose>
+  )
+}
+
+/** The desktop user menu's "Replay the tour", for the phone; signed in only. */
+export function MobileReplayTour() {
+  const { t } = useTranslation()
+  const { user } = useSession()
+  const replayTour = useMascotContext()?.replayTour
+
+  if (!user || !replayTour) return null
+
+  return (
+    <SheetClose asChild>
+      <Button
+        variant="outline"
+        onClick={replayTour}
+      >
+        <Sparkles className="size-4" />
+        {t("tour.replay")}
+      </Button>
+    </SheetClose>
   )
 }
 

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
+import { requireOnboarded } from "@/app/requireOnboarded"
 import { Seo } from "@/components/Seo"
 
 import { useSession } from "@/features/auth/hooks/useSession"
@@ -28,8 +29,9 @@ const toList = <T,>(value: T | T[] | undefined): T[] =>
 const orUndefined = <T,>(list: T[]) => (list.length ? list : undefined)
 
 export const Route = createFileRoute("/_ProtectedPages/kvintet/feed")({
-  component: KvintetFeedRoute,
   validateSearch: feedSearchParamsSchema,
+  beforeLoad: requireOnboarded,
+  component: KvintetFeedRoute,
 })
 
 function KvintetFeedRoute() {

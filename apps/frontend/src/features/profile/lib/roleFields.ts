@@ -3,7 +3,7 @@
 export const ROLE_FIELDS = [
   {
     id: "tech",
-    labelKey: "onboarding.step1.fields.tech",
+    labelKey: "onboarding.fields.tech",
     roles: [
       "software-engineer",
       "frontend-developer",
@@ -23,7 +23,7 @@ export const ROLE_FIELDS = [
   },
   {
     id: "data",
-    labelKey: "onboarding.step1.fields.data",
+    labelKey: "onboarding.fields.data",
     roles: [
       "data-engineer",
       "data-scientist",
@@ -34,12 +34,12 @@ export const ROLE_FIELDS = [
   },
   {
     id: "design",
-    labelKey: "onboarding.step1.fields.design",
+    labelKey: "onboarding.fields.design",
     roles: ["ux-designer", "ui-designer", "ux-ui-designer", "product-designer", "graphic-designer"],
   },
   {
     id: "product",
-    labelKey: "onboarding.step1.fields.product",
+    labelKey: "onboarding.fields.product",
     roles: [
       "product-manager",
       "project-manager",
@@ -52,7 +52,7 @@ export const ROLE_FIELDS = [
   },
   {
     id: "marketing",
-    labelKey: "onboarding.step1.fields.marketing",
+    labelKey: "onboarding.fields.marketing",
     roles: [
       "marketing-specialist",
       "copywriter",
@@ -64,12 +64,12 @@ export const ROLE_FIELDS = [
   },
   {
     id: "people",
-    labelKey: "onboarding.step1.fields.people",
+    labelKey: "onboarding.fields.people",
     roles: ["hr-specialist", "tech-recruiter", "finance-specialist", "accountant"],
   },
   {
     id: "education",
-    labelKey: "onboarding.step1.fields.education",
+    labelKey: "onboarding.fields.education",
     roles: ["teacher", "researcher", "consultant", "entrepreneur", "student"],
   },
 ] as const

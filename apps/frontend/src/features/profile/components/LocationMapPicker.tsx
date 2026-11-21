@@ -10,9 +10,10 @@ import { formatNumber } from "@/lib/date"
 
 import "leaflet/dist/leaflet.css"
 
+import { DEFAULT_RADIUS_KM } from "@/features/profile/lib/onboardingDraft"
+
 export const DEFAULT_EUROPE_LAT = 50.0
 export const DEFAULT_EUROPE_LNG = 15.0
-export const DEFAULT_RADIUS_KM = 25
 
 type LocationMapPickerProps = {
   latitude: number | null
@@ -29,11 +30,9 @@ export function LocationMapPicker({
 }: LocationMapPickerProps) {
   const { t } = useTranslation()
 
-  const initialLat = latitude ?? DEFAULT_EUROPE_LAT
-  const initialLng = longitude ?? DEFAULT_EUROPE_LNG
-
-  const [currentLat, setCurrentLat] = useState<number>(initialLat)
-  const [currentLng, setCurrentLng] = useState<number>(initialLng)
+  // null until the user picks a place; the Europe default is only the map's initial view
+  const [currentLat, setCurrentLat] = useState<number | null>(latitude)
+  const [currentLng, setCurrentLng] = useState<number | null>(longitude)
   const [currentRadius, setCurrentRadius] = useState<number>(
     radiusKm > 0 ? radiusKm : DEFAULT_RADIUS_KM,
   )
@@ -46,17 +45,16 @@ export function LocationMapPicker({
   const circleRef = useRef<L.Circle | null>(null)
 
   const radiusRef = useRef<number>(currentRadius)
-  const latLngRef = useRef({ lat: currentLat, lng: currentLng })
+  const latLngRef = useRef<{ lat: number; lng: number } | null>(
+    latitude != null && longitude != null ? { lat: latitude, lng: longitude } : null,
+  )
 
   useEffect(() => {
     radiusRef.current = currentRadius
   }, [currentRadius])
 
-  useEffect(() => {
-    latLngRef.current = { lat: currentLat, lng: currentLng }
-  }, [currentLat, currentLng])
-
-  const presetRadii = [5, 10, 25, 50, 100, 150]
+  // Figma B2c: four presets. The slider below reaches the longer ones.
+  const presetRadii = [5, 10, 25, 50]
 
   const updateLocation = useCallback(
     (lat: number, lng: number, rad: number) => {
@@ -72,6 +70,60 @@ export function LocationMapPicker({
     [onChange],
   )
 
+  // Creates the draggable marker and radius circle on first use, then just moves them.
+  const showPin = useCallback(
+    (lat: number, lng: number) => {
+      const map = mapInstanceRef.current
+      if (!map) return
+      if (markerRef.current && circleRef.current) {
+        markerRef.current.setLatLng([lat, lng])
+        circleRef.current.setLatLng([lat, lng])
+        circleRef.current.setRadius(radiusRef.current * 1000)
+        return
+      }
+
+      // Leaflet draws the circle as SVG, which needs real colours: read the theme's accent.
+      const accent =
+        getComputedStyle(document.documentElement).getPropertyValue("--highlight").trim() ||
+        "#2f5bd3"
+
+      const customIcon = L.divIcon({
+        className: "kvinted-map-pin",
+        html: `
+          <div style="position: relative; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
+            <div style="position: relative; width: 16px; height: 16px; border-radius: 50%; background: var(--highlight); border: 2.5px solid var(--card); box-shadow: 0 1px 4px rgba(0,0,0,0.35);"></div>
+          </div>
+        `,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+      })
+
+      const marker = L.marker([lat, lng], { draggable: true, icon: customIcon }).addTo(map)
+      const circle = L.circle([lat, lng], {
+        radius: radiusRef.current * 1000,
+        color: accent,
+        fillColor: accent,
+        fillOpacity: 0.15,
+        weight: 2,
+      }).addTo(map)
+
+      marker.on("drag", (e: L.LeafletEvent) => {
+        circle.setLatLng((e.target as L.Marker).getLatLng())
+      })
+
+      marker.on("dragend", (e: L.LeafletEvent) => {
+        const pos = (e.target as L.Marker).getLatLng()
+        circle.setLatLng(pos)
+        circle.setRadius(radiusRef.current * 1000)
+        updateLocation(pos.lat, pos.lng, radiusRef.current)
+      })
+
+      markerRef.current = marker
+      circleRef.current = circle
+    },
+    [updateLocation],
+  )
+
   // Initialize Leaflet map
   useEffect(() => {
     if (!mapContainerRef.current) return
@@ -80,7 +132,7 @@ export function LocationMapPicker({
 
     try {
       const map = L.map(mapContainerRef.current, {
-        center: [currentLat, currentLng],
+        center: [latitude ?? DEFAULT_EUROPE_LAT, longitude ?? DEFAULT_EUROPE_LNG],
         zoom: radiusRef.current > 50 ? 8 : 10,
         scrollWheelZoom: false,
       })
@@ -91,55 +143,14 @@ export function LocationMapPicker({
         maxZoom: 18,
       }).addTo(map)
 
-      const customIcon = L.divIcon({
-        className: "kvinted-map-pin",
-        html: `
-          <div style="position: relative; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
-            <div style="position: absolute; width: 28px; height: 28px; border-radius: 50%; background: rgba(34, 197, 94, 0.35);"></div>
-            <div style="position: relative; width: 14px; height: 14px; border-radius: 50%; background: #16a34a; border: 2.5px solid #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.35);"></div>
-          </div>
-        `,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
-      })
-
-      const marker = L.marker([currentLat, currentLng], {
-        draggable: true,
-        icon: customIcon,
-      }).addTo(map)
-
-      const circle = L.circle([currentLat, currentLng], {
-        radius: radiusRef.current * 1000,
-        color: "#16a34a",
-        fillColor: "#22c55e",
-        fillOpacity: 0.18,
-        weight: 2,
-      }).addTo(map)
-
-      marker.on("drag", (e: L.LeafletEvent) => {
-        const target = e.target as L.Marker
-        const pos = target.getLatLng()
-        circle.setLatLng(pos)
-      })
-
-      marker.on("dragend", (e: L.LeafletEvent) => {
-        const target = e.target as L.Marker
-        const pos = target.getLatLng()
-        circle.setLatLng(pos)
-        circle.setRadius(radiusRef.current * 1000)
-        updateLocation(pos.lat, pos.lng, radiusRef.current)
-      })
+      mapInstanceRef.current = map
 
       map.on("click", (e: L.LeafletMouseEvent) => {
-        marker.setLatLng(e.latlng)
-        circle.setLatLng(e.latlng)
-        circle.setRadius(radiusRef.current * 1000)
+        showPin(e.latlng.lat, e.latlng.lng)
         updateLocation(e.latlng.lat, e.latlng.lng, radiusRef.current)
       })
 
-      mapInstanceRef.current = map
-      markerRef.current = marker
-      circleRef.current = circle
+      if (latitude != null && longitude != null) showPin(latitude, longitude)
     } catch {
       // In non-DOM or JSDOM environments, map creation may fail silently
     }
@@ -160,7 +171,7 @@ export function LocationMapPicker({
 
   const handleUseCurrentLocation = useCallback(() => {
     if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
-      setLocationNote(t("onboarding.step2.geolocationUnavailable"))
+      setLocationNote(t("onboarding.place.geolocationUnavailable"))
       return
     }
 
@@ -174,30 +185,28 @@ export function LocationMapPicker({
         const lng = pos.coords.longitude
         const activeRadius = radiusRef.current
         updateLocation(lat, lng, activeRadius)
-
-        if (mapInstanceRef.current && markerRef.current && circleRef.current) {
-          markerRef.current.setLatLng([lat, lng])
-          circleRef.current.setLatLng([lat, lng])
-          circleRef.current.setRadius(activeRadius * 1000)
-          mapInstanceRef.current.setView([lat, lng], 11)
-        }
+        showPin(lat, lng)
+        mapInstanceRef.current?.setView([lat, lng], 11)
       },
       (err) => {
         setIsLocating(false)
         if (err.code === err.PERMISSION_DENIED) {
-          setLocationNote(t("onboarding.step2.geolocationDenied"))
+          setLocationNote(t("onboarding.place.geolocationDenied"))
         } else {
-          setLocationNote(t("onboarding.step2.geolocationUnavailable"))
+          setLocationNote(t("onboarding.place.geolocationUnavailable"))
         }
       },
       { timeout: 10000, enableHighAccuracy: false, maximumAge: 300000 },
     )
-  }, [t, updateLocation])
+  }, [t, updateLocation, showPin])
 
   const handleRadiusChange = (newRadius: number) => {
     setCurrentRadius(newRadius)
     radiusRef.current = newRadius
-    updateLocation(latLngRef.current.lat, latLngRef.current.lng, newRadius)
+    // Nothing picked yet: the radius is reported together with the first pick.
+    if (latLngRef.current) {
+      updateLocation(latLngRef.current.lat, latLngRef.current.lng, newRadius)
+    }
 
     if (circleRef.current) {
       circleRef.current.setRadius(newRadius * 1000)
@@ -209,51 +218,44 @@ export function LocationMapPicker({
   }
 
   return (
-    <div className="flex flex-col gap-3.5">
-      <div className="flex flex-col items-start gap-3 md:flex-row md:justify-between md:gap-4">
-        <div className="flex flex-col gap-0.5">
-          <h2 className="text-h3">{t("onboarding.step2.whereTitle")}</h2>
-          <p className="text-small text-muted-foreground">{t("onboarding.step2.mapHint")}</p>
-        </div>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleUseCurrentLocation}
-          disabled={isLocating}
-          className="h-auto shrink-0 px-3 py-2 text-small font-normal text-highlight"
-        >
-          <LocateFixed className="size-3.5" />
-          {isLocating ? t("onboarding.step2.locating") : t("onboarding.step2.useCurrentLocation")}
-        </Button>
-      </div>
+    <div className="flex flex-col gap-3 md:gap-3.5">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={handleUseCurrentLocation}
+        disabled={isLocating}
+        className="h-auto w-fit shrink-0 border-input bg-card px-3 py-2 text-small font-normal text-highlight"
+      >
+        <LocateFixed className="size-3.5" />
+        {isLocating ? t("onboarding.place.locating") : t("onboarding.place.useCurrentLocation")}
+      </Button>
 
       {locationNote && <p className="text-small text-muted-foreground">{locationNote}</p>}
 
       <div
         ref={mapContainerRef}
         data-testid="location-map-container"
-        className="relative h-65 w-full overflow-hidden rounded-lg border border-border bg-secondary"
+        className="relative h-50 w-full overflow-hidden rounded-[10px] border border-border bg-secondary md:h-65"
         style={{ zIndex: 0 }}
       />
 
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <span className="flex items-center gap-1 font-mono text-meta tracking-meta text-muted-foreground uppercase">
-          <MapPin className="size-3 text-destructive" />
-          {formatNumber(currentLat, {
-            minimumFractionDigits: 4,
-            maximumFractionDigits: 4,
-          })}
-          °,{" "}
-          {formatNumber(currentLng, {
-            minimumFractionDigits: 4,
-            maximumFractionDigits: 4,
-          })}
-          °
-        </span>
-        <span className="text-small text-foreground">
-          {t("onboarding.step2.selectedRadius", { count: formatNumber(currentRadius) })}
-        </span>
-      </div>
+      {currentLat != null && currentLng != null && (
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <span className="flex items-center gap-1 font-mono text-meta tracking-meta text-muted-foreground uppercase">
+            <MapPin className="size-3 text-destructive" />
+            {formatNumber(currentLat, {
+              minimumFractionDigits: 4,
+              maximumFractionDigits: 4,
+            })}
+            °,{" "}
+            {formatNumber(currentLng, {
+              minimumFractionDigits: 4,
+              maximumFractionDigits: 4,
+            })}
+            °
+          </span>
+        </div>
+      )}
 
       <div className="flex flex-col gap-2.5">
         <div className="flex items-start justify-between">
@@ -261,11 +263,29 @@ export function LocationMapPicker({
             htmlFor="radius-slider"
             className="text-compact font-medium text-foreground"
           >
-            {t("onboarding.step2.radiusSliderLabel")}
+            {t("onboarding.place.radiusSliderLabel")}
           </Label>
-          <span className="font-mono text-meta tracking-meta text-highlight uppercase">
-            {t("onboarding.step2.radiusOption", { count: formatNumber(currentRadius) })}
-          </span>
+          {presetRadii.includes(currentRadius) ? null : (
+            <span className="font-mono text-meta tracking-meta text-highlight uppercase">
+              {t("onboarding.place.radiusOption", { count: formatNumber(currentRadius) })}
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-1.5">
+          {presetRadii.map((rad) => (
+            <Button
+              key={rad}
+              type="button"
+              variant={currentRadius === rad ? "default" : "outline"}
+              aria-pressed={currentRadius === rad}
+              size="sm"
+              onClick={() => handleRadiusChange(rad)}
+              className="h-auto rounded-full px-2.5 py-1 text-small font-normal"
+            >
+              {t("onboarding.place.radiusOption", { count: formatNumber(rad) })}
+            </Button>
+          ))}
         </div>
 
         <Slider
@@ -275,23 +295,8 @@ export function LocationMapPicker({
           step={5}
           value={[currentRadius]}
           onValueChange={([val]) => val !== undefined && handleRadiusChange(val)}
-          aria-label={t("onboarding.step2.radiusSliderLabel")}
+          aria-label={t("onboarding.place.radiusSliderLabel")}
         />
-
-        <div className="flex flex-wrap gap-1.5">
-          {presetRadii.map((rad) => (
-            <Button
-              key={rad}
-              type="button"
-              variant={currentRadius === rad ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleRadiusChange(rad)}
-              className="h-auto rounded-full px-2.5 py-1 text-small font-normal"
-            >
-              {t("onboarding.step2.radiusOption", { count: formatNumber(rad) })}
-            </Button>
-          ))}
-        </div>
       </div>
     </div>
   )

@@ -60,6 +60,12 @@ export class ProfileResponseDto {
   @ApiPropertyOptional({ example: '2026-10-21T12:00:00.000Z' })
   onboardingCompletedAt!: Date | null;
 
+  @ApiPropertyOptional({
+    example: '2026-11-10T12:00:00.000Z',
+    description: 'Null until the product tour was finished or skipped',
+  })
+  tourCompletedAt!: Date | null;
+
   @ApiProperty({ type: [TagDto] })
   teaches!: TagDto[];
 

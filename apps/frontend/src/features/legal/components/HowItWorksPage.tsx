@@ -1,5 +1,7 @@
 import { useTranslation } from "react-i18next"
 
+import { ProductVideo } from "@/components/ProductVideo/ProductVideo"
+
 const STEPS = [1, 2, 3, 4] as const
 
 export function HowItWorksPage() {
@@ -9,6 +11,8 @@ export function HowItWorksPage() {
     <div className="px-4 pt-7 pb-10 md:pt-14 md:pb-22">
       <article className="mx-auto flex w-full max-w-180 flex-col gap-5 md:gap-7">
         <h1 className="text-h1-mobile md:text-h1">{t("howItWorks.title")}</h1>
+
+        <ProductVideo />
 
         <ol className="flex flex-col gap-5 md:gap-7">
           {STEPS.map((n) => (

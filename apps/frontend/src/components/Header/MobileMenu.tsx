@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils"
 
 type MobileMenuProps = {
   hasNav?: boolean
+  isAdmin?: boolean
   navDisabled?: NavDisabled
   // Present when the user's kvintet has a chat; adds "Group chat" with the unread badge.
   chat?: { unreadCount: number }
@@ -64,6 +65,7 @@ function MenuLink({
 
 export function MobileMenu({
   hasNav = false,
+  isAdmin = false,
   navDisabled,
   chat,
   hasLearnMore = false,
@@ -146,6 +148,14 @@ export function MobileMenu({
                   }
                 >
                   {t("layout.groupChat")}
+                </MenuLink>
+              ) : null}
+              {isAdmin ? (
+                <MenuLink
+                  to={ROUTES.admin}
+                  isNav
+                >
+                  {t("nav.admin")}
                 </MenuLink>
               ) : null}
             </nav>

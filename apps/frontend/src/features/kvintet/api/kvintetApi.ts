@@ -45,6 +45,7 @@ export type CommonPreferences = z.infer<typeof commonPreferencesSchema>
 export const kvintetDetailsSchema = z.object({
   id: z.string(),
   title: z.string(),
+  description: z.string(),
   status: z.enum(["FORMING", "ACTIVE"]),
   createdAt: z.string(),
   activatedAt: z.string().nullable(),

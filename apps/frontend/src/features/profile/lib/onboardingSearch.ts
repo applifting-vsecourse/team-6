@@ -1,10 +1,11 @@
 import { z } from "zod"
 
-// The step lives in the URL so the app header can show it and a reload keeps it.
-// Anything that is not 1-3 (or missing) starts at the first step.
+import { FIRST_ONBOARDING_PAGE, ONBOARDING_PAGE_IDS } from "@/features/profile/lib/onboardingPages"
+
+// The page lives in the URL so Back and a reload keep it, and the header can show its step.
+// Anything that is not a page (or missing) starts at the first one.
 export const onboardingSearchSchema = z.object({
-  step: z
-    .union([z.literal(1), z.literal(2), z.literal(3)])
-    .default(1)
-    .catch(1),
+  page: z.enum(ONBOARDING_PAGE_IDS).default(FIRST_ONBOARDING_PAGE).catch(FIRST_ONBOARDING_PAGE),
+  // Set by the profile's "Edit": that one page is edited, then the person goes back to the profile.
+  from: z.literal("profile").optional().catch(undefined),
 })

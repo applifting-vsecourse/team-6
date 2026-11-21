@@ -69,6 +69,8 @@ type SignUpFormProps = {
   emailError?: string | null
   /** Lets the page draw the live avatar preview from what is being typed. */
   onUsernameChange?: (value: string) => void
+  /** The avatar looks away while a password is typed. */
+  onPasswordFocusChange?: (isFocused: boolean) => void
   onSubmit: (values: FormValues) => void | Promise<void>
 }
 
@@ -77,6 +79,7 @@ export function SignUpForm({
   errorMessage,
   emailError,
   onUsernameChange,
+  onPasswordFocusChange,
   onSubmit,
 }: SignUpFormProps) {
   const { t } = useTranslation()
@@ -168,6 +171,11 @@ export function SignUpForm({
                   type="password"
                   autoComplete="new-password"
                   {...field}
+                  onFocus={() => onPasswordFocusChange?.(true)}
+                  onBlur={() => {
+                    field.onBlur()
+                    onPasswordFocusChange?.(false)
+                  }}
                 />
               </FormControl>
               <FormDescription>
@@ -189,6 +197,11 @@ export function SignUpForm({
                   type="password"
                   autoComplete="new-password"
                   {...field}
+                  onFocus={() => onPasswordFocusChange?.(true)}
+                  onBlur={() => {
+                    field.onBlur()
+                    onPasswordFocusChange?.(false)
+                  }}
                 />
               </FormControl>
               <FormMessage />

@@ -3,6 +3,7 @@ import { PrismaModule } from '@/core/prisma/prisma.module';
 import { Config } from '@/shared/config/config.service';
 import { ConfigModule } from '@applifting-io/nestjs-decorated-config';
 import { Module } from '@nestjs/common';
+import { AdminGuard } from './guards/admin.guard';
 import { AuthenticatedUserGuard } from './guards/authenticated-user.guard';
 import { MemberGuard } from './guards/member.guard';
 import { OnboardedGuard } from './guards/onboarded.guard';
@@ -17,12 +18,14 @@ import { betterAuthProvider } from './providers/better-auth.provider';
   providers: [
     betterAuthProvider,
     AuthenticatedUserGuard,
+    AdminGuard,
     OnboardedGuard,
     MemberGuard,
   ],
   exports: [
     betterAuthProvider,
     AuthenticatedUserGuard,
+    AdminGuard,
     OnboardedGuard,
     MemberGuard,
     PrismaModule,
