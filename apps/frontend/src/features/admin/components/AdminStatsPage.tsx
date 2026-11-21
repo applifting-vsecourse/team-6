@@ -134,7 +134,11 @@ function ExportGroup() {
       <h2 className="text-h3">{t("admin.export.title")}</h2>
       <div className="flex flex-wrap gap-2">
         {EXPORTS.map((dataset) => (
-          <Button key={dataset} variant="outline" asChild>
+          <Button
+            key={dataset}
+            variant="outline"
+            asChild
+          >
             <a href={`${env.VITE_API_URL}/admin/export/${dataset}`}>
               {t(`admin.export.${dataset}`)}
             </a>

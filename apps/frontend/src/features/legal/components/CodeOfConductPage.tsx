@@ -35,9 +35,7 @@ export function CodeOfConductPage() {
 
         <section className="flex flex-col gap-5 md:gap-2">
           <h2 className="text-h3">{t("codeOfConduct.dataTitle")}</h2>
-          <p className="text-compact text-muted-foreground">
-            {t("codeOfConduct.dataText")}
-          </p>
+          <p className="text-compact text-muted-foreground">{t("codeOfConduct.dataText")}</p>
         </section>
 
         <section className="flex flex-col gap-5 md:gap-2">
