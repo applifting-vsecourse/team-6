@@ -388,6 +388,7 @@
     "profile": "Profil"
   },
   "onboarding": {
+    "backToProfile": "Zpět na profil",
     "days": {
       "weekdays": "Všední dny",
       "weekends": "Víkendy"
@@ -499,6 +500,7 @@
       "searchRoleAria": "Hledat roli",
       "searchRolePlaceholder": "Hledat roli…"
     },
+    "saveAndReturn": "Uložit",
     "stepProgress": "Krok {{current}} ze {{total}}",
     "stepShort": "{{current}} / {{total}}",
     "summary": {
@@ -653,12 +655,21 @@
       "expectations": "Zatím nic nepřidáno",
       "interests": "Zatím nic nepřidáno",
       "learn": "Zatím nic nepřidáno",
+      "note": "Zatím nic nepřidáno",
       "role": "Zatím bez role",
       "teach": "Zatím nic nepřidáno",
       "whenAndWhere": "Zatím nenastaveno"
     },
     "error": {
       "title": "Profil se nepodařilo načíst"
+    },
+    "rows": {
+      "days": "Dny",
+      "expectations": "Očekávání",
+      "frequency": "Jak často",
+      "note": "Poznámka",
+      "place": "Místo",
+      "time": "Denní doba"
     },
     "sections": {
       "expectations": "Co očekáváte",
@@ -670,12 +681,7 @@
     },
     "title": "Profil",
     "when": {
-      "afternoons": "odpoledne",
-      "allDays": "Všední dny i víkendy",
-      "evenings": "večery",
-      "mornings": "dopoledne",
-      "weekdays": "Všední dny",
-      "weekends": "Víkendy"
+      "allDays": "Všední dny i víkendy"
     },
     "withinRadius": "v okruhu {{count}} km"
   },

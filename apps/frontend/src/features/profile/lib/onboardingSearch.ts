@@ -6,4 +6,6 @@ import { FIRST_ONBOARDING_PAGE, ONBOARDING_PAGE_IDS } from "@/features/profile/l
 // Anything that is not a page (or missing) starts at the first one.
 export const onboardingSearchSchema = z.object({
   page: z.enum(ONBOARDING_PAGE_IDS).default(FIRST_ONBOARDING_PAGE).catch(FIRST_ONBOARDING_PAGE),
+  // Set by the profile's "Edit": that one page is edited, then the person goes back to the profile.
+  from: z.literal("profile").optional().catch(undefined),
 })

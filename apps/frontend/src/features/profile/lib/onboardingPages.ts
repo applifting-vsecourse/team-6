@@ -30,10 +30,6 @@ export const ONBOARDING_PAGE_IDS = ONBOARDING_PAGES.map((page) => page.id) as [
 
 const indexOf = (id: OnboardingPageId) => ONBOARDING_PAGES.findIndex((page) => page.id === id)
 
-/** Where a step begins: what the profile page's "Edit" of a section opens. */
-export const firstPageOfStep = (step: OnboardingStep): OnboardingPageId =>
-  ONBOARDING_PAGES.find((page) => page.step === step)!.id
-
 export const pageOf = (id: OnboardingPageId) => ONBOARDING_PAGES[indexOf(id)]!
 
 export const previousPage = (id: OnboardingPageId): OnboardingPageId | undefined =>

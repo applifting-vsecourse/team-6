@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_ProtectedPages/onboarding")({
 function OnboardingPage() {
   const { t } = useTranslation()
   const { user } = useSession()
-  const { page } = Route.useSearch()
+  const { page, from } = Route.useSearch()
   const navigate = Route.useNavigate()
 
   return (
@@ -34,7 +34,8 @@ function OnboardingPage() {
             // Same seed as the header: username, id when there is none. Never the e-mail.
             seed={user ? user.username || user.id : undefined}
             page={page}
-            onPageChange={(next) => void navigate({ search: { page: next } })}
+            from={from}
+            onPageChange={(next) => void navigate({ search: { page: next, from } })}
           />
         </div>
       </div>
