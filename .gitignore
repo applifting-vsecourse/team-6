@@ -33,3 +33,4 @@ SKILL.md
 skills-lock.json
 *.pptx
 
+.venv

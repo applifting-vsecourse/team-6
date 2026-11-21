@@ -62,6 +62,13 @@ const createAuth = (
     },
     // If change (setup) affects database, must be in core config, in order to be able to run migrations
     ...betterAuthCoreConfig,
+    rateLimit: {
+      ...betterAuthCoreConfig.rateLimit,
+      enabled:
+        process.env.DISABLE_RATE_LIMIT === 'true'
+          ? false
+          : (betterAuthCoreConfig.rateLimit?.enabled ?? true),
+    },
     plugins: resolveBetterAuthPlugins(config.nodeEnv),
   });
 
