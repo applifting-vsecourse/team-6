@@ -263,6 +263,26 @@ describe('KvintetService.feed', () => {
       expect(feed.items.map((item) => item.id)).toEqual(['boundary']);
     });
 
+    it('records the ranked list with scores, and still answers when recording fails', async () => {
+      const { repository, service } = setup();
+      repository.isMember.mockResolvedValue(false);
+      repository.findMatchProfile.mockResolvedValue(me);
+      repository.findOpenKvintets.mockResolvedValue([
+        kvintet([member(null, teacher)], 'strong', ['data-ai']),
+      ]);
+
+      await service.feed('u1');
+
+      expect(repository.recordFeedSnapshot).toHaveBeenCalledWith('u1', false, [
+        { kvintetId: 'strong', score: expect.any(Number) as number },
+      ]);
+
+      repository.recordFeedSnapshot.mockRejectedValue(new Error('db down'));
+      await expect(service.feed('u1')).resolves.toMatchObject({
+        items: [{ id: 'strong' }],
+      });
+    });
+
     it('lists every kvintet, flagged as fallback, when none reaches the threshold', async () => {
       const { repository, service } = setup();
       repository.isMember.mockResolvedValue(false);

@@ -1,6 +1,8 @@
 import { AdminController } from '@/modules/admin/controllers/admin.controller';
+import { ExportDataset } from '@/modules/admin/domain/admin-export';
 import { AdminService } from '@/modules/admin/services/admin.service';
 import { AdminGuard } from '@/shared/auth/guards/admin.guard';
+import type { Response } from 'express';
 import { mock } from 'jest-mock-extended';
 
 // The real guard pulls in the better-auth provider, which this Jest setup does not load.
@@ -29,5 +31,19 @@ describe('AdminController', () => {
     service.getStats.mockResolvedValue(stats);
 
     await expect(controller.getStats()).resolves.toBe(stats);
+  });
+
+  it('sends the export as a CSV download', async () => {
+    service.exportCsv.mockResolvedValue('a,b');
+    const res = { setHeader: jest.fn() } as unknown as Response;
+
+    await expect(controller.exportCsv(ExportDataset.Feed, res)).resolves.toBe(
+      'a,b',
+    );
+
+    expect(res.setHeader).toHaveBeenCalledWith(
+      'Content-Disposition',
+      'attachment; filename="kvintet-feed.csv"',
+    );
   });
 });
