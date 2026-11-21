@@ -46,6 +46,15 @@ describe("AdminStatsPage", () => {
     expect(valueOf("Forming, 3–4 people (can vote to start)")).toHaveTextContent("2")
   })
 
+  it("links the matching data downloads", async () => {
+    respondWith(() => Promise.resolve(stats))
+    renderPage()
+
+    const link = await screen.findByRole("link", { name: "Feed loads" })
+    expect(link).toHaveAttribute("href", expect.stringMatching(/\/admin\/export\/feed$/))
+    expect(screen.getAllByRole("link")).toHaveLength(4)
+  })
+
   it("shows each figure as a share of everyone registered and copes with zero registrations", async () => {
     respondWith(() => Promise.resolve(stats))
     const { unmount } = renderPage()

@@ -16,6 +16,13 @@
       "retry": "Try again",
       "title": "The numbers could not be loaded"
     },
+    "export": {
+      "feed": "Feed loads",
+      "kvintets": "How long kvintets were listed",
+      "memberships": "Joins and leaves",
+      "title": "Matching data",
+      "users": "Time to first join"
+    },
     "kvintets": {
       "active": "Started",
       "formingReady": "Forming, 3–4 people (can vote to start)",
@@ -103,6 +110,8 @@
     "you": "You"
   },
   "codeOfConduct": {
+    "dataText": "To improve the suggestions, we record which kvintets you were shown, which one you joined and how long you stayed. It is kept under a pseudonym, never shown to other members, and made anonymous when you delete your account.",
+    "dataTitle": "What we record",
     "reportIntro": "Write to <email>{{email}}</email>. It stays between us.",
     "reportTitle": "Something wrong?",
     "rule1": "Be kind. No insults.",

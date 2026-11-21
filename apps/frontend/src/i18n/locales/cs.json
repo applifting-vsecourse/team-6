@@ -16,6 +16,13 @@
       "retry": "Zkusit znovu",
       "title": "Čísla se nepodařilo načíst"
     },
+    "export": {
+      "feed": "Načtení kvintetů",
+      "kvintets": "Jak dlouho byly kvintety ve feedu",
+      "memberships": "Vstupy a odchody",
+      "title": "Data o doporučování",
+      "users": "Doby do prvního vstupu do Kvintetu"
+    },
     "kvintets": {
       "active": "Začaly",
       "formingReady": "Skládají se, 3–4 lidé (mohou hlasovat pro start)",
@@ -105,6 +112,8 @@
     "you": "Vy"
   },
   "codeOfConduct": {
+    "dataText": "Abychom vám mohli lépe doporučovat, zaznamenáváme, jaké kvintety vám byly nabídnuty, do kterého jste vstoupili a jak dlouho jste v něm zůstali. Data jsou uložena pod pseudonymem, nikdy je neuvidí ostatní členové a po smazání účtu se stanou anonymními.",
+    "dataTitle": "Co zaznamenáváme",
     "reportIntro": "Napište na <email>{{email}}</email>. Zůstane to mezi námi.",
     "reportTitle": "Něco se děje?",
     "rule1": "Buďte laskaví. Žádné urážky.",
