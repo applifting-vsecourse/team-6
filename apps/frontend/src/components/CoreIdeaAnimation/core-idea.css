@@ -1352,7 +1352,7 @@ and a tick lands when it does. */
 }
 .ci-m .ci-s1 {
   --fx: -39px;
-  --fy: 93px;
+  --fy: 113px;
 }
 .ci-m .ci-s2 {
   --fx: -124px;
@@ -1360,7 +1360,7 @@ and a tick lands when it does. */
 }
 .ci-m .ci-s3 {
   --fx: -39px;
-  --fy: -145px;
+  --fy: -165px;
 }
 .ci-m .ci-s4 {
   --fx: 101px;
@@ -1372,7 +1372,7 @@ and a tick lands when it does. */
 }
 .ci-d .ci-s1 {
   --fx: -46px;
-  --fy: 113px;
+  --fy: 129px;
 }
 .ci-d .ci-s2 {
   --fx: -148px;
@@ -1380,7 +1380,20 @@ and a tick lands when it does. */
 }
 .ci-d .ci-s3 {
   --fx: -46px;
-  --fy: -169px;
+  --fy: -185px;
+}
+/* The two tags under a side seat are taller than the gap down to the seat below it, so while the
+   tags show, the lower pair steps down out of their way (--fy above allows for the same step).
+   Not during the regroup: that travels from the seat's own spot and sets its own transform. */
+.ci-m .ci-tagged:not(.ci-regroup) :is(.ci-s2, .ci-s3) {
+  transform: translateY(20px);
+  transition-duration: 0.4s;
+  transition-delay: 0s;
+}
+.ci-d .ci-tagged:not(.ci-regroup) :is(.ci-s2, .ci-s3) {
+  transform: translateY(16px);
+  transition-duration: 0.4s;
+  transition-delay: 0s;
 }
 .ci-d .ci-s4 {
   --fx: 120px;
