@@ -88,6 +88,38 @@ describe("VideoPlayer", () => {
     expect(pause).toHaveBeenCalled()
   })
 
+  it("plays and pauses when the picture itself is clicked", () => {
+    const play = vi.spyOn(HTMLMediaElement.prototype, "play")
+    const pause = vi.spyOn(HTMLMediaElement.prototype, "pause")
+    const { container, film } = renderPlayer()
+    fireEvent.playing(film) // the poster is gone, only the click layer is left
+    const picture = container.querySelector<HTMLElement>("[role=presentation]")!
+    Object.defineProperty(film, "paused", { configurable: true, value: false })
+
+    fireEvent.click(picture)
+    expect(pause).toHaveBeenCalled()
+
+    Object.defineProperty(film, "paused", { configurable: true, value: true })
+    play.mockClear()
+    fireEvent.click(picture)
+    expect(play).toHaveBeenCalled()
+  })
+
+  it("starts with sound when anywhere on the poster is clicked", () => {
+    stubMedia(["reduced-motion"])
+    const { film } = renderPlayer()
+
+    fireEvent.click(screen.getByText("Your story"))
+
+    expect(film.muted).toBe(false)
+  })
+
+  it("has a seek bar on every screen size, so a phone can rewind", () => {
+    renderPlayer()
+
+    expect(screen.getByRole("slider", { name: "Position in the video" })).toBeInTheDocument()
+  })
+
   it("shows the poster until the film plays", () => {
     const { film } = renderPlayer()
     expect(screen.getByText("artwork")).toBeInTheDocument()

@@ -13,9 +13,12 @@ import type { Expression } from "blobatar/expression"
 /** Seed of the yellow mascot. The blobatar package turns it into `#ffcd44`, "you" in the core-idea animation. */
 export const MASCOT_SEED = "jana"
 
-// How long the mascot waits for the next page to claim it before it leaves. Navigation unmounts the
-// old page first, and a lazily loaded route can take a moment to mount.
-const GRACE_MS = 1500
+// How long the mascot waits for the next page to claim it before it leaves. The router swaps the old
+// page for the new one in one commit, so the next page's effect runs right after the old page's
+// cleanup: this only has to bridge that gap. Anything longer is how long the mascot visibly lingers
+// on a page that never claims it. A route slower than the router's pending delay shows the loading
+// screen first; the mascot then leaves and comes back when that page mounts, which is intended.
+const GRACE_MS = 50
 
 export type MascotAction = {
   label: string
