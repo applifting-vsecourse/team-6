@@ -33,6 +33,15 @@ describe('AccountController', () => {
     expect(guards).toContain(AuthenticatedUserGuard);
   });
 
+  it('returns the data of the caller only, from accountService.exportData', async () => {
+    service.exportData.mockResolvedValue({ id: 'user-123' });
+
+    const result = await controller.exportData(mockUser);
+
+    expect(service.exportData).toHaveBeenCalledWith('user-123');
+    expect(result).toEqual({ id: 'user-123' });
+  });
+
   it('calls accountService.deleteAccount and returns { success: true }', async () => {
     service.deleteAccount.mockResolvedValue(undefined);
 

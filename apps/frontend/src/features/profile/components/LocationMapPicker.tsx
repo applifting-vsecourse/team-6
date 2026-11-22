@@ -58,8 +58,9 @@ export function LocationMapPicker({
 
   const updateLocation = useCallback(
     (lat: number, lng: number, rad: number) => {
-      const roundedLat = Math.round(lat * 10000) / 10000
-      const roundedLng = Math.round(lng * 10000) / 10000
+      // Two decimals is about 1 km: all the matching needs, and not a home address.
+      const roundedLat = Math.round(lat * 100) / 100
+      const roundedLng = Math.round(lng * 100) / 100
       setCurrentLat(roundedLat)
       setCurrentLng(roundedLng)
       setCurrentRadius(rad)
@@ -239,18 +240,20 @@ export function LocationMapPicker({
         style={{ zIndex: 0 }}
       />
 
+      <p className="text-small text-muted-foreground">{t("onboarding.place.osmNote")}</p>
+
       {currentLat != null && currentLng != null && (
         <div className="flex flex-wrap items-start justify-between gap-2">
           <span className="flex items-center gap-1 font-mono text-meta tracking-meta text-muted-foreground uppercase">
             <MapPin className="size-3 text-destructive" />
             {formatNumber(currentLat, {
-              minimumFractionDigits: 4,
-              maximumFractionDigits: 4,
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
             })}
             °,{" "}
             {formatNumber(currentLng, {
-              minimumFractionDigits: 4,
-              maximumFractionDigits: 4,
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
             })}
             °
           </span>

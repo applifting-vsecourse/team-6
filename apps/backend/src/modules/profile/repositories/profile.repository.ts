@@ -3,6 +3,7 @@ import {
   MeetingFrequency,
   ProfileEntity,
   ProfileTagEntity,
+  roundCoordinate,
   SaveProfileData,
   TagKind,
 } from '@/modules/profile/domain/profile.entity';
@@ -76,6 +77,7 @@ export class ProfileRepository {
       profile.latitude,
       profile.longitude,
       profile.tourCompletedAt,
+      profile.privacyNoticeSeenAt,
     );
   }
 
@@ -84,6 +86,15 @@ export class ProfileRepository {
     await this.prisma.profile.updateMany({
       where: { userId, tourCompletedAt: null },
       data: { tourCompletedAt: new Date() },
+    });
+    return this.findByUserId(userId);
+  }
+
+  // Only sets the mark when it is empty, so repeated calls keep the first time.
+  async markPrivacyNoticeSeen(userId: string): Promise<ProfileEntity | null> {
+    await this.prisma.profile.updateMany({
+      where: { userId, privacyNoticeSeenAt: null },
+      data: { privacyNoticeSeenAt: new Date() },
     });
     return this.findByUserId(userId);
   }
@@ -171,8 +182,8 @@ export class ProfileRepository {
           userId,
           position: position ?? null,
           roles: roles ?? [],
-          latitude: data.latitude ?? null,
-          longitude: data.longitude ?? null,
+          latitude: roundCoordinate(data.latitude) ?? null,
+          longitude: roundCoordinate(data.longitude) ?? null,
           expectations: data.expectations
             ? JSON.stringify(data.expectations)
             : null,
@@ -190,9 +201,11 @@ export class ProfileRepository {
         update: {
           ...(position !== undefined ? { position } : {}),
           ...(roles !== undefined ? { roles } : {}),
-          ...(data.latitude !== undefined ? { latitude: data.latitude } : {}),
+          ...(data.latitude !== undefined
+            ? { latitude: roundCoordinate(data.latitude) }
+            : {}),
           ...(data.longitude !== undefined
-            ? { longitude: data.longitude }
+            ? { longitude: roundCoordinate(data.longitude) }
             : {}),
           ...(data.weekdays !== undefined ? { weekdays: data.weekdays } : {}),
           ...(data.weekends !== undefined ? { weekends: data.weekends } : {}),

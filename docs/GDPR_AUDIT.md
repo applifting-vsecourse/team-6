@@ -1,0 +1,152 @@
+# GDPR assessment: Kvintet (controller: not decided)
+
+**Audited:** `origin/develop` @ `1540d82` (read with `git show`, not the working tree) · **Date:** 2026-11-22
+**Type:** engineering audit from the code, not legal advice. A DPO or counsel must confirm lawful bases, transfers and the controller question.
+
+**Inputs from the team:** the controller is not decided; hosting is in the EU; no email is sent yet (no `RESEND_API_KEY` or SMTP in production, so the console mailer is active).
+**Assumed:** an adult pilot of ≤ 500 students, Czech data subjects, so the supervisory authority is the ÚOOÚ. Confirm the age range (finding 11).
+
+## Summary
+
+Privacy by construction is partly there: the feed has no name or email, peer ids are masked while a kvintet forms, admin stats are seven integers, the export pseudonymises users, and deleting an account is one atomic transaction. There are no analytics, no third-party scripts and no tracking cookies.
+
+The gaps are in what the law asks you to **say, keep and hand over**: no privacy notice, no access or export, no retention for the matching log, and (the most urgent) **emails and one-time links written to production logs**. 6 high, 6 medium and 3 low findings.
+
+## 1. ROPA (Art. 30)
+
+The controller is the missing first row. Until it is named, every `Recipients` and `Retention` cell below is provisional.
+
+| #   | Activity                                  | Purpose                                                               | Data categories                                                                                                                                                               | Subjects | Lawful basis                                          | Recipients                                                                                           | Retention                                                                                               | Transfers                                                                         |
+| --- | ----------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| 1   | Account and sign-in                       | Create and authenticate accounts                                      | name, username, email, password hash, avatar seed, role, code-of-conduct timestamp and version                                                                                | students | Contract (6(1)(b))                                    | hosting provider                                                                                     | until account deletion                                                                                  | none (EU)                                                                         |
+| 2   | Session records                           | Stay signed in; rate limiting                                         | session token, **IP address**, user agent, timestamps                                                                                                                         | students | Legitimate interests (6(1)(f))                        | hosting provider                                                                                     | **not defined**: BetterAuth `expiresAt` only, no purge                                                  | none                                                                              |
+| 3   | Profile and questionnaire                 | Match users into groups                                               | roles, tags (teach/learn/interest), availability, meeting frequency, city, **latitude/longitude (4 decimals, about 11 m)**, radius, free-text note, onboarding and tour marks | students | Contract                                              | other members see role and tags only; names appear after the kvintet starts                          | until account deletion                                                                                  | none                                                                              |
+| 4   | Kvintet, votes, chat                      | Run groups and chat                                                   | membership, votes, read marks, **message bodies**, name and username shown to co-members                                                                                      | students | Contract                                              | co-members of an active kvintet                                                                      | members: until leave or deletion; messages: until the kvintet empties, **and survive account deletion** | none                                                                              |
+| 5   | Matching data log                         | Tune matching weights ("or train on it", ARCHITECTURE §Matching data) | feed snapshots (kvintet ids and scores, newest 50 per user), join/leave history with timestamps, position and score, kvintet lifetimes                                        | students | Legitimate interests (needs a written balancing test) | admin (CSV)                                                                                          | **not defined**: `membership_log` and `kvintet_log` are never purged                                    | none                                                                              |
+| 6   | Admin CSV export                          | Same                                                                  | the log above with a keyed pseudonym per user                                                                                                                                 | students | Legitimate interests                                  | one admin account                                                                                    | the file's life on the admin's machine is not defined                                                   | none                                                                              |
+| 7   | OpenStreetMap tiles                       | Draw the location picker                                              | user IP, map area, referrer origin, sent by the browser                                                                                                                       | students | Contract / legitimate interests                       | OpenStreetMap tile servers                                                                           | outside our control                                                                                     | **unverified**: check where the tile servers answer from and their privacy policy |
+| 8   | Console mailer (production, no transport) | Deliver verify and reset links                                        | **recipient email, one-time links** in stdout                                                                                                                                 | students | none can be justified, see finding 1                  | whoever reads the container logs ("the logs are shared across the course", ARCHITECTURE principle 4) | log retention unknown                                                                                   | none                                                                              |
+| 9   | Reverse proxy and container logs          | Operate the service                                                   | IP, URL, timestamps (Traefik, nginx; not inspected)                                                                                                                           | students | Legitimate interests                                  | hosting provider                                                                                     | **not defined**                                                                                         | none                                                                              |
+| 10  | Support mailbox `support@kvintet.cz`      | Reports and requests                                                  | email and message text                                                                                                                                                        | students | Legitimate interests                                  | whoever owns the mailbox                                                                             | not defined; the code comment says the mailbox may not exist yet                                        | unknown                                                                           |
+
+**Special-category data:** none is requested. Free text (profile note, kvintet description, chat, "expectations") can contain it if a user chooses to write it; see finding 12.
+
+The helper `ropa_check.py` scored the ROPA 3/7 complete on an earlier seven-row cut: rows 2, 5, 7 and 8 have no retention period.
+
+## 2. Lawful basis
+
+| Activity                                  | Basis                                           | Reasoning                                                                                                                                                                                                                                                                                                                                                       |
+| ----------------------------------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Account, profile, kvintet, chat (1, 3, 4) | **Contract**                                    | Forming a group is the service the user signs up for. Do not call it consent: the sign-up checkbox is for community rules, and consent could be withdrawn at any time and would then stop the service.                                                                                                                                                          |
+| Sessions, logs (2, 9)                     | **Legitimate interests**                        | Security and operation. Short balancing test, short retention.                                                                                                                                                                                                                                                                                                  |
+| Matching log and export (5, 6)            | **Legitimate interests**, not contract          | The user does not need this logging to get a group; it improves the product. That makes it the weakest row: it needs a written balancing test, a notice, a retention limit and a working **objection** route (Art. 21). None exists today. Do not switch to consent as a shortcut, since consent for a pilot cohort in a course is hard to call "freely given". |
+| OSM tiles (7)                             | **Contract** (the picker is part of onboarding) | The disclosure is missing, not the basis. A map-free option (type a city) would remove the transfer.                                                                                                                                                                                                                                                            |
+| Console mailer (8)                        | none                                            | No purpose needs emails in logs. Remove, do not justify.                                                                                                                                                                                                                                                                                                        |
+
+**Art. 9:** not applicable on current design. The notice should tell users not to write health, religion, political or similar data into free-text fields.
+
+**Consent checkbox:** `acceptCodeOfConduct` records `codeOfConductAcceptedAt` and `codeOfConductVersion`. That is good evidence that the rules were accepted, but it is not GDPR consent, and the privacy text sits inside the rules page. Keep the two apart.
+
+## 3. DSAR workflow
+
+**Deadline:** one month from receipt, extendable by two further months for complex or numerous requests, with notice to the person inside the first month (Art. 12(3)). Free of charge in the normal case.
+
+| Right                                   | What exists today                                                                                                                                                | What is missing                                                                                            |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Information (Art. 13)                   | A "What we record" paragraph on the community rules page, covering only the matching log                                                                         | Everything else (finding 2)                                                                                |
+| Access (Art. 15), portability (Art. 20) | **Nothing.** No `GET /me/export`; profile data can only be read through the profile screens                                                                      | An export of account, profile, tags, membership, messages written by the user, and the user's own log rows |
+| Rectification (Art. 16)                 | Profile fields are editable. Name, username and email: BetterAuth ships an update-user endpoint, but no screen uses it and it was not verified                   | A profile-settings form, or a documented manual route                                                      |
+| Erasure (Art. 17)                       | `DELETE /me`: leaves the kvintet, deletes user, profile, tags, sessions, accounts, membership and votes; chat messages lose their author; log rows lose `userId` | Be honest in the dialog about what stays (finding 6); decide on `verification` rows and backups            |
+| Restriction, objection (Art. 18, 21)    | Nothing                                                                                                                                                          | An opt-out of the matching log, or a manual process with a named owner                                     |
+| Complaint (Art. 77)                     | Not mentioned                                                                                                                                                    | Name the ÚOOÚ in the notice                                                                                |
+
+**Proposed process (small, no new tooling):**
+
+1. **Intake:** one address on the privacy page (the controller's, once decided). Log each request with the received date and the due date (received + 1 month).
+2. **Identity:** the user writes from the account email, or is signed in and uses the in-app button. Never ask for an ID document.
+3. **Locate:** all personal data is keyed by `userId` in the tables `user`, `account`, `session`, `profile`, `profile_tag`, `kvintet_member`, `kvintet_vote`, `message` (author), `feed_snapshot`, `membership_log`. `verification` is keyed by email. Admin CSV pseudonyms are `HMAC(secret, "export:" + userId)` cut to 12 hex characters.
+4. **Answer:** JSON export for access and portability; deletion through `DELETE /me`; a short written reply either way.
+5. **Record** what was done, for accountability.
+
+## 4. DPIA screen (Art. 35)
+
+Not clearly mandatory. None of the usual triggers holds at full strength: no special-category data, not large scale (≤ 500), no legal effect from the scoring. Three things push towards doing a short one anyway:
+
+- location data of students, combined with a scoring system that ranks people into groups;
+- a stated plan to "tune or train on" the log (a purpose that grows with time);
+- a possible minor audience (finding 11).
+
+Recommendation: write a half-page DPIA covering the matching log and location, and revisit it if the log is ever used for training. Counsel confirms whether it is required.
+
+## 5. Findings, prioritised
+
+Paths are relative to the repo root.
+
+### High
+
+1. **Emails and one-time links go to the production log.** With no mail transport, `core/email/mail.module.ts` falls back to `ConsoleMailerAdapter`, which logs the recipient address and the full HTML, including the verify and **password-reset links** (`console-mailer-adapter.ts:15-23`). It even warns "in production... for link recovery". ARCHITECTURE says the logs are shared across the course. That is a disclosure of email addresses and of account-takeover tokens. _Fix:_ in production, drop the body when no transport is configured; log only that a mail was skipped. **Done on branch `fix/gdpr-matching-data` (uncommitted); `develop` still has the leak until it merges.** Refusing to start was rejected, since production runs without a transport today. Side effect: verify and reset links are now unrecoverable until SMTP or Resend is set up.
+2. **No privacy notice (Art. 12–14).** No controller, contact, purposes, bases, recipients, retention, rights, or complaint route. The only text is `codeOfConduct.dataText` about the matching log. _Fix:_ a `/privacy` page linked from sign-up, the footer and the profile; name the controller first.
+3. **Matching log: no retention, no objection, and "made anonymous" is optimistic.** `membership_log` and `kvintet_log` are never purged; `feed_snapshot` keeps 50 rows per user as long as the account lives. After deletion the rows keep `kvintetId`, join and leave times, position and score. Former co-members know which kvintet and when someone left, so in a group of five that can single the person out. Pseudonymised data is still personal data. _Fix:_ set a limit (for example delete log rows older than the pilot plus a few weeks, on write since there is no cron), document the balancing test, say "pseudonymous" in the text, and offer an opt-out.
+4. **The migration silently started the log for existing users.** `20261121100000_add_matching_data_log` backfilled `membership_log` from current `kvintet_member` rows. ARCHITECTURE notes that only new sign-ups accept code-of-conduct v1.1, and "existing users are not asked again". People who joined before 2026-11-21 were never told. _Fix:_ show the notice to everyone once (a banner or a re-acceptance), or delete the backfilled rows.
+5. **No access or portability (Art. 15, 20), no objection (Art. 21).** See section 3. These are the requests a student is most likely to send.
+6. **Pseudonym key reuse.** `AdminService.pseudonym` keys the HMAC with `BETTER_AUTH_SECRET`, and shortens it to 12 hex characters (48 bits). Anyone holding the auth secret (which signs sessions) can recompute every user's pseudonym from user ids. _Fix:_ a separate `EXPORT_PSEUDONYM_KEY`, rotated when the pilot ends.
+
+### Medium
+
+7. **Exact location is stored.** Coordinates rounded to 4 decimals (about 11 m) are saved; the matcher only needs distance within a radius of 5 km or more. This is not data minimisation (Art. 5(1)(c)). _Fix:_ round to two decimals (about 1 km) in `LocationMapPicker.updateLocation` and re-round on the server in `SaveProfileDto`; or store only the city.
+8. **OpenStreetMap tiles are loaded without disclosure.** `LocationMapPicker.tsx:140` fetches `https://{s}.tile.openstreetmap.org/...`, so each user's IP and map area go to a third party, with the origin as referrer (`strict-origin-when-cross-origin`). _Fix:_ disclose it, or self-host or proxy tiles, or offer a city list without a map.
+9. **Deletion is narrower than the dialog says, and nothing is said about what stays.** The dialog promises profile, questionnaire and seat. In fact chat message bodies stay in the group (author link removed), log rows stay (finding 3), `verification` rows are not part of the transaction (`account.repository.ts`), and backups were not inspected. Messages are kept for the other members' legitimate interest in their own conversation; that is defensible if stated. _Fix:_ update `account.deleteDialog.description` and the notice.
+10. **No retention schedule for sessions, verification rows or inactive accounts.** Session rows hold IP and user agent; no code in the repo purges expired ones, and BetterAuth's own cleanup was not checked at runtime. There is no cron (ARCHITECTURE §1), so purge on write (for example, delete expired sessions during sign-in), and decide a pilot-end deletion date.
+11. **No age gate.** Students may be under 18, and in Czechia consent-based services need the child to be 15. Contract with a minor is also doubtful. _Fix:_ confirm the audience; if minors are possible, add an age confirmation at sign-up and involve counsel.
+12. **Free text can collect special-category or third-party data.** `note` (500 chars), kvintet `description`, chat. No guidance, no report route beyond the support email. _Fix:_ a sentence in the notice and under the fields.
+
+### Low
+
+13. **Email verification is sent but not enforced** (no `requireEmailVerification`). Anyone can register with another person's address; once a mail transport exists, that person receives unsolicited mail. Side effect to check: in `better-auth.provider.ts` the spread `...betterAuthCoreConfig` comes after the inline `emailAndPassword` block, so the core `{ enabled: true }` appears to replace `sendResetPassword`; test that password reset works before relying on it.
+14. **Processors and transfers are undocumented.** Hosting (Coolify on the course infrastructure, region "EU" per the team), the container registry, GitHub (CI, `claude-review` workflows send code to an AI service; confirm no personal data in PRs), and a future mail provider. Record each with its DPA. If Resend is enabled later it is US-based, so name the mechanism (SCCs / DPF).
+15. **No breach procedure; export downloads are not logged.** Art. 33 allows 72 hours to notify the ÚOOÚ. Add a one-page runbook and log who downloaded which dataset and when. The seeded superadmin is named "Admin (Delete in Prod)" and its password comes from `SUPERADMIN_PASSWORD`; confirm that account is replaced by named admins.
+
+## 6. What already works (keep it)
+
+- Feed DTO has no name, email or user id; scores and distances never reach a client.
+- Peer ids are masked with an HMAC while a kvintet is `FORMING`; names appear only once it starts, and the sign-up hint says so.
+- Admin stats are aggregates; the CSV uses pseudonyms, and rows of deleted accounts have an empty user cell.
+- `DELETE /me` is atomic and runs the leave rules first, so no empty kvintet is left behind.
+- Consent is written server-side only (`input: false`), and sign-up is rejected without it.
+- Rate limits on sign-in and sign-up, Helmet, CORS limited to two origins, Swagger and the OpenAPI plugin off in production, first-party cookie only, no analytics or external fonts or scripts, the geolocation prompt is user-triggered.
+- Feed snapshot failures are logged without personal data.
+
+## 7. Open points for the team
+
+1. **Who is the controller?** Decide before anything else; the notice, the DSAR address and the processor contracts all depend on it.
+2. Is the audience adult only? (finding 11)
+3. Does `support@kvintet.cz` exist and who reads it? (`src/config/support.ts` says to confirm.)
+4. Where do the Coolify/Traefik/nginx logs go, for how long, and who can read them? Where are backups kept and for how long?
+5. When does the pilot end, and what happens to the data then?
+6. Is training a model on the log a real plan? If yes, it needs its own notice and basis.
+
+## Not checked
+
+Production configuration and environment variables, the live database, hosting contracts, backups, proxy log settings, the BetterAuth update-user and session-cleanup behaviour at runtime, the Czech text of the notice (counsel), and anything on branches other than `develop`.
+
+## 8. Status after the fixes (branch `fix/gdpr-matching-data`, uncommitted)
+
+| #   | Finding                             | Status                                                                                                                                                                                                                                                |
+| --- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Emails and links in production logs | **Fixed.** The console mailer logs only a warning in production.                                                                                                                                                                                      |
+| 2   | No privacy notice                   | **Fixed, one gap.** `/privacy` page (en, cs), linked from the footer and sign-up. The controller is still a visible placeholder.                                                                                                                      |
+| 3   | Matching log retention, objection   | **Partly fixed.** 365-day retention on write (earlier work on this branch). Objection is manual and the log restarts when the person loads the feed again; see `PRIVACY_OPERATIONS.md`.                                                               |
+| 4   | Existing users never told           | **Fixed.** One-time banner for every profile (`profile.privacyNoticeSeenAt`, additive migration).                                                                                                                                                     |
+| 5   | No access or portability            | **Fixed.** `GET /me/export` and a "Download my data" button on the profile page. Objection and rectification of name, username and e-mail stay manual.                                                                                                |
+| 6   | Pseudonym key reuse                 | **Fixed in code.** `EXPORT_PSEUDONYM_KEY`; falls back to the auth secret, so **set it in production**. The 12-hex-character length is unchanged.                                                                                                      |
+| 7   | Exact location                      | **Fixed.** Two decimals (about 1 km) in the picker, on save, and for existing rows by migration (not reversible).                                                                                                                                     |
+| 8   | OSM tiles undisclosed               | **Fixed by disclosure** (map note, privacy page). Tiles are still loaded from OpenStreetMap.                                                                                                                                                          |
+| 9   | Deletion text                       | **Fixed.** Dialog says messages stay without a name. `verification` rows and backups are still unchecked.                                                                                                                                             |
+| 10  | Session retention                   | **Fixed for sessions.** Expired sessions are deleted on every sign-in. No schedule for inactive accounts or `verification` rows; pilot end date still to decide.                                                                                      |
+| 11  | Age gate                            | **Partly.** "I am 18 or older" checkbox at sign-up, browser-side only, nothing stored. Confirm the audience.                                                                                                                                          |
+| 12  | Free text                           | **Fixed.** Guidance under the profile note, in the start-kvintet dialog and on the privacy page. No moderation.                                                                                                                                       |
+| 13  | E-mail verification, reset          | **Not changed.** Enforcing verification would lock everyone out while no mail is sent. The reset-password config looks overridden by the spread in `better-auth.provider.ts`, but there is no reset page in the frontend either, so it is left alone. |
+| 14  | Processors and transfers            | **Documented, not closed.** Table in `PRIVACY_OPERATIONS.md` with agreements still to confirm.                                                                                                                                                        |
+| 15  | Breach procedure, export log        | **Fixed.** Runbook in `PRIVACY_OPERATIONS.md`; admin exports are logged with the admin id.                                                                                                                                                            |
+
+Still needs a human decision or fact: the controller, the audience's age, `support@kvintet.cz`, hosting and backup details, the pilot end date, and counsel's confirmation of the bases.

@@ -18,6 +18,7 @@ import {
   KVINTET_CAPACITY,
   KvintetDetails,
   KvintetMemberDetails,
+  MATCHING_DATA_RETENTION_DAYS,
   NewKvintet,
   OpenKvintet,
   StartOutcome,
@@ -202,6 +203,15 @@ export class KvintetRepository {
         DELETE FROM "feed_snapshot" WHERE "userId" = ${userId} AND "id" NOT IN (
           SELECT "id" FROM "feed_snapshot" WHERE "userId" = ${userId}
           ORDER BY "id" DESC LIMIT ${FEED_SNAPSHOTS_KEPT})`;
+
+      // shortcut: runs only when a feed changes (no cron), so old rows can outlive the limit on a quiet app; add a scheduled purge if that matters
+      const cutoff = new Date(
+        Date.now() - MATCHING_DATA_RETENTION_DAYS * 24 * 60 * 60 * 1000,
+      );
+      await tx.feedSnapshot.deleteMany({
+        where: { createdAt: { lt: cutoff } },
+      });
+      await tx.membershipLog.deleteMany({ where: { leftAt: { lt: cutoff } } });
     });
   }
 

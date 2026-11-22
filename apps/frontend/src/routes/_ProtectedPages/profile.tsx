@@ -14,6 +14,7 @@ import { useSlugLabel } from "@/lib/useSlugLabel"
 
 import { DeleteAccountDialog } from "@/features/account/components/DeleteAccountDialog"
 import { useDeleteAccount } from "@/features/account/hooks/useDeleteAccount"
+import { useDownloadMyData } from "@/features/account/hooks/useDownloadMyData"
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
 import { useSession } from "@/features/auth/hooks/useSession"
 import { profileQueryOptions, type ProfileResponse } from "@/features/profile/api/profileApi"
@@ -159,6 +160,7 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
   const label = useSlugLabel()
   const { profile, isLoading, isError, error, refetch } = useProfile(user?.id)
   const deleteAccount = useDeleteAccount()
+  const downloadData = useDownloadMyData()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   if (isLoading) {
@@ -365,7 +367,23 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
         </dl>
       </section>
 
-      {/* 6. Danger zone (Delete account) */}
+      {/* 6. Your data (Art. 15 and 20) */}
+      <section className="flex flex-col items-start gap-2.5 border-t border-border pt-5 md:pt-6">
+        <h2 className="text-h3 font-semibold text-foreground">{t("profile.data.title")}</h2>
+        <p className="text-small text-muted-foreground md:text-compact">
+          {t("profile.data.description")}
+        </p>
+        <Button
+          variant="outline"
+          disabled={downloadData.isPending}
+          onClick={() => downloadData.mutate()}
+          className="mt-1 w-full sm:w-auto"
+        >
+          {downloadData.isPending ? t("profile.data.downloading") : t("profile.data.button")}
+        </Button>
+      </section>
+
+      {/* 7. Danger zone (Delete account) */}
       <section className="flex flex-col items-start gap-2.5 border-t border-border pt-5 md:pt-6">
         <h2 className="text-h3 font-semibold text-foreground">{t("profile.dangerZone.title")}</h2>
         <p className="text-small text-muted-foreground md:text-compact">

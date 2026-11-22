@@ -8,6 +8,7 @@ import {
   resolveBetterAuthPlugins,
 } from '@/shared/auth/config/better-auth.config';
 import { codeOfConductDatabaseHooks } from '@/shared/auth/hooks/code-of-conduct.hook';
+import { sessionPurgeDatabaseHooks } from '@/shared/auth/hooks/session-purge.hook';
 import { Config } from '@/shared/config/config.service';
 import { Inject, Provider } from '@nestjs/common';
 import { betterAuth } from 'better-auth';
@@ -47,7 +48,10 @@ const createAuth = (
         },
       },
     },
-    databaseHooks: codeOfConductDatabaseHooks,
+    databaseHooks: {
+      ...codeOfConductDatabaseHooks,
+      ...sessionPurgeDatabaseHooks(prismaService),
+    },
     trustedOrigins: [config.frontendUrl],
     emailVerification: {
       sendVerificationEmail: async ({ user, url }) => {

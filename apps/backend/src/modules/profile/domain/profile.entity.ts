@@ -18,6 +18,15 @@ export class ProfileTagEntity {
   ) {}
 }
 
+/**
+ * Two decimals is about 1 km: enough for a search radius of 5 km or more, and not a home address.
+ * Applied on save; the picker rounds the same way so what the user sees is what is stored.
+ */
+export const roundCoordinate = <T extends number | null | undefined>(
+  value: T,
+): T =>
+  (typeof value === 'number' ? Math.round(value * 100) / 100 : value) as T;
+
 export interface SaveProfileData {
   position?: string;
   roles?: string[];
@@ -60,5 +69,6 @@ export class ProfileEntity {
     public readonly latitude: number | null = null,
     public readonly longitude: number | null = null,
     public readonly tourCompletedAt: Date | null = null,
+    public readonly privacyNoticeSeenAt: Date | null = null,
   ) {}
 }

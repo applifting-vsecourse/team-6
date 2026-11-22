@@ -51,6 +51,10 @@ vi.mock("@/features/account/hooks/useDeleteAccount", () => ({
   }),
 }))
 
+vi.mock("@/features/account/hooks/useDownloadMyData", () => ({
+  useDownloadMyData: () => ({ mutate: vi.fn(), isPending: false }),
+}))
+
 const defaultUser = {
   id: "u-1",
   name: "Jana Nováková",

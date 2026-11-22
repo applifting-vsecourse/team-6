@@ -9,6 +9,71 @@ export class AccountRepository {
     private readonly kvintetRepository: KvintetRepository,
   ) {}
 
+  // Everything held about one person (Art. 15 and 20). Tokens and password hashes are left out.
+  async exportData(userId: string): Promise<Record<string, unknown>> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        email: true,
+        emailVerified: true,
+        createdAt: true,
+        codeOfConductAcceptedAt: true,
+        codeOfConductVersion: true,
+        sessions: {
+          select: {
+            createdAt: true,
+            expiresAt: true,
+            ipAddress: true,
+            userAgent: true,
+          },
+        },
+        profile: {
+          omit: { userId: true },
+          include: {
+            city: { select: { name: true } },
+            tags: { select: { kind: true, tag: { select: { slug: true } } } },
+          },
+        },
+        kvintetMember: {
+          select: { kvintetId: true, joinedAt: true, lastReadMessageId: true },
+        },
+        messages: {
+          where: { kind: 'USER' },
+          select: { kvintetId: true, body: true, createdAt: true },
+          orderBy: { id: 'asc' },
+        },
+        feedSnapshots: {
+          select: { createdAt: true, fallback: true, items: true },
+          orderBy: { id: 'asc' },
+        },
+        membershipLogs: {
+          select: {
+            kvintetId: true,
+            source: true,
+            joinedAt: true,
+            leftAt: true,
+            position: true,
+            listSize: true,
+            score: true,
+          },
+          orderBy: { id: 'asc' },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException({
+        statusCode: 404,
+        code: 'not_found',
+        message: 'User not found',
+      });
+    }
+    return { exportedAt: new Date(), ...user };
+  }
+
   async deleteAccount(userId: string): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
       // 1. Lock user row to verify existence and prevent concurrent operations

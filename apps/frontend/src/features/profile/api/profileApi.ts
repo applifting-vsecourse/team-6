@@ -54,6 +54,8 @@ export const profileResponseSchema = z
     onboardingCompletedAt: z.string().nullable(),
     /** Set once the product tour was finished or skipped. */
     tourCompletedAt: z.string().nullable().optional(),
+    /** Set once the privacy notice banner was dismissed. */
+    privacyNoticeSeenAt: z.string().nullable().optional(),
     teaches: z.array(tagSchema),
     learns: z.array(tagSchema),
     interests: z.array(tagSchema),
@@ -132,5 +134,11 @@ export const useSaveProfile = (userId?: string) => {
 /** Remembers on the server that the tour is over (finished or skipped), so it never returns. */
 export const markTourCompleted = async (): Promise<ProfileResponse> => {
   const res = await api.post("me/profile/tour-completed").json()
+  return profileResponseSchema.parse(res)
+}
+
+/** Remembers on the server that the privacy notice banner was dismissed. */
+export const markPrivacyNoticeSeen = async (): Promise<ProfileResponse> => {
+  const res = await api.post("me/profile/privacy-notice-seen").json()
   return profileResponseSchema.parse(res)
 }

@@ -127,6 +127,27 @@ export class ProfileController {
     return this.toResponseDto(profile);
   }
 
+  @Post('privacy-notice-seen')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Mark the privacy notice as seen',
+    description:
+      'Records that the caller dismissed the one-time privacy notice banner. Repeated calls keep the first time.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Profile with the privacy notice marked as seen',
+    type: ProfileResponseDto,
+  })
+  @ApiUnauthorizedResponse({ description: 'Not signed in' })
+  @ApiNotFoundResponse({ description: 'The caller has no profile yet' })
+  async markPrivacyNoticeSeen(
+    @User() user: Identity,
+  ): Promise<ProfileResponseDto> {
+    const profile = await this.profileService.markPrivacyNoticeSeen(user.id);
+    return this.toResponseDto(profile);
+  }
+
   private toResponseDto(profile: ProfileEntity): ProfileResponseDto {
     const teaches = profile.tags
       .filter((t) => t.kind === TagKind.TEACH)
@@ -157,6 +178,7 @@ export class ProfileController {
       note: profile.note,
       onboardingCompletedAt: profile.onboardingCompletedAt,
       tourCompletedAt: profile.tourCompletedAt,
+      privacyNoticeSeenAt: profile.privacyNoticeSeenAt,
       teaches,
       learns,
       interests,

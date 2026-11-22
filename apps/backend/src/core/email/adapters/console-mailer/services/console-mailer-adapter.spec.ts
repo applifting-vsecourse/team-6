@@ -48,7 +48,7 @@ describe('ConsoleMailerAdapter', () => {
     expect(logged).toContain('code=authCode9876');
   });
 
-  it('logs email body in production when no external mailer is configured so links remain recoverable', async () => {
+  it('never logs the address or links in production when no external mailer is configured', async () => {
     process.env.NODE_ENV = 'production';
     await adapter.sendEmail(
       'secret.user@university.edu',
@@ -56,30 +56,13 @@ describe('ConsoleMailerAdapter', () => {
       'Sensitive verification link: https://example.com/verify?token=abcdef',
     );
 
+    expect(logSpy).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledTimes(1);
-    expect(warnSpy.mock.calls[0][0]).toContain(
+    const warned = warnSpy.mock.calls[0][0];
+    expect(warned).toContain(
       'No external email transport configured in production',
     );
-    expect(logSpy).toHaveBeenCalledTimes(1);
-    const logged = logSpy.mock.calls[0][0];
-    expect(logged).toContain('secret.user@university.edu');
-    expect(logged).toContain('token=abcdef');
-  });
-
-  it('preserves full HTML content in production fallback', async () => {
-    process.env.NODE_ENV = 'production';
-    const htmlContent =
-      '<div>Verification link: https://app.kvinted.cz/verify?token=xyz123</div>';
-    await adapter.sendEmail(
-      'john.doe@kvintet.cz',
-      'Verify your email address',
-      htmlContent,
-    );
-
-    expect(logSpy).toHaveBeenCalledTimes(1);
-    const logged = logSpy.mock.calls[0][0];
-    expect(logged).toContain('john.doe@kvintet.cz');
-    expect(logged).toContain('Verify your email address');
-    expect(logged).toContain('token=xyz123');
+    expect(warned).not.toContain('secret.user@university.edu');
+    expect(warned).not.toContain('token=abcdef');
   });
 });

@@ -45,6 +45,11 @@ const createSchema = (t: TFunction) =>
       acceptCodeOfConduct: z.boolean().refine((isAccepted) => isAccepted, {
         message: t("auth.validation.codeOfConductRequired"),
       }),
+      // shortcut: an attestation kept in the browser only, nothing is stored; enforce it on the
+      // server (like the consent flag) if the pilot turns out to include minors.
+      confirmAdult: z.boolean().refine((isAdult) => isAdult, {
+        message: t("auth.validation.confirmAdultRequired"),
+      }),
     })
     .refine((values) => values.password === values.passwordConfirmation, {
       message: t("auth.validation.passwordsMatch"),
@@ -60,6 +65,7 @@ const defaultValues: FormValues = {
   password: "",
   passwordConfirmation: "",
   acceptCodeOfConduct: false,
+  confirmAdult: false,
 }
 
 type SignUpFormProps = {
@@ -244,6 +250,45 @@ export function SignUpForm({
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="confirmAdult"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-start gap-3">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={(checked) => field.onChange(checked === true)}
+                    onBlur={field.onBlur}
+                    ref={field.ref}
+                    className="mt-0.5"
+                  />
+                </FormControl>
+                <FormLabel className="block leading-snug font-normal">
+                  {t("auth.confirmAdult")}
+                </FormLabel>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <p className="text-small text-muted-foreground">
+          <Trans
+            i18nKey="auth.privacyNote"
+            components={{
+              privacy: (
+                <Link
+                  to={ROUTES.privacy}
+                  target="_blank"
+                  className="underline underline-offset-4"
+                />
+              ),
+            }}
+          />
+        </p>
 
         {errorMessage ? (
           <Alert variant="destructive">

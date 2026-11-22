@@ -23,6 +23,7 @@ describe('ProfileController', () => {
     getProfile: jest.Mock;
     saveProfile: jest.Mock;
     markTourCompleted: jest.Mock;
+    markPrivacyNoticeSeen: jest.Mock;
   };
 
   const mockUser: Identity = {
@@ -44,6 +45,7 @@ describe('ProfileController', () => {
       getProfile: jest.fn(),
       saveProfile: jest.fn(),
       markTourCompleted: jest.fn(),
+      markPrivacyNoticeSeen: jest.fn(),
     };
     controller = new ProfileController(service as unknown as ProfileService);
   });
@@ -111,6 +113,7 @@ describe('ProfileController', () => {
         note: 'Note',
         onboardingCompletedAt: new Date('2026-10-21T10:00:00Z'),
         tourCompletedAt: null,
+        privacyNoticeSeenAt: null,
         teaches: [{ id: 't1', slug: 'excel' }],
         learns: [{ id: 't2', slug: 'python' }],
         interests: [{ id: 't3', slug: 'hiking' }],
@@ -310,6 +313,22 @@ describe('ProfileController', () => {
       await expect(controller.markTourCompleted(mockUser)).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('markPrivacyNoticeSeen', () => {
+    it('returns the profile response with privacyNoticeSeenAt set', async (): Promise<void> => {
+      const seen = new Date('2026-11-22T12:00:00Z');
+      service.markPrivacyNoticeSeen.mockResolvedValue({
+        userId: 'u1',
+        tags: [],
+        privacyNoticeSeenAt: seen,
+      } as unknown as ProfileEntity);
+
+      const result = await controller.markPrivacyNoticeSeen(mockUser);
+
+      expect(service.markPrivacyNoticeSeen).toHaveBeenCalledWith('u1');
+      expect(result.privacyNoticeSeenAt).toBe(seen);
     });
   });
 });

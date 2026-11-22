@@ -14,6 +14,7 @@ describe('ProfileService', () => {
     findByUserId: jest.Mock;
     saveProfile: jest.Mock;
     markTourCompleted: jest.Mock;
+    markPrivacyNoticeSeen: jest.Mock;
   };
 
   beforeEach(() => {
@@ -21,6 +22,7 @@ describe('ProfileService', () => {
       findByUserId: jest.fn(),
       saveProfile: jest.fn(),
       markTourCompleted: jest.fn(),
+      markPrivacyNoticeSeen: jest.fn(),
     };
     service = new ProfileService(repository as unknown as ProfileRepository);
   });
@@ -570,6 +572,23 @@ describe('ProfileService', () => {
       await expect(service.markTourCompleted('u1')).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('markPrivacyNoticeSeen', () => {
+    it('returns the profile the repository marked', async (): Promise<void> => {
+      const entity = { userId: 'u1' } as ProfileEntity;
+      repository.markPrivacyNoticeSeen.mockResolvedValue(entity);
+
+      await expect(service.markPrivacyNoticeSeen('u1')).resolves.toBe(entity);
+    });
+
+    it('throws PROFILE_NOT_FOUND when there is no profile', async (): Promise<void> => {
+      repository.markPrivacyNoticeSeen.mockResolvedValue(null);
+
+      await expect(service.markPrivacyNoticeSeen('u1')).rejects.toMatchObject({
+        response: { code: 'PROFILE_NOT_FOUND' },
+      });
     });
   });
 });

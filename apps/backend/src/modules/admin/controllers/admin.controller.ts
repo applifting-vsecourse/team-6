@@ -1,10 +1,13 @@
 import { ExportDataset } from '@/modules/admin/domain/admin-export';
 import { AdminService } from '@/modules/admin/services/admin.service';
+import { User } from '@/shared/auth/decorators/user.decorator';
+import { Identity } from '@/shared/auth/domain/identity';
 import { AdminGuard } from '@/shared/auth/guards/admin.guard';
 import {
   Controller,
   Get,
   Header,
+  Logger,
   Param,
   ParseEnumPipe,
   Res,
@@ -27,6 +30,8 @@ import { AdminStatsDto } from './dto/admin-stats.dto';
 @UseGuards(AdminGuard)
 @Controller('admin')
 export class AdminController {
+  private readonly logger = new Logger(AdminController.name);
+
   constructor(private readonly adminService: AdminService) {}
 
   @Get('stats')
@@ -50,7 +55,10 @@ export class AdminController {
   exportCsv(
     @Param('dataset', new ParseEnumPipe(ExportDataset)) dataset: ExportDataset,
     @Res({ passthrough: true }) res: Response,
+    @User() admin: Identity,
   ): Promise<string> {
+    // The only record of who took personal data out of the app (pseudonymised, but still personal data).
+    this.logger.log(`Admin ${admin.id} exported the "${dataset}" dataset`);
     res.setHeader(
       'Content-Disposition',
       `attachment; filename="kvintet-${dataset}.csv"`,

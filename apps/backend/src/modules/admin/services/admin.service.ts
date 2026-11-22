@@ -48,7 +48,10 @@ export class AdminService {
    */
   private pseudonym(userId: string | null): string | null {
     return userId
-      ? createHmac('sha256', this.config.betterAuthSecret)
+      ? createHmac(
+          'sha256',
+          this.config.exportPseudonymKey ?? this.config.betterAuthSecret,
+        )
           .update(`export:${userId}`)
           .digest('hex')
           .slice(0, 12)

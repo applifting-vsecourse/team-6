@@ -28,6 +28,17 @@ export class ProfileService {
     return profile;
   }
 
+  async markPrivacyNoticeSeen(userId: string): Promise<ProfileEntity> {
+    const profile = await this.profileRepository.markPrivacyNoticeSeen(userId);
+    if (!profile) {
+      throw new NotFoundException({
+        code: 'PROFILE_NOT_FOUND',
+        message: 'Profile does not exist',
+      });
+    }
+    return profile;
+  }
+
   async saveProfile(
     userId: string,
     data: SaveProfileData,

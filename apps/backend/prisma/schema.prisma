@@ -196,6 +196,8 @@ model Profile {
   note                  String?           @db.Text
   onboardingCompletedAt DateTime?
   tourCompletedAt       DateTime?
+  // When the person dismissed the privacy notice banner; null until then, so everyone sees it once.
+  privacyNoticeSeenAt   DateTime?
   createdAt             DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
   tags                  ProfileTag[]

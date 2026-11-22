@@ -149,8 +149,8 @@ describe("LocationMapPicker", () => {
     expect(mockGetCurrentPosition).toHaveBeenCalled()
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
-        latitude: 49.195,
-        longitude: 16.608,
+        latitude: 49.2,
+        longitude: 16.61,
         radiusKm: 50,
       }),
     )
@@ -184,7 +184,7 @@ describe("LocationMapPicker", () => {
       const map = screen.getByTestId("location-map-container")
       expect(map.querySelector(".kvinted-map-pin")).toBeNull()
       expect(map.querySelector("path.leaflet-interactive")).toBeNull()
-      expect(screen.queryByText(/50\.0000/)).not.toBeInTheDocument()
+      expect(screen.queryByText(/50\.00/)).not.toBeInTheDocument()
 
       // Changing the radius must not report the default point as a selection
       await userEvent.click(screen.getByRole("button", { name: "Up to 50 km" }))
@@ -205,7 +205,7 @@ describe("LocationMapPicker", () => {
       expect(
         screen.getByTestId("location-map-container").querySelector(".kvinted-map-pin"),
       ).not.toBeNull()
-      expect(screen.getByText(/50\.0700/)).toBeInTheDocument()
+      expect(screen.getByText(/50\.07/)).toBeInTheDocument()
       expect(screen.getByRole("button", { name: "Up to 25 km" })).toHaveAttribute(
         "aria-pressed",
         "true",
@@ -229,8 +229,8 @@ describe("LocationMapPicker", () => {
       expect(
         screen.getByTestId("location-map-container").querySelector(".kvinted-map-pin"),
       ).not.toBeNull()
-      expect(screen.getByText(/49\.1950/)).toBeInTheDocument()
-      expect(onChange).toHaveBeenCalledWith({ latitude: 49.195, longitude: 16.608, radiusKm: 25 })
+      expect(screen.getByText(/49\.20/)).toBeInTheDocument()
+      expect(onChange).toHaveBeenCalledWith({ latitude: 49.2, longitude: 16.61, radiusKm: 25 })
     })
   })
 })

@@ -1,6 +1,9 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
 import { KVINTET_STARTED } from '@/modules/chat/domain/message';
-import { FEED_SNAPSHOTS_KEPT } from '@/modules/kvintet/domain/kvintet';
+import {
+  FEED_SNAPSHOTS_KEPT,
+  MATCHING_DATA_RETENTION_DAYS,
+} from '@/modules/kvintet/domain/kvintet';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
 import { emptyMatchProfile } from '@/modules/matching/matching';
 import { BadRequestException, ConflictException } from '@nestjs/common';
@@ -652,6 +655,51 @@ describe('KvintetRepository (Postgres)', () => {
 
       expect(await prisma.feedSnapshot.count({ where: { userId: user } })).toBe(
         FEED_SNAPSHOTS_KEPT,
+      );
+    });
+
+    it('deletes matching data older than the retention limit on the next write, even rows of deleted accounts', async () => {
+      const [user] = await createUsers(1, 'log-retention');
+      const old = new Date(
+        Date.now() - (MATCHING_DATA_RETENTION_DAYS + 1) * 24 * 60 * 60 * 1000,
+      );
+      const oldSnapshot = await prisma.feedSnapshot.create({
+        data: { userId: null, fallback: false, items: [], createdAt: old },
+      });
+      const oldStay = await prisma.membershipLog.create({
+        data: {
+          userId: null,
+          kvintetId: randomUUID(),
+          source: 'JOINED',
+          joinedAt: old,
+          leftAt: old,
+        },
+      });
+      // A stay that has not ended is not expired, however long it lasts.
+      const openStay = await prisma.membershipLog.create({
+        data: {
+          userId: null,
+          kvintetId: randomUUID(),
+          source: 'JOINED',
+          joinedAt: old,
+        },
+      });
+
+      await repository.recordFeedSnapshot(user, false, [
+        { kvintetId: randomUUID(), score: 50 },
+      ]);
+
+      expect(
+        await prisma.feedSnapshot.findUnique({ where: { id: oldSnapshot.id } }),
+      ).toBeNull();
+      expect(
+        await prisma.membershipLog.findUnique({ where: { id: oldStay.id } }),
+      ).toBeNull();
+      expect(
+        await prisma.membershipLog.findUnique({ where: { id: openStay.id } }),
+      ).not.toBeNull();
+      expect(await prisma.feedSnapshot.count({ where: { userId: user } })).toBe(
+        1,
       );
     });
   });

@@ -5,6 +5,8 @@ import { AuthenticatedUserGuard } from '@/shared/auth/guards/authenticated-user.
 import {
   Controller,
   Delete,
+  Get,
+  Header,
   HttpCode,
   HttpStatus,
   UseGuards,
@@ -23,6 +25,20 @@ import {
 @Controller('me')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
+
+  @Get('export')
+  @Header('Content-Type', 'application/json; charset=utf-8')
+  @Header('Content-Disposition', 'attachment; filename="kvintet-my-data.json"')
+  @ApiOperation({
+    summary: 'Download my data',
+    description:
+      'Everything held about the caller as JSON: account, sessions, profile, membership, own messages and matching-data rows (GDPR Art. 15 and 20)',
+  })
+  @ApiOkResponse({ description: 'JSON file' })
+  @ApiUnauthorizedResponse({ description: 'Not signed in' })
+  exportData(@User() user: Identity): Promise<Record<string, unknown>> {
+    return this.accountService.exportData(user.id);
+  }
 
   @Delete()
   @HttpCode(HttpStatus.OK)

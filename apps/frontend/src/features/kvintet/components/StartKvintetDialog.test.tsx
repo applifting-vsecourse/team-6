@@ -157,7 +157,7 @@ describe("StartKvintetDialog", () => {
     ).toBeInTheDocument()
     expect(
       screen.getByText(
-        "Others will see the topic, the description and your role. Your name only once the kvintet starts.",
+        "Others will see the topic, the description and your role. Your name only once the kvintet starts. Please leave out health, religion and other sensitive details.",
       ),
     ).toBeInTheDocument()
     expect(screen.getByRole("dialog").querySelector("[data-slot='avatar']")).not.toBeNull()

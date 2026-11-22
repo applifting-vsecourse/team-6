@@ -83,6 +83,37 @@ describe('AdminService', () => {
       expect(anonymous.startsWith(';k1;JOINED;')).toBe(true);
     });
 
+    it('keys the token with EXPORT_PSEUDONYM_KEY when set, so it differs from the auth-secret one', async () => {
+      const row = {
+        userId: 'user-1',
+        kvintetId: 'k1',
+        source: 'JOINED',
+        joinedAt: at('2026-11-21T10:00:00Z'),
+        leftAt: null,
+        position: null,
+        listSize: null,
+        score: null,
+      };
+      exports.memberships.mockResolvedValue([row]);
+      const tokenOf = async (cfg: Config): Promise<string> =>
+        (
+          await new AdminService(repository, exports, cfg).exportCsv(
+            ExportDataset.Memberships,
+          )
+        )
+          .split('\n')[1]
+          .split(';')[0];
+
+      const withAuthSecret = await tokenOf(config);
+      const withOwnKey = await tokenOf({
+        betterAuthSecret: 'secret',
+        exportPseudonymKey: 'export-key',
+      } as Config);
+
+      expect(withOwnKey).toMatch(/^[0-9a-f]{12}$/);
+      expect(withOwnKey).not.toBe(withAuthSecret);
+    });
+
     it('writes one feed row per listed kvintet, with its position and score', async () => {
       exports.feedSnapshots.mockResolvedValue([
         {

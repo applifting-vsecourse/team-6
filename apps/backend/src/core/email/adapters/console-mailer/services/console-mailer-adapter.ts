@@ -7,9 +7,11 @@ export class ConsoleMailerAdapter implements EmailService {
 
   async sendEmail(to: string, subject: string, html: string): Promise<void> {
     if (process.env.NODE_ENV === 'production') {
+      // Production logs are shared: never write the address or the one-time links in them.
       this.logger.warn(
-        '[ConsoleMailer] No external email transport configured in production (Resend / SMTP). Logging email body to console for link recovery.',
+        '[ConsoleMailer] No external email transport configured in production (Resend / SMTP). Email not sent.',
       );
+      return;
     }
 
     this.logger.log(`

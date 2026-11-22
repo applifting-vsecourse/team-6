@@ -69,12 +69,30 @@ describe("SignUpForm code of conduct consent", () => {
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
+  it("cannot be submitted without confirming the age", async () => {
+    const user = userEvent.setup()
+    const onSubmit = await renderForm()
+    await fillRequiredFields(user)
+    await user.click(screen.getAllByRole("checkbox")[0]!)
+
+    await user.click(screen.getByRole("button", { name: "Create account" }))
+
+    expect(await screen.findByText("Confirm that you are 18 or older.")).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it("links to the privacy notice", async () => {
+    await renderForm()
+
+    expect(screen.getByRole("link", { name: "privacy notice" })).toHaveAttribute("href", "/privacy")
+  })
+
   it("submits the consent flag once the checkbox is ticked", async () => {
     const user = userEvent.setup()
     const onSubmit = await renderForm()
     await fillRequiredFields(user)
 
-    await user.click(screen.getByRole("checkbox"))
+    for (const box of screen.getAllByRole("checkbox")) await user.click(box)
     await user.click(screen.getByRole("button", { name: "Create account" }))
 
     expect(onSubmit).toHaveBeenCalledOnce()
@@ -89,7 +107,7 @@ describe("SignUpForm password rules", () => {
     await fillRequiredFields(user)
     await user.clear(screen.getByLabelText("Confirm password"))
     await user.type(screen.getByLabelText("Confirm password"), "different1")
-    await user.click(screen.getByRole("checkbox"))
+    for (const box of screen.getAllByRole("checkbox")) await user.click(box)
 
     await user.click(screen.getByRole("button", { name: "Create account" }))
 
@@ -105,7 +123,7 @@ describe("SignUpForm password rules", () => {
     await user.clear(screen.getByLabelText("Confirm password"))
     await user.type(screen.getByLabelText("Password"), "short")
     await user.type(screen.getByLabelText("Confirm password"), "short")
-    await user.click(screen.getByRole("checkbox"))
+    for (const box of screen.getAllByRole("checkbox")) await user.click(box)
 
     await user.click(screen.getByRole("button", { name: "Create account" }))
 

@@ -5,7 +5,7 @@
       "cancel": "Zrušit",
       "confirm": "Smazat účet",
       "deleting": "Mazání...",
-      "description": "Opravdu chceš smazat svůj účet? Tvůj profil, dotazník i místo v kvintetu budou trvale smazány. Tuto akci nelze vzít zpět.",
+      "description": "Opravdu chceš smazat svůj účet? Tvůj profil, dotazník i místo v kvintetu budou trvale smazány. Zprávy, které jsi poslal, zůstanou v kvintetu bez tvého jména. Tuto akci nelze vzít zpět.",
       "title": "Smazat účet"
     },
     "deleteSuccess": "Tvůj účet byl úspěšně smazán."
@@ -41,6 +41,7 @@
   },
   "auth": {
     "acceptCodeOfConduct": "Souhlasím s <coc>pravidly komunity</coc>",
+    "confirmAdult": "Je mi 18 let nebo více",
     "confirmPassword": "Potvrzení hesla",
     "createAccount": "Vytvořit účet",
     "editProfile": "Upravit profil",
@@ -57,6 +58,7 @@
     "passwordHint_few": "Alespoň {{count}} znaky",
     "passwordHint_one": "Alespoň {{count}} znak",
     "passwordHint_other": "Alespoň {{count}} znaků",
+    "privacyNote": "Jak nakládáme s tvými údaji: <privacy>ochrana soukromí</privacy>.",
     "signIn": "Přihlásit se",
     "signInDescription": "Přihlas se e-mailem a heslem.",
     "signInTitle": "Vítej zpět",
@@ -68,6 +70,7 @@
     "usernameHint": "Podle něj se vytvoří tvůj avatar.",
     "validation": {
       "codeOfConductRequired": "Nejdříve souhlas s pravidly.",
+      "confirmAdultRequired": "Potvrď, že ti je 18 let nebo více.",
       "emailInvalid": "Neplatný e-mail",
       "emailRequired": "Zadej e-mail",
       "nameRequired": "Zadej jméno",
@@ -112,7 +115,7 @@
     "you": "Ty"
   },
   "codeOfConduct": {
-    "dataText": "Abychom ti mohli lépe doporučovat, zaznamenáváme, jaké kvintety ti byly nabídnuty, do kterého jsi vstoupil a jak dlouho jsi v něm zůstal. Data jsou uložena pod pseudonymem, nikdy je neuvidí ostatní členové a po smazání účtu se stanou anonymními.",
+    "dataText": "Abychom mohli lépe doporučovat všem, zaznamenáváme, jaké kvintety ti byly nabídnuty, do kterého jsi vstoupil a jak dlouho jsi v něm zůstal. Data uchováváme pod pseudonymem nejvýše rok, nikdy je neuvidí ostatní členové a po smazání účtu už nejsou spojena s tebou. Pokud to nechceš, napiš nám nebo smaž účet.",
     "dataTitle": "Co zaznamenáváme",
     "reportIntro": "Napiš na <email>{{email}}</email>. Zůstane to mezi námi.",
     "reportTitle": "Něco se děje?",
@@ -236,7 +239,7 @@
       "leaveProposalConfirm": "Opustíš tento kvintet. Když někdo přijde nebo odejde, hlasy všech se vynulují.",
       "leaveTitle": "Opravdu chceš odejít?",
       "leaving": "Odcházím…",
-      "note": "Ostatní uvidí téma, popis a tvoji roli. Tvoje jméno až po zahájení kvintetu.",
+      "note": "Ostatní uvidí téma, popis a tvoji roli. Tvoje jméno až po zahájení kvintetu. Zdravotní údaje, víru a jiné citlivé věci prosím vynech.",
       "stay": "Zůstat",
       "submit": "Založit kvintet",
       "title": "Založit kvintet",
@@ -373,6 +376,7 @@
     "mainNavigation": "Hlavní navigace",
     "menu": "Menu",
     "openMenu": "Otevřít menu",
+    "privacy": "Soukromí",
     "rules": "Pravidla",
     "settings": "Nastavení",
     "support": "Podpora",
@@ -456,7 +460,7 @@
       },
       "note": {
         "error": "Zkrať to prosím, nejvýš 300 znaků.",
-        "hint": "Je to jen na tobě.",
+        "hint": "Je to jen na tobě. Zdravotní údaje, víru a jiné citlivé věci prosím vynech.",
         "problem": "Nejvýš 300 znaků.",
         "title": "Chceš skupině ještě něco sdělit?"
       },
@@ -497,6 +501,7 @@
       "geolocationDenied": "Přístup k poloze byl zamítnut. Střed můžeš zvolit přímo na mapě.",
       "geolocationUnavailable": "Geolokace není v tomto prohlížeči podporována.",
       "locating": "Zjišťuji polohu…",
+      "osmNote": "Mapa pochází z OpenStreetMap, které vidí tvou IP adresu a oblast, kterou si prohlížíš. Tvůj bod ukládáme zaokrouhlený na zhruba 1 km.",
       "radiusOption": "Do {{count}} km",
       "radiusSliderLabel": "Okruh hledání",
       "selectedRadius": "Okruh {{count}} km",
@@ -649,6 +654,41 @@
     "subtitleMember": "Jsi v kvintetu. Podívej se, jak se mu daří.",
     "title": "Domů"
   },
+  "privacy": {
+    "controller": {
+      "text": "Správce údajů: bude určen před spuštěním pilotu. Do té doby piš na <email>{{email}}</email> s jakýmkoli dotazem k tvým údajům.",
+      "title": "Kdo za údaje odpovídá"
+    },
+    "data": {
+      "text": "Účet: jméno, uživatelské jméno, e-mail a otisk hesla, abychom tě mohli přihlásit. Profil: role, témata, dny a denní doby, místo, které vybereš na mapě (zaokrouhlené na zhruba 1 km), a tvoje poznámka, abychom ti navrhli kvintety. Kvintet a chat: tvé místo, hlasy a zprávy, aby skupina fungovala. K tomu využíváme smlouvu, kterou uzavíráš používáním Kvintetu. Přihlášení si pamatuje tvou IP adresu a údaje o prohlížeči, abys zůstal přihlášený a aby šlo zabránit zneužití. Pod pseudonymem zaznamenáváme, jaké kvintety ti byly nabídnuty, do kterého jsi vstoupil a jak dlouho jsi zůstal, abychom zlepšili návrhy. Děláme to v oprávněném zájmu a můžeš vznést námitku (viz tvá práva).",
+      "title": "Co uchováváme a proč"
+    },
+    "recipients": {
+      "text": "Ostatní členové vidí tvou roli a témata, jméno a uživatelské jméno až po začátku vašeho kvintetu. Správce vidí součty a soubor dat o párování, ve kterém vystupuješ jen jako pseudonym. Aplikace běží na hostingu v EU. Mapa na stránce s místem načítá dlaždice z OpenStreetMap, které vidí tvou IP adresu a oblast, kterou si prohlížíš.",
+      "title": "Kdo to uvidí"
+    },
+    "retention": {
+      "text": "Účet a profil: dokud svůj účet nesmažeš. Data o párování: nejvýše rok, nebo do smazání účtu, po kterém už nejsou spojena s tebou. Přihlášení: do jejich vypršení. Zprávy, které jsi napsal, po smazání účtu zůstanou v kvintetu bez tvého jména, aby šel rozhovor ostatních dál sledovat; zmizí, až kvintet zanikne.",
+      "title": "Jak dlouho to držíme"
+    },
+    "rights": {
+      "text": "Svá data si můžeš stáhnout na stránce profilu, tam také upravíš profil a smažeš účet. Jméno, uživatelské jméno nebo e-mail změníme na požádání, stejně jako vyřídíme námitku proti záznamu o párování nebo jakýkoli jiný dotaz: napiš na <email>{{email}}</email>, odpovíme do jednoho měsíce. Můžeš také podat stížnost u Úřadu pro ochranu osobních údajů (ÚOOÚ), uoou.gov.cz.",
+      "title": "Tvá práva"
+    },
+    "sensitive": {
+      "text": "Do poznámky, popisu kvintetu ani do chatu nepiš zdravotní údaje, víru, politické názory ani jiné citlivé věci. Kvintet je nepotřebuje.",
+      "title": "Co nepsat"
+    },
+    "seoTitle": "Soukromí",
+    "subtitle": "Co si o tobě Kvintet pamatuje, proč a jak to získat zpět nebo smazat.",
+    "title": "Ochrana soukromí"
+  },
+  "privacyBanner": {
+    "dismiss": "Rozumím",
+    "link": "Přečíst zásady",
+    "text": "Přečti si, co si o tobě Kvintet pamatuje, jak dlouho a jak si data stáhnout nebo smazat.",
+    "title": "Sepsali jsme, jak nakládáme s tvými údaji"
+  },
   "productVideo": {
     "heading": "Podívej se, jak to funguje",
     "posterSubtitle": "Tvůj příběh · s komentářem",
@@ -659,6 +699,12 @@
       "button": "Smazat účet",
       "description": "Smaže všechno. Tento krok nelze vzít zpět.",
       "title": "Smazat účet"
+    },
+    "data": {
+      "button": "Stáhnout má data",
+      "description": "Stáhni si vše, co o tobě Kvintet drží, jako soubor JSON.",
+      "downloading": "Připravuji…",
+      "title": "Tvá data"
     },
     "empty": {
       "expectations": "Zatím nic nepřidáno",

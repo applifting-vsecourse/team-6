@@ -5,7 +5,7 @@
       "cancel": "Cancel",
       "confirm": "Delete account",
       "deleting": "Deleting...",
-      "description": "Are you sure you want to delete your account? Your profile, questionnaire answers, and your seat in a kvintet will be permanently deleted. This action cannot be undone.",
+      "description": "Are you sure you want to delete your account? Your profile, questionnaire answers, and your seat in a kvintet will be permanently deleted. Messages you sent stay in the kvintet without your name. This action cannot be undone.",
       "title": "Delete account"
     },
     "deleteSuccess": "Your account has been deleted successfully."
@@ -41,6 +41,7 @@
   },
   "auth": {
     "acceptCodeOfConduct": "I agree to the <coc>community rules</coc>",
+    "confirmAdult": "I am 18 or older",
     "confirmPassword": "Confirm password",
     "createAccount": "Create account",
     "editProfile": "Edit profile",
@@ -56,6 +57,7 @@
     "password": "Password",
     "passwordHint_one": "At least {{count}} character",
     "passwordHint_other": "At least {{count}} characters",
+    "privacyNote": "How we handle your data: <privacy>privacy notice</privacy>.",
     "signIn": "Sign in",
     "signInDescription": "Sign in with your email and password.",
     "signInTitle": "Welcome back",
@@ -67,6 +69,7 @@
     "usernameHint": "Your avatar is made from it.",
     "validation": {
       "codeOfConductRequired": "Please agree to the rules first.",
+      "confirmAdultRequired": "Confirm that you are 18 or older.",
       "emailInvalid": "Invalid email",
       "emailRequired": "Email is required",
       "nameRequired": "Name is required",
@@ -110,7 +113,7 @@
     "you": "You"
   },
   "codeOfConduct": {
-    "dataText": "To improve the suggestions, we record which kvintets you were shown, which one you joined and how long you stayed. It is kept under a pseudonym, never shown to other members, and made anonymous when you delete your account.",
+    "dataText": "To improve the suggestions for everyone, we record which kvintets you were shown, which one you joined and how long you stayed. It is kept under a pseudonym for up to a year, never shown to other members, and no longer linked to you when you delete your account. If you don't want this, write to us or delete your account.",
     "dataTitle": "What we record",
     "reportIntro": "Write to <email>{{email}}</email>. It stays between us.",
     "reportTitle": "Something wrong?",
@@ -232,7 +235,7 @@
       "leaveProposalConfirm": "You'll leave this kvintet. When someone joins or leaves, everyone's votes are reset.",
       "leaveTitle": "Are you sure you want to leave?",
       "leaving": "Leaving…",
-      "note": "Others will see the topic, the description and your role. Your name only once the kvintet starts.",
+      "note": "Others will see the topic, the description and your role. Your name only once the kvintet starts. Please leave out health, religion and other sensitive details.",
       "stay": "Stay",
       "submit": "Start a kvintet",
       "title": "Start a kvintet",
@@ -369,6 +372,7 @@
     "mainNavigation": "Main navigation",
     "menu": "Menu",
     "openMenu": "Open menu",
+    "privacy": "Privacy",
     "rules": "Rules",
     "settings": "Settings",
     "support": "Support",
@@ -450,7 +454,7 @@
       },
       "note": {
         "error": "Shorter, please – 300 characters at most.",
-        "hint": "That's entirely up to you.",
+        "hint": "That's entirely up to you. Please leave out health, religion and other sensitive details.",
         "problem": "Keep it to 300 characters.",
         "title": "Anything else the group should know?"
       },
@@ -491,6 +495,7 @@
       "geolocationDenied": "Location access was denied. You can select the center directly on the map.",
       "geolocationUnavailable": "Geolocation is not supported in this browser.",
       "locating": "Locating…",
+      "osmNote": "The map comes from OpenStreetMap, which sees your IP address and the area you look at. We store your pin rounded to about 1 km.",
       "radiusOption": "Up to {{count}} km",
       "radiusSliderLabel": "Search radius",
       "selectedRadius": "{{count}} km radius",
@@ -639,6 +644,41 @@
     "subtitleMember": "You are in a kvintet. See how it's going.",
     "title": "Home"
   },
+  "privacy": {
+    "controller": {
+      "text": "Controller: to be named before the pilot launch. Until then, write to <email>{{email}}</email> with any question about your data.",
+      "title": "Who is responsible"
+    },
+    "data": {
+      "text": "Account: name, username, e-mail and a password hash, to sign you in. Profile: role, topics, days and times, the place you pick on the map (rounded to about 1 km) and your note, to suggest kvintets. Kvintet and chat: your seat, votes and messages, to run the group. For these we rely on the contract you enter by using Kvintet. Sign-in sessions keep your IP address and browser details, to keep you signed in and to prevent abuse. Under a pseudonym we record which kvintets you were shown, which one you joined and how long you stayed, to improve the suggestions. We do this in our legitimate interest, and you can object (see your rights).",
+      "title": "What we keep and why"
+    },
+    "recipients": {
+      "text": "Other members see your role and topics, and your name and username only once your kvintet starts. The admin sees totals and a file of matching data in which you appear only as a pseudonym. The app runs on hosting in the EU. The map on the place page loads tiles from OpenStreetMap, which sees your IP address and the area you look at.",
+      "title": "Who can see it"
+    },
+    "retention": {
+      "text": "Account and profile: until you delete your account. Matching data: at most one year, or until you delete your account, after which it is no longer linked to you. Sign-in sessions: until they expire. Messages you wrote stay in your kvintet without your name when you delete your account, so the others can still follow the conversation; they disappear when the kvintet is gone.",
+      "title": "How long we keep it"
+    },
+    "rights": {
+      "text": "You can download your data and edit your profile on your profile page, and delete your account there. To change your name, username or e-mail, to object to the matching record, or to ask anything else, write to <email>{{email}}</email>; we answer within one month. You can also complain to the Office for Personal Data Protection (ÚOOÚ), uoou.gov.cz.",
+      "title": "Your rights"
+    },
+    "sensitive": {
+      "text": "Please leave health, religion, political views and other sensitive details out of your note, a kvintet description and the chat. Kvintet does not need them.",
+      "title": "What not to write"
+    },
+    "seoTitle": "Privacy",
+    "subtitle": "What Kvintet keeps about you, why, and how to get it back or have it removed.",
+    "title": "Privacy notice"
+  },
+  "privacyBanner": {
+    "dismiss": "Got it",
+    "link": "Read the privacy notice",
+    "text": "Read what Kvintet keeps about you, for how long, and how to download or delete it.",
+    "title": "We wrote down how we handle your data"
+  },
   "productVideo": {
     "heading": "See how it works",
     "posterSubtitle": "Your story · with voice-over",
@@ -649,6 +689,12 @@
       "button": "Delete account",
       "description": "Removes everything. Can't be undone.",
       "title": "Delete account"
+    },
+    "data": {
+      "button": "Download my data",
+      "description": "Download everything Kvintet holds about you as a JSON file.",
+      "downloading": "Preparing…",
+      "title": "Your data"
     },
     "empty": {
       "expectations": "Nothing added yet",

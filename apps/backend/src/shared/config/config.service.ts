@@ -29,6 +29,12 @@ export class Config {
   @IsNotEmpty()
   readonly betterAuthSecret!: string;
 
+  // Keys the pseudonyms in the admin CSV export. Falls back to BETTER_AUTH_SECRET when unset;
+  // set it so that leaking the auth secret does not also unmask the export.
+  @Env<string>('EXPORT_PSEUDONYM_KEY')
+  @IsOptional()
+  readonly exportPseudonymKey?: string;
+
   @Env('SUPERADMIN_EMAIL')
   readonly superadminEmail!: string;
 

@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect, useMatch } from "@tanstack/react-router"
 
+import { PrivacyNoticeBanner } from "@/app/PrivacyNoticeBanner"
 import { ROUTES } from "@/app/routes"
 import { SiteHeader } from "@/app/SiteHeader"
 import { NotFoundContent } from "@/components/Error/NotFound"
@@ -43,6 +44,7 @@ function Layout() {
           />
         }
       >
+        <PrivacyNoticeBanner />
         <Outlet />
       </PageLayout>
     </>

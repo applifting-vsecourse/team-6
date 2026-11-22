@@ -66,6 +66,12 @@ export class ProfileResponseDto {
   })
   tourCompletedAt!: Date | null;
 
+  @ApiPropertyOptional({
+    example: '2026-11-22T12:00:00.000Z',
+    description: 'Null until the privacy notice banner was dismissed',
+  })
+  privacyNoticeSeenAt!: Date | null;
+
   @ApiProperty({ type: [TagDto] })
   teaches!: TagDto[];
 

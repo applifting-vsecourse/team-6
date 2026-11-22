@@ -506,6 +506,24 @@ describe('ProfileRepository', () => {
       expect(upsertCall.update).toEqual(expect.objectContaining(location));
     });
 
+    it('rounds coordinates to two decimals (about 1 km) before storing them', async (): Promise<void> => {
+      txMock.profile.findUnique.mockResolvedValue(null);
+      txMock.profile.upsert.mockResolvedValue({});
+      jest
+        .spyOn(repository, 'findByUserId')
+        .mockResolvedValue({} as ProfileEntity);
+
+      await repository.saveProfile('u1', {
+        latitude: 50.07554,
+        longitude: 14.43786,
+      });
+
+      const upsertCall = txMock.profile.upsert.mock.calls[0][0];
+      const rounded = { latitude: 50.08, longitude: 14.44 };
+      expect(upsertCall.create).toEqual(expect.objectContaining(rounded));
+      expect(upsertCall.update).toEqual(expect.objectContaining(rounded));
+    });
+
     it('partial save keeps existing values by omitting undefined optional fields from update', async (): Promise<void> => {
       txMock.city.findUnique.mockResolvedValue({ id: 'c1', name: 'Praha' });
       txMock.tag.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }, { id: 3 }]);
@@ -673,6 +691,50 @@ describe('ProfileRepository', () => {
       prisma.profile.findUnique.mockResolvedValue(null);
 
       await expect(repository.markTourCompleted('u1')).resolves.toBeNull();
+    });
+  });
+
+  describe('markPrivacyNoticeSeen', () => {
+    it('sets the mark only where it is still empty and returns the profile', async (): Promise<void> => {
+      const seen = new Date('2026-11-22T12:00:00Z');
+      prisma.profile.updateMany.mockResolvedValue({ count: 1 });
+      prisma.profile.findUnique.mockResolvedValue({
+        userId: 'u1',
+        position: null,
+        roles: [],
+        expectations: null,
+        meetingFrequency: null,
+        weekdays: false,
+        weekends: false,
+        mornings: false,
+        afternoons: false,
+        evenings: false,
+        cityId: null,
+        city: null,
+        radiusKm: null,
+        note: null,
+        onboardingCompletedAt: null,
+        tourCompletedAt: null,
+        privacyNoticeSeenAt: seen,
+        latitude: null,
+        longitude: null,
+        tags: [],
+      });
+
+      const result = await repository.markPrivacyNoticeSeen('u1');
+
+      expect(prisma.profile.updateMany).toHaveBeenCalledWith({
+        where: { userId: 'u1', privacyNoticeSeenAt: null },
+        data: { privacyNoticeSeenAt: expect.any(Date) },
+      });
+      expect(result?.privacyNoticeSeenAt).toBe(seen);
+    });
+
+    it('returns null when the profile does not exist', async (): Promise<void> => {
+      prisma.profile.updateMany.mockResolvedValue({ count: 0 });
+      prisma.profile.findUnique.mockResolvedValue(null);
+
+      await expect(repository.markPrivacyNoticeSeen('u1')).resolves.toBeNull();
     });
   });
 });
