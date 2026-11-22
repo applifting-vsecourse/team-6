@@ -179,7 +179,8 @@ export function MascotOverlay() {
             style={{ x, y, width, height }}
             initial={{ opacity: 0 }}
             animate={{ opacity: isBehindHeader ? 0 : 1 }}
-            exit={{ opacity: 0 }}
+            // Gone at once, like the rest of the page it was on.
+            exit={{ opacity: 0, transition: { duration: 0 } }}
             transition={{ duration: 0.2 }}
           >
             {/* Decorative: the bubble carries the words, so the face adds nothing for a screen reader. */}
