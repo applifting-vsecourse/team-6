@@ -9,10 +9,10 @@
     "dev:servers": "run-p \"backend start:dev\" \"frontend dev\"",
     "dev:down": "pnpm backend docker:down",
     "check-all": "run-s \"backend lint:check\" \"backend test\" \"backend build\" \"frontend lint:check\" \"frontend type-check\" \"frontend test:ci\" \"frontend build\" format:check",
+    "test:selenium:setup": "python3 -m venv .venv && .venv/bin/pip install -r tests_selenium/requirements.txt",
     "test:selenium": ".venv/bin/pytest tests_selenium",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "test:e2e:report": "playwright show-report",
+    "test:ios:setup": "mkdir -p ~/.appium-kvintet && cd ~/.appium-kvintet && ([ -f package.json ] || echo '{\"name\":\"kvintet-appium\",\"private\":true}' > package.json) && npm install --no-fund --no-audit appium@3.9.0 && APPIUM_HOME=~/.appium-kvintet/home ./node_modules/.bin/appium driver install xcuitest@12.22.8",
+    "test:ios": ".venv/bin/pytest tests_selenium -m ios --ios",
     "format": "run-s format:root:write format:workspaces:write",
     "format:check": "run-s format:root:check format:workspaces:check",
     "format:root:write": "prettier \"**/*.{cjs,js,mjs,ts,json,md,yaml,yml}\" --write --list-different",
@@ -22,7 +22,6 @@
     "prepare": "husky || true"
   },
   "devDependencies": {
-    "@playwright/test": "^1.65.1",
     "dotenv-flow": "^4.1.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.3.0",

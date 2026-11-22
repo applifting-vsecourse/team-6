@@ -1,59 +1,107 @@
-from selenium.webdriver.common.by import By
+"""Forming kvintet: voting to start (#50) and leaving (#97, #124).
+
+Every test builds its own kvintet from fresh users; the seeded ones are never changed.
+"""
+
+from ..helpers.i18n import t
 from ..pages.overview_page import OverviewPage
-from ..helpers.test_data import generate_random_user
-from ..helpers.api_client import ApiClient
 
-class TestProposalVotingAndLeaving:
-    """Voting and leaving proposal interactions."""
 
-    def test_proposal_voting(self, user_proposal_member):
-        """[KVI-2 / PR #15] Proposal member sees vote button and can toggle vote."""
-        overview_page = OverviewPage(user_proposal_member)
-        overview_page.open()
+def _signed_in_overview(driver, login_as, api):
+    login_as(api)
+    return OverviewPage(driver).open()
 
-        assert overview_page.is_visible(*OverviewPage.FORMING_HEADING)
-        assert overview_page.is_visible(*OverviewPage.VOTE_BUTTON)
 
-        initial_text = overview_page.get_text(*OverviewPage.VOTE_BUTTON)
-        overview_page.vote_to_start()
+class TestVoting:
+    def test_with_two_members_there_is_nothing_to_vote_on_yet(self, driver, login_as, scenario):
+        _, _, people = scenario.forming_kvintet(2)
+        overview = _signed_in_overview(driver, login_as, people[0][1])
 
-        new_text = overview_page.get_text(*OverviewPage.VOTE_BUTTON)
-        assert new_text != initial_text
+        overview.wait_for_heading(t("overview.forming.heading"))
+        overview.wait_for_text(t("overview.forming.waitingTitle"))
+        assert not overview.can_vote(timeout=1)
 
-        # Toggle back to maintain database state for re-runs
-        overview_page.vote_to_start()
+    def test_member_votes_to_start(self, driver, login_as, scenario):
+        _, _, people = scenario.forming_kvintet(3)
+        api = people[0][1]
+        overview = _signed_in_overview(driver, login_as, api)
 
-    def test_leave_proposal_dialog_cancel(self, user_proposal_member):
-        """[LEAVE-1 / PR #121] Cancelling leave dialog retains membership."""
-        overview_page = OverviewPage(user_proposal_member)
-        overview_page.open()
+        overview.wait_for_text(t("overview.forming.canVoteTitle"))
+        overview.vote()
 
-        overview_page.open_leave_dialog()
-        assert overview_page.is_visible(*OverviewPage.LEAVE_DIALOG)
+        overview.wait_for_text(t("kvintet.vote.voted"))
+        assert not overview.can_vote(timeout=1)
+        status = api.get_my_kvintet().json()["voteStatus"]
+        assert status["userHasVoted"] is True and status["votedCount"] == 1
+        overview.wait_for_text(
+            t("overview.forming.seatsStatus", seats=3, capacity=5, voted=1, total=3)
+        )
 
-        overview_page.cancel_leave()
-        assert not overview_page.is_visible(*OverviewPage.LEAVE_DIALOG)
+    def test_last_vote_starts_the_kvintet(self, driver, login_as, scenario):
+        """When everyone has agreed, the kvintet starts and the member sees 'Kvintet begins'."""
+        kvintet_id, proposal, people = scenario.forming_kvintet(3)
+        for _, other in people[1:]:
+            other.vote()
 
-        # Still in kvintet
-        assert overview_page.is_visible(*OverviewPage.FORMING_HEADING)
+        overview = _signed_in_overview(driver, login_as, people[0][1])
+        overview.vote()
 
-    def test_leave_proposal_confirm(self, driver, login_as):
-        """[LEAVE-2] Confirming leave leaves proposal and shows empty state."""
-        user = generate_random_user("leaver")
-        api = ApiClient()
-        api.sign_up(user["email"], user["password"], user["name"], user["username"])
-        api.complete_onboarding()
-        api.create_kvintet("Temp Leaving Kvintet", "Temporary group created to verify leaving flow.")
+        overview.wait_for_url(r"/kvintet/begins")
+        overview.wait_for_text(t("kvintet.begins.title.three"))
+        assert people[0][1].get_my_kvintet().json()["status"] == "ACTIVE"
 
-        login_as(user)
+    def test_names_stay_hidden_until_the_kvintet_starts(self, driver, login_as, scenario):
+        _, _, people = scenario.forming_kvintet(3)
+        overview = _signed_in_overview(driver, login_as, people[0][1])
 
-        overview_page = OverviewPage(driver)
-        overview_page.open()
+        overview.wait_for_text(t("overview.forming.whoSubtitle"))
+        text = overview.main_text()
+        assert people[1][0]["name"] not in text
+        assert people[2][0]["name"] not in text
 
-        assert overview_page.is_visible(*OverviewPage.FORMING_HEADING)
+    def test_someone_joining_resets_the_votes(self, driver, login_as, scenario):
+        kvintet_id, _, people = scenario.forming_kvintet(3)
+        people[0][1].vote()
+        newcomer, newcomer_api = scenario.user("py-newcomer")
+        newcomer_api.join_kvintet(kvintet_id)
 
-        overview_page.open_leave_dialog()
-        overview_page.confirm_leave()
+        overview = _signed_in_overview(driver, login_as, people[0][1])
+        overview.wait_for_text(t("overview.forming.canVoteTitle"))
+        assert overview.can_vote()
+        assert people[0][1].get_my_kvintet().json()["voteStatus"]["votedCount"] == 0
 
-        # Overview should now indicate user left
-        assert overview_page.is_visible(By.XPATH, "//*[contains(., 'Opustili jste') or contains(., 'Vyberte si')]")
+
+class TestLeaving:
+    def test_cancel_keeps_the_membership(self, driver, login_as, scenario):
+        _, _, people = scenario.forming_kvintet(2)
+        overview = _signed_in_overview(driver, login_as, people[0][1])
+
+        overview.wait_for_heading(t("overview.forming.heading"))
+        overview.open_leave_dialog()
+        overview.cancel_leave()
+
+        overview.wait_for_heading(t("overview.forming.heading"))
+        assert people[0][1].get_my_kvintet().status_code == 200
+
+    def test_confirm_leaves_and_offers_other_kvintets(self, driver, login_as, scenario):
+        _, proposal, people = scenario.forming_kvintet(2)
+        api = people[0][1]
+        overview = _signed_in_overview(driver, login_as, api)
+
+        overview.wait_for_heading(t("overview.forming.heading"))
+        overview.open_leave_dialog()
+        overview.confirm_leave()
+
+        overview.wait_for_text(t("overview.noKvintet.leftNotice", title=proposal["title"]))
+        assert api.get_my_kvintet().status_code != 200
+        # The other member is still there.
+        assert len(people[1][1].get_my_kvintet().json()["members"]) == 1
+
+    def test_leave_dialog_explains_votes_reset(self, driver, login_as, scenario):
+        _, _, people = scenario.forming_kvintet(2)
+        overview = _signed_in_overview(driver, login_as, people[0][1])
+
+        dialog = overview.open_leave_dialog()
+        assert t("kvintet.dialog.leaveTitle") in dialog.text
+        assert t("kvintet.dialog.leaveLastMemberDescription") not in dialog.text
+        overview.cancel_leave()

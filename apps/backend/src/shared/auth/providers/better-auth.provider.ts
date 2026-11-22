@@ -64,7 +64,10 @@ const createAuth = (
     ...betterAuthCoreConfig,
     rateLimit: {
       ...betterAuthCoreConfig.rateLimit,
+      // The Selenium suite (tests_selenium/) signs in far more often than the sign-in limit
+      // allows. Local opt-out only: production always keeps the limit.
       enabled:
+        config.nodeEnv !== 'production' &&
         process.env.DISABLE_RATE_LIMIT === 'true'
           ? false
           : (betterAuthCoreConfig.rateLimit?.enabled ?? true),

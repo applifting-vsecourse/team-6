@@ -1,41 +1,29 @@
 from selenium.webdriver.common.by import By
+
 from .base_page import BasePage
 
+
 class SignUpPage(BasePage):
-    EMAIL_INPUT = (By.CSS_SELECTOR, "input[type='email'], input[name='email']")
-    NAME_INPUT = (By.CSS_SELECTOR, "input[name='name']")
-    USERNAME_INPUT = (By.CSS_SELECTOR, "input[name='username']")
-    PASSWORD_INPUT = (By.CSS_SELECTOR, "input[name='password']")
-    CONFIRM_PASSWORD_INPUT = (By.CSS_SELECTOR, "input[name='passwordConfirmation']")
-    CONSENT_CHECKBOX = (By.CSS_SELECTOR, "button[role='checkbox'], input[type='checkbox']")
-    CODE_OF_CONDUCT_LINK = (By.XPATH, "//a[@href='/code-of-conduct' or contains(., 'pravidly komunity')]")
-    SUBMIT_BUTTON = (By.CSS_SELECTOR, "button[type='submit']")
-    BLOBATAR_PREVIEW = (By.CSS_SELECTOR, "svg[data-blobatar], .blobatar, svg[data-seed]")
-    
-    EMAIL_ERROR = (By.XPATH, "//*[contains(@class, 'text-destructive') and (contains(., 'e-mail') or contains(., 'E-mail') or contains(., 'Účet s tímto e-mailem'))]")
-    PASSWORD_ERROR = (By.XPATH, "//*[contains(@class, 'text-destructive') and (contains(., 'heslo') or contains(., 'Heslo') or contains(., 'znaků'))]")
-    CONFIRM_PASSWORD_ERROR = (By.XPATH, "//*[contains(@class, 'text-destructive') and (contains(., 'shodovat') or contains(., 'potvrďte'))]")
-    CONSENT_ERROR = (By.XPATH, "//*[contains(@class, 'text-destructive') and (contains(., 'pravidly') or contains(., 'souhlaste'))]")
+    path = "/signup"
+    CONSENT = (By.CSS_SELECTOR, "main button[role='checkbox']")
+    CODE_OF_CONDUCT_LINK = (By.CSS_SELECTOR, "main a[href='/code-of-conduct']")
+    SUBMIT = (By.CSS_SELECTOR, "main button[type='submit']")
 
-    def open(self):
-        return super().open("/signup")
+    def fill(self, user, confirm_password=None, accept_consent=True):
+        self.type(By.NAME, "name", user["name"])
+        self.type(By.NAME, "username", user["username"])
+        self.type(By.NAME, "email", user["email"])
+        self.type(By.NAME, "password", user["password"])
+        self.type(By.NAME, "passwordConfirmation", confirm_password or user["password"])
+        if accept_consent != self.consent_checked():
+            self.click(*self.CONSENT)
 
-    def register(self, email=None, name=None, username=None, password=None, confirm_password=None, accept_consent=True):
-        if email:
-            self.send_keys(*self.EMAIL_INPUT, email)
-        if name:
-            self.send_keys(*self.NAME_INPUT, name)
-        if username:
-            self.send_keys(*self.USERNAME_INPUT, username)
-        if password:
-            self.send_keys(*self.PASSWORD_INPUT, password)
-        if confirm_password:
-            self.send_keys(*self.CONFIRM_PASSWORD_INPUT, confirm_password)
+    def consent_checked(self):
+        return self.find(*self.CONSENT).get_attribute("aria-checked") == "true"
 
-        if accept_consent:
-            checkbox = self.find(*self.CONSENT_CHECKBOX)
-            is_checked = checkbox.get_attribute("aria-checked") == "true" or checkbox.is_selected()
-            if not is_checked:
-                self.click(*self.CONSENT_CHECKBOX)
+    def submit(self):
+        self.click(*self.SUBMIT)
 
-        self.click(*self.SUBMIT_BUTTON)
+    def register(self, user, **kwargs):
+        self.fill(user, **kwargs)
+        self.submit()

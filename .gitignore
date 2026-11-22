@@ -34,3 +34,7 @@ skills-lock.json
 *.pptx
 
 .venv
+tests_selenium/artifacts/
+
+.pytest_cache/
+__pycache__/

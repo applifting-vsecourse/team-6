@@ -1,54 +1,95 @@
+"""Landing and info pages (#92, #110, #136), theme (#55), language (#31), phone layout (#88, #113)."""
+
 from selenium.webdriver.common.by import By
-from ..pages.base_page import BasePage
 
-class TestPublicPagesAndResponsive:
-    """Public pages, theme toggle, and mobile responsive behavior."""
+from ..helpers.i18n import t, xp
+from ..pages.base_page import DIALOG, BasePage, link
 
-    def test_landing_page(self, driver):
-        """[PUB-1 / PR #110] Landing page displays hero, video CTA, and navigation links."""
-        base_page = BasePage(driver)
-        base_page.open("/")
 
-        assert base_page.is_visible(By.CSS_SELECTOR, "h1")
-        assert base_page.is_visible(By.XPATH, "//a[@href='/how-it-works']")
-        assert base_page.is_visible(By.XPATH, "//a[@href='/code-of-conduct']")
+class TestPublicPages:
+    def test_landing_has_hero_and_calls_to_action(self, driver):
+        page = BasePage(driver).open("/")
+        assert t("landing.heroTitle1") in page.find_visible(By.CSS_SELECTOR, "main h1").text
+        assert page.find_all_visible(*link("/signup", scope="//main"))
+        assert page.find_all_visible(*link("/login", scope="//main"))
+
+    def test_landing_sign_up_button_opens_registration(self, driver):
+        page = BasePage(driver).open("/")
+        page.click(*link("/signup", scope="//main"))
+        page.wait_for_url(r"/signup")
 
     def test_how_it_works_page(self, driver):
-        """[PUB-2] How it works page loads explanation."""
-        base_page = BasePage(driver)
-        base_page.open("/how-it-works")
-
-        assert base_page.is_visible(By.CSS_SELECTOR, "h1")
-        assert "kvintet" in driver.page_source.lower()
+        page = BasePage(driver).open("/")
+        page.click(*link("/how-it-works", scope="//footer"))
+        page.wait_for_url(r"/how-it-works")
+        page.wait_for_text(t("howItWorks.step1Title"))
 
     def test_code_of_conduct_page(self, driver):
-        """[PUB-3] Code of conduct lists rules and reporting email."""
-        base_page = BasePage(driver)
-        base_page.open("/code-of-conduct")
+        page = BasePage(driver).open("/code-of-conduct")
+        page.find_visible(By.XPATH, f"//main//h1[normalize-space()={xp(t('codeOfConduct.title'))}]")
+        page.wait_for_text(t("codeOfConduct.rule2"))
 
-        assert base_page.is_visible(By.XPATH, "//h1[contains(., 'Pravidla komunity')]")
-        assert "Buďte laskaví" in driver.page_source
+    def test_unknown_route_shows_not_found(self, driver):
+        page = BasePage(driver).open("/this-page-does-not-exist")
+        page.wait_for_text(t("errors.pageNotFound"))
 
-    def test_theme_switcher(self, driver):
-        """[THEME-1] Theme switcher toggles dark mode."""
-        base_page = BasePage(driver)
-        base_page.open("/")
+    def test_signed_in_user_on_landing_is_offered_home(self, user_no_kvintet):
+        page = BasePage(user_no_kvintet).open("/")
+        page.wait_for_text(t("landing.goToOverview"))
 
-        html = driver.find_element(By.TAG_NAME, "html")
-        initial_dark = "dark" in (html.get_attribute("class") or "")
 
-        base_page.toggle_theme()
-        toggled_dark = "dark" in (html.get_attribute("class") or "")
-        assert initial_dark != toggled_dark
+class TestThemeAndLanguage:
+    def test_theme_toggle_switches_and_persists(self, driver):
+        """The starting theme follows the OS colour scheme; the toggle flips it and is remembered."""
+        page = BasePage(driver).open("/")
+        page.find_visible(By.CSS_SELECTOR, "main h1")
+        started_dark = page.is_dark()
 
-    def test_mobile_hamburger_drawer(self, mobile_driver):
-        """[MOBILE-1 / PR #106, #145] Mobile viewport has hamburger menu opening sheet."""
-        base_page = BasePage(mobile_driver)
-        base_page.open("/")
+        page.toggle_theme()
+        assert page.is_dark() is not started_dark
+        driver.refresh()
+        page.find_visible(By.CSS_SELECTOR, "main h1")
+        assert page.is_dark() is not started_dark
 
-        menu_btn = mobile_driver.find_element(By.XPATH, "//header//button[contains(@aria-label, 'menu') or .//*[name()='svg' and contains(@class, 'lucide-menu')]]")
-        assert menu_btn.is_displayed()
-        menu_btn.click()
+        page.toggle_theme()
+        assert page.is_dark() is started_dark
 
-        dialog = mobile_driver.find_element(By.CSS_SELECTOR, "[role='dialog']")
-        assert dialog.is_displayed()
+    def test_language_switch_to_english_and_back(self, driver):
+        page = BasePage(driver).open("/")
+        assert page.html_lang() == "cs"
+
+        page.switch_language("English")
+        page.wait_for_text(t("landing.heroTitle1", lang="en"))
+        assert page.html_lang() == "en"
+        driver.refresh()
+        page.wait_for_text(t("landing.heroTitle1", lang="en"))
+
+        page.switch_language("Čeština")
+        page.wait_for_text(t("landing.heroTitle1", lang="cs"))
+        assert page.html_lang() == "cs"
+
+
+class TestPhoneLayout:
+    def test_hamburger_menu_opens_navigation_sheet(self, mobile_driver):
+        page = BasePage(mobile_driver).open("/")
+        page.click(By.CSS_SELECTOR, f"header button[aria-label={xp(t('layout.openMenu'))}]")
+
+        sheet = page.find_visible(By.XPATH, DIALOG)
+        for href in ("/signup", "/login", "/how-it-works", "/code-of-conduct"):
+            assert sheet.find_elements(*link(href, scope="."))
+
+        page.click(*link("/how-it-works", scope=DIALOG))
+        page.wait_for_url(r"/how-it-works")
+        page.wait_until_gone(By.XPATH, DIALOG)
+
+    def test_theme_can_be_switched_from_the_phone_menu(self, mobile_driver):
+        page = BasePage(mobile_driver).open("/")
+        page.click(By.CSS_SELECTOR, f"header button[aria-label={xp(t('layout.openMenu'))}]")
+        target = "common.themeLight" if page.is_dark() else "common.themeDark"
+        page.click(By.XPATH, f"{DIALOG}//button[@role='radio'][normalize-space()={xp(t(target))}]")
+        assert page.is_dark() is (target == "common.themeDark")
+
+    def test_desktop_nav_is_replaced_by_the_menu_button(self, mobile_driver):
+        page = BasePage(mobile_driver).open("/")
+        page.find_visible(By.CSS_SELECTOR, f"header button[aria-label={xp(t('layout.openMenu'))}]")
+        assert not page.find_all_visible(By.CSS_SELECTOR, "header button[aria-label='English']")

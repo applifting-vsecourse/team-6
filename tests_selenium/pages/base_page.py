@@ -1,78 +1,150 @@
-import time
+from selenium.common.exceptions import (
+    ElementClickInterceptedException,
+    ElementNotInteractableException,
+    TimeoutException,
+)
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+
+from ..helpers.i18n import t, xp
 from ..helpers.test_data import FRONTEND_URL
 
+
+def button(text, scope=""):
+    """XPath of a <button> whose visible text is exactly `text`."""
+    return (By.XPATH, f"{scope}//button[normalize-space()={xp(text)}]")
+
+
+def link(href, scope=""):
+    return (By.XPATH, f"{scope}//a[@href={xp(href)}]")
+
+
+def text_on_page(text):
+    """XPath of the innermost element containing `text`."""
+    return (By.XPATH, f"//body//*[contains(normalize-space(), {xp(text)}) and not(*[contains(normalize-space(), {xp(text)})])]")
+
+
+DIALOG = "//*[@role='dialog']"
+
+
 class BasePage:
+    path = "/"
+
     def __init__(self, driver, timeout=10):
         self.driver = driver
         self.timeout = timeout
-        self.wait = WebDriverWait(driver, timeout)
-        self.base_url = FRONTEND_URL
 
-    def open(self, path=""):
-        url = f"{self.base_url}{path}" if path.startswith("/") else path
-        self.driver.get(url)
+    # --- navigation -------------------------------------------------------
+
+    def open(self, path=None):
+        self.driver.get(f"{FRONTEND_URL}{path if path is not None else self.path}")
         return self
 
+    def wait_for_url(self, pattern, timeout=None):
+        """Waits until the current URL matches the regex `pattern` (re.search)."""
+        WebDriverWait(self.driver, timeout or self.timeout).until(EC.url_matches(pattern))
+
+    @property
+    def path_and_query(self):
+        return self.driver.current_url.replace(FRONTEND_URL, "", 1)
+
+    # --- finding ----------------------------------------------------------
+
     def find(self, by, value, timeout=None):
-        wait = WebDriverWait(self.driver, timeout or self.timeout)
-        return wait.until(EC.presence_of_element_located((by, value)))
+        return WebDriverWait(self.driver, timeout or self.timeout).until(
+            EC.presence_of_element_located((by, value))
+        )
 
     def find_visible(self, by, value, timeout=None):
-        wait = WebDriverWait(self.driver, timeout or self.timeout)
-        return wait.until(EC.visibility_of_element_located((by, value)))
+        return WebDriverWait(self.driver, timeout or self.timeout).until(
+            EC.visibility_of_element_located((by, value))
+        )
 
-    def find_all(self, by, value):
-        return self.driver.find_elements(by, value)
+    def find_all_visible(self, by, value):
+        return [e for e in self.driver.find_elements(by, value) if e.is_displayed()]
+
+    def is_visible(self, by, value, timeout=3):
+        try:
+            self.find_visible(by, value, timeout)
+            return True
+        except TimeoutException:
+            return False
+
+    def wait_until_gone(self, by, value, timeout=None):
+        WebDriverWait(self.driver, timeout or self.timeout).until(
+            EC.invisibility_of_element_located((by, value))
+        )
+
+    def wait_for_text(self, text, timeout=None):
+        """Waits until `text` is visible anywhere on the page and returns that element."""
+        return self.find_visible(*text_on_page(text), timeout=timeout)
+
+    def has_text(self, text, timeout=3):
+        return self.is_visible(*text_on_page(text), timeout=timeout)
+
+    # --- acting -----------------------------------------------------------
 
     def click(self, by, value, timeout=None):
         element = WebDriverWait(self.driver, timeout or self.timeout).until(
             EC.element_to_be_clickable((by, value))
         )
+        self.click_element(element)
+        return element
+
+    def click_element(self, element):
+        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'})", element)
         try:
             element.click()
-        except Exception:
-            # Fallback to javascript click if obscured or animated
-            self.driver.execute_script("arguments[0].click();", element)
+        except (ElementClickInterceptedException, ElementNotInteractableException):
+            # Something animates over it (mascot bubble, sheet transition): click it directly.
+            self.driver.execute_script("arguments[0].click()", element)
 
-    def send_keys(self, by, value, text, clear=True, timeout=None):
-        element = self.find_visible(by, value, timeout)
+    def type(self, by, value, text, clear=True):
+        element = self.find_visible(by, value)
         if clear:
             element.clear()
         element.send_keys(text)
+        return element
 
-    def get_text(self, by, value, timeout=None):
-        return self.find_visible(by, value, timeout).text
+    # --- forms ------------------------------------------------------------
 
-    def is_visible(self, by, value, timeout=3):
+    def field(self, name, scope=""):
+        return self.find(By.XPATH, f"{scope}//*[self::input or self::textarea or self::select][@name={xp(name)}]")
+
+    def field_error(self, name, timeout=3):
+        """Text of the validation message under form field `name`, or None.
+
+        shadcn's <FormMessage> has the id "<field id>-message".
+        """
+        field_id = self.field(name).get_attribute("id")
         try:
-            WebDriverWait(self.driver, timeout).until(
-                EC.visibility_of_element_located((by, value))
-            )
-            return True
+            return self.find(By.ID, f"{field_id}-message", timeout=timeout).get_attribute("textContent")
         except TimeoutException:
-            return False
+            return None
 
-    def wait_for_url(self, pattern, timeout=10):
-        WebDriverWait(self.driver, timeout).until(
-            EC.url_matches(pattern)
-        )
+    # --- header -----------------------------------------------------------
 
-    # Common Header Elements
+    USER_MENU_TRIGGER = (By.CSS_SELECTOR, "header [data-slot='dropdown-menu-trigger']")
+
     def open_user_menu(self):
-        user_menu_btn = self.find(By.XPATH, "//header//button[@aria-haspopup='menu' or @data-slot='dropdown-menu-trigger']")
-        user_menu_btn.click()
-        self.find_visible(By.XPATH, "//*[@role='menu']")
+        self.click(*self.USER_MENU_TRIGGER)
+        self.find_visible(By.CSS_SELECTOR, "[role='menu']")
 
     def sign_out(self):
         self.open_user_menu()
-        sign_out_item = self.find(By.XPATH, "//*[@role='menuitem' and contains(., 'Odhlásit se')]")
-        sign_out_item.click()
-        time.sleep(1)
+        self.click(By.XPATH, f"//*[@role='menuitem'][normalize-space()={xp(t('auth.signOut'))}]")
+
+    def is_dark(self):
+        return "dark" in (self.driver.find_element(By.TAG_NAME, "html").get_attribute("class") or "")
 
     def toggle_theme(self):
-        theme_btn = self.find(By.XPATH, "//header//button[contains(@aria-label, 'Motiv') or contains(@aria-label, 'theme') or .//*[name()='svg' and (contains(@class, 'lucide-sun') or contains(@class, 'lucide-moon'))]]")
-        theme_btn.click()
+        label = t("layout.switchToLight") if self.is_dark() else t("layout.switchToDark")
+        self.click(By.CSS_SELECTOR, f"header button[aria-label='{label}']")
+
+    def switch_language(self, lang_label):
+        """lang_label is the button's aria-label: 'Čeština' or 'English'."""
+        self.click(By.CSS_SELECTOR, f"header button[aria-label='{lang_label}']")
+
+    def html_lang(self):
+        return self.driver.find_element(By.TAG_NAME, "html").get_attribute("lang")

@@ -1,35 +1,47 @@
-import time
 from selenium.webdriver.common.by import By
-from .base_page import BasePage
+
+from ..helpers.i18n import t, xp
+from .base_page import DIALOG, BasePage, button
+
 
 class OverviewPage(BasePage):
-    HEADING = (By.CSS_SELECTOR, "h1")
-    FORMING_HEADING = (By.XPATH, "//h1[contains(., 'Kvintet se skládá') or contains(., 'Váš kvintet')]")
-    VOTE_BUTTON = (By.XPATH, "//button[contains(., 'Hlasovat pro start') or contains(., 'Odvolat hlas')]")
-    LEAVE_BUTTON = (By.XPATH, "//button[contains(., 'Opustit kvintet')]")
-    START_OWN_BUTTON = (By.XPATH, "//button[contains(., 'Založit vlastní') or contains(., 'Založit kvintet')]")
-    CHAT_LINK = (By.XPATH, "//a[@href='/kvintet/messages' or contains(., 'Přejít do chatu')]")
+    path = "/overview"
+    HEADING = (By.CSS_SELECTOR, "main h1")
 
-    # Leave Dialog
-    LEAVE_DIALOG = (By.XPATH, "//*[@role='dialog'][contains(., 'Opustit kvintet')]")
-    LEAVE_CONFIRM_BTN = (By.XPATH, "//*[@role='dialog']//button[contains(., 'Opustit kvintet') or contains(@class, 'bg-destructive')]")
-    LEAVE_CANCEL_BTN = (By.XPATH, "//*[@role='dialog']//button[contains(., 'Zůstat') or contains(., 'Zrušit')]")
+    def heading(self):
+        return self.find_visible(*self.HEADING).text
 
-    def open(self):
-        return super().open("/overview")
+    def wait_for_heading(self, text):
+        self.find_visible(By.XPATH, f"//main//h1[normalize-space()={xp(text)}]")
 
-    def vote_to_start(self):
-        self.click(*self.VOTE_BUTTON)
-        time.sleep(1)
+    def main_text(self):
+        return self.find_visible(By.TAG_NAME, "main").text
+
+    # --- forming kvintet --------------------------------------------------
+
+    def vote(self):
+        self.click(*button(t("overview.forming.voteButton"), scope="//main"))
+
+    def can_vote(self, timeout=3):
+        return self.is_visible(*button(t("overview.forming.voteButton"), scope="//main"), timeout=timeout)
+
+    # --- leaving ----------------------------------------------------------
 
     def open_leave_dialog(self):
-        self.click(*self.LEAVE_BUTTON)
-        self.find_visible(*self.LEAVE_DIALOG)
+        self.click(*button(t("overview.forming.leaveKvintet"), scope="//main"))
+        return self.find_visible(By.XPATH, DIALOG)
 
-    def confirm_leave(self):
-        self.click(*self.LEAVE_CONFIRM_BTN)
-        time.sleep(1)
+    def confirm_leave(self, active=False):
+        label = t("kvintet.dialog.confirmLeaveActive" if active else "kvintet.dialog.confirmLeave")
+        self.click(*button(label, scope=DIALOG))
+        self.wait_until_gone(By.XPATH, DIALOG)
 
     def cancel_leave(self):
-        self.click(*self.LEAVE_CANCEL_BTN)
-        time.sleep(0.5)
+        self.click(*button(t("kvintet.dialog.cancel"), scope=DIALOG))
+        self.wait_until_gone(By.XPATH, DIALOG)
+
+    # --- no kvintet -------------------------------------------------------
+
+    def join(self, title):
+        card = self.find_visible(By.XPATH, f"//main//*[.//h3[normalize-space()={xp(title)}]][.//button][1]")
+        self.click_element(card.find_element(*button(t("overview.noKvintet.join"), scope=".")))

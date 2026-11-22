@@ -1,147 +1,141 @@
-import time
-import pytest
+"""Registration (#34, #89), sign in / sign out (#36, #90) and route protection."""
+
+from ..helpers.api_client import ApiClient
+from ..helpers.i18n import t
+from ..helpers.test_data import FRONTEND_URL, SEEDED_USERS, generate_random_user
 from ..pages.login_page import LoginPage
 from ..pages.signup_page import SignUpPage
-from ..helpers.test_data import generate_random_user, SEEDED_USERS, FRONTEND_URL
 
-class TestAuthAndRegistration:
-    """Registration and Authentication integration test suite."""
 
-    def test_reg_happy_path(self, driver):
-        """[REG-1] Register a fresh user with Code of Conduct consent -> redirects to onboarding."""
-        user = generate_random_user("reg-pass")
-        signup_page = SignUpPage(driver)
-        signup_page.open()
+def _delete(user):
+    api = ApiClient()
+    try:
+        api.sign_in(user["email"], user["password"])
+        api.delete_account()
+    except Exception:
+        pass
 
-        # Fill and submit registration
-        signup_page.register(
-            email=user["email"],
-            name=user["name"],
-            username=user["username"],
-            password=user["password"],
-            confirm_password=user["password"],
-            accept_consent=True,
-        )
 
-        signup_page.wait_for_url(r".*/onboarding.*")
-        assert "/onboarding" in driver.current_url
+class TestRegistration:
+    def test_sign_up_happy_path_leads_to_onboarding(self, driver):
+        user = generate_random_user("reg-ok")
+        page = SignUpPage(driver).open()
+        try:
+            page.register(user)
+            page.wait_for_url(r"/onboarding")
+        finally:
+            _delete(user)
 
-    def test_reg_missing_consent_blocked(self, driver):
-        """[REG-2] Form submission is blocked if Code of Conduct consent is unchecked."""
+    def test_empty_form_shows_every_required_message(self, driver):
+        page = SignUpPage(driver).open()
+        page.submit()
+
+        assert page.field_error("name") == t("auth.validation.nameRequired")
+        assert page.field_error("username") == t("auth.validation.usernameRequired")
+        assert page.field_error("email") == t("auth.validation.emailRequired")
+        assert page.field_error("password") == t("auth.validation.passwordMin", count=8)
+        assert page.field_error("passwordConfirmation") == t("auth.validation.passwordConfirmationRequired")
+        assert page.has_text(t("auth.validation.codeOfConductRequired"))
+        assert "/signup" in driver.current_url
+
+    def test_mismatched_passwords_are_rejected(self, driver):
+        user = generate_random_user("reg-mismatch")
+        page = SignUpPage(driver).open()
+        page.register(user, confirm_password=user["password"] + "x")
+
+        assert page.field_error("passwordConfirmation") == t("auth.validation.passwordsMatch")
+        assert "/signup" in driver.current_url
+
+    def test_short_password_is_rejected(self, driver):
+        user = dict(generate_random_user("reg-short"), password="short1")
+        page = SignUpPage(driver).open()
+        page.register(user)
+
+        assert page.field_error("password") == t("auth.validation.passwordMin", count=8)
+
+    def test_code_of_conduct_consent_is_required(self, driver):
+        """#34: no account without accepting the community rules."""
         user = generate_random_user("reg-noconsent")
-        signup_page = SignUpPage(driver)
-        signup_page.open()
+        page = SignUpPage(driver).open()
+        page.register(user, accept_consent=False)
 
-        signup_page.register(
-            email=user["email"],
-            name=user["name"],
-            username=user["username"],
-            password=user["password"],
-            confirm_password=user["password"],
-            accept_consent=False,
-        )
-
-        # Must remain on signup page and show validation error
+        page.wait_for_text(t("auth.validation.codeOfConductRequired"))
         assert "/signup" in driver.current_url
-        assert signup_page.is_visible(*SignUpPage.CONSENT_ERROR)
-
-    def test_reg_code_of_conduct_link(self, driver):
-        """[REG-3] Clicking Code of Conduct link opens the guidelines page."""
-        signup_page = SignUpPage(driver)
-        signup_page.open()
-        link = signup_page.find(*SignUpPage.CODE_OF_CONDUCT_LINK)
-        assert "/code-of-conduct" in link.get_attribute("href")
-
-        signup_page.click(*SignUpPage.CODE_OF_CONDUCT_LINK)
-        # Handle target="_blank" (new window/tab)
-        if len(driver.window_handles) > 1:
-            driver.switch_to.window(driver.window_handles[-1])
-        assert "/code-of-conduct" in driver.current_url
-
-    def test_reg_validation_errors(self, driver):
-        """[REG-4] Displays validation errors on empty submission and passwords mismatch."""
-        signup_page = SignUpPage(driver)
-        signup_page.open()
-
-        # Submit empty form
-        signup_page.click(*SignUpPage.SUBMIT_BUTTON)
-        assert signup_page.is_visible(*SignUpPage.EMAIL_ERROR)
-        assert signup_page.is_visible(*SignUpPage.PASSWORD_ERROR)
-
-        # Mismatched passwords
-        signup_page.send_keys(*SignUpPage.EMAIL_INPUT, "valid@example.com")
-        signup_page.send_keys(*SignUpPage.PASSWORD_INPUT, "Password123!")
-        signup_page.send_keys(*SignUpPage.CONFIRM_PASSWORD_INPUT, "Mismatch123!")
-        signup_page.click(*SignUpPage.SUBMIT_BUTTON)
-        assert signup_page.is_visible(*SignUpPage.CONFIRM_PASSWORD_ERROR)
-
-    def test_reg_duplicate_email(self, driver):
-        """[REG-6] Registering with an existing email displays clear server error."""
-        signup_page = SignUpPage(driver)
-        signup_page.open()
-
-        signup_page.register(
-            email=SEEDED_USERS["JAN_NOVAK"]["email"],
-            name="Duplicate Jan",
-            username=f"dup{generate_random_user()['username']}",
-            password="passwordos",
-            confirm_password="passwordos",
-            accept_consent=True,
+        # And nothing was created on the server.
+        resp = ApiClient().session.post(
+            f"{ApiClient().backend_url}/api/auth/sign-in/email",
+            json={"email": user["email"], "password": user["password"]},
         )
+        assert resp.status_code == 401
 
+    def test_backend_rejects_sign_up_without_consent(self):
+        """#34: the API enforces the consent too, not just the form."""
+        user = generate_random_user("reg-api-noconsent")
+        resp = ApiClient().sign_up(user["email"], user["password"], user["name"], user["username"], accept_coc=False)
+        assert resp.status_code >= 400
+        assert resp.json().get("code") == "CODE_OF_CONDUCT_REQUIRED"
+
+    def test_duplicate_email_shows_server_error(self, driver):
+        user = dict(generate_random_user("reg-dup"), email=SEEDED_USERS["JAN_NOVAK"]["email"])
+        page = SignUpPage(driver).open()
+        page.register(user)
+
+        page.wait_for_text(t("errors.auth.USER_ALREADY_EXISTS"))
         assert "/signup" in driver.current_url
-        assert signup_page.is_visible(*SignUpPage.EMAIL_ERROR)
 
-    def test_login_happy_path(self, driver):
-        """[AUTH-1] Sign in as onboarded user routes to overview."""
-        login_page = LoginPage(driver)
-        login_page.open()
+    def test_code_of_conduct_link_points_to_rules(self, driver):
+        page = SignUpPage(driver).open()
+        link = page.find_visible(*SignUpPage.CODE_OF_CONDUCT_LINK)
+        assert link.get_attribute("href").endswith("/code-of-conduct")
 
-        login_page.login(SEEDED_USERS["LENKA_MALA"]["email"], SEEDED_USERS["LENKA_MALA"]["password"])
 
-        login_page.wait_for_url(r".*/overview.*")
-        assert "/overview" in driver.current_url
+class TestSignInAndOut:
+    def test_onboarded_user_signs_in_to_overview(self, driver):
+        page = LoginPage(driver).open()
+        page.login(SEEDED_USERS["LENKA_MALA"]["email"], SEEDED_USERS["LENKA_MALA"]["password"])
+        page.wait_for_url(r"/overview")
 
-    def test_login_wrong_password(self, driver):
-        """[AUTH-3] Sign in with wrong password displays generic error message."""
-        login_page = LoginPage(driver)
-        login_page.open()
+    def test_user_without_profile_signs_in_to_onboarding_or_home_prompt(self, driver, scenario):
+        """#36: someone who has not finished onboarding is sent on to finish it."""
+        user = generate_random_user("login-noprofile")
+        api = ApiClient()
+        assert api.sign_up(user["email"], user["password"], user["name"], user["username"]).status_code == 200
+        scenario.clients.append(api)
 
-        login_page.login(SEEDED_USERS["JAN_NOVAK"]["email"], "invalid_pass_xyz")
+        page = LoginPage(driver).open()
+        page.login(user["email"], user["password"])
+        page.wait_for_url(r"/(onboarding|overview)")
+        if "/overview" in driver.current_url:
+            page.wait_for_text(t("overview.profileNotFinished.title"))
 
+    def test_wrong_password_shows_generic_error(self, driver):
+        page = LoginPage(driver).open()
+        page.login(SEEDED_USERS["JAN_NOVAK"]["email"], "definitely-wrong-password")
+
+        page.wait_for_text(t("errors.auth.INVALID_EMAIL_OR_PASSWORD"))
         assert "/login" in driver.current_url
-        assert login_page.is_visible(*LoginPage.ERROR_ALERT)
 
-    def test_login_nonexistent_user(self, driver):
-        """[AUTH-4] Sign in with non-existent email displays same generic error message."""
-        login_page = LoginPage(driver)
-        login_page.open()
+    def test_unknown_email_shows_the_same_error(self, driver):
+        """No account enumeration: unknown e-mail and wrong password read the same."""
+        page = LoginPage(driver).open()
+        page.login("nobody-here-123456@example.com", "whatever-password")
 
-        login_page.login("nonexistent.random.user.999@example.com", "anypassword")
-
+        page.wait_for_text(t("errors.auth.INVALID_EMAIL_OR_PASSWORD"))
         assert "/login" in driver.current_url
-        assert login_page.is_visible(*LoginPage.ERROR_ALERT)
 
-    def test_protected_routes_redirect_to_login(self, driver):
-        """[AUTH-6] Visiting protected URL while unauthenticated redirects to /login."""
+    def test_protected_routes_redirect_anonymous_users_to_login(self, driver):
+        page = LoginPage(driver)
+        for path in ("/overview", "/profile", "/kvintet/feed", "/kvintet/messages", "/onboarding", "/admin"):
+            driver.get(f"{FRONTEND_URL}{path}")
+            page.wait_for_url(r"/login")
+
+    def test_sign_out_ends_the_session(self, driver):
+        page = LoginPage(driver).open()
+        page.login(SEEDED_USERS["LENKA_MALA"]["email"], SEEDED_USERS["LENKA_MALA"]["password"])
+        page.wait_for_url(r"/overview")
+
+        page.sign_out()
+        page.wait_for_url(r"^http://localhost:3050/?($|\?|login)")
+
         driver.get(f"{FRONTEND_URL}/overview")
-        LoginPage(driver).wait_for_url(r".*/login.*")
-        assert "/login" in driver.current_url
-
-        driver.get(f"{FRONTEND_URL}/profile")
-        LoginPage(driver).wait_for_url(r".*/login.*")
-        assert "/login" in driver.current_url
-
-    def test_sign_out(self, driver):
-        """[AUTH-5] Signing out terminates session and protects private routes."""
-        login_page = LoginPage(driver)
-        login_page.open()
-        login_page.login(SEEDED_USERS["LENKA_MALA"]["email"], SEEDED_USERS["LENKA_MALA"]["password"])
-        login_page.wait_for_url(r".*/overview.*")
-
-        login_page.sign_out()
-
-        # Navigating back to overview should redirect to login
-        driver.get(f"{FRONTEND_URL}/overview")
-        login_page.wait_for_url(r".*/login.*")
-        assert "/login" in driver.current_url
+        page.wait_for_url(r"/login")

@@ -81,5 +81,6 @@ def generate_random_proposal(prefix="Python Kvintet"):
     return {
         "title": f"{prefix} {unique}",
         "description": f"Automated Selenium test proposal description for {unique}.",
-        "categories": ["data-ai", "software-development"],
+        "category_slugs": ["data-ai"],
+        "category_label": "Data a AI",
     }
