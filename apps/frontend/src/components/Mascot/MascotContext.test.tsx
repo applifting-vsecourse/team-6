@@ -64,7 +64,7 @@ describe("Mascot context", () => {
         <Probe />
       </MascotProvider>,
     )
-    act(() => void vi.advanceTimersByTime(500))
+    act(() => void vi.advanceTimersByTime(20))
     expect(screen.getByTestId("probe")).toHaveTextContent("landing-cta")
 
     rerender(
