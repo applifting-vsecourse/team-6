@@ -95,6 +95,34 @@ describe("Mascot context", () => {
     expect(screen.getByTestId("probe")).toHaveTextContent("none")
   })
 
+  it("comes back when a slow page claims it after it already left", () => {
+    // A route that loads for longer than the router's pending delay shows the loading screen
+    // first, so the old page is gone long before the next one mounts.
+    const { rerender } = render(
+      <MascotProvider>
+        <Probe />
+        <Page anchorId="landing-cta" />
+      </MascotProvider>,
+    )
+    rerender(
+      <MascotProvider>
+        <Probe />
+      </MascotProvider>,
+    )
+    act(() => void vi.advanceTimersByTime(3000))
+    expect(screen.getByTestId("probe")).toHaveTextContent("none")
+
+    rerender(
+      <MascotProvider>
+        <Probe />
+        <Page anchorId="signup-avatar" />
+      </MascotProvider>,
+    )
+    expect(screen.getByTestId("probe")).toHaveTextContent("signup-avatar")
+    act(() => void vi.advanceTimersByTime(5000))
+    expect(screen.getByTestId("probe")).toHaveTextContent("signup-avatar")
+  })
+
   it("keeps the next page's stage when the page before it is torn down late", () => {
     // The router shows the new location before it swaps the page, so the page on the way out can
     // be unmounted after the next one has already taken the stage.

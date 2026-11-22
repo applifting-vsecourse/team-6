@@ -16,7 +16,8 @@ export const MASCOT_SEED = "jana"
 // How long the mascot waits for the next page to claim it before it leaves. The router swaps the old
 // page for the new one in one commit, so the next page's effect runs right after the old page's
 // cleanup: this only has to bridge that gap. Anything longer is how long the mascot visibly lingers
-// on a page that never claims it.
+// on a page that never claims it. A route slower than the router's pending delay shows the loading
+// screen first; the mascot then leaves and comes back when that page mounts, which is intended.
 const GRACE_MS = 50
 
 export type MascotAction = {
