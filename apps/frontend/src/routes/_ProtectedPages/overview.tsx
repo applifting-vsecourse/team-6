@@ -14,7 +14,7 @@ import { Blobatar } from "@/components/ui/blobatar"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { formatDate, formatDayAndMonth, formatHeaderDate, formatList } from "@/lib/date"
+import { formatDate, formatDayAndMonth, formatList } from "@/lib/date"
 import { getErrorMessage } from "@/lib/errorMessage"
 import { cn } from "@/lib/utils"
 
@@ -154,7 +154,6 @@ function OverviewPage() {
 
   const ownSeed = user?.username ?? user?.id ?? ""
   const firstName = user?.name.split(" ")[0]
-  const headerDate = formatHeaderDate()
 
   const isInitialLoading = profileQuery.isLoading || (isOnboarded && myKvintet.isLoading)
   const hasLoadError = profileQuery.isError || myKvintet.isError
@@ -177,16 +176,11 @@ function OverviewPage() {
           {/* Loading and error states keep the greeting, so the page does not jump when it loads. */}
           {(isInitialLoading || hasLoadError) && (
             <>
-              <div className="flex flex-col gap-1.5">
-                <p className="font-mono text-meta font-medium tracking-meta text-muted-foreground uppercase">
-                  {headerDate}
-                </p>
-                <h1 className="text-h1-mobile font-semibold text-foreground md:text-h1">
-                  {firstName
-                    ? t("overview.greeting", { name: firstName })
-                    : t("overview.greetingAnonymous")}
-                </h1>
-              </div>
+              <h1 className="text-h1-mobile font-semibold text-foreground md:text-h1">
+                {firstName
+                  ? t("overview.greeting", { name: firstName })
+                  : t("overview.greetingAnonymous")}
+              </h1>
               {isInitialLoading ? (
                 <OverviewSkeleton />
               ) : (
@@ -210,9 +204,6 @@ function OverviewPage() {
               {!isOnboarded && (
                 <>
                   <div className="flex flex-col gap-1.5">
-                    <p className="font-mono text-meta font-medium tracking-meta text-muted-foreground uppercase">
-                      {headerDate}
-                    </p>
                     <h1 className="text-h1-mobile font-semibold text-foreground md:text-h1">
                       {firstName
                         ? t("overview.greeting", { name: firstName })
@@ -256,9 +247,6 @@ function OverviewPage() {
               {isOnboarded && !kvintet && (
                 <>
                   <div className="flex flex-col gap-1.5">
-                    <p className="font-mono text-meta font-medium tracking-meta text-muted-foreground uppercase">
-                      {headerDate}
-                    </p>
                     <h1 className="text-h1-mobile font-semibold text-foreground md:text-h1">
                       {firstName
                         ? t("overview.greeting", { name: firstName })
@@ -365,9 +353,6 @@ function OverviewPage() {
               {isOnboarded && kvintet && kvintet.status === "FORMING" && (
                 <>
                   <div className="flex flex-col gap-1.5">
-                    <p className="font-mono text-meta font-medium tracking-meta text-muted-foreground uppercase">
-                      {headerDate}
-                    </p>
                     <h1 className="text-h1-mobile font-semibold text-foreground md:text-h1">
                       {t("overview.forming.heading")}
                     </h1>
@@ -499,9 +484,6 @@ function OverviewPage() {
               {isOnboarded && kvintet && kvintet.status === "ACTIVE" && (
                 <>
                   <div className="flex flex-col gap-1.5">
-                    <p className="font-mono text-meta font-medium tracking-meta text-muted-foreground uppercase">
-                      {headerDate}
-                    </p>
                     <h1 className="text-h1-mobile font-semibold text-foreground md:text-h1">
                       {t("overview.active.heading")}
                     </h1>

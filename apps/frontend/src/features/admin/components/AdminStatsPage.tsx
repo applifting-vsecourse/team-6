@@ -27,6 +27,8 @@ type Row = {
   share?: number
   /** Colour dot tying the row to its block in the segmented bar. */
   stage?: Stage
+  /** The group's total: set apart with a larger number, the rows below are its detail. */
+  headline?: boolean
 }
 
 /** A thin bar: a lighter track of the same hue with the filled part on it. */
@@ -85,19 +87,23 @@ function StatGroup({
         {rows.map((row) => (
           <div
             key={row.label}
-            className="flex flex-col gap-2 py-3"
+            className="flex flex-col gap-2 py-2.5 md:py-3"
           >
-            <div className="flex items-baseline justify-between gap-4">
-              <dt className="flex items-center gap-2 text-body">
+            <div className="flex items-start justify-between gap-4">
+              <dt
+                className={`flex min-w-0 items-start gap-2 ${row.headline ? "font-medium text-foreground" : "text-body"}`}
+              >
                 {row.stage ? (
                   <span
                     aria-hidden
-                    className={`size-2 shrink-0 rounded-full ${STAGE[row.stage]}`}
+                    className={`mt-2 size-2 shrink-0 rounded-full ${STAGE[row.stage]}`}
                   />
                 ) : null}
                 {row.label}
               </dt>
-              <dd className="flex items-baseline gap-2 text-subheading font-medium text-foreground">
+              <dd
+                className={`flex shrink-0 flex-col items-end font-medium text-foreground ${row.headline ? "text-heading" : "text-subheading"}`}
+              >
                 {row.value === undefined ? (
                   <Skeleton className="h-6 w-10" />
                 ) : (
@@ -183,7 +189,7 @@ export function AdminStatsPage() {
             title={t("admin.users.title")}
             hint={t("admin.users.hint")}
             rows={[
-              { label: t("admin.users.registered"), value: users?.registered },
+              { label: t("admin.users.registered"), value: users?.registered, headline: true },
               {
                 label: t("admin.users.onboarded"),
                 value: users?.onboarded,
@@ -210,7 +216,7 @@ export function AdminStatsPage() {
               ) : null
             }
             rows={[
-              { label: t("admin.kvintets.total"), value: kvintets?.total },
+              { label: t("admin.kvintets.total"), value: kvintets?.total, headline: true },
               {
                 label: t("admin.kvintets.formingSmall"),
                 value: kvintets?.formingSmall,
