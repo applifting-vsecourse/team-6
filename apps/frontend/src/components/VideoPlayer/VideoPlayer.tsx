@@ -196,14 +196,25 @@ export function VideoPlayer({ sources, title, subtitle, artwork, className }: Vi
           />
         </video>
 
+        {/* Clicking or tapping the picture plays or pauses it: a far bigger target than the buttons
+          below. Keyboard and screen reader users have the play button in the row under it. */}
+        <div
+          role="presentation"
+          className="absolute inset-0 cursor-pointer"
+          onClick={toggle}
+        />
+
         {hasStarted ? null : (
-          <div className="absolute inset-0 bg-highlight-soft">
+          <div
+            role="presentation"
+            className="absolute inset-0 cursor-pointer bg-highlight-soft"
+            onClick={startWithSound}
+          >
             {artwork}
             <div className="absolute inset-0 bg-linear-to-b from-transparent from-60% to-overlay/60" />
             <Button
               size="icon-lg"
               aria-label={t("videoPlayer.play")}
-              onClick={startWithSound}
               className="absolute top-1/2 left-1/2 size-14 -translate-x-1/2 -translate-y-1/2 rounded-full md:size-22 [&_svg:not([class*='size-'])]:size-6 md:[&_svg:not([class*='size-'])]:size-9"
             >
               <Play className="fill-current" />
@@ -228,29 +239,18 @@ export function VideoPlayer({ sources, title, subtitle, artwork, className }: Vi
             size="sm"
             variant="ghost"
             onClick={toggleMute}
-            className="absolute top-3 left-3 h-auto rounded-full bg-overlay/70 px-3 py-2 text-small font-normal text-white hover:bg-overlay/80 hover:text-white"
+            className="absolute top-3 left-3 h-auto rounded-full bg-overlay/70 px-3 py-2.5 text-small font-normal text-white hover:bg-overlay/80 hover:text-white"
           >
             <VolumeX />
             {t("videoPlayer.soundOff")}
           </Button>
         ) : null}
-
-        {/* On a phone the seek bar is hidden, so a hairline along the bottom edge shows the progress (as in the phone design). */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-0.75 bg-white/35 md:hidden"
-        >
-          <div
-            className="h-full bg-highlight"
-            style={{ width: `${duration ? Math.min(100, (time / duration) * 100) : 0}%` }}
-          />
-        </div>
       </div>
 
-      <div className="flex items-center gap-2 pt-3">
+      <div className="flex items-center gap-1 pt-2 md:gap-2">
         <Button
           variant="ghost"
-          size="icon"
+          size="icon-lg"
           aria-label={t(
             isEnded ? "videoPlayer.replay" : isPlaying ? "videoPlayer.pause" : "videoPlayer.play",
           )}
@@ -261,10 +261,9 @@ export function VideoPlayer({ sources, title, subtitle, artwork, className }: Vi
         <span className="w-10 shrink-0 font-mono text-small text-muted-foreground tabular-nums max-md:hidden">
           {clock(time)}
         </span>
-        <span className="flex-1 md:hidden" />
         <Slider
           aria-label={t("videoPlayer.seek")}
-          className="max-md:hidden"
+          className="h-10 cursor-pointer"
           min={0}
           max={duration || 1}
           step={0.1}
@@ -273,6 +272,7 @@ export function VideoPlayer({ sources, title, subtitle, artwork, className }: Vi
           disabled={duration === 0}
         />
         <Toggle
+          size="lg"
           aria-label={t("videoPlayer.captions")}
           pressed={shouldShowCaptions}
           onPressedChange={setCaptionsOn}
@@ -281,7 +281,7 @@ export function VideoPlayer({ sources, title, subtitle, artwork, className }: Vi
         </Toggle>
         <Button
           variant="ghost"
-          size="icon"
+          size="icon-lg"
           aria-label={t(isMuted ? "videoPlayer.unmute" : "videoPlayer.mute")}
           onClick={toggleMute}
         >
@@ -289,7 +289,7 @@ export function VideoPlayer({ sources, title, subtitle, artwork, className }: Vi
         </Button>
         <Slider
           aria-label={t("videoPlayer.volume")}
-          className="max-w-24 max-md:hidden"
+          className="h-10 w-28 shrink-0 cursor-pointer max-md:hidden"
           min={0}
           max={1}
           step={0.05}
