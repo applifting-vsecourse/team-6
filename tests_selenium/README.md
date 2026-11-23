@@ -2,7 +2,7 @@
 
 Browser tests (Python, pytest, Selenium, headless Chrome) that click through the running app:
 registration, onboarding, the feed, voting, leaving, chat, profile, account deletion, the admin
-overview, public pages, and regressions pinned to merged pull requests.
+overview, the landing page and public pages, on a desktop and on phones.
 
 ## Run
 
@@ -10,14 +10,16 @@ The app must be running (`pnpm dev`) with the sign-in rate limit off. The suite 
 far more often than the 10-per-minute limit allows:
 
 ```shell
-# apps/backend/.env (the backend reloads by itself)
+# apps/backend/.env (restart the backend after changing it)
+NODE_ENV=development     # the flag is honoured only in development and test
 DISABLE_RATE_LIMIT=true
 ```
 
 Then:
 
-`pnpm test:selenium` and `pnpm test:ios` run `tests_selenium/run.sh`: name tests as bare words
-(any part of the test, class or file name), then any pytest options.
+`pnpm test:selenium` and `pnpm test:ios` run `tests_selenium/run.sh` on macOS and Linux and
+`tests_selenium\run.bat` on Windows (`launch.cjs` picks one). Name tests as bare words (any part
+of the test, class or file name), then any pytest options.
 
 ```shell
 pnpm test:selenium:setup   # once: creates .venv and installs requirements.txt
@@ -33,6 +35,10 @@ pnpm test:selenium -m "not mobile"            # everything else
 ```
 
 You need Google Chrome. Selenium Manager downloads a matching chromedriver by itself.
+
+On Windows the same `pnpm` commands work (Python 3 from python.org, with the `py` launcher, and
+Google Chrome). Set environment variables first instead of in front of the command:
+`set HEADED=1` in cmd, `$env:HEADED = "1"` in PowerShell. The iOS Safari tests need macOS.
 When a test fails, a screenshot of its browser is saved to `tests_selenium/artifacts/` (ignored by git).
 
 Before the tests start, a preflight check stops the run with a hint if the app is not up, the
