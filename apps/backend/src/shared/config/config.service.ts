@@ -39,6 +39,12 @@ export class Config {
   @IsOptional()
   readonly nodeEnv?: string;
 
+  // Switches off better-auth's rate limit for the Selenium suite. Honoured only when NODE_ENV is
+  // development or test, see resolveRateLimitEnabled.
+  @Env('DISABLE_RATE_LIMIT', { expose: true, defaultValue: false })
+  @IsBoolean()
+  readonly disableRateLimit!: boolean;
+
   @Env('BACKEND_URL', {
     defaultValue: 'http://localhost:4050',
     expose: true,

@@ -69,6 +69,7 @@ pnpm frontend test:ci              # frontend component tests (vitest)
 pnpm backend prisma:migrations:run # create + apply a migration after schema changes
 pnpm backend prisma:studio         # browse/edit the database
 pnpm backend seed                  # re-seed the database
+pnpm test:selenium                 # browser end-to-end tests against the running app (see tests_selenium/README.md)
 pnpm dev:down                      # stop the database container
 ```
 
