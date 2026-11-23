@@ -16,15 +16,20 @@ DISABLE_RATE_LIMIT=true
 
 Then:
 
+`pnpm test:selenium` and `pnpm test:ios` run `tests_selenium/run.sh`: name tests as bare words
+(any part of the test, class or file name), then any pytest options.
+
 ```shell
 pnpm test:selenium:setup   # once: creates .venv and installs requirements.txt
 pnpm test:selenium         # the whole suite, about 10 minutes
 
-.venv/bin/pytest tests_selenium/tests/test_05_proposal_voting_and_leaving.py   # one file
-.venv/bin/pytest tests_selenium -k "chat"                                     # by name
-HEADED=1 .venv/bin/pytest tests_selenium -k "onboarding"                      # watch the browser
-.venv/bin/pytest tests_selenium -m mobile                                     # only the phone tests (any file)
-.venv/bin/pytest tests_selenium -m "not mobile"                               # everything else
+pnpm test:selenium chat                       # only tests whose name contains "chat"
+pnpm test:selenium mascot video               # several names: either one
+pnpm test:selenium test_05_proposal_voting_and_leaving.py   # one file
+pnpm test:selenium chat -x                    # options after the names go to pytest
+HEADED=1 pnpm test:selenium onboarding        # watch the browser
+pnpm test:selenium -m mobile                  # only the phone tests (any file)
+pnpm test:selenium -m "not mobile"            # everything else
 ```
 
 You need Google Chrome. Selenium Manager downloads a matching chromedriver by itself.
@@ -80,6 +85,7 @@ skipped unless you ask for them, because the simulator is heavy (about 2–3 GB 
 sudo xcodebuild -runFirstLaunch   # once per Xcode install, needs your password
 pnpm test:ios:setup               # once: Appium 3.9 + XCUITest driver into ~/.appium-kvintet
 pnpm test:ios                     # boots an iPhone simulator; first run also builds WebDriverAgent
+pnpm test:ios sheet_rides chat    # only the iOS tests whose name contains either
 ```
 
 Needs Xcode with an iOS Simulator runtime. `IOS_DEVICE="iPhone 17 Pro"` picks another simulator.
