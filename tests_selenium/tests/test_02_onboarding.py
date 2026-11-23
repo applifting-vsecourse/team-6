@@ -1,6 +1,7 @@
 """Onboarding wizard (#43, #91, #111, #116, #123) and the unfinished-profile gate (#117)."""
 
 import pytest
+from selenium.webdriver.common.by import By
 
 from ..helpers.api_client import ApiClient
 from ..helpers.i18n import t
@@ -110,6 +111,29 @@ class TestOnboarding:
         page.complete()
         page.wait_for_url(r"/overview")
         OverviewPage(driver).wait_for_heading(t("overview.greeting", name="User"))
+
+
+class TestMapPin:
+    """#116: the map shows a pin only after the user picks a place."""
+
+    def test_no_pin_until_a_place_is_picked(self, driver, login_as, scenario):
+        user = generate_random_user("py-mappin")
+        api = ApiClient()
+        api.sign_up(user["email"], user["password"], user["name"], user["username"])
+        scenario.clients.append(api)
+        api.session.put(
+            api._url("/me/profile"),
+            json={"roles": ["software-engineer"], "weekdays": True, "evenings": True},
+        ).raise_for_status()
+        login_as(api)
+
+        page = OnboardingPage(driver).open("/onboarding?page=place")
+        page.wait_for_page("place")
+        page.find_visible(*OnboardingPage.MAP)
+        assert not page.find_all_visible(By.CSS_SELECTOR, ".leaflet-marker-icon, .leaflet-interactive")
+
+        page.pick_place_on_map()
+        page.find_visible(By.CSS_SELECTOR, ".leaflet-marker-icon, .leaflet-interactive")
 
 
 class TestUnfinishedProfileGate:

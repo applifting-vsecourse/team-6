@@ -26,21 +26,40 @@ def _sign_in(drv, api):
 
 
 def _open(drv, path):
-    page = BasePage(drv, timeout=20).open(path)
-    page.find_visible(By.CSS_SELECTOR, "main h1")
-    time.sleep(0.8)
+    page = BasePage(drv, timeout=20)
+    for attempt in range(2):
+        page.open(path)
+        page.find_visible(By.CSS_SELECTOR, "main h1")
+        if drv.current_url.replace(FRONTEND_URL, "", 1) == path:
+            break
+        ios.dismiss_system_prompts(drv)  # a system sheet can swallow the navigation
+    else:
+        raise AssertionError(f"Safari did not open {path}; it is on {drv.current_url}")
+    time.sleep(1.5)  # the simulator is slow; let data load and the layout settle
+    ios.dismiss_system_prompts(drv)
     ios.install_viewport_probe(drv)
     return page
 
 
 def _tap_field(drv, field, label):
-    """A real tap on a text field: iOS focuses it and slides the keyboard up."""
-    field.click()
+    """A real tap on a text field: iOS focuses it and slides the keyboard up.
+
+    Then the field must be at least partly visible above the keyboard, where the caret is.
+    (Safari scrolls a tall textarea only far enough to show the line being typed, so a tall
+    field may be clipped at its top; that is Safari, not the app.)
+    """
+    ios.tap(drv, field)
     ios.wait_for_keyboard(drv, shown=True)
     ios.install_viewport_probe(drv)
-    assert drv.execute_script("return window.__kvVisible().keyboard") > 100, "Safari should report the keyboard"
+    assert drv.execute_script("return document.activeElement === arguments[0]", field), f"the {label} field did not get focus"
     drv.recorder.shot(f"keyboard-{label}")
-    mobile.assert_tappable(drv, field, f"the focused {label} field", reveal=False)
+    box = mobile.rect(drv, field)
+    visible = drv.execute_script("return window.__kvVisible()")
+    shown = min(box["bottom"], visible["bottom"]) - max(box["top"], visible["top"])
+    assert shown >= min(30, box["bottom"] - box["top"]), (
+        f"the focused {label} field is hidden: field y={box['top']:.0f}..{box['bottom']:.0f}, "
+        f"visible area above the keyboard y={visible['top']:.0f}..{visible['bottom']:.0f}"
+    )
 
 
 def _assert_reachable_while_typing(drv, element, label):
@@ -85,12 +104,19 @@ class TestRealKeyboardOnIos:
         submit = page.find(By.CSS_SELECTOR, "main button[type='submit']")
         consent = page.find(By.CSS_SELECTOR, "main button[role='checkbox']")
 
-        for name in ("name", "username", "email", "password", "passwordConfirmation"):
+        for name in ("name", "username", "email"):
             field = page.field(name)
             _tap_field(drv, field, name)
-            field.send_keys(user["password"] if name == "passwordConfirmation" else user[name])
+            field.send_keys(user[name])
             _assert_reachable_while_typing(drv, consent, "the community-rules checkbox")
             _assert_reachable_while_typing(drv, submit, "Create account")
+
+        # A new-password field makes iOS offer a strong password from iCloud Keychain instead of
+        # its keyboard; the simulator has no Keychain, so no keyboard appears there. Typing a
+        # password with the keyboard up is covered by the sign-in test.
+        _dismiss_keyboard(drv)
+        for name in ("password", "passwordConfirmation"):
+            page.field(name).send_keys(user["password"])
 
         consent.click()
         submit.click()

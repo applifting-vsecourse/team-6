@@ -1,7 +1,11 @@
 """Kvintet feed: browse, filter, join (#40, #51, #69, #95) and start a kvintet (#67, #118, #137, #154)."""
 
-from ..helpers.i18n import t
+import pytest
+from selenium.webdriver.common.by import By
+
+from ..helpers.i18n import t, xp
 from ..helpers.test_data import generate_random_proposal
+from ..pages.base_page import DIALOG
 from ..pages.feed_page import FeedPage
 from ..pages.overview_page import OverviewPage
 
@@ -99,3 +103,73 @@ def _title(title):
     from ..helpers.i18n import xp
 
     return (By.XPATH, f"//main//li//h2[normalize-space()={xp(title)}]")
+
+
+class TestKvintetDescription:
+    """#154 / #137: the description is mandatory and 10-280 characters long."""
+
+    @pytest.fixture
+    def dialog(self, driver, fresh_user):
+        dialog = FeedPage(driver).open().wait_loaded().open_start_dialog()
+        dialog.fill_title("Boundary check")
+        dialog.toggle_category(t("categories.data-ai"))
+        return dialog
+
+    def test_nine_characters_is_too_short(self, dialog):
+        dialog.fill_description("123456789")
+        dialog.submit()
+        assert dialog.error("description") == t("kvintet.validation.descriptionTooShort", min=10)
+
+    def test_ten_characters_is_enough(self, dialog, fresh_user):
+        dialog.fill_description("1234567890")
+        dialog.submit()
+        dialog.wait_for_url(r"/overview")
+        assert fresh_user[1].get_my_kvintet().json()["description"] == "1234567890"
+
+    def test_whitespace_does_not_count(self, dialog):
+        dialog.fill_description("          ")
+        dialog.submit()
+        assert dialog.error("description") in (
+            t("kvintet.validation.descriptionRequired"),
+            t("kvintet.validation.descriptionTooShort", min=10),
+        )
+
+    def test_typing_stops_at_280_characters(self, dialog):
+        dialog.fill_description("x" * 300)
+        value = dialog.field("description").get_attribute("value")
+        assert len(value) == 280
+
+    def test_backend_rejects_short_description(self, scenario):
+        _, api = scenario.user("py-description")
+        resp = api.session.post(
+            api._url("/kvintets"),
+            json={"title": "Too short", "description": "short", "categorySlugs": ["leisure"]},
+        )
+        assert resp.status_code == 400
+
+
+class TestKvintetCategories:
+    """#118 / #67: a kvintet has 1-3 categories."""
+
+    def test_fourth_category_cannot_be_picked(self, user_no_kvintet):
+        dialog = FeedPage(user_no_kvintet).open().wait_loaded().open_start_dialog()
+        labels = [t(f"categories.{s}") for s in ("software-development", "data-ai", "business", "languages")]
+        for label in labels[:3]:
+            dialog.toggle_category(label)
+        assert sorted(dialog.selected_categories()) == sorted(labels[:3])
+
+        fourth = dialog.find(By.XPATH, f"{DIALOG}//button[normalize-space()={xp(labels[3])}]")
+        assert not fourth.is_enabled() or fourth.get_attribute("aria-disabled") == "true"
+        dialog.cancel()
+
+    def test_backend_rejects_four_categories(self, scenario):
+        _, api = scenario.user("py-categories")
+        resp = api.session.post(
+            api._url("/kvintets"),
+            json={
+                "title": "Four categories",
+                "description": "Should be rejected by the API.",
+                "categorySlugs": ["data-ai", "business", "languages", "leisure"],
+            },
+        )
+        assert resp.status_code == 400

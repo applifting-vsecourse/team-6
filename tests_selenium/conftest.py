@@ -160,6 +160,18 @@ def mobile_driver(request):
     drv.quit()
 
 
+def reduce_motion(drv):
+    """Makes the browser ask for reduced motion (prefers-reduced-motion: reduce) from now on.
+
+    The landing animation then holds its finished scene, and the product video does not start
+    by itself, so what a test sees does not depend on timing.
+    """
+    drv.execute_cdp_cmd(
+        "Emulation.setEmulatedMedia", {"features": [{"name": "prefers-reduced-motion", "value": "reduce"}]}
+    )
+    return drv
+
+
 @pytest.fixture(params=list(PHONES), ids=list(PHONES))
 def phone(request):
     """A touch phone; every test using it runs once per size in PHONES."""

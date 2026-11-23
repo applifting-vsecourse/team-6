@@ -3,7 +3,11 @@
 Every test builds its own kvintet from fresh users; the seeded ones are never changed.
 """
 
+import pytest
+
+from ..helpers.api_client import ApiClient
 from ..helpers.i18n import t
+from ..helpers.test_data import SEEDED_USERS
 from ..pages.overview_page import OverviewPage
 
 
@@ -105,3 +109,26 @@ class TestLeaving:
         assert t("kvintet.dialog.leaveTitle") in dialog.text
         assert t("kvintet.dialog.leaveLastMemberDescription") not in dialog.text
         overview.cancel_leave()
+
+
+class TestLeavingAsTheLastMember:
+    """#124: the leave dialog tells the last member the kvintet is removed."""
+
+    @pytest.fixture
+    def onlooker(self):
+        """Seeded Lenka, signed in through the API, only to read the feed."""
+        api = ApiClient()
+        api.sign_in(SEEDED_USERS["LENKA_MALA"]["email"], SEEDED_USERS["LENKA_MALA"]["password"])
+        return api
+
+    def test_last_member_is_warned_and_kvintet_disappears(self, driver, login_as, scenario, onlooker):
+        _, proposal, people = scenario.forming_kvintet(1)
+        overview = _signed_in_overview(driver, login_as, people[0][1])
+
+        dialog = overview.open_leave_dialog()
+        assert t("kvintet.dialog.leaveLastMemberDescription") in dialog.text
+        overview.confirm_leave()
+
+        body = onlooker.session.get(onlooker._url("/kvintets/feed")).json()
+        feed = body["items"] if isinstance(body, dict) else body
+        assert proposal["title"] not in [k["title"] for k in feed]

@@ -1,4 +1,4 @@
-"""Landing and info pages (#92, #110, #136), theme (#55), language (#31), phone layout (#88, #113)."""
+"""Info pages and 404 (#110), theme (#55), language (#31) and the phone menu (#88, #113)."""
 
 from selenium.webdriver.common.by import By
 
@@ -6,18 +6,7 @@ from ..helpers.i18n import t, xp
 from ..pages.base_page import DIALOG, BasePage, link
 
 
-class TestPublicPages:
-    def test_landing_has_hero_and_calls_to_action(self, driver):
-        page = BasePage(driver).open("/")
-        assert t("landing.heroTitle1") in page.find_visible(By.CSS_SELECTOR, "main h1").text
-        assert page.find_all_visible(*link("/signup", scope="//main"))
-        assert page.find_all_visible(*link("/login", scope="//main"))
-
-    def test_landing_sign_up_button_opens_registration(self, driver):
-        page = BasePage(driver).open("/")
-        page.click(*link("/signup", scope="//main"))
-        page.wait_for_url(r"/signup")
-
+class TestInfoPages:
     def test_how_it_works_page(self, driver):
         page = BasePage(driver).open("/")
         page.click(*link("/how-it-works", scope="//footer"))
@@ -32,10 +21,6 @@ class TestPublicPages:
     def test_unknown_route_shows_not_found(self, driver):
         page = BasePage(driver).open("/this-page-does-not-exist")
         page.wait_for_text(t("errors.pageNotFound"))
-
-    def test_signed_in_user_on_landing_is_offered_home(self, user_no_kvintet):
-        page = BasePage(user_no_kvintet).open("/")
-        page.wait_for_text(t("landing.goToOverview"))
 
 
 class TestThemeAndLanguage:
@@ -69,7 +54,7 @@ class TestThemeAndLanguage:
         assert page.html_lang() == "cs"
 
 
-class TestPhoneLayout:
+class TestPhoneMenu:
     def test_hamburger_menu_opens_navigation_sheet(self, mobile_driver):
         page = BasePage(mobile_driver).open("/")
         page.click(By.CSS_SELECTOR, f"header button[aria-label={xp(t('layout.openMenu'))}]")

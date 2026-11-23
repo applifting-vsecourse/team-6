@@ -20,10 +20,10 @@ Then:
 pnpm test:selenium:setup   # once: creates .venv and installs requirements.txt
 pnpm test:selenium         # the whole suite, about 10 minutes
 
-.venv/bin/pytest tests_selenium/tests/test_04_proposal_voting_and_leaving.py   # one file
+.venv/bin/pytest tests_selenium/tests/test_05_proposal_voting_and_leaving.py   # one file
 .venv/bin/pytest tests_selenium -k "chat"                                     # by name
 HEADED=1 .venv/bin/pytest tests_selenium -k "onboarding"                      # watch the browser
-.venv/bin/pytest tests_selenium -m mobile                                     # only the phone layout tests
+.venv/bin/pytest tests_selenium -m mobile                                     # only the phone tests (any file)
 .venv/bin/pytest tests_selenium -m "not mobile"                               # everything else
 ```
 
@@ -49,7 +49,7 @@ rate limit is still on, or the seeded demo users are no longer in their seeded s
   Elsewhere, selectors use stable attributes: `name`, `href`, `role`, `aria-*`, `data-slot`.
 - **Page objects** in `pages/` hold the selectors; tests read as user steps.
 
-## Phone layout tests (`test_10_mobile_layout.py`)
+## Phone layout tests (`test_12_phone_layout.py`)
 
 Each one runs on every phone in `conftest.PHONES` (320x568 and 390x844) with touch emulation.
 They check that controls are **tappable**: after scrolling a control into view the way a user
@@ -70,18 +70,49 @@ on a real device once.
 `TestTheLayoutChecksCatchProblems` breaks a page on purpose (a covering element, a button under
 the keyboard, an overly wide element) to prove the checks can fail.
 
+## Real iOS Safari (`test_13_ios_keyboard.py`, opt-in)
+
+Five keyboard tests also run in real Safari on the iOS Simulator, with Apple's own keyboard:
+sign-in, sign-up, the start-kvintet sheet (#115), chat and the onboarding note. They are
+skipped unless you ask for them, because the simulator is heavy (about 2–3 GB of RAM):
+
+```shell
+sudo xcodebuild -runFirstLaunch   # once per Xcode install, needs your password
+pnpm test:ios:setup               # once: Appium 3.9 + XCUITest driver into ~/.appium-kvintet
+pnpm test:ios                     # boots an iPhone simulator; first run also builds WebDriverAgent
+```
+
+Needs Xcode with an iOS Simulator runtime. `IOS_DEVICE="iPhone 17 Pro"` picks another simulator.
+Every test records the simulator screen and saves screenshots to `tests_selenium/artifacts/ios/`.
+Shut the simulator down afterwards with `xcrun simctl shutdown all`.
+
+What is special about real Safari, all handled in `helpers/ios.py`:
+
+- Fields are tapped with real touches at their true screen position. Safari draws the page
+  below the status bar, so the offset is calibrated against the text fields iOS reports.
+- iOS's "Save password?" sheet appears after a sign-in and blocks taps; the tests answer
+  "Never for this website".
+- In a sign-up password field (`new-password`), the simulator shows no keyboard, because iOS
+  wants to offer a Keychain password instead. The sign-up test fills those without the keyboard;
+  the sign-in test covers typing a password with the keyboard up.
+- iOS blanks the keyboard in screenshots while a password field has focus. That is iOS privacy,
+  not a test problem.
+
 The dev server's vite-plugin-checker badge is hidden in every test browser. It is dev tooling,
 and it would otherwise cover the bottom-left corner.
 
-| File                                     | Covers                                                                                         |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `test_01_auth_and_registration.py`       | Sign-up validation and consent, duplicate e-mail, sign in/out, route protection                |
-| `test_02_onboarding.py`                  | The whole wizard, required answers, tags, Back, unfinished-profile gate (#117)                 |
-| `test_03_kvintet_feed_and_creation.py`   | Feed cards, category filter, empty state, join, start a kvintet                                |
-| `test_04_proposal_voting_and_leaving.py` | Voting rules, last vote starts the kvintet, vote reset on join, leaving                        |
-| `test_05_active_kvintet_and_chat.py`     | 'Kvintet begins', names revealed, chat send/receive/poll, whitespace, HTML escaping, access    |
-| `test_06_profile_and_account.py`         | Profile answers and radius (#119), Edit round trip (#152), account deletion (#65)              |
-| `test_07_admin_dashboard.py`             | Pilot overview, numbers match the API, admin-only access (#112)                                |
-| `test_08_public_pages_and_responsive.py` | Landing, info pages, 404, theme, language, phone menu                                          |
-| `test_09_closed_pr_regressions.py`       | #154, #118, #124, #111/#151, #147, #148, #116                                                  |
-| `test_10_mobile_layout.py`               | Phone layout: every screen, menus, bottom sheets and swipe (#113), keyboard (#115), chat, tour |
+| File                                       | Covers                                                                                                                 |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `test_01_auth_and_registration.py`         | Sign-up validation and consent, duplicate e-mail, sign in/out, route protection                                        |
+| `test_02_onboarding.py`                    | The whole wizard, required answers, tags, Back, map pin (#116), unfinished-profile gate (#117)                         |
+| `test_03_home.py`                          | Home's heading in every state, no date above it (#161); members on a phone (#148)                                      |
+| `test_04_kvintet_feed_and_creation.py`     | Feed cards, category filter, empty state, join, start a kvintet, description length (#154), 1-3 categories (#118)      |
+| `test_05_proposal_voting_and_leaving.py`   | Voting rules, last vote starts the kvintet, vote reset on join, leaving, last member leaving (#124)                    |
+| `test_06_active_kvintet_and_chat.py`       | 'Kvintet begins', names revealed, chat send/receive/poll, whitespace, HTML escaping, access                            |
+| `test_07_product_tour.py`                  | First-visit tour (#111), replay from the user menu (#151) and the phone menu (#147)                                    |
+| `test_08_profile_and_account.py`           | Profile answers and radius (#119), Edit round trip (#152), account deletion (#65)                                      |
+| `test_09_admin_dashboard.py`               | Pilot overview, numbers match the API, admin-only access (#112), layout of the numbers (#162), admin phone menu (#159) |
+| `test_10_landing_page.py`                  | Hero and calls to action, mascot leaves with the page (#158), animation tags (#160), product video (#128/#163)         |
+| `test_11_info_pages_theme_and_language.py` | Info pages, 404, theme, language, the public phone menu                                                                |
+| `test_12_phone_layout.py`                  | Phone layout: every screen, menus, bottom sheets and swipe (#113), keyboard (#115), chat, tour                         |
+| `test_13_ios_keyboard.py`                  | Opt-in: the real iOS keyboard in Safari on the iOS Simulator (sign-in, sign-up, start sheet, chat, note)               |

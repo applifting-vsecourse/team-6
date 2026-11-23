@@ -28,6 +28,14 @@ def text_on_page(text):
 DIALOG = "//*[@role='dialog']"
 
 
+def wait_for_js(driver, condition_js, message, timeout=10):
+    """Waits until the JS body `condition_js` (with a `return`) is truthy; fails with `message`."""
+    try:
+        WebDriverWait(driver, timeout, poll_frequency=0.1).until(lambda d: d.execute_script(condition_js))
+    except TimeoutException:
+        raise AssertionError(message) from None
+
+
 class BasePage:
     path = "/"
 

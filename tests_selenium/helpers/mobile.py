@@ -304,6 +304,20 @@ def visible_area(driver):
     return driver.execute_script("return window.__kvVisible()")
 
 
+def tap_at(driver, x, y):
+    """A one-finger tap at viewport point (x, y) (real touch events, via CDP)."""
+    driver.execute_cdp_cmd("Input.dispatchTouchEvent", {"type": "touchStart", "touchPoints": [{"x": x, "y": y}]})
+    driver.execute_cdp_cmd("Input.dispatchTouchEvent", {"type": "touchEnd", "touchPoints": []})
+
+
+def tap(driver, element, fx=0.5, fy=0.5):
+    """Taps `element` at a fraction of its box (0.5, 0.5 is the centre), after scrolling it into view."""
+    driver.execute_script("arguments[0].scrollIntoView({block: 'center'})", element)
+    _settle(driver)
+    box = rect(driver, element)
+    tap_at(driver, box["left"] + (box["right"] - box["left"]) * fx, box["top"] + (box["bottom"] - box["top"]) * fy)
+
+
 def swipe_down(driver, element, distance, steps=8):
     """A one-finger downward swipe starting near the top of `element` (real touch events, via CDP)."""
     x, y = driver.execute_script(

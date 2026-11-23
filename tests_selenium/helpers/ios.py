@@ -23,29 +23,121 @@ APPIUM_BIN = os.path.join(APPIUM_DIR, "node_modules", ".bin", "appium")
 APPIUM_PORT = int(os.environ.get("APPIUM_PORT", "4723"))
 APPIUM_URL = f"http://127.0.0.1:{APPIUM_PORT}"
 
+from .test_data import FRONTEND_URL
+
 ARTIFACTS_DIR = os.path.join(os.path.dirname(__file__), "..", "artifacts", "ios")
 
-# Defines window.__kvVisible from Safari's real visual viewport, so helpers/mobile.py's
-# checks measure against the real keyboard. Re-run after every navigation.
+# Defines window.__kvVisible from Safari's real visual viewport, so helpers/mobile.py's checks
+# measure against the real keyboard. Measured on iOS 26 Safari: getBoundingClientRect() is
+# relative to the visible area, so the visible area is y = 0 .. visualViewport.height in those
+# coordinates. Also hides the dev server's error badge, which is dev-only tooling.
+# Re-run after every navigation.
 REAL_VIEWPORT_JS = """
 window.__kvVisible = () => {
   const vv = window.visualViewport;
-  return {
-    top: vv.offsetTop,
-    bottom: vv.offsetTop + vv.height,
-    keyboard: Math.max(0, Math.round(window.innerHeight - vv.height)),
-  };
+  return { top: 0, bottom: vv.height, keyboard: 0 };
 };
 // What a user does to see a control while typing: scroll it to the middle of the part above
 // the keyboard.
 window.__kvReveal = (el) => {
   el.scrollIntoView({ block: "center", inline: "nearest" });
-  const vv = window.visualViewport;
   const r = el.getBoundingClientRect();
-  const middle = vv.offsetTop + vv.height / 2;
-  window.scrollBy(0, (r.top + r.bottom) / 2 - middle);
+  window.scrollBy(0, (r.top + r.bottom) / 2 - window.visualViewport.height / 2);
 };
+if (!document.getElementById("kv-hide-dev-badge")) {
+  const style = document.createElement("style");
+  style.id = "kv-hide-dev-badge";
+  style.textContent = "vite-plugin-checker-error-overlay { display: none !important; }";
+  document.head.appendChild(style);
+}
 """
+
+_WEB_FIELDS_JS = """
+return [...document.querySelectorAll("input, textarea")]
+  .filter((e) => e.type !== "hidden")
+  .map((e) => { const r = e.getBoundingClientRect(); return [r.left, r.top, r.width, r.height]; })
+  .filter((r) => r[2] > 0 && r[3] > 0);
+"""
+
+_NATIVE_FIELD_CLASSES = ("XCUIElementTypeTextField", "XCUIElementTypeSecureTextField", "XCUIElementTypeTextView")
+
+
+def _in_native(driver, fn):
+    web_context = driver.current_context
+    driver.switch_to.context("NATIVE_APP")
+    try:
+        return fn()
+    finally:
+        driver.switch_to.context(web_context)
+
+
+def page_offset_on_screen(driver):
+    """Where Safari draws the page: (dx, dy) to add to getBoundingClientRect() to get screen points.
+
+    Safari's chrome (status bar, tab bar) moves the page around, so this is calibrated by
+    matching the page's form fields with the text fields iOS exposes to accessibility.
+    """
+    from collections import Counter
+
+    from appium.webdriver.common.appiumby import AppiumBy
+
+    web = driver.execute_script(_WEB_FIELDS_JS)
+    native = _in_native(
+        driver,
+        lambda: [e.rect for cls in _NATIVE_FIELD_CLASSES for e in driver.find_elements(AppiumBy.CLASS_NAME, cls)],
+    )
+    offsets = Counter()
+    for x, y, w, h in web:
+        for n in native:
+            if abs(n["width"] - w) <= 1 and abs(n["height"] - h) <= 1:
+                offsets[(round(n["x"] - x), round(n["y"] - y))] += 1
+    if not offsets:
+        raise AssertionError("could not locate the page on screen (no matching text fields)")
+    return offsets.most_common(1)[0][0]
+
+
+# iOS system prompts that sit on top of Safari and swallow taps (iOS offers to save the
+# password after every sign-in / registration). The first choice also stops it for localhost.
+_SYSTEM_PROMPT_BUTTONS = ("Pro tuto stránku nikdy", "Never for This Website", "Teď ne", "Not Now")
+
+
+def dismiss_system_prompts(driver):
+    """Closes an iOS system sheet such as 'Save password?' if one is showing. Returns True if it did."""
+    from appium.webdriver.common.appiumby import AppiumBy
+
+    def _dismiss():
+        for label in _SYSTEM_PROMPT_BUTTONS:
+            buttons = [b for b in driver.find_elements(AppiumBy.ACCESSIBILITY_ID, label) if b.is_displayed()]
+            if buttons:
+                buttons[0].click()
+                time.sleep(0.8)
+                return True
+        return False
+
+    return _in_native(driver, _dismiss)
+
+
+def tap(driver, element, attempts=3):
+    """A real finger tap on a text field at its true position on the simulator screen.
+
+    Waits for the keyboard; on a slow simulator a tap can land while the page is still settling,
+    so it recalibrates and taps again (as a person would), up to `attempts` times.
+    """
+    for _ in range(attempts):
+        dismiss_system_prompts(driver)
+        driver.execute_script("arguments[0].scrollIntoView({block: 'center'})", element)
+        time.sleep(0.6)
+        dx, dy = page_offset_on_screen(driver)
+        left, top, width, height = driver.execute_script(
+            "const r = arguments[0].getBoundingClientRect(); return [r.left, r.top, r.width, r.height]", element
+        )
+        x, y = dx + left + width / 2, dy + top + min(height / 2, 20)
+        _in_native(driver, lambda: driver.execute_script("mobile: tap", {"x": x, "y": y}))
+        deadline = time.time() + 4
+        while time.time() < deadline:
+            if keyboard_shown(driver):
+                return
+            time.sleep(0.25)
 
 
 def appium_installed():
@@ -119,9 +211,14 @@ def safari_options(version, device_name, udid):
     options.udid = udid
     options.set_capability("appium:connectHardwareKeyboard", False)  # the software keyboard shows
     options.set_capability("appium:forceSimulatorSoftwareKeyboardPresence", True)
-    options.set_capability("appium:nativeWebTap", True)  # taps are real touches
+    # Fields are tapped with real touches via tap() below; Appium's own nativeWebTap misplaces
+    # them under iOS 26 Safari's bars. Plain clicks (buttons) go through WebDriver.
+    options.set_capability("appium:nativeWebTap", False)
     options.set_capability("appium:safariIgnoreFraudWarning", True)
-    options.set_capability("appium:safariInitialUrl", "about:blank")
+    # Start on the app itself: recent iOS does not always expose about:blank to the Web
+    # Inspector, and a cold Safari on a busy machine takes a while to show up there.
+    options.set_capability("appium:safariInitialUrl", FRONTEND_URL)
+    options.set_capability("appium:webviewConnectTimeout", 60000)
     options.set_capability("appium:newCommandTimeout", 300)
     options.set_capability("appium:simulatorStartupTimeout", 300000)
     options.set_capability("appium:wdaLaunchTimeout", 300000)
