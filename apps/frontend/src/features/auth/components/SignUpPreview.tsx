@@ -45,8 +45,8 @@ export function SignUpPreview({ username, variant }: SignUpPreviewProps) {
   }
 
   return (
-    <div className="flex flex-col items-center rounded-lg bg-card p-8 text-center">
-      {/* The mascot's bubble lives here, above the avatar and inside the card, so it covers nothing.
+    <div className="flex flex-col items-center p-8 text-center">
+      {/* The mascot's bubble lives here, above the avatar, so it covers nothing.
         The negative margin reaches into the empty margin round the blob: the drawing never fills
         its square, so without it the bubble would hang well clear of the face. */}
       <MascotBubbleSlot
