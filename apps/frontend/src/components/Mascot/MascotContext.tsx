@@ -98,8 +98,13 @@ export function MascotProvider({ children }: { children: ReactNode }) {
     setStageState(next)
   }, [])
 
+  // False once the provider is unmounted. React tears the provider down before the pages inside
+  // it, so their releases arrive after its cleanup: they must not start a timer nobody clears.
+  const isMounted = useRef(true)
+
   const releaseStage = useCallback<MascotContextValue["releaseStage"]>((released) => {
     clearTimeout(leaveTimers.current.get(released))
+    if (!isMounted.current) return
     const timer = setTimeout(() => {
       leaveTimers.current.delete(released)
       // Only the stage that was released may go. The page on the way out can be torn down after the
@@ -111,8 +116,14 @@ export function MascotProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
+    // Set here too: StrictMode runs this cleanup and then the effect again on a live provider.
+    isMounted.current = true
     const timers = leaveTimers.current
-    return () => timers.forEach((timer) => clearTimeout(timer))
+    return () => {
+      isMounted.current = false
+      timers.forEach((timer) => clearTimeout(timer))
+      timers.clear()
+    }
   }, [])
 
   const registerAnchor = useCallback((id: string, element: HTMLElement) => {

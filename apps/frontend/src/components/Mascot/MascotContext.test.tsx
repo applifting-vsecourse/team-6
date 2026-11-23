@@ -38,6 +38,20 @@ describe("Mascot context", () => {
   beforeEach(() => vi.useFakeTimers())
   afterEach(() => vi.useRealTimers())
 
+  it("leaves no timer behind when the whole app unmounts with a page on stage", () => {
+    // The provider unmounts before the page inside it, so the page's release comes after the
+    // provider's own cleanup. A timer started then would fire into a torn-down app.
+    const { unmount } = render(
+      <MascotProvider>
+        <Page anchorId="landing-cta" />
+      </MascotProvider>,
+    )
+
+    unmount()
+
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
   it("puts the mascot on the stage while a page is mounted", () => {
     const { unmount } = render(
       <MascotProvider>
