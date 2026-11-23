@@ -1,6 +1,7 @@
 import {
   betterAuthCoreConfig,
   resolveBetterAuthPlugins,
+  resolveRateLimitEnabled,
 } from './better-auth.config';
 
 describe('betterAuthCoreConfig', () => {
@@ -27,6 +28,37 @@ describe('betterAuthCoreConfig', () => {
       const devPlugins = resolveBetterAuthPlugins('development');
       expect(devPlugins.some((p) => p.id === 'open-api')).toBe(true);
       expect(devPlugins.some((p) => p.id === 'username')).toBe(true);
+    });
+  });
+
+  describe('resolveRateLimitEnabled', () => {
+    it('turns the limit off when DISABLE_RATE_LIMIT is set in development', () => {
+      expect(resolveRateLimitEnabled('development', true)).toBe(false);
+    });
+
+    it('turns the limit off when DISABLE_RATE_LIMIT is set in test', () => {
+      expect(resolveRateLimitEnabled('test', true)).toBe(false);
+    });
+
+    it('keeps the limit in production even with DISABLE_RATE_LIMIT set', () => {
+      expect(resolveRateLimitEnabled('production', true)).toBe(true);
+    });
+
+    it('keeps the limit in any other environment with DISABLE_RATE_LIMIT set, e.g. staging', () => {
+      expect(resolveRateLimitEnabled('staging', true)).toBe(true);
+      expect(resolveRateLimitEnabled('preview', true)).toBe(true);
+    });
+
+    it('keeps the limit when NODE_ENV is not set', () => {
+      expect(resolveRateLimitEnabled(undefined, true)).toBe(true);
+    });
+
+    it('keeps the limit when DISABLE_RATE_LIMIT is not set', () => {
+      expect(resolveRateLimitEnabled('development', false)).toBe(true);
+    });
+
+    it('never turns on a limit the core config switched off', () => {
+      expect(resolveRateLimitEnabled('production', false, false)).toBe(false);
     });
   });
 });

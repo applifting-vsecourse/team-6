@@ -6,6 +6,7 @@ import { PrismaService } from '@/core/prisma/prisma.service';
 import {
   betterAuthCoreConfig,
   resolveBetterAuthPlugins,
+  resolveRateLimitEnabled,
 } from '@/shared/auth/config/better-auth.config';
 import { codeOfConductDatabaseHooks } from '@/shared/auth/hooks/code-of-conduct.hook';
 import { Config } from '@/shared/config/config.service';
@@ -64,13 +65,11 @@ const createAuth = (
     ...betterAuthCoreConfig,
     rateLimit: {
       ...betterAuthCoreConfig.rateLimit,
-      // The Selenium suite (tests_selenium/) signs in far more often than the sign-in limit
-      // allows. Local opt-out only: production always keeps the limit.
-      enabled:
-        config.nodeEnv !== 'production' &&
-        process.env.DISABLE_RATE_LIMIT === 'true'
-          ? false
-          : (betterAuthCoreConfig.rateLimit?.enabled ?? true),
+      enabled: resolveRateLimitEnabled(
+        config.nodeEnv,
+        config.disableRateLimit,
+        betterAuthCoreConfig.rateLimit?.enabled,
+      ),
     },
     plugins: resolveBetterAuthPlugins(config.nodeEnv),
   });
