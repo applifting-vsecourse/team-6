@@ -7,6 +7,9 @@
 -- NOTE: this drops columns, which is not additive; it is deliberate, as keeping `userId` around
 -- would keep the link.
 
+-- One explicit transaction: without it a failure halfway leaves the tables half converted.
+BEGIN;
+
 ALTER TABLE "feed_snapshot" ADD COLUMN "subject" TEXT;
 ALTER TABLE "membership_log" ADD COLUMN "subject" TEXT;
 
@@ -32,3 +35,5 @@ ALTER TABLE "membership_log" DROP COLUMN "userId";
 
 CREATE INDEX "feed_snapshot_subject_id_idx" ON "feed_snapshot"("subject", "id");
 CREATE INDEX "membership_log_subject_idx" ON "membership_log"("subject");
+
+COMMIT;
