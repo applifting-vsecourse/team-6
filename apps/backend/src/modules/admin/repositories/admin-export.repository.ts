@@ -18,21 +18,34 @@ export class AdminExportRepository {
     private readonly config: Config,
   ) {}
 
+  /** The row's subject; rows from before #176 only have a user id, which hashes to the same value. */
+  private subjectOf(row: {
+    subject: string | null;
+    userId: string | null;
+  }): string | null {
+    if (row.subject) return row.subject;
+    return row.userId
+      ? matchingSubject(this.config.betterAuthSecret, row.userId)
+      : null;
+  }
+
   async feedSnapshots(): Promise<FeedSnapshotRow[]> {
     const rows = await this.prisma.feedSnapshot.findMany({
       orderBy: { id: 'asc' },
     });
-    return rows.map((row) => ({
+    return rows.map(({ userId: _userId, ...row }) => ({
       ...row,
+      subject: this.subjectOf({ subject: row.subject, userId: _userId }),
       items: row.items as FeedSnapshotRow['items'],
     }));
   }
 
-  memberships(): Promise<MembershipRow[]> {
-    return this.prisma.membershipLog.findMany({
+  async memberships(): Promise<MembershipRow[]> {
+    const rows = await this.prisma.membershipLog.findMany({
       orderBy: { id: 'asc' },
       select: {
         subject: true,
+        userId: true,
         kvintetId: true,
         source: true,
         joinedAt: true,
@@ -42,6 +55,10 @@ export class AdminExportRepository {
         score: true,
       },
     });
+    return rows.map(({ userId, ...row }) => ({
+      ...row,
+      subject: this.subjectOf({ subject: row.subject, userId }),
+    }));
   }
 
   kvintets(): Promise<KvintetLogRow[]> {
@@ -58,24 +75,31 @@ export class AdminExportRepository {
       onboardedAt: onboardingCompletedAt!,
     }));
     const subjects = users.map((user) => user.subject);
+    const userIds = profiles.map(({ userId }) => userId);
     const [stays, snapshots] = await Promise.all([
       this.prisma.membershipLog.findMany({
-        where: { subject: { in: subjects } },
-        select: { subject: true, joinedAt: true },
+        where: {
+          OR: [{ subject: { in: subjects } }, { userId: { in: userIds } }],
+        },
+        select: { subject: true, userId: true, joinedAt: true },
         orderBy: { joinedAt: 'asc' },
       }),
       this.prisma.feedSnapshot.findMany({
-        where: { subject: { in: subjects } },
-        select: { subject: true, items: true },
+        where: {
+          OR: [{ subject: { in: subjects } }, { userId: { in: userIds } }],
+        },
+        select: { subject: true, userId: true, items: true },
       }),
     ]);
     const firstJoined = new Map<string, Date>();
-    for (const { subject, joinedAt } of stays) {
+    for (const { joinedAt, ...ids } of stays) {
+      const subject = this.subjectOf(ids);
       if (subject && !firstJoined.has(subject))
         firstJoined.set(subject, joinedAt);
     }
     const scores = new Map<string, number[][]>();
-    for (const { subject, items } of snapshots) {
+    for (const { items, ...ids } of snapshots) {
+      const subject = this.subjectOf(ids);
       if (!subject) continue;
       const loads = scores.get(subject) ?? [];
       loads.push((items as FeedSnapshotRow['items']).map((item) => item.score));

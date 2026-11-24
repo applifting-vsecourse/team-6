@@ -106,7 +106,10 @@ export class KvintetRepository {
     private readonly config: Config,
   ) {}
 
-  /** Matching data is filed under this instead of the user id (story #176). */
+  /**
+   * New matching data is filed under this instead of the user id (story #176). Rows written
+   * before that still carry `userId`, so lookups match either until that column is dropped.
+   */
   private subjectOf(userId: string): string {
     return matchingSubject(this.config.betterAuthSecret, userId);
   }
@@ -199,7 +202,7 @@ export class KvintetRepository {
     const subject = this.subjectOf(userId);
     await this.prisma.$transaction(async (tx) => {
       const latest = await tx.feedSnapshot.findFirst({
-        where: { subject },
+        where: { OR: [{ subject }, { userId }] },
         orderBy: { id: 'desc' },
         select: { items: true },
       });
@@ -210,8 +213,8 @@ export class KvintetRepository {
 
       await tx.feedSnapshot.create({ data: { subject, fallback, items } });
       await tx.$executeRaw`
-        DELETE FROM "feed_snapshot" WHERE "subject" = ${subject} AND "id" NOT IN (
-          SELECT "id" FROM "feed_snapshot" WHERE "subject" = ${subject}
+        DELETE FROM "feed_snapshot" WHERE ("subject" = ${subject} OR "userId" = ${userId}) AND "id" NOT IN (
+          SELECT "id" FROM "feed_snapshot" WHERE "subject" = ${subject} OR "userId" = ${userId}
           ORDER BY "id" DESC LIMIT ${FEED_SNAPSHOTS_KEPT})`;
     });
   }
@@ -328,7 +331,7 @@ export class KvintetRepository {
       { id: number; items: FeedSnapshotItem[] }[]
     >`
       SELECT "id", "items" FROM "feed_snapshot"
-      WHERE "subject" = ${subject} AND "items" @> ${JSON.stringify([{ kvintetId }])}::jsonb
+      WHERE ("subject" = ${subject} OR "userId" = ${userId}) AND "items" @> ${JSON.stringify([{ kvintetId }])}::jsonb
       ORDER BY "id" DESC LIMIT 1`;
     const position = snapshot?.items.findIndex(
       (item) => item.kvintetId === kvintetId,
@@ -679,7 +682,11 @@ export class KvintetRepository {
     const remainingMembers = kvintet.members.filter((m) => m.userId !== userId);
     const now = new Date();
     await tx.membershipLog.updateMany({
-      where: { subject: this.subjectOf(userId), kvintetId, leftAt: null },
+      where: {
+        OR: [{ subject: this.subjectOf(userId) }, { userId }],
+        kvintetId,
+        leftAt: null,
+      },
       data: { leftAt: now },
     });
 

@@ -91,17 +91,23 @@ describe('KvintetRepository (Postgres)', () => {
     });
     const subjects = users.map(({ id }) => subjectOf(id));
     const logged = await prisma.membershipLog.findMany({
-      where: { subject: { in: subjects } },
+      where: {
+        OR: [{ subject: { in: subjects } }, { userId: { startsWith: prefix } }],
+      },
       select: { kvintetId: true },
     });
     await prisma.kvintetLog.deleteMany({
       where: { kvintetId: { in: logged.map((log) => log.kvintetId) } },
     });
     await prisma.membershipLog.deleteMany({
-      where: { subject: { in: subjects } },
+      where: {
+        OR: [{ subject: { in: subjects } }, { userId: { startsWith: prefix } }],
+      },
     });
     await prisma.feedSnapshot.deleteMany({
-      where: { subject: { in: subjects } },
+      where: {
+        OR: [{ subject: { in: subjects } }, { userId: { startsWith: prefix } }],
+      },
     });
     await prisma.kvintet.deleteMany({
       where: { title: { startsWith: prefix } },
@@ -642,24 +648,57 @@ describe('KvintetRepository (Postgres)', () => {
       expect(stay.leftAt).not.toBeNull();
     });
 
-    it('keeps no reference to the user in the matching tables, and the subject is not the user id', async () => {
-      const [user] = await createUsers(1, 'log-anon');
-      await repository.recordFeedSnapshot(user, false, [
-        { kvintetId: randomUUID(), score: 10 },
+    it('files new matching rows under the subject only, with no user id', async () => {
+      const [owner, joiner] = await createUsers(2, 'log-anon');
+      const kvintetId = await createKvintet([owner]);
+      await repository.recordFeedSnapshot(joiner, false, [
+        { kvintetId, score: 10 },
       ]);
-      const columns = await prisma.$queryRaw<{ column_name: string }[]>`
-        SELECT column_name FROM information_schema.columns
-        WHERE table_name IN ('feed_snapshot', 'membership_log', 'kvintet_log')`;
-      expect(columns.map((c) => c.column_name)).not.toContain('userId');
-      const foreignKeys = await prisma.$queryRaw<{ n: bigint }[]>`
-        SELECT count(*) AS n FROM information_schema.table_constraints
-        WHERE constraint_type = 'FOREIGN KEY' AND constraint_name IN
-          ('feed_snapshot_userId_fkey', 'membership_log_userId_fkey')`;
-      expect(Number(foreignKeys[0].n)).toBe(0);
+      await repository.join(joiner, kvintetId);
+
       const snapshot = await prisma.feedSnapshot.findFirstOrThrow({
-        where: { subject: subjectOf(user) },
+        where: { subject: subjectOf(joiner) },
       });
-      expect(JSON.stringify(snapshot)).not.toContain(user);
+      const stay = await prisma.membershipLog.findFirstOrThrow({
+        where: { subject: subjectOf(joiner) },
+      });
+      expect(snapshot.userId).toBeNull();
+      expect(stay.userId).toBeNull();
+      expect(JSON.stringify([snapshot, stay])).not.toContain(joiner);
+    });
+
+    it('still finds rows written before the subject existed (legacy userId only)', async () => {
+      const [owner, joiner] = await createUsers(2, 'log-legacy');
+      const kvintetId = await createKvintet([owner]);
+      await prisma.feedSnapshot.create({
+        data: {
+          userId: joiner,
+          fallback: false,
+          items: [{ kvintetId, score: 77 }],
+        },
+      });
+      const legacyStay = await prisma.membershipLog.create({
+        data: { userId: joiner, kvintetId, source: 'JOINED' },
+      });
+      await prisma.kvintetMember.create({
+        data: { kvintetId, userId: joiner },
+      });
+
+      await repository.leave(kvintetId, joiner);
+
+      // Leaving closes the legacy stay, and an unchanged feed adds no second snapshot.
+      const closed = await prisma.membershipLog.findUniqueOrThrow({
+        where: { id: legacyStay.id },
+      });
+      expect(closed.leftAt).not.toBeNull();
+      await repository.recordFeedSnapshot(joiner, false, [
+        { kvintetId, score: 77 },
+      ]);
+      expect(
+        await prisma.feedSnapshot.count({
+          where: { OR: [{ userId: joiner }, { subject: subjectOf(joiner) }] },
+        }),
+      ).toBe(1);
     });
 
     it('keeps one snapshot for an unchanged feed and only the newest fifty per user', async () => {
