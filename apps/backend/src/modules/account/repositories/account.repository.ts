@@ -38,7 +38,24 @@ export class AccountRepository {
         );
       }
 
-      // 3. Delete user row (cascades profile, sessions, accounts, and anonymises chat messages)
+      // 3. Remove what refers to the user without a foreign key (story #179). better-auth keeps
+      // pending verifications under the e-mail address (identifier) or the user id (value), so
+      // without this a deleted account would still be found by its address.
+      const { email } = await tx.user.findUniqueOrThrow({
+        where: { id: userId },
+        select: { email: true },
+      });
+      await tx.verification.deleteMany({
+        where: {
+          OR: [
+            { value: userId },
+            { identifier: { equals: email, mode: 'insensitive' } },
+          ],
+        },
+      });
+
+      // 4. Delete user row (cascades profile, sessions, accounts; chat messages and matching
+      // data lose their author and stay as anonymous history)
       await tx.user.delete({
         where: { id: userId },
       });

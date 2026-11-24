@@ -223,6 +223,84 @@ describe('Account integration against Postgres', () => {
     expect(updatedMsg!.body).toBe('Hello team');
   });
 
+  it('leaves nothing that finds the deleted user: no verification, no matching-data link, and the e-mail and username can be reused', async () => {
+    const userId = await createUser('traceless');
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+    });
+    const now = new Date();
+    await prisma.verification.createMany({
+      data: [
+        {
+          id: `ver-email-${userId}`,
+          identifier: user.email,
+          value: 'otp',
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+        {
+          id: `ver-reset-${userId}`,
+          identifier: `reset-password:${prefix}-token`,
+          value: userId,
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+        {
+          id: `ver-other-${prefix}`,
+          identifier: `someone-else-${prefix}@example.com`,
+          value: 'otp',
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+      ],
+    });
+    const snapshot = await prisma.feedSnapshot.create({
+      data: { userId, fallback: false, items: [] },
+    });
+    const stay = await prisma.membershipLog.create({
+      data: {
+        userId,
+        kvintetId: randomUUID(),
+        source: 'STARTED',
+        joinedAt: now,
+      },
+    });
+
+    await accountService.deleteAccount(userId);
+
+    const left = await prisma.verification.findMany({
+      where: { id: { in: [`ver-email-${userId}`, `ver-reset-${userId}`] } },
+    });
+    expect(left).toHaveLength(0);
+    // Someone else's verification is not touched.
+    await expect(
+      prisma.verification.findUnique({ where: { id: `ver-other-${prefix}` } }),
+    ).resolves.not.toBeNull();
+    // The logs stay, with no user to point at.
+    await expect(
+      prisma.feedSnapshot.findUniqueOrThrow({ where: { id: snapshot.id } }),
+    ).resolves.toMatchObject({ userId: null });
+    await expect(
+      prisma.membershipLog.findUniqueOrThrow({ where: { id: stay.id } }),
+    ).resolves.toMatchObject({ userId: null });
+
+    // The same e-mail address and username can sign up again as a new user.
+    await prisma.user.create({
+      data: {
+        id: `${prefix}-again`,
+        name: 'New person',
+        username: user.username,
+        email: user.email,
+        emailVerified: false,
+        createdAt: now,
+        updatedAt: now,
+      },
+    });
+    const again = await prisma.user.findMany({ where: { email: user.email } });
+    expect(again.map((u) => u.id)).toEqual([`${prefix}-again`]);
+
+    await prisma.membershipLog.delete({ where: { id: stay.id } });
+    await prisma.feedSnapshot.delete({ where: { id: snapshot.id } });
+    await prisma.verification.delete({ where: { id: `ver-other-${prefix}` } });
+  });
+
   it('throws NotFoundException when attempting to delete non-existent user', async () => {
     await expect(
       accountRepository.deleteAccount('non-existent-user-id'),
