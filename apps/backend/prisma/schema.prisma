@@ -91,8 +91,6 @@ model User {
   profile        Profile?
   kvintetMember  KvintetMember?
   messages       Message[]
-  feedSnapshots  FeedSnapshot[]
-  membershipLogs MembershipLog[]
 
   @@unique([email])
   @@unique([username])
@@ -282,21 +280,22 @@ model Message {
   @@map("message")
 }
 
-// Matching data (story #132). Pseudonymous: userId is nulled when the account is deleted, so the
-// rows stay as anonymous history. Never read by the app; only the admin CSV export reads them.
+// Matching data (story #132, anonymised by #176). These tables have no relation to `user`: `subject`
+// is HMAC-SHA256(secret, "matching:" + userId), computed in the app, so the database alone cannot
+// tie a row to an account, and rows outlive account deletion as anonymous history. Only the admin
+// CSV export reads them.
 
 // What a user's feed listed on one load, best first. `items` is [{ kvintetId, score }]; the score
 // is internal and never sent to a client.
 model FeedSnapshot {
   id          Int             @id @default(autoincrement())
-  userId      String?
-  user        User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  subject     String?
   createdAt   DateTime        @default(now())
   fallback    Boolean
   items       Json
   memberships MembershipLog[]
 
-  @@index([userId, id])
+  @@index([subject, id])
   @@map("feed_snapshot")
 }
 
@@ -312,8 +311,7 @@ enum MembershipSource {
 // null when they did not come from the feed.
 model MembershipLog {
   id         Int              @id @default(autoincrement())
-  userId     String?
-  user       User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  subject    String?
   kvintetId  String           @db.Uuid
   source     MembershipSource
   joinedAt   DateTime         @default(now())
@@ -324,7 +322,7 @@ model MembershipLog {
   listSize   Int?
   score      Float?
 
-  @@index([userId])
+  @@index([subject])
   @@index([kvintetId])
   @@map("membership_log")
 }

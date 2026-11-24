@@ -2,6 +2,7 @@ import { PrismaService } from '@/core/prisma/prisma.service';
 import { AccountRepository } from '@/modules/account/repositories/account.repository';
 import { AccountService } from '@/modules/account/services/account.service';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
+import { Config } from '@/shared/config/config.service';
 import { NotFoundException } from '@nestjs/common';
 import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
@@ -17,7 +18,9 @@ if (!['localhost', '127.0.0.1'].includes(databaseHost)) {
 describe('Account integration against Postgres', () => {
   const prefix = `it-acc-${randomUUID().slice(0, 8)}`;
   const prisma = new PrismaService();
-  const kvintetRepository = new KvintetRepository(prisma);
+  const kvintetRepository = new KvintetRepository(prisma, {
+    betterAuthSecret: 'integration-test-secret',
+  } as Config);
   const accountRepository = new AccountRepository(prisma, kvintetRepository);
   const accountService = new AccountService(accountRepository);
   let categoryId: number;
