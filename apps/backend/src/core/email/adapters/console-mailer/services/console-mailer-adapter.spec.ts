@@ -30,6 +30,7 @@ describe('ConsoleMailerAdapter', () => {
     expect(logSpy).toHaveBeenCalledTimes(1);
     const logged = logSpy.mock.calls[0][0];
     expect(logged).not.toContain('alice@example.com');
+    expect(logged).toContain('a***@example.com');
     expect(logged).toContain('token=secret12345');
     expect(logged).toContain('Verify your email address');
     expect(warnSpy).not.toHaveBeenCalled();

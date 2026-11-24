@@ -5,6 +5,16 @@ const EMAIL = /[^\s@<>()[\]"',;:]+@[^\s@<>()[\]"',;:]+\.[^\s@<>()[\]"',;:]+/g;
 
 export const REDACTED_EMAIL = '[redacted-email]';
 
+/**
+ * A placeholder that says roughly who an e-mail went to without being the address: `j***@example.com`.
+ * Enough to tell two sends apart in a log, not enough to find the person.
+ */
+export const maskEmail = (email: string): string => {
+  const at = email.lastIndexOf('@');
+  if (at < 1) return REDACTED_EMAIL;
+  return `${email[0]}***@${email.slice(at + 1)}`;
+};
+
 /** Replaces every e-mail address in the text. */
 export const redactEmails = (text: string): string =>
   text.replace(EMAIL, REDACTED_EMAIL);

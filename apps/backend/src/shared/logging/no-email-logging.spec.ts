@@ -26,7 +26,9 @@ describe('logging', () => {
         .filter(
           ({ line }) =>
             /(logger|console)\.\w+\(/i.test(line) &&
-            /\b(email|\bto\b\s*[,)}$])/i.test(line.replace(/redact\w*/gi, '')),
+            /\b(email|\bto\b\s*[,)}$])/i.test(
+              line.replace(/(redact|mask)\w*/gi, ''),
+            ),
         )
         .map(({ file, number }) => `${file.replace(root, 'src')}:${number}`),
     );

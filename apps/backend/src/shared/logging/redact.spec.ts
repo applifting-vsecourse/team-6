@@ -1,4 +1,9 @@
-import { redactedError, redactedLogLine, redactEmails } from './redact';
+import {
+  maskEmail,
+  redactedError,
+  redactedLogLine,
+  redactEmails,
+} from './redact';
 
 describe('redactEmails', () => {
   it('replaces addresses wherever they appear', () => {
@@ -11,6 +16,16 @@ describe('redactEmails', () => {
     expect(redactEmails('Resend delivery failed (429)')).toBe(
       'Resend delivery failed (429)',
     );
+  });
+});
+
+describe('maskEmail', () => {
+  it('keeps the first letter and the domain, and nothing else', () => {
+    expect(maskEmail('jan.novak@example.com')).toBe('j***@example.com');
+  });
+
+  it('does not echo something that is not an address', () => {
+    expect(maskEmail('not-an-email')).toBe('[redacted-email]');
   });
 });
 
