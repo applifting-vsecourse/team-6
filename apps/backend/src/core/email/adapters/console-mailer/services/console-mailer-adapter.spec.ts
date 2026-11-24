@@ -29,7 +29,7 @@ describe('ConsoleMailerAdapter', () => {
 
     expect(logSpy).toHaveBeenCalledTimes(1);
     const logged = logSpy.mock.calls[0][0];
-    expect(logged).toContain('alice@example.com');
+    expect(logged).not.toContain('alice@example.com');
     expect(logged).toContain('token=secret12345');
     expect(logged).toContain('Verify your email address');
     expect(warnSpy).not.toHaveBeenCalled();
@@ -48,7 +48,7 @@ describe('ConsoleMailerAdapter', () => {
     expect(logged).toContain('code=authCode9876');
   });
 
-  it('logs email body in production when no external mailer is configured so links remain recoverable', async () => {
+  it('logs the links in production when no external mailer is configured so they remain recoverable', async () => {
     process.env.NODE_ENV = 'production';
     await adapter.sendEmail(
       'secret.user@university.edu',
@@ -62,14 +62,14 @@ describe('ConsoleMailerAdapter', () => {
     );
     expect(logSpy).toHaveBeenCalledTimes(1);
     const logged = logSpy.mock.calls[0][0];
-    expect(logged).toContain('secret.user@university.edu');
+    expect(logged).not.toContain('secret.user@university.edu');
     expect(logged).toContain('token=abcdef');
   });
 
-  it('preserves full HTML content in production fallback', async () => {
+  it('never logs the recipient or the name from the body, in production too', async () => {
     process.env.NODE_ENV = 'production';
     const htmlContent =
-      '<div>Verification link: https://app.kvinted.cz/verify?token=xyz123</div>';
+      '<div>Hi Jana Nováková, verify: https://app.kvinted.cz/verify?token=xyz123</div>';
     await adapter.sendEmail(
       'john.doe@kvintet.cz',
       'Verify your email address',
@@ -78,8 +78,9 @@ describe('ConsoleMailerAdapter', () => {
 
     expect(logSpy).toHaveBeenCalledTimes(1);
     const logged = logSpy.mock.calls[0][0];
-    expect(logged).toContain('john.doe@kvintet.cz');
+    expect(logged).not.toContain('john.doe@kvintet.cz');
     expect(logged).toContain('Verify your email address');
     expect(logged).toContain('token=xyz123');
+    expect(logged).not.toContain('Jana Nováková');
   });
 });

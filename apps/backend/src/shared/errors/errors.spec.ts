@@ -110,4 +110,15 @@ describe('AllExceptionsFilter', () => {
       message: 'Internal server error',
     });
   });
+
+  it('logs unexpected errors without e-mail addresses', () => {
+    const error = jest.spyOn(Logger.prototype, 'error');
+    error.mockClear();
+
+    run(new Error('Recipient rejected: jan@example.com'));
+
+    const logged = String(error.mock.calls[0][0]);
+    expect(logged).toContain('Recipient rejected: [redacted-email]');
+    expect(logged).not.toContain('jan@example.com');
+  });
 });
