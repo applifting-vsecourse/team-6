@@ -701,6 +701,46 @@ describe('KvintetRepository (Postgres)', () => {
       ).toBe(1);
     });
 
+    it('trims legacy (userId) and new (subject) snapshots of one user as a single pool of fifty, oldest first', async () => {
+      const [user] = await createUsers(1, 'log-trim-mixed');
+      const legacyCount = 5;
+      const newCount = FEED_SNAPSHOTS_KEPT - 2;
+      const legacyIds: number[] = [];
+      for (let i = 0; i < legacyCount; i++) {
+        const legacy = await prisma.feedSnapshot.create({
+          data: {
+            userId: user,
+            fallback: false,
+            items: [{ kvintetId: randomUUID(), score: 10 }],
+          },
+        });
+        legacyIds.push(legacy.id);
+      }
+
+      for (let i = 0; i < newCount; i++) {
+        await repository.recordFeedSnapshot(user, false, [
+          { kvintetId: randomUUID(), score: 20 },
+        ]);
+      }
+
+      const kept = await prisma.feedSnapshot.findMany({
+        where: { OR: [{ userId: user }, { subject: subjectOf(user) }] },
+        orderBy: { id: 'asc' },
+        select: { id: true, userId: true, subject: true },
+      });
+      // 5 legacy + 48 new = 53 written, so the 3 oldest (all legacy) are gone.
+      expect(kept).toHaveLength(FEED_SNAPSHOTS_KEPT);
+      const keptLegacy = kept.filter((row) => row.userId === user);
+      expect(keptLegacy.map((row) => row.id)).toEqual(legacyIds.slice(-2));
+      expect(
+        kept.filter((row) => row.subject === subjectOf(user)),
+      ).toHaveLength(newCount);
+      // The kept rows are the newest overall: legacy ones come before every new one.
+      expect(kept.map((row) => row.id)).toEqual(
+        [...kept.map((row) => row.id)].sort((a, b) => a - b),
+      );
+    });
+
     it('keeps one snapshot for an unchanged feed and only the newest fifty per user', async () => {
       const [user] = await createUsers(1, 'log-feed');
       const ids = Array.from({ length: FEED_SNAPSHOTS_KEPT + 2 }, () =>
