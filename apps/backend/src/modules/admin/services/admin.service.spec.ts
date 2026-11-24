@@ -1,15 +1,13 @@
 import { ExportDataset } from '@/modules/admin/domain/admin-export';
 import { AdminExportRepository } from '@/modules/admin/repositories/admin-export.repository';
 import { AdminStatsRepository } from '@/modules/admin/repositories/admin-stats.repository';
-import { Config } from '@/shared/config/config.service';
 import { mock } from 'jest-mock-extended';
 import { AdminService } from './admin.service';
 
 describe('AdminService', () => {
   const repository = mock<AdminStatsRepository>();
   const exports = mock<AdminExportRepository>();
-  const config = { betterAuthSecret: 'secret' } as Config;
-  const service = new AdminService(repository, exports, config);
+  const service = new AdminService(repository, exports);
 
   it('splits forming kvintets into 1–2 and 3–4 members and counts from midnight UTC', async () => {
     repository.getCounts.mockResolvedValue({
@@ -32,10 +30,10 @@ describe('AdminService', () => {
   describe('exportCsv', () => {
     const at = (iso: string): Date => new Date(iso);
 
-    it('replaces the user id with the same token every time, and leaves anonymised rows empty', async () => {
+    it('writes a short token of the stored subject, the same every time, and leaves rows without one empty', async () => {
       exports.memberships.mockResolvedValue([
         {
-          userId: 'user-1',
+          subject: 'a1b2c3d4e5f6a7b8c9d0',
           kvintetId: 'k1',
           source: 'JOINED',
           joinedAt: at('2026-11-21T10:00:00Z'),
@@ -45,7 +43,7 @@ describe('AdminService', () => {
           score: 61.5,
         },
         {
-          userId: 'user-1',
+          subject: 'a1b2c3d4e5f6a7b8c9d0',
           kvintetId: 'k2',
           source: 'STARTED',
           joinedAt: at('2026-11-22T10:00:00Z'),
@@ -55,7 +53,7 @@ describe('AdminService', () => {
           score: null,
         },
         {
-          userId: null,
+          subject: null,
           kvintetId: 'k1',
           source: 'JOINED',
           joinedAt: at('2026-11-21T10:00:00Z'),
@@ -75,7 +73,7 @@ describe('AdminService', () => {
       );
       const token = first.split(';')[0];
       expect(token).toMatch(/^[0-9a-f]{12}$/);
-      expect(first).not.toContain('user-1');
+      expect(token).toBe('a1b2c3d4e5f6');
       expect(first).toBe(
         `${token};k1;JOINED;2026-11-21T10:00:00.000Z;2026-11-21T11:30:00.000Z;90;2;5;61.5`,
       );
@@ -87,7 +85,7 @@ describe('AdminService', () => {
       exports.feedSnapshots.mockResolvedValue([
         {
           id: 7,
-          userId: null,
+          subject: null,
           createdAt: at('2026-11-21T10:00:00Z'),
           fallback: true,
           items: [
@@ -141,19 +139,19 @@ describe('AdminService', () => {
     it('gives the time to the first join, or the best score for someone who never joined', async () => {
       exports.onboardedUsers.mockResolvedValue([
         {
-          userId: 'joined',
+          subject: 'joined',
           onboardedAt: at('2026-11-21T10:00:00Z'),
           firstJoinedAt: at('2026-11-21T10:20:00Z'),
           feedScores: [[50, 70], [65]],
         },
         {
-          userId: 'never',
+          subject: 'never',
           onboardedAt: at('2026-11-21T10:00:00Z'),
           firstJoinedAt: null,
           feedScores: [[20], [35, 10]],
         },
         {
-          userId: 'empty',
+          subject: 'empty',
           onboardedAt: at('2026-11-21T10:00:00Z'),
           firstJoinedAt: null,
           feedScores: [],

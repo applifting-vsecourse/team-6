@@ -8,7 +8,7 @@ export enum ExportDataset {
 
 export type FeedSnapshotRow = {
   id: number;
-  userId: string | null;
+  subject: string | null;
   createdAt: Date;
   fallback: boolean;
   /** `[{ kvintetId, score }]` in feed order. */
@@ -16,7 +16,7 @@ export type FeedSnapshotRow = {
 };
 
 export type MembershipRow = {
-  userId: string | null;
+  subject: string | null;
   kvintetId: string;
   source: string;
   joinedAt: Date;
@@ -34,7 +34,8 @@ export type KvintetLogRow = {
 };
 
 export type OnboardedUserRow = {
-  userId: string;
+  /** The user's matching subject; the account id never leaves the repository. */
+  subject: string;
   onboardedAt: Date;
   firstJoinedAt: Date | null;
   /** Every feed load still kept, each as its kvintets' scores. */

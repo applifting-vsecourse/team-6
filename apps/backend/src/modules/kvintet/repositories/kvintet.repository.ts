@@ -26,6 +26,8 @@ import {
   emptyMatchProfile,
   type MatchProfile,
 } from '@/modules/matching/matching';
+import { matchingSubject } from '@/modules/matching/subject';
+import { Config } from '@/shared/config/config.service';
 import {
   BadRequestException,
   ConflictException,
@@ -99,7 +101,18 @@ export interface LeaveOptions {
 
 @Injectable()
 export class KvintetRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: Config,
+  ) {}
+
+  /**
+   * New matching data is filed under this instead of the user id (story #176). Rows written
+   * before that still carry `userId`, so lookups match either until that column is dropped.
+   */
+  private subjectOf(userId: string): string {
+    return matchingSubject(this.config.betterAuthSecret, userId);
+  }
 
   async isMember(userId: string): Promise<boolean> {
     const member = await this.prisma.kvintetMember.findUnique({
@@ -186,9 +199,10 @@ export class KvintetRepository {
   ): Promise<void> {
     if (items.length === 0) return;
     const order = items.map((item) => item.kvintetId).join();
+    const subject = this.subjectOf(userId);
     await this.prisma.$transaction(async (tx) => {
       const latest = await tx.feedSnapshot.findFirst({
-        where: { userId },
+        where: { OR: [{ subject }, { userId }] },
         orderBy: { id: 'desc' },
         select: { items: true },
       });
@@ -197,10 +211,10 @@ export class KvintetRepository {
         .join();
       if (latestOrder === order) return;
 
-      await tx.feedSnapshot.create({ data: { userId, fallback, items } });
+      await tx.feedSnapshot.create({ data: { subject, fallback, items } });
       await tx.$executeRaw`
-        DELETE FROM "feed_snapshot" WHERE "userId" = ${userId} AND "id" NOT IN (
-          SELECT "id" FROM "feed_snapshot" WHERE "userId" = ${userId}
+        DELETE FROM "feed_snapshot" WHERE ("subject" = ${subject} OR "userId" = ${userId}) AND "id" NOT IN (
+          SELECT "id" FROM "feed_snapshot" WHERE "subject" = ${subject} OR "userId" = ${userId}
           ORDER BY "id" DESC LIMIT ${FEED_SNAPSHOTS_KEPT})`;
     });
   }
@@ -245,7 +259,11 @@ export class KvintetRepository {
           data: { kvintetId: kvintet.id, createdAt: kvintet.createdAt },
         });
         await tx.membershipLog.create({
-          data: { userId, kvintetId: kvintet.id, source: 'STARTED' },
+          data: {
+            subject: this.subjectOf(userId),
+            kvintetId: kvintet.id,
+            source: 'STARTED',
+          },
         });
         return { result: 'started' as const, id: kvintet.id };
       });
@@ -308,18 +326,19 @@ export class KvintetRepository {
     userId: string,
     kvintetId: string,
   ): Promise<void> {
+    const subject = this.subjectOf(userId);
     const [snapshot] = await tx.$queryRaw<
       { id: number; items: FeedSnapshotItem[] }[]
     >`
       SELECT "id", "items" FROM "feed_snapshot"
-      WHERE "userId" = ${userId} AND "items" @> ${JSON.stringify([{ kvintetId }])}::jsonb
+      WHERE ("subject" = ${subject} OR "userId" = ${userId}) AND "items" @> ${JSON.stringify([{ kvintetId }])}::jsonb
       ORDER BY "id" DESC LIMIT 1`;
     const position = snapshot?.items.findIndex(
       (item) => item.kvintetId === kvintetId,
     );
     await tx.membershipLog.create({
       data: {
-        userId,
+        subject,
         kvintetId,
         source: 'JOINED',
         ...(snapshot && {
@@ -663,7 +682,11 @@ export class KvintetRepository {
     const remainingMembers = kvintet.members.filter((m) => m.userId !== userId);
     const now = new Date();
     await tx.membershipLog.updateMany({
-      where: { userId, kvintetId, leftAt: null },
+      where: {
+        OR: [{ subject: this.subjectOf(userId) }, { userId }],
+        kvintetId,
+        leftAt: null,
+      },
       data: { leftAt: now },
     });
 

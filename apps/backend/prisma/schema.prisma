@@ -282,13 +282,18 @@ model Message {
   @@map("message")
 }
 
-// Matching data (story #132). Pseudonymous: userId is nulled when the account is deleted, so the
-// rows stay as anonymous history. Never read by the app; only the admin CSV export reads them.
+// Matching data (story #132, anonymised by #176). New rows carry `subject` =
+// HMAC-SHA256(secret, "matching:" + userId), computed in the app, so the database alone cannot tie
+// them to an account, and they outlive account deletion as anonymous history. `userId` is LEGACY:
+// only rows written before #176 have it (nulled when that account is deleted); nothing writes it
+// any more, and a later migration drops it once those rows have been backfilled or aged out.
+// Only the admin CSV export reads these tables.
 
 // What a user's feed listed on one load, best first. `items` is [{ kvintetId, score }]; the score
 // is internal and never sent to a client.
 model FeedSnapshot {
   id          Int             @id @default(autoincrement())
+  subject     String?
   userId      String?
   user        User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
   createdAt   DateTime        @default(now())
@@ -297,6 +302,7 @@ model FeedSnapshot {
   memberships MembershipLog[]
 
   @@index([userId, id])
+  @@index([subject, id])
   @@map("feed_snapshot")
 }
 
@@ -312,6 +318,7 @@ enum MembershipSource {
 // null when they did not come from the feed.
 model MembershipLog {
   id         Int              @id @default(autoincrement())
+  subject    String?
   userId     String?
   user       User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
   kvintetId  String           @db.Uuid
@@ -325,6 +332,7 @@ model MembershipLog {
   score      Float?
 
   @@index([userId])
+  @@index([subject])
   @@index([kvintetId])
   @@map("membership_log")
 }

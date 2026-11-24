@@ -3,6 +3,8 @@ import { KVINTET_STARTED } from '@/modules/chat/domain/message';
 import { FEED_SNAPSHOTS_KEPT } from '@/modules/kvintet/domain/kvintet';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
 import { emptyMatchProfile } from '@/modules/matching/matching';
+import { matchingSubject } from '@/modules/matching/subject';
+import { Config } from '@/shared/config/config.service';
 import { BadRequestException, ConflictException } from '@nestjs/common';
 import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
@@ -22,7 +24,11 @@ if (!['localhost', '127.0.0.1'].includes(databaseHost)) {
 describe('KvintetRepository (Postgres)', () => {
   const prefix = `it-${randomUUID().slice(0, 8)}`;
   const prisma = new PrismaService();
-  const repository = new KvintetRepository(prisma);
+  const secret = 'integration-test-secret';
+  const repository = new KvintetRepository(prisma, {
+    betterAuthSecret: secret,
+  } as Config);
+  const subjectOf = (userId: string): string => matchingSubject(secret, userId);
   let categoryId: number;
 
   const createUser = async (name: string): Promise<string> => {
@@ -79,18 +85,29 @@ describe('KvintetRepository (Postgres)', () => {
 
   afterAll(async () => {
     // The matching-data logs have no foreign key to kvintet, so remove them by hand.
+    const users = await prisma.user.findMany({
+      where: { id: { startsWith: prefix } },
+      select: { id: true },
+    });
+    const subjects = users.map(({ id }) => subjectOf(id));
     const logged = await prisma.membershipLog.findMany({
-      where: { userId: { startsWith: prefix } },
+      where: {
+        OR: [{ subject: { in: subjects } }, { userId: { startsWith: prefix } }],
+      },
       select: { kvintetId: true },
     });
     await prisma.kvintetLog.deleteMany({
       where: { kvintetId: { in: logged.map((log) => log.kvintetId) } },
     });
     await prisma.membershipLog.deleteMany({
-      where: { userId: { startsWith: prefix } },
+      where: {
+        OR: [{ subject: { in: subjects } }, { userId: { startsWith: prefix } }],
+      },
     });
     await prisma.feedSnapshot.deleteMany({
-      where: { userId: { startsWith: prefix } },
+      where: {
+        OR: [{ subject: { in: subjects } }, { userId: { startsWith: prefix } }],
+      },
     });
     await prisma.kvintet.deleteMany({
       where: { title: { startsWith: prefix } },
@@ -549,7 +566,9 @@ describe('KvintetRepository (Postgres)', () => {
 
       const [viaFeed, viaLink] = await Promise.all(
         [fromFeed, deepLink].map((userId) =>
-          prisma.membershipLog.findFirstOrThrow({ where: { userId } }),
+          prisma.membershipLog.findFirstOrThrow({
+            where: { subject: subjectOf(userId) },
+          }),
         ),
       );
       expect(viaFeed).toMatchObject({
@@ -582,7 +601,9 @@ describe('KvintetRepository (Postgres)', () => {
       await repository.join(joiner, kvintetId);
 
       await expect(
-        prisma.membershipLog.findFirstOrThrow({ where: { userId: starter } }),
+        prisma.membershipLog.findFirstOrThrow({
+          where: { subject: subjectOf(starter) },
+        }),
       ).resolves.toMatchObject({ kvintetId, source: 'STARTED' });
       await expect(
         prisma.kvintetLog.findUniqueOrThrow({ where: { kvintetId } }),
@@ -590,7 +611,7 @@ describe('KvintetRepository (Postgres)', () => {
 
       await repository.leave(kvintetId, joiner);
       const left = await prisma.membershipLog.findFirstOrThrow({
-        where: { userId: joiner },
+        where: { subject: subjectOf(joiner) },
       });
       expect(left.leftAt).not.toBeNull();
       await expect(
@@ -623,8 +644,101 @@ describe('KvintetRepository (Postgres)', () => {
       const stay = await prisma.membershipLog.findFirstOrThrow({
         where: { kvintetId, source: 'JOINED' },
       });
-      expect(stay.userId).toBeNull();
+      expect(stay.subject).toBe(subjectOf(last));
       expect(stay.leftAt).not.toBeNull();
+    });
+
+    it('files new matching rows under the subject only, with no user id', async () => {
+      const [owner, joiner] = await createUsers(2, 'log-anon');
+      const kvintetId = await createKvintet([owner]);
+      await repository.recordFeedSnapshot(joiner, false, [
+        { kvintetId, score: 10 },
+      ]);
+      await repository.join(joiner, kvintetId);
+
+      const snapshot = await prisma.feedSnapshot.findFirstOrThrow({
+        where: { subject: subjectOf(joiner) },
+      });
+      const stay = await prisma.membershipLog.findFirstOrThrow({
+        where: { subject: subjectOf(joiner) },
+      });
+      expect(snapshot.userId).toBeNull();
+      expect(stay.userId).toBeNull();
+      expect(JSON.stringify([snapshot, stay])).not.toContain(joiner);
+    });
+
+    it('still finds rows written before the subject existed (legacy userId only)', async () => {
+      const [owner, joiner] = await createUsers(2, 'log-legacy');
+      const kvintetId = await createKvintet([owner]);
+      await prisma.feedSnapshot.create({
+        data: {
+          userId: joiner,
+          fallback: false,
+          items: [{ kvintetId, score: 77 }],
+        },
+      });
+      const legacyStay = await prisma.membershipLog.create({
+        data: { userId: joiner, kvintetId, source: 'JOINED' },
+      });
+      await prisma.kvintetMember.create({
+        data: { kvintetId, userId: joiner },
+      });
+
+      await repository.leave(kvintetId, joiner);
+
+      // Leaving closes the legacy stay, and an unchanged feed adds no second snapshot.
+      const closed = await prisma.membershipLog.findUniqueOrThrow({
+        where: { id: legacyStay.id },
+      });
+      expect(closed.leftAt).not.toBeNull();
+      await repository.recordFeedSnapshot(joiner, false, [
+        { kvintetId, score: 77 },
+      ]);
+      expect(
+        await prisma.feedSnapshot.count({
+          where: { OR: [{ userId: joiner }, { subject: subjectOf(joiner) }] },
+        }),
+      ).toBe(1);
+    });
+
+    it('trims legacy (userId) and new (subject) snapshots of one user as a single pool of fifty, oldest first', async () => {
+      const [user] = await createUsers(1, 'log-trim-mixed');
+      const legacyCount = 5;
+      const newCount = FEED_SNAPSHOTS_KEPT - 2;
+      const legacyIds: number[] = [];
+      for (let i = 0; i < legacyCount; i++) {
+        const legacy = await prisma.feedSnapshot.create({
+          data: {
+            userId: user,
+            fallback: false,
+            items: [{ kvintetId: randomUUID(), score: 10 }],
+          },
+        });
+        legacyIds.push(legacy.id);
+      }
+
+      for (let i = 0; i < newCount; i++) {
+        await repository.recordFeedSnapshot(user, false, [
+          { kvintetId: randomUUID(), score: 20 },
+        ]);
+      }
+
+      const kept = await prisma.feedSnapshot.findMany({
+        where: { OR: [{ userId: user }, { subject: subjectOf(user) }] },
+        orderBy: { id: 'asc' },
+        select: { id: true, userId: true, subject: true },
+      });
+      // 5 legacy + 48 new = 53 written, so the 3 oldest (all legacy) are gone.
+      expect(kept).toHaveLength(FEED_SNAPSHOTS_KEPT);
+      const keptLegacy = kept.filter((row) => row.userId === user);
+      expect(keptLegacy.map((row) => row.id)).toEqual(legacyIds.slice(-2));
+      expect(
+        kept.filter((row) => row.subject === subjectOf(user)),
+      ).toHaveLength(newCount);
+      // The kept rows are the newest overall: legacy ones come before every new one.
+      expect(kept.map((row) => row.id)).toEqual(
+        [...kept.map((row) => row.id)].sort((a, b) => a - b),
+      );
     });
 
     it('keeps one snapshot for an unchanged feed and only the newest fifty per user', async () => {
@@ -640,9 +754,11 @@ describe('KvintetRepository (Postgres)', () => {
       await repository.recordFeedSnapshot(user, false, [
         { kvintetId: ids[0], score: 51 },
       ]);
-      expect(await prisma.feedSnapshot.count({ where: { userId: user } })).toBe(
-        1,
-      );
+      expect(
+        await prisma.feedSnapshot.count({
+          where: { subject: subjectOf(user) },
+        }),
+      ).toBe(1);
 
       for (const id of ids.slice(1)) {
         await repository.recordFeedSnapshot(user, true, [
@@ -650,9 +766,11 @@ describe('KvintetRepository (Postgres)', () => {
         ]);
       }
 
-      expect(await prisma.feedSnapshot.count({ where: { userId: user } })).toBe(
-        FEED_SNAPSHOTS_KEPT,
-      );
+      expect(
+        await prisma.feedSnapshot.count({
+          where: { subject: subjectOf(user) },
+        }),
+      ).toBe(FEED_SNAPSHOTS_KEPT);
     });
   });
 });

@@ -1,10 +1,9 @@
-import { createHmac } from 'crypto';
 import { ExportDataset } from '@/modules/admin/domain/admin-export';
 import { AdminStats } from '@/modules/admin/domain/admin-stats';
 import { toCsv } from '@/modules/admin/domain/csv';
 import { AdminExportRepository } from '@/modules/admin/repositories/admin-export.repository';
 import { AdminStatsRepository } from '@/modules/admin/repositories/admin-stats.repository';
-import { Config } from '@/shared/config/config.service';
+import { exportToken } from '@/modules/matching/subject';
 import { Injectable } from '@nestjs/common';
 
 // A forming kvintet can vote to start once it has this many members.
@@ -18,7 +17,6 @@ export class AdminService {
   constructor(
     private readonly repository: AdminStatsRepository,
     private readonly exports: AdminExportRepository,
-    private readonly config: Config,
   ) {}
 
   async getStats(): Promise<AdminStats> {
@@ -41,20 +39,6 @@ export class AdminService {
     };
   }
 
-  /**
-   * Stands in for the user id in an export: the same person always gets the same token, so their
-   * rows can be followed, but it cannot be traced to an account. Rows of deleted accounts have
-   * no user id and get an empty cell.
-   */
-  private pseudonym(userId: string | null): string | null {
-    return userId
-      ? createHmac('sha256', this.config.betterAuthSecret)
-          .update(`export:${userId}`)
-          .digest('hex')
-          .slice(0, 12)
-      : null;
-  }
-
   async exportCsv(dataset: ExportDataset): Promise<string> {
     switch (dataset) {
       case ExportDataset.Feed:
@@ -71,7 +55,7 @@ export class AdminService {
           (await this.exports.feedSnapshots()).flatMap((snapshot) =>
             snapshot.items.map((item, position) => [
               snapshot.id,
-              this.pseudonym(snapshot.userId),
+              exportToken(snapshot.subject),
               snapshot.createdAt,
               snapshot.fallback,
               position,
@@ -94,7 +78,7 @@ export class AdminService {
             'score',
           ],
           (await this.exports.memberships()).map((row) => [
-            this.pseudonym(row.userId),
+            exportToken(row.subject),
             row.kvintetId,
             row.source,
             row.joinedAt,
@@ -138,7 +122,7 @@ export class AdminService {
           (await this.exports.onboardedUsers()).map((row) => {
             const scores = row.feedScores.flat();
             return [
-              this.pseudonym(row.userId),
+              exportToken(row.subject),
               row.onboardedAt,
               row.firstJoinedAt,
               minutesBetween(row.onboardedAt, row.firstJoinedAt),
