@@ -21,6 +21,9 @@ describe('Account integration against Postgres', () => {
   const accountRepository = new AccountRepository(prisma, kvintetRepository);
   const accountService = new AccountService(accountRepository);
   let categoryId: number;
+  // Rows the traceless-deletion test leaves behind (they lose their user), removed in afterAll even
+  // when an assertion fails halfway.
+  const leftover = { snapshots: [] as number[], stays: [] as number[] };
   let tagId: number;
 
   const createUser = async (name: string): Promise<string> => {
@@ -49,6 +52,15 @@ describe('Account integration against Postgres', () => {
   });
 
   afterAll(async () => {
+    await prisma.membershipLog.deleteMany({
+      where: { id: { in: leftover.stays } },
+    });
+    await prisma.feedSnapshot.deleteMany({
+      where: { id: { in: leftover.snapshots } },
+    });
+    await prisma.verification.deleteMany({
+      where: { id: { contains: prefix } },
+    });
     await prisma.kvintet.deleteMany({
       where: { title: { startsWith: prefix } },
     });
@@ -244,6 +256,25 @@ describe('Account integration against Postgres', () => {
           expiresAt: new Date(Date.now() + 3600000),
         },
         {
+          id: `ver-otp-${userId}`,
+          identifier: `email-verification-otp-${user.email}`,
+          value: 'otp',
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+        {
+          id: `ver-colon-${userId}`,
+          identifier: `sign-in-otp:${user.email.toUpperCase()}`,
+          value: 'otp',
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+        {
+          // Contains the address as a suffix of a longer local part: someone else's.
+          id: `ver-lookalike-${prefix}`,
+          identifier: `x${user.email}`,
+          value: 'otp',
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+        {
           id: `ver-other-${prefix}`,
           identifier: `someone-else-${prefix}@example.com`,
           value: 'otp',
@@ -254,6 +285,7 @@ describe('Account integration against Postgres', () => {
     const snapshot = await prisma.feedSnapshot.create({
       data: { userId, fallback: false, items: [] },
     });
+    leftover.snapshots.push(snapshot.id);
     const stay = await prisma.membershipLog.create({
       data: {
         userId,
@@ -262,17 +294,31 @@ describe('Account integration against Postgres', () => {
         joinedAt: now,
       },
     });
+    leftover.stays.push(stay.id);
 
     await accountService.deleteAccount(userId);
 
     const left = await prisma.verification.findMany({
-      where: { id: { in: [`ver-email-${userId}`, `ver-reset-${userId}`] } },
+      where: {
+        id: {
+          in: [
+            `ver-email-${userId}`,
+            `ver-reset-${userId}`,
+            `ver-otp-${userId}`,
+            `ver-colon-${userId}`,
+          ],
+        },
+      },
     });
     expect(left).toHaveLength(0);
-    // Someone else's verification is not touched.
+    // Someone else's verifications, including a lookalike address, are not touched.
     await expect(
-      prisma.verification.findUnique({ where: { id: `ver-other-${prefix}` } }),
-    ).resolves.not.toBeNull();
+      prisma.verification.count({
+        where: {
+          id: { in: [`ver-other-${prefix}`, `ver-lookalike-${prefix}`] },
+        },
+      }),
+    ).resolves.toBe(2);
     // The logs stay, with no user to point at.
     await expect(
       prisma.feedSnapshot.findUniqueOrThrow({ where: { id: snapshot.id } }),
@@ -295,10 +341,6 @@ describe('Account integration against Postgres', () => {
     });
     const again = await prisma.user.findMany({ where: { email: user.email } });
     expect(again.map((u) => u.id)).toEqual([`${prefix}-again`]);
-
-    await prisma.membershipLog.delete({ where: { id: stay.id } });
-    await prisma.feedSnapshot.delete({ where: { id: snapshot.id } });
-    await prisma.verification.delete({ where: { id: `ver-other-${prefix}` } });
   });
 
   it('throws NotFoundException when attempting to delete non-existent user', async () => {

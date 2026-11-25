@@ -50,6 +50,10 @@ export class AccountRepository {
           OR: [
             { value: userId },
             { identifier: { equals: email, mode: 'insensitive' } },
+            // Plugins store a prefixed form (e.g. `email-verification-otp-<email>`). Only a delimiter
+            // plus the whole address matches, so `a@x.cz` never matches `ba@x.cz`.
+            { identifier: { endsWith: `-${email}`, mode: 'insensitive' } },
+            { identifier: { endsWith: `:${email}`, mode: 'insensitive' } },
           ],
         },
       });
