@@ -1,7 +1,11 @@
 // Story #177: e-mail addresses never reach the logs, which are shared across the course.
 // Everything that logs an error or a third-party message goes through here.
 
-const EMAIL = /[^\s@<>()[\]"',;:]+@[^\s@<>()[\]"',;:]+\.[^\s@<>()[\]"',;:]+/g;
+// A real address: word characters in the local part, a dotted domain ending in a letters-only TLD.
+// Deliberately not "anything around an @": stack traces contain package paths such as
+// `@prisma+client@7.9.1_@types+react/node_modules/...` that would otherwise be mangled.
+const EMAIL =
+  /[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}(?![A-Za-z0-9-])/g;
 
 export const REDACTED_EMAIL = '[redacted-email]';
 

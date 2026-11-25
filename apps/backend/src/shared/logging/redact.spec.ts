@@ -12,6 +12,19 @@ describe('redactEmails', () => {
     ).toBe('To: [redacted-email], cc <[redacted-email]>; "[redacted-email]"');
   });
 
+  it('leaves package paths and versions in stack traces alone', () => {
+    const stack =
+      'at async file:///x/node_modules/.pnpm/@prisma+client@7.9.1_@types+react@19.2.18/node_modules/better-auth/dist/a.mjs:221:12 ' +
+      'at internalHandler (better-call@4.6.7/node_modules/better-call/src/endpoint.ts:648:20)';
+    expect(redactEmails(stack)).toBe(stack);
+  });
+
+  it('still redacts an address next to a path or a version', () => {
+    expect(
+      redactEmails('failed for jan@example.com in better-call@4.6.7/x.ts'),
+    ).toBe('failed for [redacted-email] in better-call@4.6.7/x.ts');
+  });
+
   it('leaves text without an address alone', () => {
     expect(redactEmails('Resend delivery failed (429)')).toBe(
       'Resend delivery failed (429)',
