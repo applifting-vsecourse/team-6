@@ -1,85 +1,38 @@
 import { ConsoleMailerAdapter } from './console-mailer-adapter';
 
 describe('ConsoleMailerAdapter', () => {
-  let adapter: ConsoleMailerAdapter;
-  let logSpy: jest.SpyInstance;
-  let warnSpy: jest.SpyInstance;
-  const originalEnv = process.env.NODE_ENV;
+  afterEach(() => jest.restoreAllMocks());
 
-  beforeEach(() => {
-    adapter = new ConsoleMailerAdapter();
+  it('logs nothing about the e-mail: no recipient, subject, name or link', async () => {
+    const adapter = new ConsoleMailerAdapter();
     // @ts-expect-error accessing private logger
-    logSpy = jest.spyOn(adapter.logger, 'log').mockImplementation();
-    // @ts-expect-error accessing private logger
-    warnSpy = jest.spyOn(adapter.logger, 'warn').mockImplementation();
-  });
+    const logger = adapter.logger as { log: jest.Mock; warn: jest.Mock };
+    const log = jest.spyOn(logger, 'log').mockImplementation();
+    const warn = jest.spyOn(logger, 'warn').mockImplementation();
 
-  afterEach(() => {
-    process.env.NODE_ENV = originalEnv;
-    jest.restoreAllMocks();
-  });
-
-  it('logs verification links and tokens in development so developers can complete flows', async () => {
-    process.env.NODE_ENV = 'development';
-    await adapter.sendEmail(
-      'alice@example.com',
-      'Verify your email address',
-      '<p>Click <a href="https://example.com/verify?token=secret12345">here</a></p>',
+    await (
+      adapter.sendEmail as (
+        to: string,
+        subject: string,
+        html: string,
+      ) => Promise<void>
+    ).call(
+      adapter,
+      'jan@example.com',
+      'Password reset',
+      '<p>Hi Jan Novák</p><a href="https://kvintet.test/reset?token=abc">Reset</a>',
     );
 
-    expect(logSpy).toHaveBeenCalledTimes(1);
-    const logged = logSpy.mock.calls[0][0];
-    expect(logged).toContain('alice@example.com');
-    expect(logged).toContain('token=secret12345');
-    expect(logged).toContain('Verify your email address');
-    expect(warnSpy).not.toHaveBeenCalled();
-  });
-
-  it('logs verification code query parameters in development terminal output', async () => {
-    process.env.NODE_ENV = 'development';
-    await adapter.sendEmail(
-      'bob@example.com',
-      'Verify code',
-      '<p>Code link: https://example.com/verify?code=authCode9876</p>',
-    );
-
-    expect(logSpy).toHaveBeenCalledTimes(1);
-    const logged = logSpy.mock.calls[0][0];
-    expect(logged).toContain('code=authCode9876');
-  });
-
-  it('logs email body in production when no external mailer is configured so links remain recoverable', async () => {
-    process.env.NODE_ENV = 'production';
-    await adapter.sendEmail(
-      'secret.user@university.edu',
-      'Verify email',
-      'Sensitive verification link: https://example.com/verify?token=abcdef',
-    );
-
-    expect(warnSpy).toHaveBeenCalledTimes(1);
-    expect(warnSpy.mock.calls[0][0]).toContain(
-      'No external email transport configured in production',
-    );
-    expect(logSpy).toHaveBeenCalledTimes(1);
-    const logged = logSpy.mock.calls[0][0];
-    expect(logged).toContain('secret.user@university.edu');
-    expect(logged).toContain('token=abcdef');
-  });
-
-  it('preserves full HTML content in production fallback', async () => {
-    process.env.NODE_ENV = 'production';
-    const htmlContent =
-      '<div>Verification link: https://app.kvinted.cz/verify?token=xyz123</div>';
-    await adapter.sendEmail(
-      'john.doe@kvintet.cz',
-      'Verify your email address',
-      htmlContent,
-    );
-
-    expect(logSpy).toHaveBeenCalledTimes(1);
-    const logged = logSpy.mock.calls[0][0];
-    expect(logged).toContain('john.doe@kvintet.cz');
-    expect(logged).toContain('Verify your email address');
-    expect(logged).toContain('token=xyz123');
+    expect(log).not.toHaveBeenCalled();
+    const output = warn.mock.calls.map((call) => String(call[0])).join('\n');
+    expect(output).toContain('not sent');
+    for (const secret of [
+      'jan@example.com',
+      'Password reset',
+      'Jan Novák',
+      'token=abc',
+    ]) {
+      expect(output).not.toContain(secret);
+    }
   });
 });

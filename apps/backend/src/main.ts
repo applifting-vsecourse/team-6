@@ -1,3 +1,4 @@
+import { redactedError } from '@/shared/logging/redact';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { toNodeHandler } from 'better-auth/node';
@@ -91,4 +92,6 @@ async function main(): Promise<void> {
 }
 
 // Execute the main function
-main().catch((error) => console.error('Application error:', error));
+main().catch((error) =>
+  console.error('Application error:', redactedError(error)),
+);

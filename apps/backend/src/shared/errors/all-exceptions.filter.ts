@@ -1,3 +1,4 @@
+import { redactedError } from '@/shared/logging/redact';
 import {
   ArgumentsHost,
   Catch,
@@ -57,7 +58,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       });
     }
 
-    this.logger.error(exception);
+    this.logger.error(redactedError(exception));
     return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       code: 'internal_error',

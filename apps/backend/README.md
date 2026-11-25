@@ -159,7 +159,8 @@ Keep in mind that there are 2 better auth configurations, one in the src/shared/
 Emails are sent via [Resend](https://resend.com). Templates are authored as React components using [react-email](https://react.email) and live in `src/core/email/templates/`.
 
 - `ResendAdapter` is used automatically when `RESEND_API_KEY` is set.
-- If `RESEND_API_KEY` is empty (the default in `.env.example`), the `ConsoleMailerAdapter` logs emails to stdout — handy for local dev.
+- SMTP (`SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD`) is used when Resend is not configured.
+- If neither is set (the default in `.env.example`), the `ConsoleMailerAdapter` **drops the e-mail** and logs only a warning that no transport is configured. It does not print the recipient, subject, body or links, because the logs must not hold e-mail addresses or live tokens. So locally you will **not** see a verification link in the console. Sign-in does not require a verified e-mail, so you can still use the app; a way to read local e-mails (a dev mailbox) is tracked in #180.
 - The `from` address comes from `EMAIL_FROM`.
 
 #### Authoring templates

@@ -10,6 +10,7 @@ import {
 } from '@/shared/auth/config/better-auth.config';
 import { codeOfConductDatabaseHooks } from '@/shared/auth/hooks/code-of-conduct.hook';
 import { Config } from '@/shared/config/config.service';
+import { redactingAuthLog } from '@/shared/logging/redact';
 import { Inject, Provider } from '@nestjs/common';
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
@@ -50,6 +51,8 @@ const createAuth = (
     },
     databaseHooks: codeOfConductDatabaseHooks,
     trustedOrigins: [config.frontendUrl],
+    // better-auth logs failed sign-ups and sends with the user's input; keep e-mails out (#177).
+    logger: { log: redactingAuthLog },
     emailVerification: {
       sendVerificationEmail: async ({ user, url }) => {
         const html = await renderEmail(VerifyEmail, { url });

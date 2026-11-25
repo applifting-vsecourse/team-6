@@ -1,5 +1,6 @@
 import { ResendConfig } from '@/core/email/adapters/resend/interfaces/resend-config.interface';
 import { EmailService } from '@/core/email/interfaces/email-service.interface';
+import { maskEmail, redactEmails } from '@/shared/logging/redact';
 import { Injectable, Logger } from '@nestjs/common';
 import { Resend } from 'resend';
 
@@ -21,8 +22,12 @@ export class ResendAdapter implements EmailService {
     });
 
     if (error) {
-      this.logger.error(`Resend delivery failed: ${error.message}`, error);
-      throw new Error(`Resend delivery failed: ${error.message}`);
+      // The provider's message can quote the recipient, so redact it before it is logged or thrown.
+      const reason = redactEmails(error.message);
+      this.logger.error(
+        `Resend delivery failed for ${maskEmail(to)}: ${error.name}: ${reason}`,
+      );
+      throw new Error(`Resend delivery failed: ${reason}`);
     }
   }
 }
