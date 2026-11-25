@@ -43,3 +43,15 @@ export const redactedLogLine = (message: string, args: unknown[]): string =>
       .map((part) => (typeof part === 'string' ? part : redactedError(part)))
       .join(' '),
   );
+
+/** better-auth's `logger.log`: writes each line to the console with e-mail addresses redacted. */
+export const redactingAuthLog = (
+  level: string,
+  message: string,
+  ...args: unknown[]
+): void => {
+  const line = redactedLogLine(message, args);
+  if (level === 'error') console.error(line);
+  else if (level === 'warn') console.warn(line);
+  else console.log(line);
+};

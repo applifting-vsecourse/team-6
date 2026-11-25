@@ -3,6 +3,7 @@ import {
   redactedError,
   redactedLogLine,
   redactEmails,
+  redactingAuthLog,
 } from './redact';
 
 describe('redactEmails', () => {
@@ -71,4 +72,29 @@ describe('redactedLogLine', () => {
     expect(line).not.toContain('jan@example.com');
     expect(line).toContain('Failed for [redacted-email]');
   });
+});
+
+describe('redactingAuthLog (what better-auth logs through)', () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  it.each([
+    ['error', 'error'],
+    ['warn', 'warn'],
+    ['info', 'log'],
+    ['debug', 'log'],
+  ] as const)(
+    'writes a %s line with console.%s and no e-mail address',
+    (level, method) => {
+      const write = jest.spyOn(console, method).mockImplementation();
+
+      redactingAuthLog(level, 'Sign-up failed for jan@example.com', {
+        email: 'jan@example.com',
+      });
+
+      expect(write).toHaveBeenCalledTimes(1);
+      const line = String(write.mock.calls[0][0]);
+      expect(line).toContain('Sign-up failed for [redacted-email]');
+      expect(line).not.toContain('jan@example.com');
+    },
+  );
 });
