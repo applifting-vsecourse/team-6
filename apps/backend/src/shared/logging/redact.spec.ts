@@ -26,6 +26,18 @@ describe('redactEmails', () => {
     ).toBe('failed for [redacted-email] in better-call@4.6.7/x.ts');
   });
 
+  it('redacts addresses with special characters and non-ASCII letters in full', () => {
+    expect(redactEmails("o'brien@example.com")).toBe('[redacted-email]');
+    expect(redactEmails('a!b#c$d&e*f/g=h?i^j`k{l|m}n~o@example.com')).toBe(
+      '[redacted-email]',
+    );
+    expect(redactEmails('jürgen@bücher.de wrote')).toBe(
+      '[redacted-email] wrote',
+    );
+    expect(redactEmails('novák@příklad.cz')).toBe('[redacted-email]');
+    expect(redactEmails('jan@xn--bcher-kva.de')).toBe('[redacted-email]');
+  });
+
   it('leaves text without an address alone', () => {
     expect(redactEmails('Resend delivery failed (429)')).toBe(
       'Resend delivery failed (429)',

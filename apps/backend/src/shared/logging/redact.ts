@@ -1,11 +1,13 @@
 // Story #177: e-mail addresses never reach the logs, which are shared across the course.
 // Everything that logs an error or a third-party message goes through here.
 
-// A real address: word characters in the local part, a dotted domain ending in a letters-only TLD.
-// Deliberately not "anything around an @": stack traces contain package paths such as
-// `@prisma+client@7.9.1_@types+react/node_modules/...` that would otherwise be mangled.
+// A real address: RFC 5322 "atext" characters in the local part (so `o'brien@` and `a+b@` match in
+// full), Unicode letters allowed (IDN domains, `jürgen@bücher.de`), and a dotted domain ending in a
+// letters-only TLD. Deliberately not "anything around an @": stack traces contain package paths such
+// as `@prisma+client@7.9.1_@types+react/node_modules/...` whose "domain" is a version number, which
+// has no letters-only TLD and so is left alone.
 const EMAIL =
-  /[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}(?![A-Za-z0-9-])/g;
+  /[\p{L}\p{N}\p{M}._%+\-'!#$&*/=?^`{|}~]+@(?:[\p{L}\p{N}\p{M}-]+\.)+\p{L}{2,}(?![\p{L}\p{N}\p{M}-])/gu;
 
 export const REDACTED_EMAIL = '[redacted-email]';
 
