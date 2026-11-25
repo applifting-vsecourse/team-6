@@ -12,6 +12,7 @@ describe('ProfileRepository', () => {
   let prisma: {
     profile: {
       findUnique: jest.Mock;
+      updateMany: jest.Mock;
     };
     $transaction: jest.Mock;
   };
@@ -45,6 +46,7 @@ describe('ProfileRepository', () => {
     prisma = {
       profile: {
         findUnique: jest.fn(),
+        updateMany: jest.fn(),
       },
       $transaction: jest.fn().mockImplementation(async (cb) => cb(txMock)),
     };
@@ -84,6 +86,7 @@ describe('ProfileRepository', () => {
         evenings: false,
         cityId: 'c1',
         city: { id: 'c1', name: 'Praha' },
+        tourCompletedAt: new Date('2026-11-10T12:00:00Z'),
         radiusKm: 25,
         note: 'Note',
         onboardingCompletedAt: new Date('2026-10-21T10:00:00Z'),
@@ -119,6 +122,7 @@ describe('ProfileRepository', () => {
       expect(result?.expectations).toEqual(['learn_new', 'meet_people']);
       expect(result?.meetingFrequency).toBe(MeetingFrequency.WEEKLY);
       expect(result?.cityName).toBe('Praha');
+      expect(result?.tourCompletedAt).toBe(dbProfile.tourCompletedAt);
       expect(result?.tags).toHaveLength(3);
       expect(result?.tags[0]).toEqual({
         tagId: '1',
@@ -625,6 +629,50 @@ describe('ProfileRepository', () => {
           }),
         }),
       );
+    });
+  });
+
+  describe('markTourCompleted', () => {
+    const dbProfile = {
+      userId: 'u1',
+      position: null,
+      roles: [],
+      expectations: null,
+      meetingFrequency: null,
+      weekdays: false,
+      weekends: false,
+      mornings: false,
+      afternoons: false,
+      evenings: false,
+      cityId: null,
+      city: null,
+      radiusKm: null,
+      note: null,
+      onboardingCompletedAt: null,
+      tourCompletedAt: new Date('2026-11-10T12:00:00Z'),
+      latitude: null,
+      longitude: null,
+      tags: [],
+    };
+
+    it('sets the mark only where it is still empty and returns the profile', async (): Promise<void> => {
+      prisma.profile.updateMany.mockResolvedValue({ count: 1 });
+      prisma.profile.findUnique.mockResolvedValue(dbProfile);
+
+      const result = await repository.markTourCompleted('u1');
+
+      expect(prisma.profile.updateMany).toHaveBeenCalledWith({
+        where: { userId: 'u1', tourCompletedAt: null },
+        data: { tourCompletedAt: expect.any(Date) },
+      });
+      expect(result?.tourCompletedAt).toBe(dbProfile.tourCompletedAt);
+    });
+
+    it('returns null when the profile does not exist', async (): Promise<void> => {
+      prisma.profile.updateMany.mockResolvedValue({ count: 0 });
+      prisma.profile.findUnique.mockResolvedValue(null);
+
+      await expect(repository.markTourCompleted('u1')).resolves.toBeNull();
     });
   });
 });

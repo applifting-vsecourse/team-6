@@ -11,3 +11,11 @@ export function useSlugLabel() {
   return (group: "categories" | "tags" | "roles", slug: string) =>
     (t as unknown as Translate)(`${group}.${slug}`, { defaultValue: slug })
 }
+
+/** A person's role is one slug or several joined by ", "; each becomes its label. */
+export function roleLabel(role: string, label: ReturnType<typeof useSlugLabel>) {
+  return role
+    .split(", ")
+    .map((slug) => label("roles", slug))
+    .join(", ")
+}

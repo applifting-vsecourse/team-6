@@ -88,9 +88,11 @@ model User {
   username        String? @db.VarChar(50)
   displayUsername String? @db.VarChar(50)
 
-  profile       Profile?
-  kvintetMember KvintetMember?
-  messages      Message[]
+  profile        Profile?
+  kvintetMember  KvintetMember?
+  messages       Message[]
+  feedSnapshots  FeedSnapshot[]
+  membershipLogs MembershipLog[]
 
   @@unique([email])
   @@unique([username])
@@ -135,7 +137,6 @@ model Category {
   id                Int               @id @default(autoincrement())
   slug              String            @unique
   sortOrder         Int
-  kvintets          Kvintet[]
   tags              TagCategory[]
   kvintetCategories KvintetCategory[]
 
@@ -194,6 +195,7 @@ model Profile {
   radiusKm              Int?
   note                  String?           @db.Text
   onboardingCompletedAt DateTime?
+  tourCompletedAt       DateTime?
   createdAt             DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
   tags                  ProfileTag[]
@@ -206,10 +208,7 @@ model Kvintet {
   id          String            @id @default(uuid()) @db.Uuid
   status      KvintetStatus     @default(FORMING)
   title       String
-  description String?
-  // Deprecated: holds the first of `categories`. Kept until a later deploy drops it (additive migrations only).
-  categoryId  Int
-  category    Category          @relation(fields: [categoryId], references: [id])
+  description String
   categories  KvintetCategory[]
   createdAt   DateTime          @default(now())
   activatedAt DateTime?
@@ -281,4 +280,61 @@ model Message {
 
   @@index([kvintetId, id])
   @@map("message")
+}
+
+// Matching data (story #132). Pseudonymous: userId is nulled when the account is deleted, so the
+// rows stay as anonymous history. Never read by the app; only the admin CSV export reads them.
+
+// What a user's feed listed on one load, best first. `items` is [{ kvintetId, score }]; the score
+// is internal and never sent to a client.
+model FeedSnapshot {
+  id          Int             @id @default(autoincrement())
+  userId      String?
+  user        User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt   DateTime        @default(now())
+  fallback    Boolean
+  items       Json
+  memberships MembershipLog[]
+
+  @@index([userId, id])
+  @@map("feed_snapshot")
+}
+
+enum MembershipSource {
+  STARTED
+  JOINED
+
+  @@map("membership_source")
+}
+
+// One stay in a kvintet. kvintetId has no foreign key: the kvintet is deleted when it empties.
+// position (0-based), listSize and score are copied from the feed snapshot the user joined from;
+// null when they did not come from the feed.
+model MembershipLog {
+  id         Int              @id @default(autoincrement())
+  userId     String?
+  user       User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  kvintetId  String           @db.Uuid
+  source     MembershipSource
+  joinedAt   DateTime         @default(now())
+  leftAt     DateTime?
+  snapshotId Int?
+  snapshot   FeedSnapshot?    @relation(fields: [snapshotId], references: [id], onDelete: SetNull)
+  position   Int?
+  listSize   Int?
+  score      Float?
+
+  @@index([userId])
+  @@index([kvintetId])
+  @@map("membership_log")
+}
+
+// How long a kvintet was listed: created, started (ACTIVE) or disbanded (emptied and deleted).
+model KvintetLog {
+  kvintetId   String    @id @db.Uuid
+  createdAt   DateTime
+  activatedAt DateTime?
+  endedAt     DateTime?
+
+  @@map("kvintet_log")
 }

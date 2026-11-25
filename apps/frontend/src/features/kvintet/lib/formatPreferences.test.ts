@@ -24,7 +24,7 @@ describe("formatSharedPreferences", () => {
         },
         t,
       ),
-    ).toBe("evenings · weekdays · every 14 days")
+    ).toBe("evenings · weekdays · every two weeks")
   })
 
   it("is empty when members share nothing", () => {

@@ -12,6 +12,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 
@@ -23,6 +24,8 @@ const alreadyInKvintet = (): ConflictException =>
 
 @Injectable()
 export class KvintetService {
+  private readonly logger = new Logger(KvintetService.name);
+
   constructor(private readonly repository: KvintetRepository) {}
 
   async membership(userId: string): Promise<{ isMember: boolean }> {
@@ -60,15 +63,32 @@ export class KvintetService {
     // A small pilot must never get an empty feed just because nothing fits well.
     const fallback = matching.length === 0 && ranked.length > 0;
 
+    const listed = fallback ? ranked : matching;
+
+    // Data for tuning the weights (story #132). Analytics must never break the feed.
+    try {
+      await this.repository.recordFeedSnapshot(
+        userId,
+        fallback,
+        listed.map(({ kvintet, score }) => ({
+          kvintetId: kvintet.id,
+          score,
+        })),
+      );
+    } catch {
+      this.logger.warn('Could not record a feed snapshot');
+    }
+
     return {
       fallback,
-      items: (fallback ? ranked : matching).map(({ kvintet, reasons }) => {
+      items: listed.map(({ kvintet, reasons }) => {
         const frequencies = new Set(
           kvintet.members.map((member) => member.meetingFrequency),
         );
         return {
           id: kvintet.id,
           title: kvintet.title,
+          description: kvintet.description,
           categories: kvintet.categories,
           capacity: KVINTET_CAPACITY,
           memberCount: kvintet.members.length,

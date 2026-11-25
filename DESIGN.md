@@ -59,7 +59,7 @@ Kvintet shows no photos, so every person is represented by a generated avatar fr
 
 - **Seed:** the user's `username`, falling back to `id` when there is none. Use the same seed everywhere, or one person turns into two faces. Never seed from the e-mail (it is private). The exception is a person who is not in your group yet: their face is seeded by an opaque seat or membership value, so it never reveals who they are.
 - **Three states, one meaning each**:
-  - **Grey** — not met yet. Anyone outside your group: feed, proposals, "who's here" before the kvintet starts.
+  - **Grey** — not met yet. Anyone outside your group: the feed, kvintet cards, "who's here" before the kvintet starts.
   - **Colour** (`Blobatar`) — you, and your group once it has started.
   - **Dashed circle** — a seat nobody has taken. Never a "+" or an empty avatar.
 - **A kvintet is a group of five seats, never a number.** One shared component (`KvintetSeats`) draws it, as a compact row (cards) or as a ring (the table of the home page and "kvintet begins"; seats scale with the container). Its default geometry is Figma K3/M9: seats 27 % of the width on a ring of radius 36.5 % (96 px / 130 px at 356 px wide, 72 px / 100 px at 272 px), with the name directly under the seat. Members first, free seats after, always five in total.
@@ -69,7 +69,7 @@ Kvintet shows no photos, so every person is represented by a generated avatar fr
   | ------------------------------------------------- | ------ | --------- |
   | Inline, in a chip or tile                         | 24 px  | `size-6`  |
   | Compact list ("who's here"), last message on home | 32 px  | `size-8`  |
-  | Chat message, seats in a proposal card on home    | 36 px  | `size-9`  |
+  | Chat message, seats in a kvintet card on home     | 36 px  | `size-9`  |
   | Header of the "Start a kvintet" dialog            | 44 px  | `size-11` |
   | Member row in the feed, nav bar, mobile menu      | 48 px  | `size-12` |
   | Page title accent (onboarding), empty-state group | 56 px  | `size-14` |
@@ -81,11 +81,35 @@ Kvintet shows no photos, so every person is represented by a generated avatar fr
 
 - **Animate wherever it is affordable, and follow the mouse.** A blobatar that looks back at you is the point of the app, so give every avatar the eyes-follow-the-cursor motion unless the cost below rules it out. A static blobatar is one `<img>`; an animated one is ~12 SVG nodes, and every animated avatar runs its own gaze driver (its own `pointermove`, `scroll` and `resize` listeners and a frame loop). That is cheap for a handful and wasteful for dozens, so there are two modes, plus one special case:
   - **`always`** (`GazeBlobatar`, `animate="always"`) for one large avatar or one group of five: sign-up preview, profile header, the ring on home and "kvintet begins". Keep it to about ten on screen at once.
-  - **`hover`** for everything that comes in a list: chat messages, feed and "who's here" rows, proposal cards. It is a static `Blobatar` that becomes animated only while the mouse is over it, so a list of any length costs one driver at a time. Never `always` in a list.
+  - **`hover`** for everything that comes in a list: chat messages, feed and "who's here" rows, kvintet cards. It is a static `Blobatar` that becomes animated only while the mouse is over it, so a list of any length costs one driver at a time. Never `always` in a list.
   - **Nav bar:** the one avatar that is always on screen is a single `GazeBlobatar` with `animate="hover"` (it idles only while hovered) and a larger `travel`.
   - Both switch themselves off for `prefers-reduced-motion` and on touch. The ~10 and "a list" thresholds are judgement, not measurements: if a profile of a real screen shows jank, move that screen from `always` to `hover`, and write the screen here.
 - **Decorative by default** (no alt text) because the name is written next to it. If an avatar stands alone, pass `blobatar={{ title: name }}`.
 - **Tests:** jsdom lacks `matchMedia`/`ResizeObserver`, so a test that renders `GazeBlobatar` mocks `@blobatar/react/gaze` (see `SignUpForm.test.tsx`).
+
+## Onboarding
+
+A conversation, not a form (Figma #126): **one question per page**, eleven pages in three steps (`features/profile/lib/onboardingPages.ts` is the one list of them). At the top the person's own avatar (96px) with the question in its speech bubble (title, and a hint under it); the answers right below it; Back / Continue under the answers. The column is 640px, centred.
+
+- **No cards and no frames.** Answers are soft shapes: a **chip** (a field of work, a topic: white with an edge, chosen = `highlight-soft` with a `highlight` edge and text) or a **tile** (one answer of a list: white, no edge, `rounded-2xl`, chosen = `highlight-soft`; a 22px indicator, a square for "as many as you like" and a round one for "pick one"). The search fields and the note are white with no edge. All of it is in `lib/optionStyles.ts`.
+- **A missing required answer** (role, days, time of day, place, frequency) is not a red frame: the bubble's hint becomes red text, the same is said once more in red next to Continue, and the avatar shakes its head once. It goes away as soon as the person answers. The pages that ask nothing (topics, expectations, the note) can be left empty.
+- **The avatar and its question are sticky** under the header, so on a long page (many topics, the map) they stay in view while the answers scroll.
+- **On a phone** (Figma M3…M17d, below `md`) it is the same page, tighter: a 60px avatar, a 17px title, the guide still sticky (once stuck under the header, its bubble shrinks to the title alone, so it covers little of the answers; a red hint stays), chips and tiles at full width, a 200px map. Back and Continue sit in one row under the answers (not pinned to the bottom); the "change it any time" note is hidden, and a save error moves above the buttons.
+- **Progress**: the name of the step (a green tick on the summary) and one bar per step that fills per question. The header keeps "Step N of 3". There is no second "2 / 4" counter next to it: two counters on one screen read as a contradiction.
+- **Each Continue saves** that page's answers, so a reload, Back or an edit from the profile page keeps them. Step 1 ends with a summary (Edit goes back to a question), and the avatar is happy there.
+- **The avatar** is the mascot while the tour runs (its overlay stands on the avatar's spot, so after "Done" it can fly on to Home) and the page's own face otherwise, as on a repeat of onboarding. It shows the same expression and shake either way (`MascotFace`).
+
+## The mascot
+
+One yellow blobatar, seed `jana` (the "you" of the landing animation), guides a new person: it sits on the corner of "Create account", flies to the avatar slot on sign-up, turns into that person's own avatar as the username is typed, is the avatar at the top of every onboarding page (see Onboarding), then walks Home and the feed, and finally flies into the header avatar. Everything lives in `components/Mascot/`; the tour is `app/tour/`.
+
+- **One mascot at a time.** It is a single overlay above the router (`z-45`: over the header, under dialogs and menus). A page never draws its own: it declares a place with `useMascotAnchor(id)` and asks for the stage with `useMascotStage({ anchorId, seed?, expression?, shakeKey?, bubble? })` (memoize it). Leave out `seed` for the yellow mascot; give a person's seed and it cross-fades into that face (it cannot morph between two seeds). While the mascot is on screen as a person, every other copy of that person's avatar steps aside (`invisible`, not removed): the header avatar (and, in onboarding, the avatar's own spot, which the mascot stands on).
+- **It never rides over the header.** An anchor that scrolls under the sticky header takes the mascot out of sight with it; only an anchor inside the header shows it there. A sticky anchor (`data-mascot-sticky`, as the pinned sign-up avatar has) instead stays just under the header while its holder is on screen.
+- **The bubble covers nothing.** On landing it shows only while the button or the mascot is hovered or focused, below the mascot (above it on a phone, where below would cover the sign-in button), and takes no clicks; where there is nothing to hover with (a phone) it shows for four seconds when the page opens and after a tap. On sign-up it sits in room the page reserved (`MascotBubbleSlot`, named by `bubble.slotId`). It is as wide as its text and appears once the mascot has landed.
+- **Sign-up on a phone.** The avatar stays pinned, small and silent, under the header while the form scrolls, so the face changing with the username stays in view.
+- **The cross.** On Home and the feed it ends the tour: the mascot flies to the header, says where the tour can be replayed, and the tour is saved as done at that moment (`tourCompletedAt`), not at "Done". A replay from the avatar menu writes nothing.
+- **It looks away from a password.** While a password field has focus on sign-up its eyes shut (`isEyesClosed`, the `sleepy` pose) and look the other way from the cursor.
+- **Words and motion.** The face is `aria-hidden`; the words are `role="status"`. Copy comes from `landing.mascot.*`, `auth.mascot.*` and `tour.*`, in the first person, and never names the mascot. Movement is a spring flight with `motion`; under `prefers-reduced-motion` it only appears on its target.
 
 ## Every list has three states
 
@@ -99,6 +123,21 @@ Data refreshes itself: refetch when the tab regains focus, and invalidate the qu
 - Every icon-only control has an `aria-label`.
 - Focus rings are never removed. If you restyle focus, it must stay clearly visible.
 - Text contrast at least 4.5:1 — the tokens are chosen to satisfy this; hardcoded colours are how you break it.
+
+## Words
+
+The UI uses one name for one thing, in every locale file (`cs.json`, `en.json`).
+
+| Thing                              | English              | Czech               | Never                                |
+| ---------------------------------- | -------------------- | ------------------- | ------------------------------------ |
+| A group of up to five people       | kvintet / kvintets   | kvintet / kvintety  | proposal, návrh, table               |
+| A kvintet that has not started yet | is forming           | se skládá           | open proposal                        |
+| A kvintet that has started         | starts / has started | začne / začal       | is formed, vznikne, active (in text) |
+| Starting with three or four people | vote to start        | hlasovat pro start  | —                                    |
+| A free place in a kvintet          | free seat / Free     | volné místo / Volné | spot                                 |
+| The rules everyone agrees to       | community rules      | pravidla komunity   | code of conduct, kodex               |
+
+"Group" / "skupina" appears only in fixed phrases about the people in a kvintet ("group chat", "message the group", "tip for the group"), never as another name for the kvintet. Every screen says in one or two plain sentences what it is for and what to do next; error and empty states say what happened and what to do, with the words above.
 
 ## When you are unsure
 

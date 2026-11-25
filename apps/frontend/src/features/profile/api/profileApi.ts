@@ -8,7 +8,10 @@ export const tagSchema = z.object({
   slug: z.string(),
 })
 
-export type Tag = z.infer<typeof tagSchema>
+// The reference list also says which categories a tag belongs to; a profile's tags do not.
+export const referenceTagSchema = tagSchema.extend({ categories: z.array(z.string()) })
+
+export type ReferenceTag = z.infer<typeof referenceTagSchema>
 
 export const citySchema = z.object({
   id: z.string(),
@@ -20,8 +23,9 @@ export const citySchema = z.object({
 export type City = z.infer<typeof citySchema>
 
 export const referenceResponseSchema = z.object({
+  categories: z.array(z.object({ slug: z.string() })),
   cities: z.array(citySchema),
-  tags: z.array(tagSchema),
+  tags: z.array(referenceTagSchema),
 })
 
 export type ReferenceResponse = z.infer<typeof referenceResponseSchema>
@@ -48,6 +52,8 @@ export const profileResponseSchema = z
     radiusKm: z.number().nullable().optional(),
     note: z.string().nullable(),
     onboardingCompletedAt: z.string().nullable(),
+    /** Set once the product tour was finished or skipped. */
+    tourCompletedAt: z.string().nullable().optional(),
     teaches: z.array(tagSchema),
     learns: z.array(tagSchema),
     interests: z.array(tagSchema),
@@ -59,14 +65,14 @@ export type ProfileResponse = z.infer<typeof profileResponseSchema>
 export const saveProfileSchema = z.object({
   position: z.string().max(100).optional(),
   roles: z.array(z.string()).optional(),
-  teachTagIds: z.array(z.string()),
-  learnTagIds: z.array(z.string()),
-  interestTagIds: z.array(z.string()),
-  weekdays: z.boolean(),
-  weekends: z.boolean(),
-  mornings: z.boolean(),
-  afternoons: z.boolean(),
-  evenings: z.boolean(),
+  teachTagIds: z.array(z.string()).optional(),
+  learnTagIds: z.array(z.string()).optional(),
+  interestTagIds: z.array(z.string()).optional(),
+  weekdays: z.boolean().optional(),
+  weekends: z.boolean().optional(),
+  mornings: z.boolean().optional(),
+  afternoons: z.boolean().optional(),
+  evenings: z.boolean().optional(),
   cityId: z.string().nullable().optional(),
   radiusKm: z.number().min(1).max(500).optional(),
   latitude: z.number().nullable().optional(),
@@ -121,4 +127,10 @@ export const useSaveProfile = (userId?: string) => {
       queryClient.setQueryData(profileKeys.me(userId), data)
     },
   })
+}
+
+/** Remembers on the server that the tour is over (finished or skipped), so it never returns. */
+export const markTourCompleted = async (): Promise<ProfileResponse> => {
+  const res = await api.post("me/profile/tour-completed").json()
+  return profileResponseSchema.parse(res)
 }

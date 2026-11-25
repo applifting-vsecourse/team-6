@@ -1,0 +1,218 @@
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react"
+import type { Expression } from "blobatar/expression"
+
+/** Seed of the yellow mascot. The blobatar package turns it into `#ffcd44`, "you" in the core-idea animation. */
+export const MASCOT_SEED = "jana"
+
+// How long the mascot waits for the next page to claim it before it leaves. The router swaps the old
+// page for the new one in one commit, so the next page's effect runs right after the old page's
+// cleanup: this only has to bridge that gap. Anything longer is how long the mascot visibly lingers
+// on a page that never claims it. A route slower than the router's pending delay shows the loading
+// screen first; the mascot then leaves and comes back when that page mounts, which is intended.
+const GRACE_MS = 50
+
+export type MascotAction = {
+  label: string
+  onClick: () => void
+  variant?: "default" | "ghost"
+}
+
+export type MascotBubble = {
+  text: string
+  /** Room a page set aside for this bubble (`MascotBubbleSlot`). Without it, it opens beside the mascot. */
+  slotId?: string
+  /** Without a slot: open `above` or `below` the mascot instead of beside it. */
+  prefer?: "above" | "below"
+  actions?: MascotAction[]
+  /**
+   * Shows a close cross in the top right corner. It only hides the bubble: the mascot stays, and a
+   * click on it brings the bubble back. A new text opens it again, so a guide keeps guiding.
+   */
+  isClosable?: boolean
+  /** Shows the cross too, but the page decides what it does (e.g. end the tour). */
+  onClose?: () => void
+}
+
+export type MascotStage = {
+  /** Which anchor (see `useMascotAnchor`) the mascot flies to. */
+  anchorId: string
+  /** A person's seed: the mascot cross-fades into that avatar. Leave out for the yellow mascot. */
+  seed?: string
+  /** The mascot looks away: its eyes shut, e.g. while a password is typed. */
+  isEyesClosed?: boolean
+  /** A pose to hold, e.g. `happy`. Leave out for the neutral face (the yellow mascot is happy). */
+  expression?: Expression
+  /** The mascot shakes its head once each time this changes. */
+  shakeKey?: number
+  bubble?: MascotBubble
+}
+
+type MascotContextValue = {
+  stage: MascotStage | null
+  /** Puts the mascot on a stage at once, or takes it away (`null`). */
+  setStage: (stage: MascotStage | null) => void
+  /**
+   * A page lets go of its stage. The mascot leaves only if that stage is still the current one
+   * once the grace time is over: a page that mounted meanwhile has taken over, and stays.
+   */
+  releaseStage: (stage: MascotStage) => void
+  registerAnchor: (id: string, element: HTMLElement) => () => void
+  /** The first element of that anchor that is on screen, e.g. the desktop or the phone avatar. */
+  resolveAnchor: (id: string) => HTMLElement | null
+  /** Called whenever an anchor appears or disappears. */
+  subscribe: (listener: () => void) => () => void
+  /** The tour is running: the header keeps its own avatar back until the mascot lands there. */
+  isTourActive: boolean
+  setTourActive: (isActive: boolean) => void
+  replayToken: number
+  replayTour: () => void
+}
+
+const MascotContext = createContext<MascotContextValue | null>(null)
+
+export function MascotProvider({ children }: { children: ReactNode }) {
+  const [stage, setStageState] = useState<MascotStage | null>(null)
+  const [replayToken, setReplayToken] = useState(0)
+  const [isTourActive, setTourActive] = useState(false)
+  const anchors = useRef(new Map<string, Set<HTMLElement>>())
+  const listeners = useRef(new Set<() => void>())
+  // One pending release per stage, so a stage that is put back is not taken away by its own timer.
+  const leaveTimers = useRef(new Map<MascotStage, ReturnType<typeof setTimeout>>())
+
+  const setStage = useCallback<MascotContextValue["setStage"]>((next) => {
+    // StrictMode runs a page's effect, tears it down and runs it again with the very same stage:
+    // the release that teardown scheduled must not outlive the stage being put back.
+    if (next) {
+      clearTimeout(leaveTimers.current.get(next))
+      leaveTimers.current.delete(next)
+    }
+    setStageState(next)
+  }, [])
+
+  // False once the provider is unmounted. React tears the provider down before the pages inside
+  // it, so their releases arrive after its cleanup: they must not start a timer nobody clears.
+  const isMounted = useRef(true)
+
+  const releaseStage = useCallback<MascotContextValue["releaseStage"]>((released) => {
+    clearTimeout(leaveTimers.current.get(released))
+    if (!isMounted.current) return
+    const timer = setTimeout(() => {
+      leaveTimers.current.delete(released)
+      // Only the stage that was released may go. The page on the way out can be torn down after the
+      // next one has mounted (the router shows the new location before it swaps the page), and it
+      // must not take the new page's stage with it.
+      setStageState((current) => (current === released ? null : current))
+    }, GRACE_MS)
+    leaveTimers.current.set(released, timer)
+  }, [])
+
+  useEffect(() => {
+    // Set here too: StrictMode runs this cleanup and then the effect again on a live provider.
+    isMounted.current = true
+    const timers = leaveTimers.current
+    return () => {
+      isMounted.current = false
+      timers.forEach((timer) => clearTimeout(timer))
+      timers.clear()
+    }
+  }, [])
+
+  const registerAnchor = useCallback((id: string, element: HTMLElement) => {
+    const set = anchors.current.get(id) ?? new Set<HTMLElement>()
+    set.add(element)
+    anchors.current.set(id, set)
+    listeners.current.forEach((listener) => listener())
+    return () => {
+      set.delete(element)
+      listeners.current.forEach((listener) => listener())
+    }
+  }, [])
+
+  const resolveAnchor = useCallback((id: string) => {
+    for (const element of anchors.current.get(id) ?? []) {
+      if (element.getClientRects().length > 0) return element
+    }
+    return null
+  }, [])
+
+  const subscribe = useCallback((listener: () => void) => {
+    listeners.current.add(listener)
+    return () => {
+      listeners.current.delete(listener)
+    }
+  }, [])
+
+  const replayTour = useCallback(() => setReplayToken((token) => token + 1), [])
+
+  const value = useMemo(
+    () => ({
+      stage,
+      setStage,
+      releaseStage,
+      registerAnchor,
+      resolveAnchor,
+      subscribe,
+      isTourActive,
+      setTourActive,
+      replayToken,
+      replayTour,
+    }),
+    [
+      stage,
+      setStage,
+      releaseStage,
+      registerAnchor,
+      resolveAnchor,
+      subscribe,
+      isTourActive,
+      replayToken,
+      replayTour,
+    ],
+  )
+
+  return <MascotContext.Provider value={value}>{children}</MascotContext.Provider>
+}
+
+/** `null` outside a provider, so components that carry anchors still render in isolation. */
+export const useMascotContext = () => useContext(MascotContext)
+
+/**
+ * Marks an element as a place the mascot can fly to: `[attach, isOccupied]`. `isOccupied` is true
+ * while the mascot is there, so the page can hide its own copy of the avatar and avoid showing it twice.
+ */
+export function useMascotAnchor(id: string) {
+  const context = useMascotContext()
+  const registerAnchor = context?.registerAnchor
+
+  const attach = useCallback(
+    (element: HTMLElement | null) => {
+      if (!element || !registerAnchor) return
+      return registerAnchor(id, element)
+    },
+    [id, registerAnchor],
+  )
+
+  return [attach, context?.stage?.anchorId === id] as const
+}
+
+/** Puts the mascot on a stage while the calling page is mounted. Pass a memoized value. */
+export function useMascotStage(stage: MascotStage | null) {
+  const context = useMascotContext()
+  const setStage = context?.setStage
+  const releaseStage = context?.releaseStage
+
+  useEffect(() => {
+    if (!setStage || !releaseStage || !stage) return
+    setStage(stage)
+    return () => releaseStage(stage)
+  }, [setStage, releaseStage, stage])
+}

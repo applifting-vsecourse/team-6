@@ -1,5 +1,5 @@
 // Bump when the code of conduct text changes; stored with each user's consent.
-export const CODE_OF_CONDUCT_VERSION = '1.0';
+export const CODE_OF_CONDUCT_VERSION = '1.1';
 
 // Stamps the consent onto a new user, or returns null when the client did not
 // send `acceptCodeOfConduct: true`. The client only sends the flag, never the

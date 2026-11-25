@@ -6,6 +6,7 @@ import { PrismaService } from '@/core/prisma/prisma.service';
 import {
   betterAuthCoreConfig,
   resolveBetterAuthPlugins,
+  resolveRateLimitEnabled,
 } from '@/shared/auth/config/better-auth.config';
 import { codeOfConductDatabaseHooks } from '@/shared/auth/hooks/code-of-conduct.hook';
 import { Config } from '@/shared/config/config.service';
@@ -62,6 +63,14 @@ const createAuth = (
     },
     // If change (setup) affects database, must be in core config, in order to be able to run migrations
     ...betterAuthCoreConfig,
+    rateLimit: {
+      ...betterAuthCoreConfig.rateLimit,
+      enabled: resolveRateLimitEnabled(
+        config.nodeEnv,
+        config.disableRateLimit,
+        betterAuthCoreConfig.rateLimit?.enabled,
+      ),
+    },
     plugins: resolveBetterAuthPlugins(config.nodeEnv),
   });
 

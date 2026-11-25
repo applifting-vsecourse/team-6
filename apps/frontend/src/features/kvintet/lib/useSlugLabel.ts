@@ -1,1 +1,1 @@
-export { useSlugLabel } from "@/lib/useSlugLabel"
+export { roleLabel, useSlugLabel } from "@/lib/useSlugLabel"

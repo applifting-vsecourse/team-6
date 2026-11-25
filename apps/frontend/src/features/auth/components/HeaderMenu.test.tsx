@@ -3,7 +3,15 @@ import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
-import { HeaderMenu, MobileAccount, MobileSignOut } from "@/features/auth/components/HeaderMenu"
+import { MascotProvider, useMascotContext } from "@/components/Mascot/MascotContext"
+import { Sheet } from "@/components/ui/sheet"
+
+import {
+  HeaderMenu,
+  MobileAccount,
+  MobileReplayTour,
+  MobileSignOut,
+} from "@/features/auth/components/HeaderMenu"
 
 // The gaze driver needs browser APIs jsdom lacks (matchMedia, ResizeObserver).
 vi.mock("@blobatar/react/gaze", () => ({ useGaze: () => ({ ref: vi.fn() }) }))
@@ -30,19 +38,27 @@ vi.mock("@/features/auth/hooks/useSignOut", () => ({
 describe("MobileAccount", () => {
   beforeEach(() => useSession.mockReset())
 
-  it("shows who is signed in, without any sign-out or profile link", () => {
+  // SheetClose needs the sheet's dialog context, as in the real mobile menu.
+  const renderInSheet = () =>
+    render(
+      <Sheet>
+        <MobileAccount />
+      </Sheet>,
+    )
+
+  it("shows who is signed in as a link to the profile, without a sign-out button", () => {
     useSession.mockReturnValue({ user: { id: "u1", name: "Jana Nováková", username: "jana" } })
-    render(<MobileAccount />)
+    renderInSheet()
 
     expect(screen.getByText("Jana Nováková")).toBeInTheDocument()
-    expect(screen.getByText("@jana")).toBeInTheDocument()
+    expect(screen.getByText("View your profile")).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: /Jana Nováková/ })).toHaveAttribute("href", "/profile")
     expect(screen.queryByRole("button")).not.toBeInTheDocument()
-    expect(screen.queryByRole("link")).not.toBeInTheDocument()
   })
 
-  it("leaves the @ out when there is no username", () => {
+  it("never prints a handle, only the profile link text", () => {
     useSession.mockReturnValue({ user: { id: "u1", name: "Jana Nováková", username: "" } })
-    render(<MobileAccount />)
+    renderInSheet()
 
     expect(screen.queryByText(/^@/)).not.toBeInTheDocument()
   })
@@ -68,6 +84,40 @@ describe("MobileSignOut", () => {
     await userEvent.click(screen.getByRole("button", { name: "Sign out" }))
 
     expect(signOut).toHaveBeenCalledOnce()
+  })
+})
+
+describe("MobileReplayTour", () => {
+  beforeEach(() => useSession.mockReset())
+
+  // The provider's own counter is what the tour controller watches for a replay.
+  function ReplayCount() {
+    return <p>replays: {useMascotContext()?.replayToken}</p>
+  }
+  const renderInSheet = () =>
+    render(
+      <MascotProvider>
+        <Sheet>
+          <MobileReplayTour />
+        </Sheet>
+        <ReplayCount />
+      </MascotProvider>,
+    )
+
+  it("renders nothing when signed out", () => {
+    useSession.mockReturnValue({ user: null })
+    renderInSheet()
+
+    expect(screen.queryByRole("button", { name: "Replay the tour" })).not.toBeInTheDocument()
+  })
+
+  it("replays the tour on click", async () => {
+    useSession.mockReturnValue({ user: { id: "u1", name: "Jana Nováková", username: "jana" } })
+    renderInSheet()
+
+    await userEvent.click(screen.getByRole("button", { name: "Replay the tour" }))
+
+    expect(screen.getByText("replays: 1")).toBeInTheDocument()
   })
 })
 

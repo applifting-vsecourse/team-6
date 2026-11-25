@@ -1,5 +1,6 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
 import { KVINTET_STARTED } from '@/modules/chat/domain/message';
+import { FEED_SNAPSHOTS_KEPT } from '@/modules/kvintet/domain/kvintet';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
 import { emptyMatchProfile } from '@/modules/matching/matching';
 import { BadRequestException, ConflictException } from '@nestjs/common';
@@ -52,7 +53,7 @@ describe('KvintetRepository (Postgres)', () => {
     const kvintet = await prisma.kvintet.create({
       data: {
         title: `${prefix} kvintet`,
-        categoryId,
+        description: `${prefix} description`,
         categories: { create: { categoryId } },
         members: { create: memberIds.map((userId) => ({ userId })) },
       },
@@ -77,6 +78,20 @@ describe('KvintetRepository (Postgres)', () => {
   });
 
   afterAll(async () => {
+    // The matching-data logs have no foreign key to kvintet, so remove them by hand.
+    const logged = await prisma.membershipLog.findMany({
+      where: { userId: { startsWith: prefix } },
+      select: { kvintetId: true },
+    });
+    await prisma.kvintetLog.deleteMany({
+      where: { kvintetId: { in: logged.map((log) => log.kvintetId) } },
+    });
+    await prisma.membershipLog.deleteMany({
+      where: { userId: { startsWith: prefix } },
+    });
+    await prisma.feedSnapshot.deleteMany({
+      where: { userId: { startsWith: prefix } },
+    });
     await prisma.kvintet.deleteMany({
       where: { title: { startsWith: prefix } },
     });
@@ -137,7 +152,7 @@ describe('KvintetRepository (Postgres)', () => {
             })
           ).slug,
         ],
-        description: null,
+        description: `${prefix} description`,
       }),
     ).resolves.toEqual({ result: 'already_member' });
   });
@@ -167,10 +182,12 @@ describe('KvintetRepository (Postgres)', () => {
     expect(outcome.result).toBe('started');
     const id = outcome.result === 'started' ? outcome.id : '';
     const open = await repository.findOpenKvintets(categories[1].slug);
-    expect(open.find((p) => p.id === id)?.categories).toEqual([
+    const started = open.find((p) => p.id === id);
+    expect(started?.categories).toEqual([
       categories[0].slug,
       categories[1].slug,
     ]);
+    expect(started?.description).toBe('Short description');
   });
 
   it('refuses to start a kvintet when any category is unknown', async () => {
@@ -183,7 +200,7 @@ describe('KvintetRepository (Postgres)', () => {
       repository.start(user, {
         title: `${prefix} nope`,
         categorySlugs: [slug, 'does-not-exist'],
-        description: null,
+        description: `${prefix} description`,
       }),
     ).resolves.toEqual({ result: 'unknown_category' });
     await expect(repository.isMember(user)).resolves.toBe(false);
@@ -317,6 +334,7 @@ describe('KvintetRepository (Postgres)', () => {
     const details = await repository.findKvintetDetailsByUserId(users[0]);
     expect(details).not.toBeNull();
     expect(details?.id).toBe(kvintetId);
+    expect(details?.description).toBe(`${prefix} description`);
     expect(details?.status).toBe('FORMING');
     expect(details?.members).toHaveLength(3);
     expect(details?.voteStatus.canVote).toBe(true);
@@ -514,5 +532,127 @@ describe('KvintetRepository (Postgres)', () => {
     const [user] = await createUsers(1, 'begins-none');
 
     await expect(repository.markBeginsSeen(user)).resolves.toBeUndefined();
+  });
+
+  describe('matching data log', () => {
+    it('logs where the kvintet stood in the latest feed that listed it, and nothing when it was not listed', async () => {
+      const [owner, fromFeed, deepLink] = await createUsers(3, 'log-join');
+      const kvintetId = await createKvintet([owner]);
+      const other = randomUUID();
+      await repository.recordFeedSnapshot(fromFeed, false, [
+        { kvintetId: other, score: 80 },
+        { kvintetId, score: 42.5 },
+      ]);
+
+      await repository.join(fromFeed, kvintetId);
+      await repository.join(deepLink, kvintetId);
+
+      const [viaFeed, viaLink] = await Promise.all(
+        [fromFeed, deepLink].map((userId) =>
+          prisma.membershipLog.findFirstOrThrow({ where: { userId } }),
+        ),
+      );
+      expect(viaFeed).toMatchObject({
+        kvintetId,
+        source: 'JOINED',
+        position: 1,
+        listSize: 2,
+        score: 42.5,
+        leftAt: null,
+      });
+      expect(viaFeed.snapshotId).not.toBeNull();
+      expect(viaLink).toMatchObject({
+        source: 'JOINED',
+        snapshotId: null,
+        position: null,
+        listSize: null,
+        score: null,
+      });
+    });
+
+    it('logs a started kvintet, its start and its disbanding, and the time each member left', async () => {
+      const [starter, joiner] = await createUsers(2, 'log-life');
+      const outcome = await repository.start(starter, {
+        title: `${prefix} logged`,
+        description: `${prefix} description`,
+        categorySlugs: ['languages'],
+      });
+      if (outcome.result !== 'started') throw new Error('not started');
+      const kvintetId = outcome.id;
+      await repository.join(joiner, kvintetId);
+
+      await expect(
+        prisma.membershipLog.findFirstOrThrow({ where: { userId: starter } }),
+      ).resolves.toMatchObject({ kvintetId, source: 'STARTED' });
+      await expect(
+        prisma.kvintetLog.findUniqueOrThrow({ where: { kvintetId } }),
+      ).resolves.toMatchObject({ activatedAt: null, endedAt: null });
+
+      await repository.leave(kvintetId, joiner);
+      const left = await prisma.membershipLog.findFirstOrThrow({
+        where: { userId: joiner },
+      });
+      expect(left.leftAt).not.toBeNull();
+      await expect(
+        prisma.kvintetLog.findUniqueOrThrow({ where: { kvintetId } }),
+      ).resolves.toMatchObject({ endedAt: null });
+
+      await repository.leave(kvintetId, starter);
+      const ended = await prisma.kvintetLog.findUniqueOrThrow({
+        where: { kvintetId },
+      });
+      expect(ended.endedAt).not.toBeNull();
+    });
+
+    it('logs when a kvintet starts, and keeps the rows anonymous after the account is deleted', async () => {
+      const members = await createUsers(4, 'log-start');
+      const [last] = await createUsers(1, 'log-last');
+      const kvintetId = await createKvintet(members);
+      await prisma.kvintetLog.create({
+        data: { kvintetId, createdAt: new Date() },
+      });
+
+      await repository.join(last, kvintetId);
+      await repository.leave(kvintetId, last);
+      await prisma.user.delete({ where: { id: last } });
+
+      const log = await prisma.kvintetLog.findUniqueOrThrow({
+        where: { kvintetId },
+      });
+      expect(log.activatedAt).not.toBeNull();
+      const stay = await prisma.membershipLog.findFirstOrThrow({
+        where: { kvintetId, source: 'JOINED' },
+      });
+      expect(stay.userId).toBeNull();
+      expect(stay.leftAt).not.toBeNull();
+    });
+
+    it('keeps one snapshot for an unchanged feed and only the newest fifty per user', async () => {
+      const [user] = await createUsers(1, 'log-feed');
+      const ids = Array.from({ length: FEED_SNAPSHOTS_KEPT + 2 }, () =>
+        randomUUID(),
+      );
+
+      await repository.recordFeedSnapshot(user, false, []);
+      await repository.recordFeedSnapshot(user, false, [
+        { kvintetId: ids[0], score: 50 },
+      ]);
+      await repository.recordFeedSnapshot(user, false, [
+        { kvintetId: ids[0], score: 51 },
+      ]);
+      expect(await prisma.feedSnapshot.count({ where: { userId: user } })).toBe(
+        1,
+      );
+
+      for (const id of ids.slice(1)) {
+        await repository.recordFeedSnapshot(user, true, [
+          { kvintetId: id, score: 10 },
+        ]);
+      }
+
+      expect(await prisma.feedSnapshot.count({ where: { userId: user } })).toBe(
+        FEED_SNAPSHOTS_KEPT,
+      );
+    });
   });
 });

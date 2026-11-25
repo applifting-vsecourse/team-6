@@ -231,6 +231,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
           {
             id: "k-1",
             title: "AI at work",
+            description: "We meet and learn together.",
             categories: ["software-development"],
             capacity: 5,
             memberCount: 3,
@@ -246,6 +247,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
           {
             id: "k-2",
             title: "Python for Data",
+            description: "We meet and learn together.",
             categories: ["data-ai"],
             capacity: 5,
             memberCount: 2,
@@ -267,6 +269,8 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       const joinButtons = screen.getAllByRole("button", { name: "Join" })
       expect(joinButtons).toHaveLength(2)
+      // On a phone each card opens a sheet with the people instead (CSS swaps the two buttons).
+      expect(screen.getAllByRole("button", { name: /^View / })).toHaveLength(2)
 
       expect(screen.getByRole("link", { name: "See all" })).toHaveAttribute("href", "/kvintet/feed")
       expect(screen.getByRole("button", { name: "Start your own" })).toBeInTheDocument()
@@ -278,13 +282,14 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(api.post).toHaveBeenCalledWith("kvintets/k-1/members")
     })
 
-    it("shows what every member shares and a labelled free seat on each card", async () => {
+    it("shows the description, what every member shares and a labelled free seat on each card", async () => {
       feedData = {
         fallback: false,
         items: [
           {
             id: "k-1",
             title: "AI at work",
+            description: "We swap prompts that save time.",
             categories: ["software-development", "business"],
             capacity: 5,
             memberCount: 2,
@@ -301,7 +306,8 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       renderWithClient(<OverviewPage />)
 
-      expect(await screen.findByText("evenings · weekdays · every 14 days")).toBeInTheDocument()
+      expect(await screen.findByText("evenings · weekdays · every two weeks")).toBeInTheDocument()
+      expect(screen.getByText("We swap prompts that save time.")).toBeInTheDocument()
       expect(screen.getByText("Software development")).toBeInTheDocument()
       expect(screen.getByText("Business")).toBeInTheDocument()
       expect(screen.getAllByText("Free")).toHaveLength(3)
@@ -314,6 +320,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
           {
             id: "k-fail",
             title: "Full Kvintet",
+            description: "We meet and learn together.",
             categories: ["software-development"],
             capacity: 5,
             memberCount: 4,
@@ -348,7 +355,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
 
       renderWithClient(<OverviewPage />)
 
-      expect(await screen.findByText("No proposals available right now.")).toBeInTheDocument()
+      expect(await screen.findByText("No kvintets to join right now.")).toBeInTheDocument()
     })
 
     it("opens start kvintet dialog when clicking 'Start your own'", async () => {
@@ -365,6 +372,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
     const formingKvintet: KvintetDetails = {
       id: "k-forming",
       title: "AI at work – what really works",
+      description: "Prompts that actually help with everyday work.",
       status: "FORMING",
       createdAt: "2026-10-25T10:00:00Z",
       activatedAt: null,
@@ -434,6 +442,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(
         await screen.findByRole("heading", { name: /Your kvintet is forming/i }),
       ).toBeInTheDocument()
+      expect(screen.getByText("Prompts that actually help with everyday work.")).toBeInTheDocument()
       expect(screen.getByText(/3 OF 4 WANT TO START/i)).toBeInTheDocument()
 
       const voteButton = screen.getByRole("button", { name: "Start now" })
@@ -520,7 +529,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(
         await screen.findByRole("heading", { name: "Waiting for more people" }),
       ).toBeInTheDocument()
-      expect(screen.getByText("At three people, you can vote to start.")).toBeInTheDocument()
+      expect(screen.getByText("With three people, you can vote to start.")).toBeInTheDocument()
       expect(screen.queryByRole("button", { name: "Start now" })).not.toBeInTheDocument()
     })
 
@@ -539,16 +548,25 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       expect(screen.queryByRole("button", { name: "Start now" })).not.toBeInTheDocument()
     })
 
+    it("shows who is here on every screen size while forming (#145)", async () => {
+      myKvintetData = formingKvintet
+
+      renderWithClient(<OverviewPage />)
+
+      // jsdom applies no CSS, so assert the card carries no `hidden` utility.
+      const card = (await screen.findByRole("heading", { name: "Who's here" })).closest(
+        "div.rounded-lg",
+      )
+      expect(card).not.toHaveClass("hidden")
+      expect(card).not.toHaveClass("md:flex")
+    })
+
     it("allows leaving forming kvintet and shows post-leave notice in State 2", async () => {
       myKvintetData = formingKvintet
 
       renderWithClient(<OverviewPage />)
 
-      // Two buttons, one per layout (beside "Who's here" on desktop, under the card on a phone);
-      // jsdom applies no CSS, so both exist here.
-      const [leaveButton] = await screen.findAllByRole("button", { name: "Leave kvintet" })
-      if (!leaveButton) throw new Error("Leave button missing")
-      await userEvent.click(leaveButton)
+      await userEvent.click(await screen.findByRole("button", { name: "Leave kvintet" }))
 
       // Dialog opens
       expect(
@@ -574,6 +592,7 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
     const activeKvintet: KvintetDetails = {
       id: "k-active",
       title: "AI at work – what really works",
+      description: "Prompts that actually help with everyday work.",
       status: "ACTIVE",
       createdAt: "2026-10-20T10:00:00Z",
       activatedAt: "2026-10-22T12:00:00Z",
@@ -630,11 +649,33 @@ describe("OverviewPage - 4 States, Lifecycle, Gating and Actions", () => {
       renderWithClient(<OverviewPage />)
 
       expect(await screen.findByRole("heading", { name: "Your kvintet" })).toBeInTheDocument()
+      expect(screen.getByText("Prompts that actually help with everyday work.")).toBeInTheDocument()
       expect(await screen.findByText("Looking forward to our first meeting!")).toBeInTheDocument()
       expect(screen.getAllByText("Petr").length).toBeGreaterThanOrEqual(1)
 
       const chatLink = screen.getByRole("link", { name: "Open chat" })
       expect(chatLink).toHaveAttribute("href", "/kvintet/messages")
+    })
+
+    it('calls your own last message "You", as the chat does, not by your name', async () => {
+      myKvintetData = activeKvintet
+      messagesData = [
+        {
+          id: 1,
+          kind: "USER",
+          authorId: "u1",
+          authorName: "Jana",
+          authorUsername: "jana",
+          body: "See you on Thursday!",
+          createdAt: "2026-10-22T13:00:00Z",
+        },
+      ]
+
+      renderWithClient(<OverviewPage />)
+
+      await screen.findByText("See you on Thursday!")
+      expect(screen.getByText("You")).toBeInTheDocument()
+      expect(screen.queryByText("Jana")).not.toBeInTheDocument()
     })
 
     it("lists the members with what they teach, and when everyone can meet", async () => {

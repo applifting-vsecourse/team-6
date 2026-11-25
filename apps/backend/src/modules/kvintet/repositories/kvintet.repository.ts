@@ -12,6 +12,8 @@ import {
 import { KVINTET_STARTED } from '@/modules/chat/domain/message';
 import {
   CommonPreferences,
+  FEED_SNAPSHOTS_KEPT,
+  FeedSnapshotItem,
   JoinOutcome,
   KVINTET_CAPACITY,
   KvintetDetails,
@@ -129,6 +131,7 @@ export class KvintetRepository {
       select: {
         id: true,
         title: true,
+        description: true,
         categories: {
           orderBy: { category: { sortOrder: 'asc' } },
           select: { category: { select: { slug: true } } },
@@ -151,6 +154,7 @@ export class KvintetRepository {
     return kvintets.map((kvintet) => ({
       id: kvintet.id,
       title: kvintet.title,
+      description: kvintet.description,
       categories: kvintet.categories.map(({ category }) => category.slug),
       members: kvintet.members.map(({ user: { profile } }) => {
         const slugsOf = (kind: ProfileTagKind): string[] =>
@@ -168,6 +172,37 @@ export class KvintetRepository {
         };
       }),
     }));
+  }
+
+  /**
+   * Keeps what a feed load listed, for tuning the matching weights. A load that lists the same
+   * kvintets in the same order as the user's latest one adds nothing (the feed is loaded from
+   * several pages), and only the newest FEED_SNAPSHOTS_KEPT are kept, so no cron is needed.
+   */
+  async recordFeedSnapshot(
+    userId: string,
+    fallback: boolean,
+    items: FeedSnapshotItem[],
+  ): Promise<void> {
+    if (items.length === 0) return;
+    const order = items.map((item) => item.kvintetId).join();
+    await this.prisma.$transaction(async (tx) => {
+      const latest = await tx.feedSnapshot.findFirst({
+        where: { userId },
+        orderBy: { id: 'desc' },
+        select: { items: true },
+      });
+      const latestOrder = ((latest?.items ?? []) as FeedSnapshotItem[])
+        .map((item) => item.kvintetId)
+        .join();
+      if (latestOrder === order) return;
+
+      await tx.feedSnapshot.create({ data: { userId, fallback, items } });
+      await tx.$executeRaw`
+        DELETE FROM "feed_snapshot" WHERE "userId" = ${userId} AND "id" NOT IN (
+          SELECT "id" FROM "feed_snapshot" WHERE "userId" = ${userId}
+          ORDER BY "id" DESC LIMIT ${FEED_SNAPSHOTS_KEPT})`;
+    });
   }
 
   /** What matching needs about the caller; an empty profile when there is none. */
@@ -193,21 +228,27 @@ export class KvintetRepository {
     );
 
     try {
-      // A nested create is one transaction; the unique userId rejects a second kvintet.
-      const kvintet = await this.prisma.kvintet.create({
-        data: {
-          title: input.title,
-          description: input.description,
-          // Deprecated column, kept until it is dropped: the first chosen category.
-          categoryId: categoryIds[0],
-          categories: {
-            create: categoryIds.map((categoryId) => ({ categoryId })),
+      // The unique userId rejects a second kvintet and rolls the whole transaction back.
+      return await this.prisma.$transaction(async (tx) => {
+        const kvintet = await tx.kvintet.create({
+          data: {
+            title: input.title,
+            description: input.description,
+            categories: {
+              create: categoryIds.map((categoryId) => ({ categoryId })),
+            },
+            members: { create: { userId } },
           },
-          members: { create: { userId } },
-        },
-        select: { id: true },
+          select: { id: true, createdAt: true },
+        });
+        await tx.kvintetLog.create({
+          data: { kvintetId: kvintet.id, createdAt: kvintet.createdAt },
+        });
+        await tx.membershipLog.create({
+          data: { userId, kvintetId: kvintet.id, source: 'STARTED' },
+        });
+        return { result: 'started' as const, id: kvintet.id };
       });
-      return { result: 'started', id: kvintet.id };
     } catch (error) {
       if (isUniqueViolation(error)) return { result: 'already_member' };
       throw error;
@@ -219,9 +260,14 @@ export class KvintetRepository {
     tx: TransactionClient,
     kvintetId: string,
   ): Promise<void> {
+    const activatedAt = new Date();
     await tx.kvintet.update({
       where: { id: kvintetId },
-      data: { status: 'ACTIVE', activatedAt: new Date() },
+      data: { status: 'ACTIVE', activatedAt },
+    });
+    await tx.kvintetLog.updateMany({
+      where: { kvintetId },
+      data: { activatedAt },
     });
     await tx.message.create({
       data: { kvintetId, kind: 'SYSTEM', body: KVINTET_STARTED },
@@ -243,6 +289,7 @@ export class KvintetRepository {
         // Votes agreed to the old roster; everyone must vote again.
         await tx.kvintetVote.deleteMany({ where: { kvintetId } });
         await tx.kvintetMember.create({ data: { kvintetId, userId } });
+        await this.logJoin(tx, userId, kvintetId);
         if (members + 1 === KVINTET_CAPACITY) {
           await this.activateInTransaction(tx, kvintetId);
         }
@@ -253,6 +300,36 @@ export class KvintetRepository {
       if (isUniqueViolation(error)) return 'already_member';
       throw error;
     }
+  }
+
+  /** Records a join, with where the kvintet stood in the caller's latest feed that listed it. */
+  private async logJoin(
+    tx: TransactionClient,
+    userId: string,
+    kvintetId: string,
+  ): Promise<void> {
+    const [snapshot] = await tx.$queryRaw<
+      { id: number; items: FeedSnapshotItem[] }[]
+    >`
+      SELECT "id", "items" FROM "feed_snapshot"
+      WHERE "userId" = ${userId} AND "items" @> ${JSON.stringify([{ kvintetId }])}::jsonb
+      ORDER BY "id" DESC LIMIT 1`;
+    const position = snapshot?.items.findIndex(
+      (item) => item.kvintetId === kvintetId,
+    );
+    await tx.membershipLog.create({
+      data: {
+        userId,
+        kvintetId,
+        source: 'JOINED',
+        ...(snapshot && {
+          snapshotId: snapshot.id,
+          position,
+          listSize: snapshot.items.length,
+          score: snapshot.items[position].score,
+        }),
+      },
+    });
   }
 
   async findMembership(userId: string): Promise<{
@@ -419,6 +496,7 @@ export class KvintetRepository {
     return {
       id: kvintet.id,
       title: kvintet.title,
+      description: kvintet.description,
       status: kvintet.status,
       createdAt: kvintet.createdAt,
       activatedAt: kvintet.activatedAt,
@@ -583,10 +661,19 @@ export class KvintetRepository {
     });
 
     const remainingMembers = kvintet.members.filter((m) => m.userId !== userId);
+    const now = new Date();
+    await tx.membershipLog.updateMany({
+      where: { userId, kvintetId, leftAt: null },
+      data: { leftAt: now },
+    });
 
     if (remainingMembers.length === 0) {
       await tx.kvintet.delete({
         where: { id: kvintetId },
+      });
+      await tx.kvintetLog.updateMany({
+        where: { kvintetId },
+        data: { endedAt: now },
       });
     } else if (kvintet.status === 'FORMING') {
       // Votes agreed to the old roster; the rest must vote again.

@@ -15,6 +15,7 @@ describe("LeaveKvintetDialog", () => {
         onConfirm={vi.fn()}
         isLeaving={false}
         isActiveKvintet={false}
+        isLastMember={false}
         avatarSeed="jana"
       />,
     )
@@ -22,7 +23,7 @@ describe("LeaveKvintetDialog", () => {
     expect(
       screen.getByRole("heading", { name: "Are you sure you want to leave?" }),
     ).toBeInTheDocument()
-    expect(screen.getByText(/You will leave this proposal/i)).toBeInTheDocument()
+    expect(screen.getByText(/You'll leave this kvintet/i)).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Leave" })).toBeInTheDocument()
     expect(document.body.querySelector("[data-slot=avatar]")).toBeInTheDocument()
@@ -37,6 +38,7 @@ describe("LeaveKvintetDialog", () => {
         onConfirm={vi.fn()}
         isLeaving={false}
         isActiveKvintet={true}
+        isLastMember={false}
         avatarSeed="jana"
       />,
     )
@@ -50,6 +52,43 @@ describe("LeaveKvintetDialog", () => {
     expect(leaveButton).toHaveClass("bg-destructive")
   })
 
+  it("says the kvintet will be removed when the last member leaves a forming kvintet", () => {
+    render(
+      <LeaveKvintetDialog
+        isOpen={true}
+        onOpenChange={vi.fn()}
+        onConfirm={vi.fn()}
+        isLeaving={false}
+        isActiveKvintet={false}
+        isLastMember={true}
+      />,
+    )
+
+    expect(
+      screen.getByText("You're the only member, so the kvintet will be removed."),
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/You'll leave this kvintet/i)).not.toBeInTheDocument()
+  })
+
+  it("says the kvintet will be removed and hides the callout when the last member leaves an active kvintet", () => {
+    render(
+      <LeaveKvintetDialog
+        isOpen={true}
+        onOpenChange={vi.fn()}
+        onConfirm={vi.fn()}
+        isLeaving={false}
+        isActiveKvintet={true}
+        isLastMember={true}
+      />,
+    )
+
+    expect(
+      screen.getByText("You're the only member, so the kvintet will be removed."),
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/Others will see that you left/i)).not.toBeInTheDocument()
+    expect(screen.queryByText("The others carry on without you.")).not.toBeInTheDocument()
+  })
+
   it("calls onOpenChange(false) when Stay/Cancel is clicked", async () => {
     const handleOpenChange = vi.fn()
     render(
@@ -59,6 +98,7 @@ describe("LeaveKvintetDialog", () => {
         onConfirm={vi.fn()}
         isLeaving={false}
         isActiveKvintet={true}
+        isLastMember={false}
       />,
     )
 
@@ -75,6 +115,7 @@ describe("LeaveKvintetDialog", () => {
         onConfirm={handleConfirm}
         isLeaving={false}
         isActiveKvintet={true}
+        isLastMember={false}
       />,
     )
 
@@ -90,6 +131,7 @@ describe("LeaveKvintetDialog", () => {
         onConfirm={vi.fn()}
         isLeaving={true}
         isActiveKvintet={true}
+        isLastMember={false}
       />,
     )
 

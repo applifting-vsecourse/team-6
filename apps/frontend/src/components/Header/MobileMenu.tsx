@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils"
 
 type MobileMenuProps = {
   hasNav?: boolean
+  isAdmin?: boolean
   navDisabled?: NavDisabled
   // Present when the user's kvintet has a chat; adds "Group chat" with the unread badge.
   chat?: { unreadCount: number }
@@ -28,7 +29,7 @@ type MobileMenuProps = {
 }
 
 const ROW =
-  "group flex items-center gap-3 rounded-lg p-3.5 text-compact font-medium text-foreground"
+  "group flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-compact font-medium text-foreground"
 const DOT = "size-2 shrink-0 rounded-full bg-input"
 const META_LABEL = "font-mono text-meta tracking-meta text-muted-foreground uppercase"
 
@@ -64,6 +65,7 @@ function MenuLink({
 
 export function MobileMenu({
   hasNav = false,
+  isAdmin = false,
   navDisabled,
   chat,
   hasLearnMore = false,
@@ -97,7 +99,7 @@ export function MobileMenu({
           </SheetClose>
         </div>
 
-        <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 pt-4 pb-6">
+        <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 pt-4 pb-4">
           {top}
 
           {hasNav ? (
@@ -148,6 +150,14 @@ export function MobileMenu({
                   {t("layout.groupChat")}
                 </MenuLink>
               ) : null}
+              {isAdmin ? (
+                <MenuLink
+                  to={ROUTES.admin}
+                  isNav
+                >
+                  {t("nav.admin")}
+                </MenuLink>
+              ) : null}
             </nav>
           ) : null}
 
@@ -176,7 +186,7 @@ export function MobileMenu({
             </div>
           </section>
 
-          <div className="mt-auto flex flex-col gap-4 pt-6">
+          <div className="mt-auto flex flex-col gap-3 pt-3">
             {bottom}
             <div className="flex justify-center gap-5 text-sm text-muted-foreground">
               <SheetClose asChild>

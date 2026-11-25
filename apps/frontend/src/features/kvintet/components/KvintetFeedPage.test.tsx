@@ -39,6 +39,7 @@ const commonAvailability = {
 const kvintet = (id: string, title: string, overrides: Partial<FeedKvintet> = {}): FeedKvintet => ({
   id,
   title,
+  description: "We swap prompts that save time.",
   categories: ["software-development"],
   capacity: 5,
   memberCount: 1,
@@ -145,7 +146,7 @@ describe("KvintetFeedPage", () => {
     renderPage()
 
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/overview", replace: true }))
-    expect(toast.info).toHaveBeenCalledWith("You are already in a proposal.")
+    expect(toast.info).toHaveBeenCalledWith("You are already in a kvintet.")
     expect(screen.queryByText("We couldn't load the kvintets")).not.toBeInTheDocument()
   })
 
@@ -157,7 +158,7 @@ describe("KvintetFeedPage", () => {
 
     expect(api.post).toHaveBeenCalledWith("kvintets/k1/members")
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/overview" }))
-    expect(toast.success).toHaveBeenCalledWith("You joined the proposal.")
+    expect(toast.success).toHaveBeenCalledWith("You joined the kvintet.")
   })
 
   it("explains when the kvintet filled up meanwhile", async () => {
@@ -168,7 +169,7 @@ describe("KvintetFeedPage", () => {
     await userEvent.click(await screen.findByRole("button", { name: "Join" }))
 
     await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith("This proposal is full or no longer open."),
+      expect(toast.error).toHaveBeenCalledWith("This kvintet is full or has already started."),
     )
     expect(navigate).not.toHaveBeenCalled()
   })
@@ -290,8 +291,7 @@ describe("starting a kvintet", () => {
   }
 
   const pickCategory = async (name: string) => {
-    await userEvent.click(screen.getByRole("combobox", { name: "Category" }))
-    await userEvent.click(await screen.findByRole("option", { name }))
+    await userEvent.click(screen.getByRole("button", { name }))
   }
 
   it("shows what is missing instead of disabling the button", async () => {
@@ -301,6 +301,7 @@ describe("starting a kvintet", () => {
 
     expect(await screen.findByText("Enter a topic")).toBeInTheDocument()
     expect(screen.getByText("Choose a category")).toBeInTheDocument()
+    expect(screen.getByText("Describe what the kvintet is about")).toBeInTheDocument()
     expect(api.post).not.toHaveBeenCalled()
   })
 
@@ -312,15 +313,20 @@ describe("starting a kvintet", () => {
       "  How to use AI in a small firm ",
     )
     await pickCategory("Business")
+    await userEvent.type(screen.getByLabelText("Description"), " We share what works. ")
     await userEvent.click(within(dialog).getByRole("button", { name: "Start a kvintet" }))
 
     await waitFor(() =>
       expect(api.post).toHaveBeenCalledWith("kvintets", {
-        json: { title: "How to use AI in a small firm", categorySlugs: ["business"] },
+        json: {
+          title: "How to use AI in a small firm",
+          categorySlugs: ["business"],
+          description: "We share what works.",
+        },
       }),
     )
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: "/overview" }))
-    expect(toast.success).toHaveBeenCalledWith("Your proposal is open. Others can join it now.")
+    expect(toast.success).toHaveBeenCalledWith("Your kvintet is open. Others can join it now.")
   })
 
   it("shows the server's reason inside the dialog", async () => {
@@ -329,10 +335,9 @@ describe("starting a kvintet", () => {
 
     await userEvent.type(screen.getByLabelText("What do you want to talk about"), "Topic")
     await pickCategory("Software development")
+    await userEvent.type(screen.getByLabelText("Description"), "We talk together.")
     await userEvent.click(within(dialog).getByRole("button", { name: "Start a kvintet" }))
 
-    expect(
-      await screen.findByText("You are already in a proposal or a kvintet."),
-    ).toBeInTheDocument()
+    expect(await screen.findByText("You are already in a kvintet.")).toBeInTheDocument()
   })
 })

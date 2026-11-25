@@ -134,8 +134,8 @@ export const seedDatabase = async (
       name: 'Lenka Malá',
       username: 'LenkaMala',
       email: 'lenka.mala@example.com',
-      position: 'Project manager',
-      roles: ['Project Manager'],
+      position: 'project-manager',
+      roles: ['project-manager'],
       meetingFrequency: 'WEEKLY',
       teach: ['agile', 'leadership'],
       learn: ['python'],
@@ -145,8 +145,8 @@ export const seedDatabase = async (
       name: 'Nathan Němec',
       username: 'NathanNemec',
       email: 'nathan.nemec@example.com',
-      position: 'Data engineer',
-      roles: ['Data Engineer'],
+      position: 'data-engineer',
+      roles: ['data-engineer'],
       meetingFrequency: 'BIWEEKLY',
       teach: ['postgresql', 'python'],
       learn: ['kubernetes'],
@@ -156,8 +156,8 @@ export const seedDatabase = async (
       name: 'Martin Bambas',
       username: 'MartinBambas',
       email: 'martin.bambas@example.com',
-      position: 'Backend developer',
-      roles: ['Backend Developer'],
+      position: 'backend-developer',
+      roles: ['backend-developer'],
       meetingFrequency: 'WEEKLY',
       teach: ['nestjs', 'typescript'],
       learn: ['terraform'],
@@ -167,8 +167,8 @@ export const seedDatabase = async (
       name: 'Dominik Šimon',
       username: 'DominikSimon',
       email: 'dominik.simon@example.com',
-      position: 'UX/UI designer',
-      roles: ['UX/UI Designer'],
+      position: 'ux-ui-designer',
+      roles: ['ux-ui-designer'],
       meetingFrequency: 'BIWEEKLY',
       teach: ['figma', 'ux-design'],
       learn: ['react'],
@@ -180,8 +180,8 @@ export const seedDatabase = async (
       name: 'Petr Mráček',
       username: 'PetrMracek',
       email: 'petr.mracek@example.com',
-      position: 'Security engineer',
-      roles: ['Security Engineer'],
+      position: 'security-engineer',
+      roles: ['security-engineer'],
       meetingFrequency: 'MONTHLY',
       teach: ['cybersecurity', 'linux'],
       learn: ['public-speaking'],
@@ -193,8 +193,8 @@ export const seedDatabase = async (
       name: 'David Vokurka',
       username: 'DavidVokurka',
       email: 'david.vokurka@example.com',
-      position: 'Product manager',
-      roles: ['Product Manager'],
+      position: 'product-manager',
+      roles: ['product-manager'],
       meetingFrequency: 'WEEKLY',
       teach: ['product-strategy', 'roadmapping'],
       learn: ['sql'],
@@ -221,11 +221,13 @@ export const seedDatabase = async (
   await createDemoKvintets(prisma, [
     {
       title: 'Using AI at work – what really works',
+      description:
+        'We bring one real task from our week, try it with an AI assistant together and compare notes: which prompts saved time, where it made things up, and what we would never hand over to it. No hype, no slides, just honest examples and a shared list of what works.',
       categories: ['data-ai'],
       members: [
         {
           userId: jan.id,
-          position: 'Backend developer',
+          position: 'backend-developer',
           meetingFrequency: 'BIWEEKLY',
           teach: ['python', 'sql'],
           learn: ['ux-design'],
@@ -233,7 +235,7 @@ export const seedDatabase = async (
         },
         {
           userId: petra.id,
-          position: 'Data analyst',
+          position: 'data-analyst',
           meetingFrequency: 'BIWEEKLY',
           teach: ['statistics'],
           learn: ['public-speaking'],
@@ -241,7 +243,7 @@ export const seedDatabase = async (
         },
         {
           userId: tomas.id,
-          position: 'Product manager',
+          position: 'product-manager',
           meetingFrequency: 'BIWEEKLY',
           teach: ['roadmapping'],
           learn: ['negotiation'],
@@ -249,7 +251,7 @@ export const seedDatabase = async (
         },
         {
           userId: ondrej.id,
-          position: 'BI consultant',
+          position: 'consultant',
           meetingFrequency: 'BIWEEKLY',
           teach: ['sql'],
           learn: ['python'],
@@ -261,11 +263,13 @@ export const seedDatabase = async (
     },
     {
       title: 'From Excel to Python',
+      description:
+        'Turning spreadsheet habits into small Python scripts, one report at a time.',
       categories: ['data-ai', 'software-development', 'business'],
       members: [
         {
           userId: eva.id,
-          position: 'Accountant',
+          position: 'accountant',
           meetingFrequency: 'WEEKLY',
           teach: ['excel'],
           learn: ['python'],
@@ -275,11 +279,13 @@ export const seedDatabase = async (
     },
     {
       title: 'Spanish conversation over lunch',
+      description:
+        'Relaxed Spanish practice for A2–B1 speakers. No grammar drills, just talking.',
       categories: ['languages'],
       members: [
         {
           userId: lucie.id,
-          position: 'Translator',
+          position: 'copywriter',
           meetingFrequency: 'WEEKLY',
           teach: ['copywriting'],
           learn: ['spanish'],
@@ -291,11 +297,13 @@ export const seedDatabase = async (
     },
     {
       title: 'Negotiating your first client deal',
+      description:
+        'Role-play pricing talks and swap stories from real negotiations.',
       categories: ['business'],
       members: [
         {
           userId: martin.id,
-          position: 'Startup founder',
+          position: 'entrepreneur',
           meetingFrequency: 'BIWEEKLY',
           teach: ['startups'],
           learn: ['negotiation'],
@@ -307,11 +315,13 @@ export const seedDatabase = async (
     },
     {
       title: 'Cooking together on Sundays',
+      description:
+        'Each month one of us picks a cuisine and we cook it together.',
       categories: ['leisure'],
       members: [
         {
           userId: katerina.id,
-          position: 'Graphic designer',
+          position: 'graphic-designer',
           meetingFrequency: 'MONTHLY',
           teach: ['cooking'],
           learn: ['music'],
@@ -325,6 +335,7 @@ export const seedDatabase = async (
     },
     {
       title: 'Frontend craft circle',
+      description: 'Code reviews, small UI experiments and accessibility tips.',
       categories: ['software-development'],
       active: true,
       votes: 5,
@@ -357,7 +368,7 @@ export const seedDatabase = async (
       members: [
         {
           userId: anna.id,
-          position: 'Frontend developer',
+          position: 'frontend-developer',
           meetingFrequency: 'WEEKLY',
           teach: ['react'],
           learn: ['ux-design'],
@@ -365,7 +376,7 @@ export const seedDatabase = async (
         },
         {
           userId: jakub.id,
-          position: 'Full-stack developer',
+          position: 'fullstack-developer',
           meetingFrequency: 'WEEKLY',
           teach: ['typescript'],
           learn: ['docker'],
@@ -373,7 +384,7 @@ export const seedDatabase = async (
         },
         {
           userId: david.id,
-          position: 'Tech lead',
+          position: 'tech-lead',
           meetingFrequency: 'WEEKLY',
           teach: ['git'],
           learn: ['public-speaking'],
@@ -381,7 +392,7 @@ export const seedDatabase = async (
         },
         {
           userId: dana.id,
-          position: 'UI designer',
+          position: 'ui-designer',
           meetingFrequency: 'WEEKLY',
           teach: ['figma'],
           learn: ['html-css'],
@@ -389,7 +400,7 @@ export const seedDatabase = async (
         },
         {
           userId: filip.id,
-          position: 'DevOps engineer',
+          position: 'devops-engineer',
           meetingFrequency: 'WEEKLY',
           teach: ['docker'],
           learn: ['react'],

@@ -126,7 +126,8 @@ describe('Account integration against Postgres', () => {
     const kvintet = await prisma.kvintet.create({
       data: {
         title: `${prefix} group`,
-        categoryId,
+        description: `${prefix} description`,
+        categories: { create: { categoryId } },
         status: 'FORMING',
         members: {
           create: [{ userId: u1 }, { userId: u2 }],
@@ -167,7 +168,8 @@ describe('Account integration against Postgres', () => {
     const kvintet = await prisma.kvintet.create({
       data: {
         title: `${prefix} sole group`,
-        categoryId,
+        description: `${prefix} description`,
+        categories: { create: { categoryId } },
         status: 'FORMING',
         members: {
           create: [{ userId: u }],
@@ -193,7 +195,8 @@ describe('Account integration against Postgres', () => {
     const kvintet = await prisma.kvintet.create({
       data: {
         title: `${prefix} chat group`,
-        categoryId,
+        description: `${prefix} description`,
+        categories: { create: { categoryId } },
         status: 'ACTIVE',
         members: {
           create: [{ userId: u1 }, { userId: u2 }],

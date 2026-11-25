@@ -16,6 +16,7 @@ const commonAvailability = {
 const kvintet: FeedKvintet = {
   id: "k1",
   title: "Using AI at work",
+  description: "We swap prompts that save time.",
   categories: ["software-development", "business"],
   capacity: 5,
   memberCount: 2,
@@ -50,6 +51,13 @@ const renderCard = (overrides: Partial<FeedKvintet> = {}, onJoin = vi.fn()) => {
 }
 
 describe("KvintetCard", () => {
+  it("offers the sheet with the people on a phone next to Join (CSS shows one of the two)", () => {
+    renderCard()
+
+    expect(screen.getByRole("button", { name: /^View / })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Join" })).toBeInTheDocument()
+  })
+
   it("shows the topic, every category and how many seats are taken", () => {
     renderCard()
 
@@ -57,6 +65,12 @@ describe("KvintetCard", () => {
     expect(screen.getByText("Software development")).toBeInTheDocument()
     expect(screen.getByText("Business")).toBeInTheDocument()
     expect(screen.getByText("2 / 5")).toBeInTheDocument()
+  })
+
+  it("shows the description", () => {
+    renderCard()
+
+    expect(screen.getByText("We swap prompts that save time.")).toBeInTheDocument()
   })
 
   it("says why the kvintet suits the user, in one line with translated tags and categories", () => {
@@ -89,6 +103,20 @@ describe("KvintetCard", () => {
     ])
     // A member's tags are not on the card.
     expect(screen.queryByText(/Teaches/)).not.toBeInTheDocument()
+  })
+
+  it("cuts a long role with an ellipsis and a tooltip, and gives the fallback label none", () => {
+    const position = "Accountant & financial controller"
+    renderCard({
+      members: [
+        { position, teach: [], learn: [], interests: [] },
+        { position: null, teach: [], learn: [], interests: [] },
+      ],
+    })
+
+    expect(screen.getByText(position)).toHaveAttribute("title", position)
+    expect(screen.getByText(position)).toHaveClass("truncate")
+    expect(screen.getByText("Member")).not.toHaveAttribute("title")
   })
 
   it("shows the shared meeting frequency only when there is one", () => {

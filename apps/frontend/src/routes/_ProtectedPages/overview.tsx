@@ -14,7 +14,7 @@ import { Blobatar } from "@/components/ui/blobatar"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { formatDate, formatDayAndMonth, formatHeaderDate, formatList } from "@/lib/date"
+import { formatDate, formatDayAndMonth, formatList } from "@/lib/date"
 import { getErrorMessage } from "@/lib/errorMessage"
 import { cn } from "@/lib/utils"
 
@@ -28,15 +28,15 @@ import {
   kvintetFeedQueryOptions,
   type FeedKvintet,
 } from "@/features/kvintet/api/kvintetFeedQueryOptions"
+import { KvintetDescription } from "@/features/kvintet/components/KvintetDescription"
+import { KvintetDetailsDialog } from "@/features/kvintet/components/KvintetDetailsDialog"
 import { LeaveKvintetDialog } from "@/features/kvintet/components/LeaveKvintetDialog"
 import { StartKvintetDialog } from "@/features/kvintet/components/StartKvintetDialog"
 import { useJoinKvintet } from "@/features/kvintet/hooks/useJoinKvintet"
 import { useMyKvintet } from "@/features/kvintet/hooks/useMyKvintet"
 import { formatSharedPreferences } from "@/features/kvintet/lib/formatPreferences"
-import { useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
+import { roleLabel, useSlugLabel } from "@/features/kvintet/lib/useSlugLabel"
 import { profileQueryOptions } from "@/features/profile/api/profileApi"
-
-type SlugLabel = ReturnType<typeof useSlugLabel>
 
 const ICEBREAKER_KEYS = [
   "overview.active.icebreaker.q1",
@@ -154,7 +154,6 @@ function OverviewPage() {
 
   const ownSeed = user?.username ?? user?.id ?? ""
   const firstName = user?.name.split(" ")[0]
-  const headerDate = formatHeaderDate()
 
   const isInitialLoading = profileQuery.isLoading || (isOnboarded && myKvintet.isLoading)
   const hasLoadError = profileQuery.isError || myKvintet.isError
@@ -177,16 +176,11 @@ function OverviewPage() {
           {/* Loading and error states keep the greeting, so the page does not jump when it loads. */}
           {(isInitialLoading || hasLoadError) && (
             <>
-              <div className="flex flex-col gap-1.5">
-                <p className="font-mono text-meta font-medium tracking-meta text-muted-foreground uppercase">
-                  {headerDate}
-                </p>
-                <h1 className="text-h1-mobile font-semibold text-foreground md:text-h1">
-                  {firstName
-                    ? t("overview.greeting", { name: firstName })
-                    : t("overview.greetingAnonymous")}
-                </h1>
-              </div>
+              <h1 className="text-h1-mobile font-semibold text-foreground md:text-h1">
+                {firstName
+                  ? t("overview.greeting", { name: firstName })
+                  : t("overview.greetingAnonymous")}
+              </h1>
               {isInitialLoading ? (
                 <OverviewSkeleton />
               ) : (
@@ -210,9 +204,6 @@ function OverviewPage() {
               {!isOnboarded && (
                 <>
                   <div className="flex flex-col gap-1.5">
-                    <p className="font-mono text-meta font-medium tracking-meta text-muted-foreground uppercase">
-                      {headerDate}
-                    </p>
                     <h1 className="text-h1-mobile font-semibold text-foreground md:text-h1">
                       {firstName
                         ? t("overview.greeting", { name: firstName })
@@ -256,9 +247,6 @@ function OverviewPage() {
               {isOnboarded && !kvintet && (
                 <>
                   <div className="flex flex-col gap-1.5">
-                    <p className="font-mono text-meta font-medium tracking-meta text-muted-foreground uppercase">
-                      {headerDate}
-                    </p>
                     <h1 className="text-h1-mobile font-semibold text-foreground md:text-h1">
                       {firstName
                         ? t("overview.greeting", { name: firstName })
@@ -365,15 +353,16 @@ function OverviewPage() {
               {isOnboarded && kvintet && kvintet.status === "FORMING" && (
                 <>
                   <div className="flex flex-col gap-1.5">
-                    <p className="font-mono text-meta font-medium tracking-meta text-muted-foreground uppercase">
-                      {headerDate}
-                    </p>
                     <h1 className="text-h1-mobile font-semibold text-foreground md:text-h1">
                       {t("overview.forming.heading")}
                     </h1>
                     <p className="text-compact text-muted-foreground md:text-lead">
                       {kvintet.title}
                     </p>
+                    <KvintetDescription
+                      text={kvintet.description}
+                      className="max-w-prose"
+                    />
                   </div>
 
                   <CommonTime kvintet={kvintet} />
@@ -452,7 +441,7 @@ function OverviewPage() {
                     </div>
 
                     {/* Right Card: Who's here */}
-                    <div className="hidden w-full shrink-0 flex-col gap-3 rounded-lg border border-border bg-card p-5 md:flex lg:w-85">
+                    <div className="flex w-full shrink-0 flex-col gap-3 rounded-lg border border-border bg-card p-5 lg:w-85">
                       <div className="flex flex-col gap-0.5">
                         <h3 className="text-h3 font-semibold text-foreground">
                           {t("overview.forming.whoTitle")}
@@ -479,21 +468,13 @@ function OverviewPage() {
                     </div>
                   </div>
 
-                  {/* M5: no "Who's here" list on a phone, so Leave sits under the card. */}
-                  <button
-                    type="button"
-                    onClick={() => setIsLeaveDialogOpen(true)}
-                    className={`md:hidden ${LEAVE_BUTTON_CLASS}`}
-                  >
-                    {t("overview.forming.leaveKvintet")}
-                  </button>
-
                   <LeaveKvintetDialog
                     isOpen={isLeaveDialogOpen}
                     onOpenChange={setIsLeaveDialogOpen}
                     onConfirm={handleLeave}
                     isLeaving={myKvintet.isLeaving}
                     isActiveKvintet={false}
+                    isLastMember={kvintet.members.length === 1}
                     avatarSeed={user ? user.username || user.id : undefined}
                   />
                 </>
@@ -503,9 +484,6 @@ function OverviewPage() {
               {isOnboarded && kvintet && kvintet.status === "ACTIVE" && (
                 <>
                   <div className="flex flex-col gap-1.5">
-                    <p className="font-mono text-meta font-medium tracking-meta text-muted-foreground uppercase">
-                      {headerDate}
-                    </p>
                     <h1 className="text-h1-mobile font-semibold text-foreground md:text-h1">
                       {t("overview.active.heading")}
                     </h1>
@@ -516,6 +494,10 @@ function OverviewPage() {
                         date: formatDayAndMonth(new Date(kvintet.activatedAt ?? kvintet.createdAt)),
                       })}
                     </p>
+                    <KvintetDescription
+                      text={kvintet.description}
+                      className="max-w-prose"
+                    />
                   </div>
 
                   <CommonTime kvintet={kvintet} />
@@ -540,7 +522,9 @@ function OverviewPage() {
                             <div className="flex w-full flex-col gap-1 rounded-md bg-secondary p-3 text-small">
                               <div className="flex items-baseline justify-between gap-2">
                                 <span className="font-medium text-foreground">
-                                  {lastMessage.authorName ?? t("chat.deletedMember")}
+                                  {lastMessage.authorId === user?.id
+                                    ? t("chat.you")
+                                    : (lastMessage.authorName ?? t("chat.deletedMember"))}
                                 </span>
                                 <span className="text-meta text-muted-foreground">
                                   {formatDate(new Date(lastMessage.createdAt))}
@@ -651,6 +635,7 @@ function OverviewPage() {
                     onConfirm={handleLeave}
                     isLeaving={myKvintet.isLeaving}
                     isActiveKvintet={true}
+                    isLastMember={kvintet.members.length === 1}
                     avatarSeed={user ? user.username || user.id : undefined}
                   />
                 </>
@@ -697,25 +682,37 @@ function ProposalCard({
           </span>
         </div>
 
-        {/* The feed never carries a name, so the faces are grey and seeded by the seat. */}
-        <KvintetSeats
-          layout="row"
-          freeLabel={t("kvintet.vacancy")}
-          members={proposal.members.map((member, idx) => ({
-            seed: `${proposal.id}-seat-${idx}`,
-            anonymous: true,
-            label: member.position ? roleLabel(member.position, label) : t("kvintet.member"),
-          }))}
-        />
+        <KvintetDescription text={proposal.description} />
+
+        {/* The feed never carries a name, so the faces are grey and seeded by the seat. A phone
+            shows them in the sheet behind the View button. */}
+        <div className="max-sm:hidden">
+          <KvintetSeats
+            layout="row"
+            freeLabel={t("kvintet.vacancy")}
+            members={proposal.members.map((member, idx) => ({
+              seed: `${proposal.id}-seat-${idx}`,
+              anonymous: true,
+              label: member.position ? roleLabel(member.position, label) : t("kvintet.member"),
+            }))}
+          />
+        </div>
 
         <p className="text-small text-muted-foreground">
           {formatSharedPreferences(proposal, t) || "—"}
         </p>
       </div>
 
+      <KvintetDetailsDialog
+        kvintet={proposal}
+        isJoining={isJoining}
+        isDisabled={isDisabled}
+        onJoin={onJoin}
+        triggerClassName="w-full sm:hidden"
+      />
       <Button
         variant="outline"
-        className="w-full"
+        className="w-full max-sm:hidden"
         onClick={() => onJoin(proposal.id)}
         disabled={isJoining || isDisabled}
       >
@@ -787,13 +784,6 @@ function OverviewError({
       </Button>
     </StateAlert>
   )
-}
-
-function roleLabel(role: string, label: SlugLabel) {
-  return role
-    .split(", ")
-    .map((slug) => label("roles", slug))
-    .join(", ")
 }
 
 /** The days and parts of the day that suit every member, never a place. */

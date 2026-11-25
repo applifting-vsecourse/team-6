@@ -77,6 +77,9 @@ export class KvintetDetailsDto {
   @ApiProperty({ example: 'AI v práci – co opravdu funguje' })
   title!: string;
 
+  @ApiProperty({ example: 'Sdílíme prompty, které nám šetří čas.' })
+  description!: string;
+
   @ApiProperty({ enum: ['FORMING', 'ACTIVE'], example: 'FORMING' })
   status!: 'FORMING' | 'ACTIVE';
 
