@@ -1,4 +1,5 @@
 import { PrismaService } from '@/core/prisma/prisma.service';
+import { Prisma } from '@/generated/prisma/client';
 import { KvintetRepository } from '@/modules/kvintet/repositories/kvintet.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
@@ -45,18 +46,23 @@ export class AccountRepository {
         where: { id: userId },
         select: { email: true },
       });
-      await tx.verification.deleteMany({
-        where: {
-          OR: [
-            { value: userId },
-            { identifier: { equals: email, mode: 'insensitive' } },
-            // Plugins store a prefixed form (e.g. `email-verification-otp-<email>`). Only a delimiter
-            // plus the whole address matches, so `a@x.cz` never matches `ba@x.cz`.
-            { identifier: { endsWith: `-${email}`, mode: 'insensitive' } },
-            { identifier: { endsWith: `:${email}`, mode: 'insensitive' } },
-          ],
-        },
-      });
+      // Exact identifiers only: the bare address and the forms better-auth's emailOTP plugin builds
+      // (`<type>-otp-<email>`). A suffix match would catch `foo-a@x.cz` when `a@x.cz` is deleted.
+      const identifiers = [
+        email,
+        ...['email-verification', 'sign-in', 'forget-password'].map(
+          (type) => `${type}-otp-${email}`,
+        ),
+      ].map((identifier) => identifier.toLowerCase());
+      // The change-email OTP is keyed by user id: `change-email-otp-<userId>:<newEmail>`.
+      const changeEmailPrefix = `change-email-otp-${userId}:`;
+      // Raw SQL on purpose: Prisma's `mode: 'insensitive'` compares with ILIKE, where `_` in an
+      // address is a wildcard and would match other people's rows.
+      await tx.$executeRaw`
+        DELETE FROM "verification"
+        WHERE "value" = ${userId}
+          OR lower("identifier") IN (${Prisma.join(identifiers)})
+          OR starts_with("identifier", ${changeEmailPrefix})`;
 
       // 4. Delete user row (cascades profile, sessions, accounts; chat messages and matching
       // data lose their author and stay as anonymous history)

@@ -262,8 +262,20 @@ describe('Account integration against Postgres', () => {
           expiresAt: new Date(Date.now() + 3600000),
         },
         {
-          id: `ver-colon-${userId}`,
-          identifier: `sign-in-otp:${user.email.toUpperCase()}`,
+          id: `ver-signin-${userId}`,
+          identifier: `sign-in-otp-${user.email.toUpperCase()}`,
+          value: 'otp',
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+        {
+          id: `ver-forget-${userId}`,
+          identifier: `forget-password-otp-${user.email}`,
+          value: 'otp',
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+        {
+          id: `ver-change-${userId}`,
+          identifier: `change-email-otp-${userId}:new-address@example.com`,
           value: 'otp',
           expiresAt: new Date(Date.now() + 3600000),
         },
@@ -305,7 +317,9 @@ describe('Account integration against Postgres', () => {
             `ver-email-${userId}`,
             `ver-reset-${userId}`,
             `ver-otp-${userId}`,
-            `ver-colon-${userId}`,
+            `ver-signin-${userId}`,
+            `ver-forget-${userId}`,
+            `ver-change-${userId}`,
           ],
         },
       },
@@ -341,6 +355,41 @@ describe('Account integration against Postgres', () => {
     });
     const again = await prisma.user.findMany({ where: { email: user.email } });
     expect(again.map((u) => u.id)).toEqual([`${prefix}-again`]);
+  });
+
+  it("never deletes another user's verifications, however much their address looks like the deleted one", async () => {
+    const userId = await createUser('look_alike');
+    const { email } = await prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+    });
+    // Each of these is a different person's address (`-`, `_`, `%` are all legal in one).
+    const others = [
+      `foo-${email}`,
+      `email-verification-otp-foo-${email}`,
+      `sign-in-otp-x:${email}`,
+      // `_` is a single-character wildcard in SQL LIKE.
+      email.replace('_', 'X'),
+      `forget-password-otp-${email.replace('_', 'X')}`,
+      `change-email-otp-${userId}X:new@example.com`,
+    ];
+    await prisma.verification.createMany({
+      data: others.map((identifier, i) => ({
+        id: `ver-foreign-${i}-${prefix}`,
+        identifier,
+        value: 'otp',
+        expiresAt: new Date(Date.now() + 3600000),
+      })),
+    });
+
+    await accountService.deleteAccount(userId);
+
+    const survivors = await prisma.verification.findMany({
+      where: { id: { startsWith: 'ver-foreign-', endsWith: prefix } },
+      select: { identifier: true },
+    });
+    expect(survivors.map((row) => row.identifier).sort()).toEqual(
+      [...others].sort(),
+    );
   });
 
   it('throws NotFoundException when attempting to delete non-existent user', async () => {
