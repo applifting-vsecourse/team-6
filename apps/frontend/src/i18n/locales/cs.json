@@ -692,7 +692,12 @@
     "when": {
       "allDays": "Všední dny i víkendy"
     },
-    "withinRadius": "v okruhu {{count}} km"
+    "withinRadius": "v okruhu {{count}} km",
+    "yourData": {
+      "request": "Chceš kopii dat, která o tobě ukládáme? Napiš na <email>{{email}}</email> z e-mailové adresy svého účtu.",
+      "terms": "Je to zdarma. Odpovíme do jednoho měsíce a data pošleme ve strojově čitelném souboru.",
+      "title": "Tvoje data"
+    }
   },
   "roles": {
     "account-manager": "Account manažer",

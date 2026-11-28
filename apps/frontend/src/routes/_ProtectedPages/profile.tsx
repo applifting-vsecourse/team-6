@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { getErrorMessage } from "@/lib/errorMessage"
 import { useSlugLabel } from "@/lib/useSlugLabel"
 
+import { DataRequestSection } from "@/features/account/components/DataRequestSection"
 import { DeleteAccountDialog } from "@/features/account/components/DeleteAccountDialog"
 import { useDeleteAccount } from "@/features/account/hooks/useDeleteAccount"
 import { authSessionQueryOptions } from "@/features/auth/api/authSessionQueryOptions"
@@ -364,6 +365,8 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
           />
         </dl>
       </section>
+
+      <DataRequestSection />
 
       {/* 6. Danger zone (Delete account) */}
       <section className="flex flex-col items-start gap-2.5 border-t border-border pt-5 md:pt-6">

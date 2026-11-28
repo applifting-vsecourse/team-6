@@ -117,6 +117,16 @@ Matching data (story #132), outside the diagram. Nothing in the app reads these 
 
 **Reference data** (tags, categories, cities) is inserted by **migrations** with `INSERT … ON CONFLICT DO NOTHING`, so it reaches production through the normal deploy. The seed script is only for local demo users and must never run against production.
 
+**Data access and portability (#178):** there is deliberately no export endpoint and no download in the app. The profile page ("Your data") tells users to write to `SUPPORT_EMAIL` (`apps/frontend/src/config/support.ts`) from their account's address, and the admin who reads that mailbox collects the data from the database and answers by hand. GDPR does not require self-service, but the manual route only works if all of this holds:
+
+- **Mailbox:** it exists on a domain the team controls and someone reads it. The one-month clock starts when a request arrives, read or not. `support@kvintet.cz` is a placeholder until confirmed.
+- **Deadline and cost:** answer within one month, free of charge. A complex request may take two months longer if the person is told why within the first month (Art. 12(3)). A request that arrives another way counts too.
+- **Identity:** send the data only to the e-mail address stored on the account. A request from another address is answered by asking them to write from that one, or to confirm who they are in another proportionate way. Do not ask for an ID document.
+- **Contents:** one JSON file with the person's `user` row, `account` (sign-in provider and dates), `session` (IP address, user agent, dates), pending `verification` entries, `profile` with its city and tags, `kvintet_member` with the kvintet's title and description, `kvintet_vote`, the `message` rows they wrote, `feed_snapshot` and `membership_log`; also server or proxy log entries about them, if any are kept. Leave out password hashes and session and OAuth tokens, and other people's data (their messages, names, ids). A new table or column with personal data is added to this list in the same PR.
+- **Covering note:** purposes, categories of data, recipients, retention, where data did not come from the person, how the feed ranks kvintets, their rights (rectification, erasure, restriction, objection) and the right to complain to the ÚOOÚ (Art. 15(1)).
+- **Sending:** an encrypted archive, with the password sent separately.
+- **Record:** the date received, the date answered and what was sent.
+
 **Admin account:** `user.role` already exists and users cannot set it through the API. The admin registers normally, then someone sets `role = 'admin'` in the database. The admin is otherwise a regular user: one extra page, no extra access. Chat stays behind `MemberGuard`, so an admin reads only the chat of a kvintet they joined themselves.
 
 **Admin stats:** `GET /admin/stats` returns seven integers and nothing else: `users { registered, onboarded, activeToday }` and `kvintets { total, active, formingSmall (1–2 members), formingReady (3–4) }`. "Active today" is derived, not stored: distinct users with a `session.updatedAt` since 00:00 UTC. BetterAuth's `session.updateAge` is one hour so that a returning user's session is refreshed on their first request of the day; someone who signs in and out again the same day is not counted. Board numbers join when the `board` module exists.
