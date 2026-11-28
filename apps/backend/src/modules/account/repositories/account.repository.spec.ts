@@ -21,6 +21,9 @@ describe('Account integration against Postgres', () => {
   const accountRepository = new AccountRepository(prisma, kvintetRepository);
   const accountService = new AccountService(accountRepository);
   let categoryId: number;
+  // Rows the traceless-deletion test leaves behind (they lose their user), removed in afterAll even
+  // when an assertion fails halfway.
+  const leftover = { snapshots: [] as number[], stays: [] as number[] };
   let tagId: number;
 
   const createUser = async (name: string): Promise<string> => {
@@ -49,6 +52,15 @@ describe('Account integration against Postgres', () => {
   });
 
   afterAll(async () => {
+    await prisma.membershipLog.deleteMany({
+      where: { id: { in: leftover.stays } },
+    });
+    await prisma.feedSnapshot.deleteMany({
+      where: { id: { in: leftover.snapshots } },
+    });
+    await prisma.verification.deleteMany({
+      where: { id: { contains: prefix } },
+    });
     await prisma.kvintet.deleteMany({
       where: { title: { startsWith: prefix } },
     });
@@ -221,6 +233,163 @@ describe('Account integration against Postgres', () => {
     expect(updatedMsg).not.toBeNull();
     expect(updatedMsg!.authorId).toBeNull();
     expect(updatedMsg!.body).toBe('Hello team');
+  });
+
+  it('leaves nothing that finds the deleted user: no verification, no matching-data link, and the e-mail and username can be reused', async () => {
+    const userId = await createUser('traceless');
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+    });
+    const now = new Date();
+    await prisma.verification.createMany({
+      data: [
+        {
+          id: `ver-email-${userId}`,
+          identifier: user.email,
+          value: 'otp',
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+        {
+          id: `ver-reset-${userId}`,
+          identifier: `reset-password:${prefix}-token`,
+          value: userId,
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+        {
+          id: `ver-otp-${userId}`,
+          identifier: `email-verification-otp-${user.email}`,
+          value: 'otp',
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+        {
+          id: `ver-signin-${userId}`,
+          identifier: `sign-in-otp-${user.email.toUpperCase()}`,
+          value: 'otp',
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+        {
+          id: `ver-forget-${userId}`,
+          identifier: `forget-password-otp-${user.email}`,
+          value: 'otp',
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+        {
+          id: `ver-change-${userId}`,
+          identifier: `change-email-otp-${userId}:new-address@example.com`,
+          value: 'otp',
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+        {
+          // Contains the address as a suffix of a longer local part: someone else's.
+          id: `ver-lookalike-${prefix}`,
+          identifier: `x${user.email}`,
+          value: 'otp',
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+        {
+          id: `ver-other-${prefix}`,
+          identifier: `someone-else-${prefix}@example.com`,
+          value: 'otp',
+          expiresAt: new Date(Date.now() + 3600000),
+        },
+      ],
+    });
+    const snapshot = await prisma.feedSnapshot.create({
+      data: { userId, fallback: false, items: [] },
+    });
+    leftover.snapshots.push(snapshot.id);
+    const stay = await prisma.membershipLog.create({
+      data: {
+        userId,
+        kvintetId: randomUUID(),
+        source: 'STARTED',
+        joinedAt: now,
+      },
+    });
+    leftover.stays.push(stay.id);
+
+    await accountService.deleteAccount(userId);
+
+    const left = await prisma.verification.findMany({
+      where: {
+        id: {
+          in: [
+            `ver-email-${userId}`,
+            `ver-reset-${userId}`,
+            `ver-otp-${userId}`,
+            `ver-signin-${userId}`,
+            `ver-forget-${userId}`,
+            `ver-change-${userId}`,
+          ],
+        },
+      },
+    });
+    expect(left).toHaveLength(0);
+    // Someone else's verifications, including a lookalike address, are not touched.
+    await expect(
+      prisma.verification.count({
+        where: {
+          id: { in: [`ver-other-${prefix}`, `ver-lookalike-${prefix}`] },
+        },
+      }),
+    ).resolves.toBe(2);
+    // The logs stay, with no user to point at.
+    await expect(
+      prisma.feedSnapshot.findUniqueOrThrow({ where: { id: snapshot.id } }),
+    ).resolves.toMatchObject({ userId: null });
+    await expect(
+      prisma.membershipLog.findUniqueOrThrow({ where: { id: stay.id } }),
+    ).resolves.toMatchObject({ userId: null });
+
+    // The same e-mail address and username can sign up again as a new user.
+    await prisma.user.create({
+      data: {
+        id: `${prefix}-again`,
+        name: 'New person',
+        username: user.username,
+        email: user.email,
+        emailVerified: false,
+        createdAt: now,
+        updatedAt: now,
+      },
+    });
+    const again = await prisma.user.findMany({ where: { email: user.email } });
+    expect(again.map((u) => u.id)).toEqual([`${prefix}-again`]);
+  });
+
+  it("never deletes another user's verifications, however much their address looks like the deleted one", async () => {
+    const userId = await createUser('look_alike');
+    const { email } = await prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+    });
+    // Each of these is a different person's address (`-`, `_`, `%` are all legal in one).
+    const others = [
+      `foo-${email}`,
+      `email-verification-otp-foo-${email}`,
+      `sign-in-otp-x:${email}`,
+      // `_` is a single-character wildcard in SQL LIKE.
+      email.replace('_', 'X'),
+      `forget-password-otp-${email.replace('_', 'X')}`,
+      `change-email-otp-${userId}X:new@example.com`,
+    ];
+    await prisma.verification.createMany({
+      data: others.map((identifier, i) => ({
+        id: `ver-foreign-${i}-${prefix}`,
+        identifier,
+        value: 'otp',
+        expiresAt: new Date(Date.now() + 3600000),
+      })),
+    });
+
+    await accountService.deleteAccount(userId);
+
+    const survivors = await prisma.verification.findMany({
+      where: { id: { startsWith: 'ver-foreign-', endsWith: prefix } },
+      select: { identifier: true },
+    });
+    expect(survivors.map((row) => row.identifier).sort()).toEqual(
+      [...others].sort(),
+    );
   });
 
   it('throws NotFoundException when attempting to delete non-existent user', async () => {
