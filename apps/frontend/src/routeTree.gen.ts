@@ -14,6 +14,7 @@ import { Route as ProtectedPagesRouteImport } from './routes/_ProtectedPages'
 import { Route as CodeOfConductRouteImport } from './routes/code-of-conduct'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ProtectedPagesAdminRouteImport } from './routes/_ProtectedPages/admin'
 import { Route as ProtectedPagesOnboardingRouteImport } from './routes/_ProtectedPages/onboarding'
@@ -46,6 +47,11 @@ const HowItWorksRoute = HowItWorksRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignupRoute = SignupRouteImport.update({
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/code-of-conduct': typeof CodeOfConductRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/signup': typeof SignupRoute
   '/admin': typeof ProtectedPagesAdminRoute
   '/onboarding': typeof ProtectedPagesOnboardingRoute
@@ -119,6 +126,7 @@ export interface FileRoutesByTo {
   '/code-of-conduct': typeof CodeOfConductRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/signup': typeof SignupRoute
   '/admin': typeof ProtectedPagesAdminRoute
   '/onboarding': typeof ProtectedPagesOnboardingRoute
@@ -136,6 +144,7 @@ export interface FileRoutesById {
   '/code-of-conduct': typeof CodeOfConductRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/signup': typeof SignupRoute
   '/_ProtectedPages/admin': typeof ProtectedPagesAdminRoute
   '/_ProtectedPages/onboarding': typeof ProtectedPagesOnboardingRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/code-of-conduct'
     | '/how-it-works'
     | '/login'
+    | '/privacy'
     | '/signup'
     | '/admin'
     | '/onboarding'
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/code-of-conduct'
     | '/how-it-works'
     | '/login'
+    | '/privacy'
     | '/signup'
     | '/admin'
     | '/onboarding'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/code-of-conduct'
     | '/how-it-works'
     | '/login'
+    | '/privacy'
     | '/signup'
     | '/_ProtectedPages/admin'
     | '/_ProtectedPages/onboarding'
@@ -201,6 +213,7 @@ export interface RootRouteChildren {
   CodeOfConductRoute: typeof CodeOfConductRoute
   HowItWorksRoute: typeof HowItWorksRoute
   LoginRoute: typeof LoginRoute
+  PrivacyRoute: typeof PrivacyRoute
   SignupRoute: typeof SignupRoute
 }
 
@@ -239,6 +252,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signup': {
@@ -339,6 +359,7 @@ const rootRouteChildren: RootRouteChildren = {
   CodeOfConductRoute: CodeOfConductRoute,
   HowItWorksRoute: HowItWorksRoute,
   LoginRoute: LoginRoute,
+  PrivacyRoute: PrivacyRoute,
   SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport

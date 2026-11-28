@@ -393,6 +393,13 @@ describe("ProfilePage", () => {
     const dialogAvatar = dialog.querySelector("[data-slot=avatar]")
     expect(dialogAvatar).toBeInTheDocument()
   })
+
+  it("links to the privacy notice", () => {
+    mockUseProfile.mockReturnValue(mockProfileData())
+    render(<ProfilePage />)
+
+    expect(screen.getByRole("link", { name: "privacy notice" })).toHaveAttribute("href", "/privacy")
+  })
 })
 
 describe("row values", () => {

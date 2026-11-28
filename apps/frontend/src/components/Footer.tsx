@@ -23,6 +23,12 @@ export function Footer() {
           >
             {t("layout.rules")}
           </Link>
+          <Link
+            to={ROUTES.privacy}
+            className="hover:underline"
+          >
+            {t("layout.privacy")}
+          </Link>
           <a
             href={`mailto:${SUPPORT_EMAIL}`}
             className="hover:underline"
