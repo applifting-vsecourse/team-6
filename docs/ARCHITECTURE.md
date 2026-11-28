@@ -203,15 +203,15 @@ Member-only routes use `mine` instead of `:id`, so a client cannot address someo
 
 Routes (TanStack Router, file-based). The `_ProtectedPages` layout route checks the session in its loader and redirects to `/login`. Home (`/overview`) is open to every signed-in user and tells those with an unfinished profile to finish it; there is no forced redirect to `/onboarding`. The pages the server serves only to onboarded users (`OnboardedGuard`, otherwise 403 `ONBOARDING_REQUIRED`) guard themselves with `requireOnboarded` (`src/app/requireOnboarded.ts`) as `beforeLoad`, which sends users with an unfinished or missing profile to Home. It is used by `/kvintet/feed`, `/kvintet/messages` and `/kvintet/begins`. `/admin` is a single page, so its own loader checks the role and shows the 404 page to non-admins.
 
-| Route                                                         | Access                            |
-| ------------------------------------------------------------- | --------------------------------- |
-| `/`, `/login`, `/signup`, `/code-of-conduct`, `/how-it-works` | public                            |
-| `/overview`                                                   | signed in                         |
-| `/onboarding`                                                 | signed in, not onboarded          |
-| `/profile`                                                    | signed in + onboarded             |
-| `/board`, `/board/new`                                        | signed in + onboarded             |
-| `/kvintet/feed`, `/kvintet/messages`, `/kvintet/begins`       | signed in + onboarded (else Home) |
-| `/admin`                                                      | admin                             |
+| Route                                                                     | Access                            |
+| ------------------------------------------------------------------------- | --------------------------------- |
+| `/`, `/login`, `/signup`, `/code-of-conduct`, `/how-it-works`, `/privacy` | public                            |
+| `/overview`                                                               | signed in                         |
+| `/onboarding`                                                             | signed in, not onboarded          |
+| `/profile`                                                                | signed in + onboarded             |
+| `/board`, `/board/new`                                                    | signed in + onboarded             |
+| `/kvintet/feed`, `/kvintet/messages`, `/kvintet/begins`                   | signed in + onboarded (else Home) |
+| `/admin`                                                                  | admin                             |
 
 The chat has its own page, `/kvintet/messages`, linked from the "Open chat" button on Home for an `ACTIVE` kvintet; it shows the kvintet title, a back link and the members as a row of blobatars whose eyes follow the cursor (names only for screen readers and as tooltips), and sends anyone whose kvintet is missing or not `ACTIVE` back to Home (`/overview`). Features may not import each other, so the `kvintet` feature renders that page and takes the chat as a render prop that the route supplies.
 
@@ -223,6 +223,7 @@ The chat has its own page, `/kvintet/messages`, linked from the "Open chat" butt
 - **Theme:** light and dark, switched by a `.dark` class on `<html>` (Tailwind `dark:` is a class variant, see `global.css`). A small inline script in `index.html` sets it before first paint from `localStorage` (`theme`), else the OS preference; `lib/theme.ts` (`useTheme`) changes and stores it. It is per browser and never touches the backend. Assets with baked-in colours (logo, seats) ship a `-dark` variant rendered through `ThemedImage`.
 - **Localization:** react-i18next with one JSON file per language in `src/i18n/locales`, registered in `src/i18n/index.ts` (English and Czech). The language comes from `localStorage`, then the browser, falling back to English; the header switcher changes it. All UI text uses `t()` keys, dates and numbers go through `lib/date.ts`, and server errors are translated by `lib/errorMessage.ts` from their `code` (backend codes under `errors.*`, BetterAuth codes under `errors.auth.*`, validation constraints under `validation.*`). Backend text that users see (emails) is not localized yet.
 - **Product video:** the landing page ("See how it works") and `/how-it-works` play one short film through `components/ProductVideo` and `components/VideoPlayer` (native `<video>`, controls from the UI kit). The files are in `src/assets/video/` and imported with `?url`, so Vite hashes them and the frontend's Nginx serves them from `/assets/` with the existing immutable cache (Range requests work, so seeking needs nothing extra). There is no CDN and no Git LFS, so keep each file near 6 MB (1080p30, H.264, AAC 128 k) and commit only accepted cuts. The film has a picture per theme (`video.<lang>.light.mp4` / `.dark.mp4`, colours are baked in) and one WebVTT file per language (`captions.<lang>.vtt`, kept a real file by `assetsInlineLimit` in `vite.config.ts`). A language without a film of its own sees English; adding one is its three files plus one entry in `PRODUCT_VIDEO_SOURCES`. It starts muted when scrolled into view and never starts by itself under `prefers-reduced-motion`.
+- **Privacy notice:** `/privacy` (`features/legal/components/PrivacyPage.tsx`, texts under `privacy.*`) is the GDPR Art. 13 notice, linked from the footer, the sign-up form and the profile page. It is information, not consent: there is no checkbox and nothing is stored. It describes what the code does, so a PR that changes what is stored, who sees it, how long it is kept, what deleting an account removes, what the browser stores or which outside service is called (today only OpenStreetMap tiles; no e-mail provider) updates the notice in every locale file and its `LAST_UPDATED` date. Access and portability requests are answered by e-mail to `SUPPORT_EMAIL`; the app offers no download. Still open before the pilot: the controller (a visible placeholder on the page), confirmation of the support mailbox, the legal bases and the EU hosting, and retention periods for the matching logs, server logs, support mail and backups. Users who signed up before the notice are not told about it in the app.
 - UI rules are in [`DESIGN.md`](../DESIGN.md).
 
 ## 5. Testing

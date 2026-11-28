@@ -263,6 +263,13 @@ describe("ProfilePage", () => {
     expect(screen.getAllByText("No preferences set yet").length).toBe(4) // days, time, place, how often
   })
 
+  it("links to the privacy notice", () => {
+    mockUseProfile.mockReturnValue(mockProfileData())
+    render(<ProfilePage />)
+
+    expect(screen.getByRole("link", { name: "privacy notice" })).toHaveAttribute("href", "/privacy")
+  })
+
   it("opens real delete account dialog and confirms account deletion", async () => {
     mockUseProfile.mockReturnValue(mockProfileData())
 
