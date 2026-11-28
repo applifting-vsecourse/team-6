@@ -781,7 +781,12 @@
     "when": {
       "allDays": "Weekdays and weekends"
     },
-    "withinRadius": "within {{count}} km"
+    "withinRadius": "within {{count}} km",
+    "yourData": {
+      "request": "To get a copy of the data we store about you, write to <email>{{email}}</email> from your account's e-mail address.",
+      "terms": "It's free. We answer within one month and send your data in a machine-readable file.",
+      "title": "Your data"
+    }
   },
   "roles": {
     "account-manager": "Account Manager",
