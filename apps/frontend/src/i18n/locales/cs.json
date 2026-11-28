@@ -716,7 +716,7 @@
     },
     "rights": {
       "access": "Získat kopii svých údajů, i jako strojově čitelný soubor, který si můžeš odnést jinam: napiš na <email>{{email}}</email> z e-mailové adresy svého účtu.",
-      "answer": "Žádosti jsou zdarma. Odpovíme do jednoho měsíce. U složité žádosti se lhůta může prodloužit až o dva měsíce a během prvního měsíce ti sdělíme důvod.",
+      "answer": "Žádosti jsou zdarma. V aplikaci není žádné stahování dat: každou žádost vyřizuje ručně administrátor, a to do jednoho měsíce. U složité žádosti se lhůta může prodloužit až o dva měsíce a během prvního měsíce ti sdělíme důvod.",
       "correct": "Opravit je: odpovědi v profilu upravíš na stránce profilu. Kvůli změně jména, uživatelského jména nebo e-mailu nám napiš.",
       "erase": "Smazat je: účet smažeš na stránce profilu. Pokud chceš vymazat i to, co po smazání zůstává, napiš nám.",
       "object": "Požádat nás, abychom používání tvých údajů omezili, nebo vznést námitku proti tomu, co děláme na základě oprávněného zájmu, třeba proti záznamům o párování: napiš nám.",
@@ -770,7 +770,6 @@
     "error": {
       "title": "Profil se nepodařilo načíst"
     },
-    "privacyNote": "Co o tobě uchováváme a proč: <privacy>ochrana soukromí</privacy>.",
     "rows": {
       "days": "Dny",
       "expectations": "Očekávání",
@@ -793,6 +792,7 @@
     },
     "withinRadius": "v okruhu {{count}} km",
     "yourData": {
+      "privacyNote": "Co o tobě uchováváme a proč: <privacy>ochrana soukromí</privacy>.",
       "request": "Chceš kopii dat, která o tobě ukládáme? Napiš na <email>{{email}}</email> z e-mailové adresy svého účtu.",
       "terms": "Je to zdarma. Odpovíme do jednoho měsíce a data pošleme ve strojově čitelném souboru.",
       "title": "Tvoje data"

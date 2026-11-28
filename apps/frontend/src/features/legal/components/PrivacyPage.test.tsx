@@ -59,7 +59,9 @@ describe("PrivacyPage", () => {
     expect(screen.getByText(/Get a copy of your data/)).toHaveTextContent(
       `write to ${SUPPORT_EMAIL} from your account's e-mail address`,
     )
-    expect(screen.getByText(/We answer within one month/)).toBeInTheDocument()
+    expect(screen.getByText(/the administrator answers each request by hand/)).toHaveTextContent(
+      "within one month",
+    )
     expect(screen.queryByRole("button")).not.toBeInTheDocument()
     expect(container).not.toHaveTextContent(/download (my|your) data/i)
   })

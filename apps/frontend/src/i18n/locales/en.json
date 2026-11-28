@@ -706,7 +706,7 @@
     },
     "rights": {
       "access": "Get a copy of your data, also as a machine-readable file you can take elsewhere: write to <email>{{email}}</email> from your account's e-mail address.",
-      "answer": "Requests are free. We answer within one month. A complex request can take up to two months longer, and we tell you why within the first month.",
+      "answer": "Requests are free. There is no download in the app: the administrator answers each request by hand, within one month. A complex request can take up to two months longer, and we tell you why within the first month.",
       "correct": "Correct it: change your profile answers on your profile page. To change your name, username or e-mail, write to us.",
       "erase": "Delete it: delete your account on your profile page. Write to us if you also want to erase what stays afterwards.",
       "object": "Ask us to restrict how we use your data, or object to what we do because of our legitimate interest, such as the matching records: write to us.",
@@ -760,7 +760,6 @@
     "error": {
       "title": "Couldn't load profile"
     },
-    "privacyNote": "What we keep about you and why: <privacy>privacy notice</privacy>.",
     "rows": {
       "days": "Days",
       "expectations": "Expectations",
@@ -783,6 +782,7 @@
     },
     "withinRadius": "within {{count}} km",
     "yourData": {
+      "privacyNote": "What we keep about you and why: <privacy>privacy notice</privacy>.",
       "request": "To get a copy of the data we store about you, write to <email>{{email}}</email> from your account's e-mail address.",
       "terms": "It's free. We answer within one month and send your data in a machine-readable file.",
       "title": "Your data"

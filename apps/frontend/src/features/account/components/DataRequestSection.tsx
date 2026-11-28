@@ -1,5 +1,7 @@
+import { Link } from "@tanstack/react-router"
 import { Trans, useTranslation } from "react-i18next"
 
+import { ROUTES } from "@/app/routes"
 import { SUPPORT_EMAIL } from "@/config/support"
 
 /**
@@ -30,6 +32,19 @@ export function DataRequestSection() {
       </p>
       <p className="text-small text-muted-foreground md:text-compact">
         {t("profile.yourData.terms")}
+      </p>
+      <p className="text-small text-muted-foreground md:text-compact">
+        <Trans
+          i18nKey="profile.yourData.privacyNote"
+          components={{
+            privacy: (
+              <Link
+                to={ROUTES.privacy}
+                className="text-foreground underline underline-offset-4"
+              />
+            ),
+          }}
+        />
       </p>
     </section>
   )

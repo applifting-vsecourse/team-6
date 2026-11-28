@@ -410,11 +410,14 @@ describe("ProfilePage", () => {
     expect(dialogAvatar).toBeInTheDocument()
   })
 
-  it("links to the privacy notice", () => {
+  it("links to the privacy notice from the Your data section", () => {
     mockUseProfile.mockReturnValue(mockProfileData())
     render(<ProfilePage />)
 
-    expect(screen.getByRole("link", { name: "privacy notice" })).toHaveAttribute("href", "/privacy")
+    const heading = screen.getByRole("heading", { level: 2, name: "Your data" })
+    expect(
+      within(heading.closest("section")!).getByRole("link", { name: "privacy notice" }),
+    ).toHaveAttribute("href", "/privacy")
   })
 })
 

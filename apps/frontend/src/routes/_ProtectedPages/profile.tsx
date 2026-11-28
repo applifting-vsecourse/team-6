@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import type { TFunction } from "i18next"
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 
 import { ROUTES } from "@/app/routes"
 import { GazeBlobatar } from "@/components/GazeBlobatar"
@@ -382,20 +382,6 @@ export function ProfilePage({ user: propUser }: ProfilePageProps = {}) {
           {t("profile.dangerZone.button")}
         </Button>
       </section>
-
-      <p className="text-small text-muted-foreground md:text-compact">
-        <Trans
-          i18nKey="profile.privacyNote"
-          components={{
-            privacy: (
-              <Link
-                to={ROUTES.privacy}
-                className="text-foreground underline underline-offset-4"
-              />
-            ),
-          }}
-        />
-      </p>
 
       {/* Delete Account Dialog */}
       <DeleteAccountDialog
