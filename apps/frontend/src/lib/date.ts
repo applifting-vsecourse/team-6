@@ -16,6 +16,13 @@ export function formatLongDate(date: string | number | Date) {
   )
 }
 
+// "November 28, 2026" / "28. listopadu 2026"
+export function formatCalendarDate(date: string | number | Date) {
+  return new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "long" }).format(
+    new Date(date),
+  )
+}
+
 // "6:02 PM" / "18:02"
 export function formatTime(date: string | number | Date) {
   return new Intl.DateTimeFormat(i18n.resolvedLanguage, { timeStyle: "short" }).format(

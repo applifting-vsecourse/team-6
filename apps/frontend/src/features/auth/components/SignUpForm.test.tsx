@@ -31,8 +31,12 @@ async function renderForm(onSubmit = vi.fn(), extras: FormExtras = {}) {
     getParentRoute: () => rootRoute,
     path: "/code-of-conduct",
   })
+  const privacyRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/privacy",
+  })
   const router = createRouter({
-    routeTree: rootRoute.addChildren([indexRoute, codeOfConductRoute]),
+    routeTree: rootRoute.addChildren([indexRoute, codeOfConductRoute, privacyRoute]),
     history: createMemoryHistory({ initialEntries: ["/"] }),
   })
   render(<RouterProvider router={router} />)
@@ -47,6 +51,18 @@ async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Password"), "password1")
   await user.type(screen.getByLabelText("Confirm password"), "password1")
 }
+
+describe("SignUpForm privacy notice", () => {
+  it("links to it in a new tab, so what is typed stays, without asking for consent", async () => {
+    await renderForm()
+
+    const link = screen.getByRole("link", { name: "privacy notice" })
+    expect(link).toHaveAttribute("href", "/privacy")
+    expect(link).toHaveAttribute("target", "_blank")
+    // The only checkbox is the one for the community rules.
+    expect(screen.getAllByRole("checkbox")).toHaveLength(1)
+  })
+})
 
 describe("SignUpForm code of conduct consent", () => {
   it("links to the code of conduct from the checkbox label", async () => {

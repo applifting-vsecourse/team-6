@@ -245,6 +245,22 @@ export function SignUpForm({
           )}
         />
 
+        {/* Information, not consent: no checkbox. A new tab keeps what is typed in the form. */}
+        <p className="text-small text-muted-foreground">
+          <Trans
+            i18nKey="auth.privacyNote"
+            components={{
+              privacy: (
+                <Link
+                  to={ROUTES.privacy}
+                  target="_blank"
+                  className="font-medium text-foreground underline underline-offset-4"
+                />
+              ),
+            }}
+          />
+        </p>
+
         {errorMessage ? (
           <Alert variant="destructive">
             <AlertDescription>{errorMessage}</AlertDescription>

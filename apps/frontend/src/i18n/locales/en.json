@@ -56,6 +56,7 @@
     "password": "Password",
     "passwordHint_one": "At least {{count}} character",
     "passwordHint_other": "At least {{count}} characters",
+    "privacyNote": "How we handle your data: <privacy>privacy notice</privacy>.",
     "signIn": "Sign in",
     "signInDescription": "Sign in with your email and password.",
     "signInTitle": "Welcome back",
@@ -369,6 +370,7 @@
     "mainNavigation": "Main navigation",
     "menu": "Menu",
     "openMenu": "Open menu",
+    "privacy": "Privacy",
     "rules": "Rules",
     "settings": "Settings",
     "support": "Support",
@@ -639,6 +641,102 @@
     "subtitleMember": "You are in a kvintet. See how it's going.",
     "title": "Home"
   },
+  "privacy": {
+    "browser": {
+      "text": "Signing in sets cookies that are needed to keep you signed in. Your language and colour theme are stored in your browser until you clear its data.",
+      "title": "Cookies and browser storage"
+    },
+    "complaint": {
+      "text": "If you think your data is handled wrongly, you can complain to the Office for Personal Data Protection (ÚOOÚ), Pplk. Sochora 27, 170 00 Praha 7, <uoou>uoou.gov.cz</uoou>, or to the data protection authority in the EU country where you live or work.",
+      "title": "Complaints"
+    },
+    "controller": {
+      "contact": "Until then, write to <email>{{email}}</email> with any question or request about your data.",
+      "placeholder": "[To be completed before launch: the controller's name, address and contact e-mail]",
+      "placeholderTitle": "Controller not decided yet",
+      "title": "Who is responsible"
+    },
+    "data": {
+      "account": {
+        "title": "Account",
+        "what": "Your name, username, e-mail and a hash of your password (never the password itself), when the account was created and changed, and when you accepted the community rules and in which version.",
+        "why": "To let you sign in and to run your account. Legal basis: our contract with you for using Kvintet (Art. 6(1)(b) GDPR)."
+      },
+      "kvintet": {
+        "title": "Kvintets and chat",
+        "what": "Which kvintet you are in and since when, your vote, how far you have read the chat, whether you have seen that your kvintet began, the topic and description you write when you start a kvintet, and your chat messages.",
+        "why": "To run your kvintet. Legal basis: our contract with you (Art. 6(1)(b))."
+      },
+      "matching": {
+        "title": "Matching records",
+        "what": "Which open kvintets your feed listed, in what order, with what matching score and when. For each kvintet you start or join: when you joined and left, and its place and score in your feed. These records are stored with your account's internal ID.",
+        "why": "To check and improve how kvintets are suggested. Legal basis: our legitimate interest in better suggestions (Art. 6(1)(f)). You can object."
+      },
+      "profile": {
+        "title": "Profile",
+        "what": "Your role, what you can teach, want to learn and are interested in, when and how often you can meet, what you expect, the point you pick on the map with a search radius, your note, and when you finished the questions and the tour. The point is saved to about 10 metres, so pick a spot nearby if you do not want to give your exact address. “Use my location” takes the point from your device, after your browser asks you.",
+        "why": "To suggest kvintets that fit you and to show what members have in common. Legal basis: our contract with you (Art. 6(1)(b))."
+      },
+      "required": "To have an account you must give a name, username, e-mail and password. To see and join kvintets you must also give your role, days, time of day, place and how often you want to meet. Topics, expectations and the note are optional.",
+      "security": {
+        "title": "Sign-in and security",
+        "what": "For each sign-in, your IP address, browser details and times. The server also counts requests per IP address for a short time, and keeps technical logs that can contain your IP address, the addresses requested and error details.",
+        "why": "To keep you signed in (our contract with you), and to protect accounts, stop abuse and fix faults (our legitimate interest in a safe, working service, Art. 6(1)(f))."
+      },
+      "support": {
+        "title": "When you write to us",
+        "what": "Your e-mail address and what you write.",
+        "why": "To answer you. Legal basis: our legitimate interest in helping the people who use Kvintet (Art. 6(1)(f)); for requests about your data, our legal obligation (Art. 6(1)(c))."
+      },
+      "title": "What we keep, why and on what legal basis"
+    },
+    "ranking": {
+      "effect": "This only decides what the feed lists and in what order. You choose which kvintet to join. No decision with a legal or similarly significant effect on you is made automatically.",
+      "how": "The feed compares your profile with the members of each open kvintet (topics, what you can teach and want to learn, days and times, distance, how often, expectations and roles) and orders kvintets by how well they fit. Those that fit poorly are left out, unless none fits well.",
+      "title": "How kvintets are suggested"
+    },
+    "retention": {
+      "account": "Account and profile: until you delete your account. Unused accounts are not deleted automatically.",
+      "deletion": "Deleting your account removes your account, profile, sign-in records, place in a kvintet and vote. Your chat messages and kvintet descriptions stay while the kvintet exists, including anything you typed in them; messages no longer show your name. Matching records stay without your account ID, name or e-mail, with no time limit yet. Combined with what others remember, they could in rare cases still point to you.",
+      "kvintet": "Your place in a kvintet: until you leave. Your vote: until you leave; while the kvintet is forming, also until its members change. A kvintet, its description and its chat: until its last member leaves.",
+      "matching": "Matching records: only your 50 latest feed lists are kept. The record of when you joined and left kvintets has no time limit yet.",
+      "other": "Server logs, e-mails to support and any backups have no set retention period yet, and deleting your account does not remove them.",
+      "sessions": "Sign-in records: signing in lasts one day. The sign-in created with a new account lasts seven days and is extended while you use it. Signing out removes the record. An expired record can stay until you delete your account.",
+      "title": "How long we keep it"
+    },
+    "rights": {
+      "access": "Get a copy of your data, also as a machine-readable file you can take elsewhere: write to <email>{{email}}</email> from your account's e-mail address.",
+      "answer": "Requests are free. There is no download in the app: the administrator answers each request by hand, within one month. A complex request can take up to two months longer, and we tell you why within the first month.",
+      "correct": "Correct it: change your profile answers on your profile page. To change your name, username or e-mail, write to us.",
+      "erase": "Delete it: delete your account on your profile page. Write to us if you also want to erase what stays afterwards.",
+      "object": "Ask us to restrict how we use your data, or object to what we do because of our legitimate interest, such as the matching records: write to us.",
+      "title": "Your rights"
+    },
+    "sensitive": {
+      "text": "Please leave health, religion, political views and other sensitive details, yours or anyone else's, out of your note, kvintet descriptions and the chat. Kvintet does not need them.",
+      "title": "What not to write"
+    },
+    "services": {
+      "email": "No e-mail provider is set up at the moment, so Kvintet sends no e-mail. The confirmation message it prepares when you sign up, with your e-mail address and a confirmation link, is written to the server log instead.",
+      "hosting": "The app and its database run on hosting in the EU.",
+      "logs": "Server logs are shared within the course that hosts the pilot, so other people in the course may be able to read them.",
+      "map": "The map where you pick your place comes from OpenStreetMap. Your browser contacts its servers directly, so they receive your IP address, details of your browser and device, the address of this site, the time and the part of the map you look at. The OpenStreetMap Foundation is based in the United Kingdom, and the map is delivered by servers around the world, which may be outside the EU. Read its <osm>privacy policy</osm>.",
+      "title": "Where your data goes",
+      "tracking": "Kvintet has no advertising, analytics or tracking tools, and loads its fonts from its own server."
+    },
+    "subtitle": "What Kvintet keeps about you, why, who can see it and what you can ask us to do.",
+    "title": "Privacy notice",
+    "updated": "Last updated {{date}}",
+    "visibility": {
+      "admin": "The app's administrator sees overall counts and can download the matching records, where a code replaces your account ID. The same code appears on all your rows, so the files are pseudonymous, not anonymous.",
+      "feed": "People signed in with a finished profile see each open kvintet's topic and description, and the role and topics of its members, without names. They also see the days, times of day and meeting frequency that all its members share. In a small community, an unusual combination can still show who someone is.",
+      "forming": "While your kvintet is forming, its members see your role, your topics and whether you voted to start, but not your name or username.",
+      "hidden": "Other people are not shown your e-mail, your point on the map or your note.",
+      "operators": "The people who run Kvintet and its server have technical access to the database and the logs. Whoever answers the support address reads what you send there.",
+      "started": "Once it starts, they also see your name, your username and your chat messages. Your messages stay there with your name if you leave the kvintet.",
+      "title": "Who can see your data"
+    }
+  },
   "productVideo": {
     "heading": "See how it works",
     "posterSubtitle": "Your story · with voice-over",
@@ -682,7 +780,13 @@
     "when": {
       "allDays": "Weekdays and weekends"
     },
-    "withinRadius": "within {{count}} km"
+    "withinRadius": "within {{count}} km",
+    "yourData": {
+      "privacyNote": "What we keep about you and why: <privacy>privacy notice</privacy>.",
+      "request": "To get a copy of the data we store about you, write to <email>{{email}}</email> from your account's e-mail address.",
+      "terms": "It's free. We answer within one month and send your data in a machine-readable file.",
+      "title": "Your data"
+    }
   },
   "roles": {
     "account-manager": "Account Manager",

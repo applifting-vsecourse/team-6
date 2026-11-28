@@ -57,6 +57,7 @@
     "passwordHint_few": "Alespoň {{count}} znaky",
     "passwordHint_one": "Alespoň {{count}} znak",
     "passwordHint_other": "Alespoň {{count}} znaků",
+    "privacyNote": "Jak nakládáme s tvými údaji: <privacy>ochrana soukromí</privacy>.",
     "signIn": "Přihlásit se",
     "signInDescription": "Přihlas se e-mailem a heslem.",
     "signInTitle": "Vítej zpět",
@@ -373,6 +374,7 @@
     "mainNavigation": "Hlavní navigace",
     "menu": "Menu",
     "openMenu": "Otevřít menu",
+    "privacy": "Soukromí",
     "rules": "Pravidla",
     "settings": "Nastavení",
     "support": "Podpora",
@@ -649,6 +651,102 @@
     "subtitleMember": "Jsi v kvintetu. Podívej se, jak se mu daří.",
     "title": "Domů"
   },
+  "privacy": {
+    "browser": {
+      "text": "Při přihlášení se uloží cookies, které jsou potřeba k udržení přihlášení. Jazyk a barevný motiv se ukládají v prohlížeči, dokud jeho data nesmažeš.",
+      "title": "Cookies a úložiště prohlížeče"
+    },
+    "complaint": {
+      "text": "Pokud si myslíš, že s tvými údaji nakládáme špatně, můžeš podat stížnost u Úřadu pro ochranu osobních údajů (ÚOOÚ), Pplk. Sochora 27, 170 00 Praha 7, <uoou>uoou.gov.cz</uoou>, nebo u úřadu pro ochranu údajů v zemi EU, kde bydlíš nebo pracuješ.",
+      "title": "Stížnosti"
+    },
+    "controller": {
+      "contact": "Do té doby piš s jakýmkoli dotazem nebo žádostí k tvým údajům na <email>{{email}}</email>.",
+      "placeholder": "[Doplnit před spuštěním: jméno, adresa a kontaktní e-mail správce]",
+      "placeholderTitle": "Správce údajů zatím není určen",
+      "title": "Kdo za údaje odpovídá"
+    },
+    "data": {
+      "account": {
+        "title": "Účet",
+        "what": "Jméno, uživatelské jméno, e-mail a otisk hesla (nikdy samotné heslo), kdy účet vznikl a kdy se změnil a kdy a v jaké verzi proběhl tvůj souhlas s pravidly komunity.",
+        "why": "Pro tvoje přihlášení a vedení tvého účtu. Právní základ: smlouva s tebou o používání Kvintetu (čl. 6 odst. 1 písm. b GDPR)."
+      },
+      "kvintet": {
+        "title": "Kvintety a chat",
+        "what": "Ve kterém kvintetu jsi a od kdy, tvůj hlas, kam až máš přečtený chat, zda se ti už ukázalo, že tvůj kvintet začal, téma a popis, které napíšeš při založení kvintetu, a tvoje zprávy v chatu.",
+        "why": "Aby tvůj kvintet fungoval. Právní základ: smlouva s tebou (čl. 6 odst. 1 písm. b)."
+      },
+      "matching": {
+        "title": "Záznamy o párování",
+        "what": "Které otevřené kvintety se ti ukázaly v nabídce, v jakém pořadí, s jakým skóre shody a kdy. U každého kvintetu, který založíš nebo do kterého se přidáš: kdy jsi v něm od a do a jaké měl pořadí a skóre ve tvé nabídce. Záznamy ukládáme s interním identifikátorem tvého účtu.",
+        "why": "Abychom ověřovali a zlepšovali, jak kvintety doporučujeme. Právní základ: náš oprávněný zájem na lepších doporučeních (čl. 6 odst. 1 písm. f). Můžeš vznést námitku."
+      },
+      "profile": {
+        "title": "Profil",
+        "what": "Tvoje role, s čím poradíš, co se chceš naučit a co tě zajímá, kdy a jak často se můžeš scházet, co očekáváš, bod vybraný na mapě a okruh hledání, tvoje poznámka a kdy proběhlo dokončení dotazníku a prohlídky. Bod ukládáme s přesností asi 10 metrů, takže pokud nechceš prozradit přesnou adresu, vyber místo poblíž. „Použít moji polohu“ převezme bod z tvého zařízení poté, co se tě prohlížeč zeptá.",
+        "why": "Abychom ti navrhli vhodné kvintety a ukázali, co mají členové společného. Právní základ: smlouva s tebou (čl. 6 odst. 1 písm. b)."
+      },
+      "required": "Pro účet musíš zadat jméno, uživatelské jméno, e-mail a heslo. Pro procházení kvintetů a přidání se k nim musíš doplnit také roli, dny, denní dobu, místo a jak často se chceš scházet. Témata, očekávání a poznámka jsou nepovinné.",
+      "security": {
+        "title": "Přihlášení a bezpečnost",
+        "what": "U každého přihlášení tvoje IP adresa, údaje o prohlížeči a časy. Server také krátce počítá požadavky z jedné IP adresy a vede technické záznamy, které mohou obsahovat tvoji IP adresu, požadované adresy a podrobnosti o chybách.",
+        "why": "Pro udržení tvého přihlášení (smlouva s tebou) a abychom chránili účty, bránili zneužití a opravovali chyby (náš oprávněný zájem na bezpečné a funkční službě, čl. 6 odst. 1 písm. f)."
+      },
+      "support": {
+        "title": "Když nám napíšeš",
+        "what": "Tvoje e-mailová adresa a to, co napíšeš.",
+        "why": "Abychom ti odpověděli. Právní základ: náš oprávněný zájem pomáhat lidem, kteří Kvintet používají (čl. 6 odst. 1 písm. f); u žádostí o tvé údaje naše právní povinnost (čl. 6 odst. 1 písm. c)."
+      },
+      "title": "Co uchováváme, proč a na jakém právním základě"
+    },
+    "ranking": {
+      "effect": "Rozhoduje to jen o tom, co a v jakém pořadí nabídka ukáže. Do kterého kvintetu se přidáš, vybíráš ty. Žádné rozhodnutí, které by pro tebe mělo právní nebo podobně závažné účinky, se nedělá automaticky.",
+      "how": "Nabídka porovnává tvůj profil se členy každého otevřeného kvintetu (témata, s čím poradíš a co se chceš naučit, dny a časy, vzdálenost, četnost, očekávání a role) a řadí kvintety podle shody. Ty se slabou shodou vynechá, pokud se aspoň některý hodí dobře.",
+      "title": "Jak se kvintety doporučují"
+    },
+    "retention": {
+      "account": "Účet a profil: dokud účet nesmažeš. Nepoužívané účty se automaticky nemažou.",
+      "deletion": "Smazáním účtu se odstraní účet, profil, záznamy o přihlášení, tvoje místo v kvintetu a hlas. Zprávy v chatu a popisy kvintetů zůstanou, dokud kvintet existuje, a to včetně všeho, co do nich napíšeš; u zpráv se už neukazuje tvoje jméno. Záznamy o párování zůstanou bez identifikátoru účtu, jména a e-mailu, zatím bez časového omezení. Ve spojení s tím, co si pamatují ostatní, na tebe mohou ve výjimečných případech stále ukazovat.",
+      "kvintet": "Tvoje místo v kvintetu: dokud neodejdeš. Tvůj hlas: dokud neodejdeš; dokud se kvintet skládá, také jen do změny členů. Kvintet, jeho popis a chat: dokud neodejde poslední člen.",
+      "matching": "Záznamy o párování: uchováváme jen 50 posledních podob tvé nabídky. Záznam o tom, kdy proběhlo tvé přidání do kvintetu a odchod z něj, zatím nemá časové omezení.",
+      "other": "Pro záznamy serveru, e-maily podpoře a případné zálohy zatím není stanovená doba uchování a smazání účtu je neodstraní.",
+      "sessions": "Záznamy o přihlášení: přihlášení platí jeden den. Přihlášení vytvořené spolu s novým účtem platí sedm dní a při používání se prodlužuje. Odhlášením se záznam smaže. Záznam, kterému vypršela platnost, může zůstat, dokud nesmažeš účet.",
+      "title": "Jak dlouho údaje uchováváme"
+    },
+    "rights": {
+      "access": "Získat kopii svých údajů, i jako strojově čitelný soubor, který si můžeš odnést jinam: napiš na <email>{{email}}</email> z e-mailové adresy svého účtu.",
+      "answer": "Žádosti jsou zdarma. V aplikaci není žádné stahování dat: každou žádost vyřizuje ručně administrátor, a to do jednoho měsíce. U složité žádosti se lhůta může prodloužit až o dva měsíce a během prvního měsíce ti sdělíme důvod.",
+      "correct": "Opravit je: odpovědi v profilu upravíš na stránce profilu. Kvůli změně jména, uživatelského jména nebo e-mailu nám napiš.",
+      "erase": "Smazat je: účet smažeš na stránce profilu. Pokud chceš vymazat i to, co po smazání zůstává, napiš nám.",
+      "object": "Požádat nás, abychom používání tvých údajů omezili, nebo vznést námitku proti tomu, co děláme na základě oprávněného zájmu, třeba proti záznamům o párování: napiš nám.",
+      "title": "Tvá práva"
+    },
+    "sensitive": {
+      "text": "Do poznámky, popisu kvintetu ani do chatu prosím nepiš zdravotní údaje, víru, politické názory ani jiné citlivé informace, o sobě ani o nikom jiném. Kvintet je nepotřebuje.",
+      "title": "Co nepsat"
+    },
+    "services": {
+      "email": "Momentálně není nastavený žádný poskytovatel e-mailu, takže Kvintet žádné e-maily neposílá. Potvrzovací zpráva, kterou připraví při registraci, s tvou e-mailovou adresou a potvrzovacím odkazem, se místo toho zapíše do záznamů serveru.",
+      "hosting": "Aplikace a její databáze běží na hostingu v EU.",
+      "logs": "Záznamy serveru jsou sdílené v rámci kurzu, který pilot hostuje, takže je mohou vidět i další lidé z kurzu.",
+      "map": "Mapu, na které vybíráš místo, poskytuje OpenStreetMap. Tvůj prohlížeč se k jeho serverům připojuje přímo, takže získají tvoji IP adresu, údaje o prohlížeči a zařízení, adresu tohoto webu, čas a část mapy, kterou si prohlížíš. OpenStreetMap Foundation sídlí ve Spojeném království a mapu doručují servery po celém světě, které mohou být i mimo EU. Přečti si jejich <osm>zásady ochrany soukromí</osm>.",
+      "title": "Kam se tvé údaje dostávají",
+      "tracking": "Kvintet nepoužívá reklamu, analytické ani sledovací nástroje a písma načítá z vlastního serveru."
+    },
+    "subtitle": "Co o tobě Kvintet uchovává, proč, kdo to vidí a o co nás můžeš požádat.",
+    "title": "Ochrana soukromí",
+    "updated": "Naposledy upraveno {{date}}",
+    "visibility": {
+      "admin": "Administrátor aplikace vidí souhrnné počty a může si stáhnout záznamy o párování, ve kterých identifikátor tvého účtu nahrazuje kód. Stejný kód je u všech tvých řádků, takže soubory jsou pseudonymní, ne anonymní.",
+      "feed": "Přihlášení lidé s vyplněným profilem vidí u každého otevřeného kvintetu téma a popis a role a témata jeho členů, bez jmen. Vidí také dny, denní doby a četnost setkávání, na kterých se všichni členové shodnou. V malé komunitě může i tak neobvyklá kombinace prozradit, o koho jde.",
+      "forming": "Dokud se tvůj kvintet skládá, jeho členové vidí tvoji roli, tvoje témata a to, zda od tebe přišel hlas pro start, ale ne tvoje jméno ani uživatelské jméno.",
+      "hidden": "Ostatním se neukazuje tvůj e-mail, bod na mapě ani poznámka.",
+      "operators": "Lidé, kteří provozují Kvintet a jeho server, mají technický přístup k databázi a záznamům. Kdo vyřizuje adresu podpory, čte, co na ni pošleš.",
+      "started": "Jakmile začne, vidí také tvoje jméno, uživatelské jméno a zprávy v chatu. Pokud kvintet opustíš, tvoje zprávy v něm zůstanou i se jménem.",
+      "title": "Kdo tvé údaje vidí"
+    }
+  },
   "productVideo": {
     "heading": "Podívej se, jak to funguje",
     "posterSubtitle": "Tvůj příběh · s komentářem",
@@ -692,7 +790,13 @@
     "when": {
       "allDays": "Všední dny i víkendy"
     },
-    "withinRadius": "v okruhu {{count}} km"
+    "withinRadius": "v okruhu {{count}} km",
+    "yourData": {
+      "privacyNote": "Co o tobě uchováváme a proč: <privacy>ochrana soukromí</privacy>.",
+      "request": "Chceš kopii dat, která o tobě ukládáme? Napiš na <email>{{email}}</email> z e-mailové adresy svého účtu.",
+      "terms": "Je to zdarma. Odpovíme do jednoho měsíce a data pošleme ve strojově čitelném souboru.",
+      "title": "Tvoje data"
+    }
   },
   "roles": {
     "account-manager": "Account manažer",

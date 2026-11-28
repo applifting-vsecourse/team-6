@@ -5,6 +5,8 @@ import type { TFunction } from "i18next"
 import { HTTPError } from "ky"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
+import { SUPPORT_EMAIL } from "@/config/support"
+
 import type { ProfileResponse } from "@/features/profile/api/profileApi"
 import type { useProfile } from "@/features/profile/hooks/useProfile"
 
@@ -263,6 +265,20 @@ describe("ProfilePage", () => {
     expect(screen.getAllByText("No preferences set yet").length).toBe(4) // days, time, place, how often
   })
 
+  it("tells where to ask for a copy of the stored data, without offering a download", () => {
+    mockUseProfile.mockReturnValue(mockProfileData())
+    render(<ProfilePage />)
+
+    const heading = screen.getByRole("heading", { level: 2, name: "Your data" })
+    const section = within(heading.closest("section")!)
+    expect(section.getByRole("link", { name: SUPPORT_EMAIL })).toHaveAttribute(
+      "href",
+      `mailto:${SUPPORT_EMAIL}`,
+    )
+    expect(section.getByText(/within one month/)).toBeInTheDocument()
+    expect(section.queryByRole("button")).not.toBeInTheDocument()
+  })
+
   it("opens real delete account dialog and confirms account deletion", async () => {
     mockUseProfile.mockReturnValue(mockProfileData())
 
@@ -392,6 +408,16 @@ describe("ProfilePage", () => {
     expect(dialog).toBeInTheDocument()
     const dialogAvatar = dialog.querySelector("[data-slot=avatar]")
     expect(dialogAvatar).toBeInTheDocument()
+  })
+
+  it("links to the privacy notice from the Your data section", () => {
+    mockUseProfile.mockReturnValue(mockProfileData())
+    render(<ProfilePage />)
+
+    const heading = screen.getByRole("heading", { level: 2, name: "Your data" })
+    expect(
+      within(heading.closest("section")!).getByRole("link", { name: "privacy notice" }),
+    ).toHaveAttribute("href", "/privacy")
   })
 })
 

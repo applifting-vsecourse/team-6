@@ -26,7 +26,7 @@ vi.mock("@tanstack/react-router", () => ({
 }))
 
 describe("Footer", () => {
-  it("links to how it works, the rules and support", () => {
+  it("links to how it works, the rules, the privacy notice and support", () => {
     render(<Footer />)
 
     expect(screen.getByRole("link", { name: "How Kvintet works" })).toHaveAttribute(
@@ -34,6 +34,7 @@ describe("Footer", () => {
       "/how-it-works",
     )
     expect(screen.getByRole("link", { name: "Rules" })).toHaveAttribute("href", "/code-of-conduct")
+    expect(screen.getByRole("link", { name: "Privacy" })).toHaveAttribute("href", "/privacy")
     // jsdom applies no CSS, so both the short and the long label are in the name.
     expect(screen.getByRole("link", { name: /Contact support/ })).toHaveAttribute(
       "href",
